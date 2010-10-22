@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+  <persistence-unit name="UnidadePersistente" transaction-type="RESOURCE_LOCAL">
+    <provider>oracle.toplink.essentials.PersistenceProvider</provider>
+    <class>condominioPlus.negocio.Condominio</class>
+    <class>condominioPlus.negocio.Condomino</class>
+    <class>condominioPlus.negocio.Configuracao</class>
+    <class>condominioPlus.negocio.Endereco</class>
+    <class>condominioPlus.negocio.Inquilino</class>
+    <class>condominioPlus.negocio.Telefone</class>
+    <class>condominioPlus.negocio.Unidade</class>
+    <class>condominioPlus.negocio.funcionario.Caracteristica</class>
+    <class>condominioPlus.negocio.funcionario.CategoriaFuncionario</class>
+    <class>condominioPlus.negocio.funcionario.ControleAcesso</class>
+    <class>condominioPlus.negocio.funcionario.Funcionario</class>
+    <class>logicpoint.usuario.Usuario</class>
+    <class>condominioPlus.negocio.Banco</class>
+    <class>condominioPlus.negocio.ContaBancaria</class>
+    <class>condominioPlus.negocio.NotificacaoJudicial</class>
+    <class>condominioPlus.negocio.ProcessoJudicial</class>
+    <class>condominioPlus.negocio.Advogado</class>
+    <class>condominioPlus.negocio.financeiro.Conta</class>
+    <class>condominioPlus.negocio.fornecedor.Fornecedor</class>
+    <class>condominioPlus.negocio.financeiro.ContaCorrente</class>
+    <class>condominioPlus.negocio.financeiro.Pagamento</class>
+    <properties>
+      <property name="toplink.jdbc.user" value="administrador"/>
+      <property name="toplink.jdbc.password" value="senha"/>
+      <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/condominio_plus"/>
+      <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+    </properties>
+  </persistence-unit>
+</persistence>
