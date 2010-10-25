@@ -18,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
-import logicpoint.util.DataUtil;
 
 /**
  *
@@ -86,6 +85,7 @@ public class ContaCorrente implements Serializable {
     }
 
     public void calculaSaldo() {
+        saldo = new BigDecimal(0);
         if(!pagamentos.isEmpty()){
         for (Pagamento pagamento : pagamentos) {
             if (pagamento.getConta().isCredito()) {
