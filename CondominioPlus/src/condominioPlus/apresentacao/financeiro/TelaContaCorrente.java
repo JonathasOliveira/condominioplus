@@ -17,9 +17,11 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private Conta conta;
     private TabelaModelo_2 modeloTabela;
+    private TabelaModelo_2 modeloTabela2;
     private List<Pagamento> cheques = new ArrayList<Pagamento>();
 
     /** Creates new form TelaContaCorrente */
@@ -147,7 +150,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaCheque() {
-        modeloTabela = new TabelaModelo_2<Pagamento>(tabelaCheque, "Data, Cheque, Descricão, Valor".split(",")) {
+        modeloTabela2 = new TabelaModelo_2<Pagamento>(tabelaCheque, "Data, Cheque, Descricão, Valor".split(",")) {
 
             @Override
             protected Pagamento getAdicionar() {
@@ -202,7 +205,14 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 }
             }
         };
-   }
+
+        tabelaContaCorrente.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setMaxWidth(80);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setMinWidth(30);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(325);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setMinWidth(100);
+    }
 
 //    private List<Condominio> filtrarListaPorNome(String sequencia, List<Condominio> condominios) {
 //        ArrayList<Condominio> listaFiltrada = new ArrayList<Condominio>();
@@ -222,18 +232,29 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 //
 //        return listaFiltrada;
 //    }
-
-    private void gravarCheques(){
+    private void gravarCheques() {
         condominio.getContaCorrente().getPagamentos().addAll(cheques);
         cheques.clear();
         carregarTabelaCheque();
         contaCorrente.calculaSaldo();
         carregarTabela();
+    }
 
+    private List listaCampos() {
+        List<Object> campos = new ArrayList<Object>();
+        campos.add(txtNumeroDocumento);
+        campos.add(txtConta);
+        campos.add(txtValor);
+        campos.add(txtHistorico);
+        return campos;
     }
 
     private void preencherPagamento() {
         pagamento = new Pagamento();
+        ValidadorGenerico validador = new ValidadorGenerico();
+        if (!validador.validar(listaCampos())) {
+            validador.exibirErros(this);
+        }
         pagamento.setData_lancamento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
         pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
@@ -252,21 +273,26 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             condominio.getContaCorrente().adicionarPagamento(pagamento);
             new DAO().salvar(condominio);
         }
-
     }
 
     private void pegarConta() {
         DialogoConta c = new DialogoConta(null, true);
         c.setVisible(true);
+
+
         if (c.getConta() != null) {
             conta = c.getConta();
             txtConta.setText(String.valueOf(conta.getCodigo()));
             txtHistorico.setText(conta.getNome());
+
+
         }
     }
 
     public void setConta(Conta conta) {
         this.conta = conta;
+
+
     }
 
     private void adicionarPagamento() {
@@ -292,14 +318,42 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             btnDocumento.setText("Nº Cheque:");
             btnGravar.setEnabled(true);
             btnImprimir.setEnabled(true);
+
             return 0;
+
         } else {
             painelCheque.setVisible(false);
             btnDocumento.setText("Nº Doc:");
             btnGravar.setEnabled(false);
             btnImprimir.setEnabled(false);
-            return 1;
 
+            return 1;
+        }
+    }
+
+    private void apagarItensSelecionados() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+            return;
+        }
+        if (modeloTabela.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
+            List<Pagamento> itensRemover = modeloTabela.getObjetosSelecionados();
+
+            for (Pagamento p : itensRemover) {
+                modeloTabela.remover(p);
+                modeloTabela.notificar();
+
+                if (!p.getConta().isCredito()) {
+                    contaCorrente.setSaldo(contaCorrente.getSaldo().add(p.getValor()));
+                } else {
+                    contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
+                }
+            }
+            new DAO().remover(itensRemover);
+            new DAO().salvar(contaCorrente);
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
 
     }
@@ -320,7 +374,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 contador = verificarTipoDocumento(contador);
             } else if (origem == btnConta) {
                 pegarConta();
-
             } else if (origem == btnIncluir) {
                 adicionarPagamento();
                 carregarTabela();
@@ -328,8 +381,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 contaCorrente.calculaSaldo();
                 carregarTabela();
                 new DAO().salvar(contaCorrente);
-            }else if (origem == btnGravar){
+            } else if (origem == btnGravar) {
                 gravarCheques();
+            } else if (origem == itemMenuApagarSelecionados) {
+                apagarItensSelecionados();
             }
         }
 
@@ -345,6 +400,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             btnImprimir.addActionListener(this);
             btnIncluir.addActionListener(this);
             btnPesquisar.addActionListener(this);
+            tabelaContaCorrente.addMouseListener(this);
+            itemMenuApagarSelecionados.addActionListener(this);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
     }
 
@@ -352,7 +416,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuApagarSelecionados = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
@@ -371,13 +438,22 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         btnDocumento = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         txtHistorico = new javax.swing.JTextField();
-        btnFixarHistórico = new javax.swing.JButton();
         cbFornecedores = new javax.swing.JComboBox();
         btnBK = new javax.swing.JButton();
         btnABN = new javax.swing.JButton();
+        btnFixarHistórico = new javax.swing.JToggleButton();
         painelCheque = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaCheque = new javax.swing.JTable();
+
+        itemMenuApagarSelecionados.setText("Apagar Selecionado");
+        popupMenu.add(itemMenuApagarSelecionados);
+
+        jMenuItem2.setText("jMenuItem2");
+        popupMenu.add(jMenuItem2);
+
+        jMenuItem3.setText("jMenuItem3");
+        popupMenu.add(jMenuItem3);
 
         setClosable(true);
         setMaximizable(true);
@@ -407,7 +483,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         jLabel3.setText("Valor:");
 
-        jLabel1.setText("Data do Lçto:");
+        txtNumeroDocumento.setName("Número Documento"); // NOI18N
+
+        jLabel1.setText("Data do Lançamento:");
+
+        txtData.setFocusable(false);
+
+        txtValor.setName("Valor"); // NOI18N
+
+        txtConta.setName("Conta"); // NOI18N
 
         btnConta.setText("Conta:");
         btnConta.setBorder(null);
@@ -490,11 +574,13 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        btnFixarHistórico.setText("Fixar Histórico");
+        txtHistorico.setName("Histórico"); // NOI18N
 
         btnBK.setText("BK");
 
         btnABN.setText("ABN");
+
+        btnFixarHistórico.setText("Fixar Histórico");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -503,9 +589,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnFixarHistórico)
-                .addGap(28, 28, 28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnBK)
@@ -528,7 +614,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         tabelaCheque.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-
+                {null, null, null, null}
             },
             new String [] {
                 "Data", "Cheque", "Descrição", "Valor"
@@ -582,20 +668,23 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnDocumento;
-    private javax.swing.JButton btnFixarHistórico;
+    private javax.swing.JToggleButton btnFixarHistórico;
     private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
     private javax.swing.JButton btnPesquisar;
     private javax.swing.JComboBox cbFornecedores;
+    private javax.swing.JMenuItem itemMenuApagarSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPanel painelCheque;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaCheque;
     private javax.swing.JTable tabelaContaCorrente;
     private javax.swing.JTextField txtConta;
@@ -605,7 +694,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
 
-    private class RenderizadorFundo extends DefaultTableCellRenderer {
+    private class RenderizadorFundo
+            extends DefaultTableCellRenderer {
 
         private Color corNaoPagoAberta = Color.GREEN.darker();
         private Color corNaoPagoEncerrada = Color.RED;
@@ -624,6 +714,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 setForeground(corNaoPagoEncerrada);
             } else {
                 setForeground(table.getForeground());
+                if (isSelected) {
+                    setForeground(Color.WHITE);
+                }
             }
             return this;
         }
