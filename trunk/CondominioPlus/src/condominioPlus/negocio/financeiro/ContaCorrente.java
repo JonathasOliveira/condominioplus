@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +19,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import logicpoint.persistencia.DAO;
+import logicpoint.util.DataUtil;
 
 /**
  *
@@ -85,26 +88,12 @@ public class ContaCorrente implements Serializable {
     }
 
     public void calculaSaldo() {
-        saldo = new BigDecimal(0);
-        if(!pagamentos.isEmpty()){
-        for (Pagamento pagamento : pagamentos) {
-            if (pagamento.getConta().isCredito()) {
-                if (dataFechamento.before(pagamento.getData_lancamento())) {
-                    if (pagamento.getSaldo().intValue() == 0) {
-                        saldo = saldo.add(pagamento.getValor());
-                        pagamento.setSaldo(saldo);
-                    }
-                }
-            } else if (!pagamento.getConta().isCredito()) {
-                if (dataFechamento.before(pagamento.getData_lancamento())) {
-                    if (pagamento.getSaldo().intValue() == 0) {
-                        saldo = saldo.subtract(pagamento.getValor());
-                        pagamento.setSaldo(saldo);
-                    }
-                }
-            }
+        List<Pagamento> lista = new DAO().listar("PagamentosPorData", this, dataFechamento);
+        for (Pagamento pagamento : lista) {
+            System.out.println("descricao " + pagamento.getHistorico());
+            System.out.println("data " + DataUtil.getDateTime( pagamento.getData_lancamento()).toString());
         }
-        }
-        this.setSaldo(saldo);
     }
 }
+    
+

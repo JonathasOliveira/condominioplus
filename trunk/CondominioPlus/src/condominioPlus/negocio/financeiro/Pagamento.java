@@ -14,6 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 
 /**
@@ -21,6 +23,10 @@ import javax.persistence.Temporal;
  * @author Administrador
  */
 @Entity
+@NamedQueries(value = {
+    @NamedQuery(name = "PagamentosPorOrdem", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
+    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento > ?2 order by c.data_lancamento")
+})
 public class Pagamento implements Serializable {
 
     @Id
@@ -125,7 +131,27 @@ public class Pagamento implements Serializable {
         this.numeroDocumento = numeroDocumento;
     }
 
-    private void calculaSaldo(){
-
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pagamento other = (Pagamento) obj;
+        if (this.codigo != other.codigo) {
+            return false;
+        }
+        return true;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + this.codigo;
+        return hash;
+    }
+
+    
 }
