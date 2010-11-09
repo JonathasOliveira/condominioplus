@@ -91,7 +91,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
-                return condominio.getContaCorrente().getPagamentos();
+                return new DAO().listar("PagamentosPorOrdem", condominio.getContaCorrente());
             }
 
 //            @Override
@@ -291,8 +291,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     public void setConta(Conta conta) {
         this.conta = conta;
-
-
     }
 
     private void adicionarPagamento() {
