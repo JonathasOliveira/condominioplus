@@ -8,6 +8,7 @@ import condominioPlus.negocio.fornecedor.Fornecedor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
+import logicpoint.persistencia.DAO;
 
 /**
  *
@@ -25,7 +27,8 @@ import javax.persistence.Temporal;
 @Entity
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosPorOrdem", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
-    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento > ?2 order by c.data_lancamento")
+    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
+    @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento")
 })
 public class Pagamento implements Serializable {
 
@@ -153,5 +156,13 @@ public class Pagamento implements Serializable {
         return hash;
     }
 
-    
+    public void calcularSaldo() {
+        List<Pagamento> lista = new DAO().listar(Pagamento.class, "PagamentosPorData", this.getData_lancamento());
+
+        Pagamento p = lista.get(lista.size() - 1);
+
+        this.setSaldo(this.valor.add(p.getSaldo()));
+
+    }
 }
+

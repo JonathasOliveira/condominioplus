@@ -17,6 +17,8 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.util.ComparadorPagamentoCodigo;
+import condominioPlus.util.ComparatorPagamento;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Color;
 import java.awt.Component;
@@ -25,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -52,6 +55,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private TabelaModelo_2 modeloTabela;
     private TabelaModelo_2 modeloTabela2;
     private List<Pagamento> cheques = new ArrayList<Pagamento>();
+    private List<Pagamento> pagamentos;
 
     /** Creates new form TelaContaCorrente */
     public TelaContaCorrente(Condominio condominio) {
@@ -91,7 +95,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
-                return new DAO().listar("PagamentosPorOrdem", condominio.getContaCorrente());
+                return getPagamentos();
             }
 
 //            @Override
@@ -233,11 +237,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 //        return listaFiltrada;
 //    }
     private void gravarCheques() {
-        condominio.getContaCorrente().getPagamentos().addAll(cheques);
-        cheques.clear();
-        carregarTabelaCheque();
-        contaCorrente.calculaSaldo();
-        carregarTabela();
+        if (!cheques.isEmpty()) {
+            condominio.getContaCorrente().getPagamentos().addAll(cheques);
+            new DAO().salvar(cheques);
+            cheques.clear();
+            carregarTabelaCheque();
+            carregarTabela();
+        } else {
+            ApresentacaoUtil.exibirInformacao("Não é possivel gravar sem ter inserido cheques para gravar!", this);
+        }
     }
 
     private List listaCampos() {
@@ -247,6 +255,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         campos.add(txtValor);
         campos.add(txtHistorico);
         return campos;
+    }
+
+    private List getPagamentos() {
+        pagamentos = new DAO().listar("PagamentosPorOrdem", condominio.getContaCorrente());
+        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+        Collections.sort(pagamentos, comCod);
+        ComparatorPagamento comparator = new ComparatorPagamento();
+        Collections.sort(pagamentos, comparator);
+        return pagamentos;
     }
 
     private void preencherPagamento() {
@@ -263,6 +280,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         pagamento.setConta(conta);
         pagamento.setSaldo(new BigDecimal(0));
         pagamento.setContaCorrente(condominio.getContaCorrente());
+        verificarDataPagamento(pagamento);
 
         if (btnDocumento.getText().equalsIgnoreCase("Nº Cheque:")) {
             pagamento.setFormaPagamento("cheque");
@@ -275,6 +293,41 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         }
     }
 
+    private void verificarDataPagamento(Pagamento p2) {
+        if (condominio.getContaCorrente().getPagamentos().isEmpty()) {
+//            for (Pagamento pagamento : condominio.getContaCorrente().getPagamentos()) {
+//                if (DataUtil.compararData(DataUtil.getDateTime(p2.getData_lancamento()), DataUtil.getDateTime(pagamento.getData_lancamento())) == -1) {
+//                    System.out.println("codominio --- " + condominio.getContaCorrente().getPagamentos().size());
+//                    if (Integer.parseInt(p2.getNumeroDocumento()) < Integer.parseInt(pagamento.getNumeroDocumento())) {
+//                        p2.setSaldo(p2.getValor());
+//                        condominio.getContaCorrente().setSaldo(p2.getValor());
+//
+//                    }
+//                }
+//
+//            }
+//        } else {
+            pagamento.setSaldo(p2.getValor());
+            condominio.getContaCorrente().setSaldo(p2.getValor());
+        }}
+//    }
+
+//        } else {
+//            for (Pagamento p : condominio.getContaCorrente().getPagamentos()) {
+//
+//                if (DataUtil.compararDia(DataUtil.getDateTime(p.getData_lancamento()), DataUtil.getDateTime(p2.getData_lancamento()))) {
+//                    if (p2.getCodigo() < p.getCodigo()) {
+//                        p2.setSaldo(p2.getValor());
+//                        break;
+//                    }
+//                }
+//
+//                if (DataUtil.compararData(DataUtil.getDateTime(p.getData_lancamento()), DataUtil.getDateTime(p2.getData_lancamento())) == 1) {
+//                    pagamento.setSaldo(p2.getValor());
+//                }
+//            }
+//        }
+//    }
     private void pegarConta() {
         DialogoConta c = new DialogoConta(null, true);
         c.setVisible(true);
@@ -340,7 +393,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             for (Pagamento p : itensRemover) {
                 modeloTabela.remover(p);
                 modeloTabela.notificar();
-
                 if (!p.getConta().isCredito()) {
                     contaCorrente.setSaldo(contaCorrente.getSaldo().add(p.getValor()));
                 } else {
@@ -348,6 +400,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 }
             }
             new DAO().remover(itensRemover);
+            condominio.getContaCorrente().getPagamentos().removeAll(itensRemover);
             new DAO().salvar(contaCorrente);
             ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
         } else {
