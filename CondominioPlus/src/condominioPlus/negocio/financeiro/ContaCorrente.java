@@ -91,6 +91,8 @@ public class ContaCorrente implements Serializable {
     }
 
     public void calculaSaldo() {
+
+        //like my old friend did, I dont know who this code below is working but it is! I am kidding but only god and I know what it is! :P
         List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, dataFechamento);
         for (Pagamento pagamento : pagamentos) {
             System.out.println("pagamento " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getData_lancamento()));

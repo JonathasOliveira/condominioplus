@@ -29,8 +29,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ComboModelo_2;
@@ -145,11 +147,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(new RenderizadorFundo());
 
         tabelaContaCorrente.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setMaxWidth(80);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setMinWidth(30);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(325);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setMinWidth(100);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(80);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setPreferredWidth(80);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setPreferredWidth(320);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setPreferredWidth(90);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setPreferredWidth(90);
 
     }
 
@@ -210,12 +212,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             }
         };
 
-        tabelaContaCorrente.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setMaxWidth(80);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setMinWidth(30);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(325);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setMinWidth(100);
+        tabelaCheque.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(0)).setMaxWidth(80);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(1)).setMinWidth(250);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(2)).setMinWidth(325);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(3)).setMinWidth(230);
     }
 
 //    private List<Condominio> filtrarListaPorNome(String sequencia, List<Condominio> condominios) {
@@ -271,6 +272,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         ValidadorGenerico validador = new ValidadorGenerico();
         if (!validador.validar(listaCampos())) {
             validador.exibirErros(this);
+            return;
         }
         pagamento.setData_lancamento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
@@ -284,13 +286,31 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         if (btnDocumento.getText().equalsIgnoreCase("Nº Cheque:")) {
             pagamento.setFormaPagamento("cheque");
-            cheques.add(pagamento);
-            carregarTabelaCheque();
+            if (cbFornecedores.getModel().getSelectedItem() == null) {
+                ApresentacaoUtil.exibirAdvertencia("Deve-se selecionar um favorecido!", this);
+                return;
+            } else {
+                cheques.add(pagamento);
+                carregarTabelaCheque();
+                limparCampos();
+            }
         } else {
             pagamento.setFormaPagamento("documento");
             condominio.getContaCorrente().adicionarPagamento(pagamento);
             new DAO().salvar(condominio);
+            limparCampos();
         }
+    }
+
+    private String fixarHistorico() {
+        String texto = "";
+        if (btnFixarHistórico.isSelected()) {
+            texto = txtHistorico.getText();
+            return texto;
+        } else {
+            return texto;
+        }
+
     }
 
     private void verificarDataPagamento(Pagamento p2) {
@@ -309,7 +329,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 //        } else {
             pagamento.setSaldo(p2.getValor());
             condominio.getContaCorrente().setSaldo(p2.getValor());
-        }}
+        }
+    }
 //    }
 
 //        } else {
@@ -336,7 +357,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         if (c.getConta() != null) {
             conta = c.getConta();
             txtConta.setText(String.valueOf(conta.getCodigo()));
-            txtHistorico.setText(conta.getNome());
+            if (!btnFixarHistórico.isSelected()) {
+                txtHistorico.setText(conta.getNome());
+            } else {
+                txtHistorico.setText(fixarHistorico());
+            }
 
 
         }
@@ -348,11 +373,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     private void adicionarPagamento() {
         preencherPagamento();
-        limparCampos();
     }
 
     private void limparCampos() {
-        txtHistorico.setText("");
+        txtHistorico.setText(fixarHistorico());
         txtConta.setText("");
         txtNumeroDocumento.setText("");
         txtValor.setText("");
@@ -436,11 +460,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 gravarCheques();
             } else if (origem == itemMenuApagarSelecionados) {
                 apagarItensSelecionados();
+            } else if (origem == btnFixarHistórico) {
             }
         }
 
         @Override
         public void configurar() {
+
+            ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaContaCorrente.this, JTextField.class);
+
             btnConta.addActionListener(this);
             btnDocumento.addActionListener(this);
             btnABN.addActionListener(this);
@@ -539,6 +567,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel1.setText("Data do Lançamento:");
 
         txtData.setFocusable(false);
+        txtData.setRequestFocusEnabled(false);
 
         txtValor.setName("Valor"); // NOI18N
 
@@ -568,7 +597,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtData, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                        .addComponent(txtData, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jLabel1)
@@ -642,7 +671,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 340, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnFixarHistórico)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnBK)
@@ -677,25 +706,28 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         painelCheque.setLayout(painelChequeLayout);
         painelChequeLayout.setHorizontalGroup(
             painelChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 883, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 884, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         painelChequeLayout.setVerticalGroup(
             painelChequeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(painelChequeLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(painelCheque, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 883, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -708,7 +740,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(painelCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addContainerGap())
         );
 
         pack();
