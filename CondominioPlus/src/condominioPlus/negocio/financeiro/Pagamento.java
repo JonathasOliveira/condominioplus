@@ -19,6 +19,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import logicpoint.persistencia.DAO;
+import logicpoint.persistencia.Removivel;
 
 /**
  *
@@ -30,7 +31,7 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento")
 })
-public class Pagamento implements Serializable {
+public class Pagamento implements Serializable, Removivel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -38,6 +39,9 @@ public class Pagamento implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "data_lancamento")
     private Calendar data_lancamento;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(name = "data_vencimento")
+    private Calendar dataVencimento;
     @Column(precision = 20, scale = 2)
     private BigDecimal valor = new BigDecimal(0);
     private String historico;
@@ -53,6 +57,15 @@ public class Pagamento implements Serializable {
     private BigDecimal saldo = new BigDecimal(0);
     @ManyToOne
     private ContaCorrente contaCorrente;
+    private boolean removido;
+
+    public Calendar getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(Calendar dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    }
 
     public ContaCorrente getContaCorrente() {
         return contaCorrente;
@@ -163,6 +176,14 @@ public class Pagamento implements Serializable {
 
         this.setSaldo(this.valor.add(p.getSaldo()));
 
+    }
+
+    public void setRemovido(boolean removido) {
+        this.removido = removido;
+    }
+
+    public boolean isRemovido() {
+        return removido;
     }
 }
 
