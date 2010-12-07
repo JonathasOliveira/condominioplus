@@ -246,6 +246,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         checkBoxAtivo.setSelected(condominio.isAtivo());
         txtSindico.setText(condominio.getSindico());
 
+        if(condominio.getContaCorrente().getDataFechamento() != null){
+            txtDataFechamentoCaixa.setValue(DataUtil.getDate(condominio.getDataCadastro().getTimeInMillis()));
+        }
+
         txtRua.setText(condominio.getEndereco().getLogradouro());
         txtNumero.setText(condominio.getEndereco().getNumero());
         txtComplemento.setText(condominio.getEndereco().getComplemento());
@@ -323,6 +327,12 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         condominio.getContaBancaria().setValor(new BigDecimal(txtLimiteBanking.getText().replace(",", ".")));
 
         condominio.setAnotacoes(txtAreaAnotacoes.getText());
+
+        if(condominio.getContaCorrente().getDataFechamento() == null){
+            condominio.getContaCorrente().setDataFechamento(DataUtil.getCalendar(DataUtil.hoje()));
+        }else{
+            condominio.getContaCorrente().setDataFechamento(DataUtil.getCalendar(txtDataFechamentoCaixa.getValue()));
+        }
 
 
     }
@@ -466,6 +476,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jPanel13 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtAreaAnotacoes = new javax.swing.JTextArea();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        txtDataFechamentoCaixa = new net.sf.nachocalendar.components.DateField();
+        jLabel19 = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -996,8 +1010,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1082,6 +1096,49 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         abas.addTab("Anotações", jPanel13);
 
+        jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados Caixa"));
+
+        jLabel19.setText("Fechado até:");
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtDataFechamentoCaixa, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel19))
+                .addContainerGap(541, Short.MAX_VALUE))
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addComponent(jLabel19)
+                .addGap(7, 7, 7)
+                .addComponent(txtDataFechamentoCaixa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(80, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        abas.addTab("Caixa", jPanel14);
+
         jPanel12.setLayout(new java.awt.GridBagLayout());
 
         btnSalvar.setText("Salvar");
@@ -1154,6 +1211,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -1178,6 +1236,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1204,6 +1264,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JTextField txtContato;
     private javax.swing.JTextField txtCpfBanking;
     private net.sf.nachocalendar.components.DateField txtDataCadastro;
+    private net.sf.nachocalendar.components.DateField txtDataFechamentoCaixa;
     private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtLimiteBanking;
     private javax.swing.JTextField txtNumero;

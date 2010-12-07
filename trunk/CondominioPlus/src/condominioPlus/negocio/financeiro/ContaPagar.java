@@ -5,6 +5,7 @@
 
 package condominioPlus.negocio.financeiro;
 
+import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import javax.persistence.OneToMany;
  * @author Administrador
  */
 @Entity
-public class ContaPagar {
+public class ContaPagar implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
