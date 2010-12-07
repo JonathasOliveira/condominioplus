@@ -13,6 +13,7 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaCorrente;
+import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
@@ -29,7 +30,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -285,7 +285,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         verificarDataPagamento(pagamento);
 
         if (btnDocumento.getText().equalsIgnoreCase("Nº Cheque:")) {
-            pagamento.setFormaPagamento("cheque");
+            pagamento.setForma(FormaPagamento.CHEQUE);
             if (cbFornecedores.getModel().getSelectedItem() == null) {
                 ApresentacaoUtil.exibirAdvertencia("Deve-se selecionar um favorecido!", this);
                 return;
@@ -295,7 +295,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 limparCampos();
             }
         } else {
-            pagamento.setFormaPagamento("documento");
+            pagamento.setForma(FormaPagamento.DINHEIRO);
             condominio.getContaCorrente().adicionarPagamento(pagamento);
             new DAO().salvar(condominio);
             limparCampos();

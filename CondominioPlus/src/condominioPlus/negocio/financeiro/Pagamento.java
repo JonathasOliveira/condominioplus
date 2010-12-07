@@ -51,13 +51,12 @@ public class Pagamento implements Serializable, Removivel {
     private Conta conta;
     @Column(name = "numero_documento")
     private String numeroDocumento;
-    @Column(name = "forma_pagamento")
-    private String formaPagamento;
     @Column(precision = 20, scale = 2)
     private BigDecimal saldo = new BigDecimal(0);
     @ManyToOne
     private ContaCorrente contaCorrente;
     private boolean removido;
+    private FormaPagamento forma = FormaPagamento.DINHEIRO;
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -131,12 +130,12 @@ public class Pagamento implements Serializable, Removivel {
         this.valor = valor;
     }
 
-    public String getFormaPagamento() {
-        return formaPagamento;
+    public FormaPagamento getForma() {
+        return forma;
     }
 
-    public void setFormaPagamento(String formaPagamento) {
-        this.formaPagamento = formaPagamento;
+    public void setForma(FormaPagamento forma) {
+        this.forma = forma;
     }
 
     public String getNumeroDocumento() {
