@@ -27,7 +27,7 @@ import logicpoint.persistencia.Removivel;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "PagamentosPorOrdem", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
+    @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento"),
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento")
 })
@@ -55,8 +55,11 @@ public class Pagamento implements Serializable, Removivel {
     private BigDecimal saldo = new BigDecimal(0);
     @ManyToOne
     private ContaCorrente contaCorrente;
+    @ManyToOne
+    private ContaPagar contaPagar;
     private boolean removido;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
+    private boolean pago = false;
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -184,5 +187,23 @@ public class Pagamento implements Serializable, Removivel {
     public boolean isRemovido() {
         return removido;
     }
+
+    public boolean isPago() {
+        return pago;
+    }
+
+    public void setPago(boolean pago) {
+        this.pago = pago;
+    }
+
+    public ContaPagar getContaPagar() {
+        return contaPagar;
+    }
+
+    public void setContaPagar(ContaPagar contaPagar) {
+        this.contaPagar = contaPagar;
+    }
+
+    
 }
 

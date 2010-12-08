@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
@@ -21,10 +20,37 @@ import javax.persistence.OneToMany;
 public class ContaPagar implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     @OneToMany
-    private List<Pagamento>pagamentos;
+    private List<Pagamento> pagamentos;
 
+    public int getCodigo() {
+        return codigo;
+    }
 
+    public void setCodigo(int codigo) {
+        this.codigo = codigo;
+    }
+
+    public List<Pagamento> getPagamentos() {
+        return pagamentos;
+    }
+
+    public void setPagamentos(List<Pagamento> pagamentos) {
+        this.pagamentos = pagamentos;
+    }
+
+    public void adicionarPagamento(Pagamento pagamento) {
+        if (pagamento != null) {
+            pagamento.setContaPagar(this);
+            pagamentos.add(pagamento);
+        }
+    }
+
+    public void removerPagamento(Pagamento pagamento) {
+        if (pagamento != null) {
+            pagamentos.remove(pagamento);
+        }
+    }
 }

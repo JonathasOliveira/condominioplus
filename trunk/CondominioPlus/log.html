@@ -9851,3 +9851,157 @@ Error Code: 0</td>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.sessions.DefaultConnector.connect(DefaultConnector.java:100)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	... 24 more
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>08/12/2010 04:56:11</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">No Persistence provider for EntityManager named UnidadePersistente: Provider named oracle.toplink.essentials.PersistenceProvider threw unexpected exception at create EntityManagerFactory: 
+oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+Local Exception Stack: 
+Exception [TOPLINK-30005] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+Exception Description: An exception was thrown while searching for persistence archives with ClassLoader: sun.misc.Launcher$AppClassLoader@11b86e7
+Internal Exception: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+	at oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException.exceptionSearchingForPersistenceResources(PersistenceUnitLoadingException.java:143)
+	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:169)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:110)
+	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:643)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.callPredeploy(JavaSECMPInitializer.java:171)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initPersistenceUnits(JavaSECMPInitializer.java:239)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initialize(JavaSECMPInitializer.java:255)
+	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:155)
+	... 10 more
+Caused by: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+	at oracle.toplink.essentials.exceptions.EntityManagerSetupException.predeployFailed(EntityManagerSetupException.java:228)
+	... 15 more
+Caused by: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+	at oracle.toplink.essentials.exceptions.ValidationException.nonEntityTargetInRelationship(ValidationException.java:1140)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataValidator.throwNonEntityTargetInRelationship(MetadataValidator.java:321)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.getReferenceDescriptor(RelationshipAccessor.java:164)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOneToOneForeignKeyRelationship(ObjectAccessor.java:128)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOwningMappingKeys(ObjectAccessor.java:205)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.OneToOneAccessor.process(OneToOneAccessor.java:133)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.processRelationship(RelationshipAccessor.java:290)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.processRelationshipDescriptors(MetadataProject.java:579)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.process(MetadataProject.java:512)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProcessor.processAnnotations(MetadataProcessor.java:246)
+	at oracle.toplink.essentials.ejb.cmp3.persistence.PersistenceUnitProcessor.processORMetadata(PersistenceUnitProcessor.java:370)
+	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:607)
+	... 14 more
+
+
+ The following providers:
+oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider
+Returned null to createEntityManagerFactory.
+</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">javax.persistence.PersistenceException: No Persistence provider for EntityManager named UnidadePersistente: Provider named oracle.toplink.essentials.PersistenceProvider threw unexpected exception at create EntityManagerFactory: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-30005] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: An exception was thrown while searching for persistence archives with ClassLoader: sun.misc.Launcher$AppClassLoader@11b86e7
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException.exceptionSearchingForPersistenceResources(PersistenceUnitLoadingException.java:143)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:110)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:643)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.callPredeploy(JavaSECMPInitializer.java:171)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initPersistenceUnits(JavaSECMPInitializer.java:239)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initialize(JavaSECMPInitializer.java:255)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:155)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 10 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.EntityManagerSetupException.predeployFailed(EntityManagerSetupException.java:228)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 15 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.financeiro.ContaPagar] as target entity in the relationship attribute [private condominioPlus.negocio.financeiro.ContaPagar condominioPlus.negocio.Condominio.contaPagar].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.ValidationException.nonEntityTargetInRelationship(ValidationException.java:1140)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataValidator.throwNonEntityTargetInRelationship(MetadataValidator.java:321)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.getReferenceDescriptor(RelationshipAccessor.java:164)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOneToOneForeignKeyRelationship(ObjectAccessor.java:128)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOwningMappingKeys(ObjectAccessor.java:205)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.OneToOneAccessor.process(OneToOneAccessor.java:133)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.processRelationship(RelationshipAccessor.java:290)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.processRelationshipDescriptors(MetadataProject.java:579)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.process(MetadataProject.java:512)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProcessor.processAnnotations(MetadataProcessor.java:246)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.persistence.PersistenceUnitProcessor.processORMetadata(PersistenceUnitProcessor.java:370)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:607)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 14 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp; The following providers:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Returned null to createEntityManagerFactory.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:154)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+</td></tr>
