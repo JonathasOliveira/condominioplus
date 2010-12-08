@@ -5,6 +5,7 @@
 package condominioPlus.negocio;
 
 import condominioPlus.negocio.financeiro.ContaCorrente;
+import condominioPlus.negocio.financeiro.ContaPagar;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -68,6 +69,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaBancaria contaBancaria = new ContaBancaria();
     @OneToOne(cascade=CascadeType.ALL)
     private ContaCorrente contaCorrente = new ContaCorrente();
+    @OneToOne(cascade=CascadeType.ALL)
+    private ContaPagar contaPagar = new ContaPagar();
 
     public Condominio() {
     }
@@ -264,6 +267,16 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setContaCorrente(ContaCorrente contaCorrente) {
         this.contaCorrente = contaCorrente;
     }
+
+    public ContaPagar getContaPagar() {
+        return contaPagar;
+    }
+
+    public void setContaPagar(ContaPagar contaPagar) {
+        this.contaPagar = contaPagar;
+    }
+
+    
 
     
 }

@@ -23,6 +23,12 @@
     <class>condominioPlus.negocio.fornecedor.Fornecedor</class>
     <class>condominioPlus.negocio.financeiro.ContaCorrente</class>
     <class>condominioPlus.negocio.financeiro.Pagamento</class>
+    <class>condominioPlus.negocio.financeiro.ContaPagar</class>
+    <class>condominioPlus.negocio.financeiro.DadosCheque</class>
+    <class>condominioPlus.negocio.financeiro.DadosDOC</class>
+    <class>condominioPlus.negocio.financeiro.DadosDeposito</class>
+    <class>condominioPlus.negocio.financeiro.DadosPagamento</class>
+    <class>condominioPlus.negocio.financeiro.DadosTED</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>

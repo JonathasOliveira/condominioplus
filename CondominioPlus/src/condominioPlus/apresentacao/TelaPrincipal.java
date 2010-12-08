@@ -33,6 +33,7 @@ import condominioPlus.apresentacao.condominio.TelaSelecionarCondominio;
 import condominioPlus.apresentacao.condomino.TelaCondomino;
 import condominioPlus.apresentacao.financeiro.TelaConta;
 import condominioPlus.apresentacao.financeiro.TelaContaCorrente;
+import condominioPlus.apresentacao.financeiro.TelaContaPagar;
 import condominioPlus.apresentacao.fornecedor.TelaFornecedor;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.funcionario.CaracteristicaAcesso;
@@ -335,6 +336,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
+                } else if (source == menuItemContaPagar) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaContaPagar(Main.getCondominio()));
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
                 } else if (source == menuItemExtratoBancario) {
 //                    criarFrame(new TelaPagamento());
                 } else if (source == menuItemComissao) {
@@ -389,6 +396,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemSobre.addActionListener(this);
             menuItemContas.addActionListener(this);
             menuItemFornecedores.addActionListener(this);
+            menuItemContaPagar.addActionListener(this);
             menuLogoff.addMouseListener(new MouseAdapter() {
 
                 @Override
@@ -448,6 +456,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemConsignacao = new javax.swing.JMenuItem();
         menuItemEmprestimo = new javax.swing.JMenuItem();
         menuItemFluxoCaixa = new javax.swing.JMenuItem();
+        menuItemContaPagar = new javax.swing.JMenuItem();
         menuContas = new javax.swing.JMenu();
         menuItemContasDispensaveis = new javax.swing.JMenuItem();
         menItemContasIndispensaveis = new javax.swing.JMenuItem();
@@ -690,6 +699,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemFluxoCaixa.setText("Fluxo de Caixa");
         menuFinanceiro.add(menuItemFluxoCaixa);
 
+        menuItemContaPagar.setText("Contas a Pagar");
+        menuFinanceiro.add(menuItemContaPagar);
+
         menu.add(menuFinanceiro);
 
         menuContas.setText("Contas");
@@ -807,6 +819,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemConfiguracao;
     private javax.swing.JMenuItem menuItemConsignacao;
     private javax.swing.JMenuItem menuItemContaCorrente;
+    private javax.swing.JMenuItem menuItemContaPagar;
     private javax.swing.JMenuItem menuItemContas;
     private javax.swing.JMenuItem menuItemContasDispensaveis;
     private javax.swing.JMenuItem menuItemControleAcesso;
