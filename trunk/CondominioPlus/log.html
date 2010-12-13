@@ -10005,3 +10005,523 @@ Returned null to createEntityManagerFactory.
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/12/2010 11:11:18</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">
+Exception Description: Error compiling the query [PagamentosContaPagar: SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.data_vencimento], line 1, column 81: unknown state or association field [data_vencimento] of class [condominioPlus.negocio.financeiro.Pagamento].</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-8030] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EJBQLException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: Error compiling the query [PagamentosContaPagar: SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.data_vencimento], line 1, column 81: unknown state or association field [data_vencimento] of class [condominioPlus.negocio.financeiro.Pagamento].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.EJBQLException.unknownAttribute(EJBQLException.java:474)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.DotNode.validate(DotNode.java:101)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.OrderByItemNode.validate(OrderByItemNode.java:63)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.OrderByNode.validate(OrderByNode.java:96)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:211)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:201)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.EJBQLParseTree.populateReadQueryInternal(EJBQLParseTree.java:134)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.EJBQLParseTree.populateQuery(EJBQLParseTree.java:108)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EJBQueryImpl.buildEJBQLDatabaseQuery(EJBQueryImpl.java:219)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.EJBQLPlaceHolderQuery.processEjbQLQuery(EJBQLPlaceHolderQuery.java:111)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2059)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2046)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.postConnectDatasource(DatabaseSessionImpl.java:724)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.login(DatabaseSessionImpl.java:617)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.login(EntityManagerFactoryProvider.java:282)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.deploy(EntityManagerSetupImpl.java:229)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.getServerSession(EntityManagerFactoryImpl.java:93)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:126)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:120)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerFactoryImpl.createEntityManager(EntityManagerFactoryImpl.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.setFabrica(DAOGenerico.java:89)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:66)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/12/2010 11:18:07</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">Falha na operação com a Base de Dados!</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">logicpoint.exception.PersistenciaException: Falha na operação com a Base de Dados!
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.tratarExcecao(DAO.java:264)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.salvar(DAO.java:104)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.financeiro.TelaContaPagar.&lt;init&gt;(TelaContaPagar.java:68)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.TelaPrincipal$ControladorEventos.actionPerformed(TelaPrincipal.java:341)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.doClick(AbstractButton.java:357)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicMenuItemUI.doClick(BasicMenuItemUI.java:1223)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicMenuItemUI$Handler.mouseReleased(BasicMenuItemUI.java:1264)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: javax.persistence.PersistenceException: Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: ERRO: inserção ou atualização em tabela &quot;condominio&quot; viola restrição de chave estrangeira &quot;fk_condominio_contapagar_codigo&quot;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;  Detalhe: Chave (contapagar_codigo)=(102) não está presente na tabela &quot;contapagar&quot;.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Call: UPDATE CONDOMINIO SET CONTAPAGAR_CODIGO = ? WHERE (CODIGO = ?)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	bind =&gt; [102, 1]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Query: UpdateObjectQuery(TESTE)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerImpl.flush(EntityManagerImpl.java:353)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.flush(DAOGenerico.java:104)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.concluir(DAOGenerico.java:111)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.concluirTransacao(DAO.java:75)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.concluir(DAO.java:88)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.salvar(DAO.java:102)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 29 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: ERRO: inserção ou atualização em tabela &quot;condominio&quot; viola restrição de chave estrangeira &quot;fk_condominio_contapagar_codigo&quot;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;  Detalhe: Chave (contapagar_codigo)=(102) não está presente na tabela &quot;contapagar&quot;.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Call: UPDATE CONDOMINIO SET CONTAPAGAR_CODIGO = ? WHERE (CODIGO = ?)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	bind =&gt; [102, 1]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Query: UpdateObjectQuery(TESTE)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.DatabaseException.sqlException(DatabaseException.java:311)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:654)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeNoSelect(DatabaseAccessor.java:703)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.basicExecuteCall(DatabaseAccessor.java:492)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeCall(DatabaseAccessor.java:452)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeCall(AbstractSession.java:690)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:228)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:214)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.updateObject(DatasourceCallQueryMechanism.java:699)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.StatementQueryMechanism.updateObject(StatementQueryMechanism.java:452)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatabaseQueryMechanism.updateObjectForWriteWithChangeSet(DatabaseQueryMechanism.java:1293)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.UpdateObjectQuery.executeCommitWithChangeSet(UpdateObjectQuery.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatabaseQueryMechanism.executeWriteWithChangeSet(DatabaseQueryMechanism.java:390)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.WriteObjectQuery.executeDatabaseQuery(WriteObjectQuery.java:109)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.DatabaseQuery.execute(DatabaseQuery.java:628)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.DatabaseQuery.executeInUnitOfWork(DatabaseQuery.java:555)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelModifyQuery.executeInUnitOfWorkObjectLevelModifyQuery(ObjectLevelModifyQuery.java:138)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelModifyQuery.executeInUnitOfWork(ObjectLevelModifyQuery.java:110)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.internalExecuteQuery(UnitOfWorkImpl.java:2233)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:952)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:909)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.CommitManager.commitChangedObjectsForClassWithChangeSet(CommitManager.java:309)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.CommitManager.commitAllObjectsForClassWithChangeSet(CommitManager.java:245)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.CommitManager.commitAllObjectsWithChangeSet(CommitManager.java:202)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.writeAllObjectsWithChangeSet(AbstractSession.java:2657)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.commitToDatabase(UnitOfWorkImpl.java:1044)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.RepeatableWriteUnitOfWork.commitToDatabase(RepeatableWriteUnitOfWork.java:403)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.commitToDatabaseWithPreBuiltChangeSet(UnitOfWorkImpl.java:1160)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.RepeatableWriteUnitOfWork.writeChanges(RepeatableWriteUnitOfWork.java:276)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerImpl.flush(EntityManagerImpl.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 34 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: org.postgresql.util.PSQLException: ERRO: inserção ou atualização em tabela &quot;condominio&quot; viola restrição de chave estrangeira &quot;fk_condominio_contapagar_codigo&quot;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;  Detalhe: Chave (contapagar_codigo)=(102) não está presente na tabela &quot;contapagar&quot;.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:1592)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:1327)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:192)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.execute(AbstractJdbc2Statement.java:451)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeWithFlags(AbstractJdbc2Statement.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeUpdate(AbstractJdbc2Statement.java:304)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:647)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 62 more
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/12/2010 04:06:57</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">No Persistence provider for EntityManager named UnidadePersistente: Provider named oracle.toplink.essentials.PersistenceProvider threw unexpected exception at create EntityManagerFactory: 
+oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+Local Exception Stack: 
+Exception [TOPLINK-30005] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+Exception Description: An exception was thrown while searching for persistence archives with ClassLoader: sun.misc.Launcher$AppClassLoader@11b86e7
+Internal Exception: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+	at oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException.exceptionSearchingForPersistenceResources(PersistenceUnitLoadingException.java:143)
+	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:169)
+	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:110)
+	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:643)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.callPredeploy(JavaSECMPInitializer.java:171)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initPersistenceUnits(JavaSECMPInitializer.java:239)
+	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initialize(JavaSECMPInitializer.java:255)
+	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:155)
+	... 10 more
+Caused by: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+	at oracle.toplink.essentials.exceptions.EntityManagerSetupException.predeployFailed(EntityManagerSetupException.java:228)
+	... 15 more
+Caused by: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+	at oracle.toplink.essentials.exceptions.ValidationException.nonEntityTargetInRelationship(ValidationException.java:1140)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataValidator.throwNonEntityTargetInRelationship(MetadataValidator.java:321)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.getReferenceDescriptor(RelationshipAccessor.java:164)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOneToOneForeignKeyRelationship(ObjectAccessor.java:128)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOwningMappingKeys(ObjectAccessor.java:205)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.OneToOneAccessor.process(OneToOneAccessor.java:133)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.processRelationship(RelationshipAccessor.java:290)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.processRelationshipDescriptors(MetadataProject.java:579)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.process(MetadataProject.java:512)
+	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProcessor.processAnnotations(MetadataProcessor.java:246)
+	at oracle.toplink.essentials.ejb.cmp3.persistence.PersistenceUnitProcessor.processORMetadata(PersistenceUnitProcessor.java:370)
+	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:607)
+	... 14 more
+
+
+ The following providers:
+oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider
+Returned null to createEntityManagerFactory.
+</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">javax.persistence.PersistenceException: No Persistence provider for EntityManager named UnidadePersistente: Provider named oracle.toplink.essentials.PersistenceProvider threw unexpected exception at create EntityManagerFactory: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-30005] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: An exception was thrown while searching for persistence archives with ClassLoader: sun.misc.Launcher$AppClassLoader@11b86e7
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.PersistenceUnitLoadingException.exceptionSearchingForPersistenceResources(PersistenceUnitLoadingException.java:143)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:110)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: javax.persistence.PersistenceException: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:643)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.callPredeploy(JavaSECMPInitializer.java:171)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initPersistenceUnits(JavaSECMPInitializer.java:239)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.JavaSECMPInitializer.initialize(JavaSECMPInitializer.java:255)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.createEntityManagerFactory(EntityManagerFactoryProvider.java:155)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 10 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-28018] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EntityManagerSetupException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: predeploy for PersistenceUnit [UnidadePersistente] failed.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.EntityManagerSetupException.predeployFailed(EntityManagerSetupException.java:228)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 15 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-7250] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.ValidationException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: [class condominioPlus.negocio.Condominio] uses a non-entity [class condominioPlus.negocio.DadosTalaoCheque] as target entity in the relationship attribute [private condominioPlus.negocio.DadosTalaoCheque condominioPlus.negocio.Condominio.dadosTalao].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.ValidationException.nonEntityTargetInRelationship(ValidationException.java:1140)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataValidator.throwNonEntityTargetInRelationship(MetadataValidator.java:321)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.getReferenceDescriptor(RelationshipAccessor.java:164)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOneToOneForeignKeyRelationship(ObjectAccessor.java:128)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.ObjectAccessor.processOwningMappingKeys(ObjectAccessor.java:205)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.OneToOneAccessor.process(OneToOneAccessor.java:133)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.accessors.RelationshipAccessor.processRelationship(RelationshipAccessor.java:290)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.processRelationshipDescriptors(MetadataProject.java:579)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProject.process(MetadataProject.java:512)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.metadata.MetadataProcessor.processAnnotations(MetadataProcessor.java:246)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.persistence.PersistenceUnitProcessor.processORMetadata(PersistenceUnitProcessor.java:370)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.predeploy(EntityManagerSetupImpl.java:607)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 14 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp; The following providers:
+<br>&nbsp;&nbsp;&nbsp;&nbsp;oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Returned null to createEntityManagerFactory.
+<br>&nbsp;&nbsp;&nbsp;&nbsp;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.persistence.Persistence.createEntityManagerFactory(Persistence.java:154)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.PersistenciaUtil.getFabrica(PersistenciaUtil.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/12/2010 04:09:12</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">For input string: &quot;&quot;</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">java.lang.NumberFormatException: For input string: &quot;&quot;
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:48)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Integer.parseInt(Integer.java:470)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Integer.parseInt(Integer.java:499)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.preencherObjeto(TelaDadosCondominio.java:338)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.salvar(TelaDadosCondominio.java:108)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.access$200(TelaDadosCondominio.java:46)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio$ControladorEventos.actionPerformed(TelaDadosCondominio.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:236)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/12/2010 04:19:22</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+Internal Exception: org.postgresql.util.PSQLException: ERRO: coluna &quot;numeroinicial&quot; é do tipo integer mas expressão é do tipo character varying
+Error Code: 0
+Call: UPDATE dados_talao_cheque SET NUMEROINICIAL = ?, NUMEROFINAL = ? WHERE (CODIGO = ?)
+	bind =&gt; [001, 010, 5]
+Query: UpdateObjectQuery(condominioPlus.negocio.DadosTalaoCheque@13a34af)</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">javax.persistence.PersistenceException: Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: ERRO: coluna &quot;numeroinicial&quot; é do tipo integer mas expressão é do tipo character varying
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Call: UPDATE dados_talao_cheque SET NUMEROINICIAL = ?, NUMEROFINAL = ? WHERE (CODIGO = ?)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	bind =&gt; [001, 010, 5]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Query: UpdateObjectQuery(condominioPlus.negocio.DadosTalaoCheque@13a34af)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerImpl.flush(EntityManagerImpl.java:353)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.flush(DAOGenerico.java:104)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.concluir(DAOGenerico.java:111)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.concluirTransacao(DAO.java:75)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.salvar(TelaDadosCondominio.java:122)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.access$200(TelaDadosCondominio.java:46)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio$ControladorEventos.actionPerformed(TelaDadosCondominio.java:355)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:236)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: ERRO: coluna &quot;numeroinicial&quot; é do tipo integer mas expressão é do tipo character varying
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Call: UPDATE dados_talao_cheque SET NUMEROINICIAL = ?, NUMEROFINAL = ? WHERE (CODIGO = ?)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	bind =&gt; [001, 010, 5]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Query: UpdateObjectQuery(condominioPlus.negocio.DadosTalaoCheque@13a34af)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.DatabaseException.sqlException(DatabaseException.java:311)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:654)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeNoSelect(DatabaseAccessor.java:703)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.basicExecuteCall(DatabaseAccessor.java:492)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeCall(DatabaseAccessor.java:452)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeCall(AbstractSession.java:690)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:228)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:214)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.updateObject(DatasourceCallQueryMechanism.java:699)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.StatementQueryMechanism.updateObject(StatementQueryMechanism.java:452)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatabaseQueryMechanism.updateObjectForWriteWithChangeSet(DatabaseQueryMechanism.java:1293)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.UpdateObjectQuery.executeCommitWithChangeSet(UpdateObjectQuery.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatabaseQueryMechanism.executeWriteWithChangeSet(DatabaseQueryMechanism.java:390)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.WriteObjectQuery.executeDatabaseQuery(WriteObjectQuery.java:109)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.DatabaseQuery.execute(DatabaseQuery.java:628)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.DatabaseQuery.executeInUnitOfWork(DatabaseQuery.java:555)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelModifyQuery.executeInUnitOfWorkObjectLevelModifyQuery(ObjectLevelModifyQuery.java:138)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelModifyQuery.executeInUnitOfWork(ObjectLevelModifyQuery.java:110)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.internalExecuteQuery(UnitOfWorkImpl.java:2233)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:952)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:909)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.CommitManager.commitChangedObjectsForClassWithChangeSet(CommitManager.java:309)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.CommitManager.commitAllObjectsWithChangeSet(CommitManager.java:195)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.writeAllObjectsWithChangeSet(AbstractSession.java:2657)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.commitToDatabase(UnitOfWorkImpl.java:1044)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.RepeatableWriteUnitOfWork.commitToDatabase(RepeatableWriteUnitOfWork.java:403)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.commitToDatabaseWithPreBuiltChangeSet(UnitOfWorkImpl.java:1160)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.RepeatableWriteUnitOfWork.writeChanges(RepeatableWriteUnitOfWork.java:276)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerImpl.flush(EntityManagerImpl.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 31 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: org.postgresql.util.PSQLException: ERRO: coluna &quot;numeroinicial&quot; é do tipo integer mas expressão é do tipo character varying
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:1592)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:1327)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:192)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.execute(AbstractJdbc2Statement.java:451)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeWithFlags(AbstractJdbc2Statement.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeUpdate(AbstractJdbc2Statement.java:304)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeDirectNoSelect(DatabaseAccessor.java:647)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 58 more
+</td></tr>

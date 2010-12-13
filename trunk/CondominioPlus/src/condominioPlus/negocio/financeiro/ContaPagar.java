@@ -6,23 +6,26 @@ package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  *
  * @author Administrador
  */
 @Entity
+@Table(name = "conta_pagar")
 public class ContaPagar implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
-    @OneToMany
+    @OneToMany(mappedBy = "contaPagar", cascade = CascadeType.ALL)
     private List<Pagamento> pagamentos;
 
     public int getCodigo() {

@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import logicpoint.persistencia.DAO;
 import logicpoint.persistencia.Removivel;
@@ -29,7 +30,8 @@ import logicpoint.persistencia.Removivel;
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento"),
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
-    @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento")
+    @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
+    @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento")
 })
 public class Pagamento implements Serializable, Removivel {
 
@@ -58,7 +60,9 @@ public class Pagamento implements Serializable, Removivel {
     @ManyToOne
     private ContaPagar contaPagar;
     private boolean removido;
-    private FormaPagamento forma = FormaPagamento.DINHEIRO;
+    private FormaPagamento forma = FormaPagamento.CHEQUE;
+    @OneToOne
+    private DadosPagamento dadosPagamento;
     private boolean pago = false;
 
     public Calendar getDataVencimento() {
@@ -204,6 +208,13 @@ public class Pagamento implements Serializable, Removivel {
         this.contaPagar = contaPagar;
     }
 
+    public DadosPagamento getDadosPagamento() {
+        return dadosPagamento;
+    }
+
+    public void setDadosPagamento(DadosPagamento dadosPagamento) {
+        this.dadosPagamento = dadosPagamento;
+    }
     
 }
 

@@ -67,10 +67,12 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<Unidade> unidades = new LinkedList<Unidade>();
     @OneToOne(cascade = CascadeType.ALL)
     private ContaBancaria contaBancaria = new ContaBancaria();
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private ContaCorrente contaCorrente = new ContaCorrente();
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private ContaPagar contaPagar = new ContaPagar();
+    @OneToOne(cascade=CascadeType.ALL)
+    private DadosTalaoCheque dadosTalao = new DadosTalaoCheque();
 
     public Condominio() {
     }
@@ -253,7 +255,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         List<Unidade> conselheiros = new ArrayList<Unidade>();
 
         for (Unidade u : getUnidades()) {
-            if(u.getCondomino().isConselheiro()){
+            if (u.getCondomino().isConselheiro()) {
                 conselheiros.add(u);
             }
         }
@@ -276,7 +278,11 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.contaPagar = contaPagar;
     }
 
-    
+    public DadosTalaoCheque getDadosTalao() {
+        return dadosTalao;
+    }
 
-    
+    public void setDadosTalao(DadosTalaoCheque dadosTalao) {
+        this.dadosTalao = dadosTalao;
+    }
 }
