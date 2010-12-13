@@ -29,12 +29,13 @@
     <class>condominioPlus.negocio.financeiro.DadosDeposito</class>
     <class>condominioPlus.negocio.financeiro.DadosPagamento</class>
     <class>condominioPlus.negocio.financeiro.DadosTED</class>
+    <class>condominioPlus.negocio.DadosTalaoCheque</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>
       <property name="toplink.jdbc.url" value="jdbc:postgresql://localhost:5432/condominio_plus"/>
       <property name="toplink.jdbc.driver" value="org.postgresql.Driver"/>
-      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.ddl-generation" value="drop-and-create-tables"/>
     </properties>
   </persistence-unit>
 </persistence>

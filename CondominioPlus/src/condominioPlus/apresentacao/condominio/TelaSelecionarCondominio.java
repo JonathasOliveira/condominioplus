@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.CaretEvent;
 import condominioPlus.negocio.Condominio;
+import javax.swing.JTable;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
-import logicpoint.apresentacao.Identificavel;
 import logicpoint.apresentacao.NotificavelClasse;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
@@ -46,7 +46,7 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
     }
 
     private void carregarTabela() {
-        modelo = new TabelaModelo_2<Condominio>(tabela, "Nome, CNPJ, Síndico, Telefone".split(",")) {
+        modelo = new TabelaModelo_2<Condominio>(tabela, "Nome, Síndico, Telefone".split(",")) {
 
             @Override
             protected List<Condominio> getCarregarObjetos() {
@@ -64,10 +64,8 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
                     case 0:
                         return condominio.getRazaoSocial();
                     case 1:
-                        return condominio.getCnpj();
-                    case 2:
                         return condominio.getSindico();
-                    case 3:
+                    case 2:
                         return condominio.getTelefones().size() > 0 ? condominio.getTelefones().get(0).getNumero() : "";
                     default:
                         return null;
@@ -75,7 +73,10 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
             }
         };
 
-        modelo.setLargura(1, 200, 200, -1);
+        tabela.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tabela.getColumn(modelo.getCampo(0)).setPreferredWidth(280);
+        tabela.getColumn(modelo.getCampo(1)).setPreferredWidth(200);
+        tabela.getColumn(modelo.getCampo(2)).setPreferredWidth(130);
 
     }
 
