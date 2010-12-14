@@ -31,7 +31,8 @@ import logicpoint.persistencia.Removivel;
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento"),
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
-    @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento")
+    @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento"),
+    @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento")
 })
 public class Pagamento implements Serializable, Removivel {
 
@@ -215,6 +216,5 @@ public class Pagamento implements Serializable, Removivel {
     public void setDadosPagamento(DadosPagamento dadosPagamento) {
         this.dadosPagamento = dadosPagamento;
     }
-    
 }
 
