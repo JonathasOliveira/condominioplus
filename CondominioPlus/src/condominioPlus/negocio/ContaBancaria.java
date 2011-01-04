@@ -26,9 +26,13 @@ public class ContaBancaria implements Serializable {
     @GeneratedValue
     private int codigo;
     @Column(name = "conta_corrente")
-    private String ContaCorrente = "";
+    private String contaCorrente = "";
+    @Column(name = "digito_conta_corrente")
+    private String digitoCorrente = "";
     @Column(name = "conta_poupanca")
-    private String ContaPoupanca = "";
+    private String contaPoupanca = "";
+    @Column(name = "digito_poupanca")
+    private String digitoPoupanca = "";
     @OneToOne(cascade = CascadeType.ALL)
     private Banco banco;
     @Column(name = "usuario_banking")
@@ -47,21 +51,20 @@ public class ContaBancaria implements Serializable {
     public ContaBancaria() {
     }
 
-    
     public String getContaCorrente() {
-        return ContaCorrente;
+        return contaCorrente;
     }
 
-    public void setContaCorrente(String ContaCorrente) {
-        this.ContaCorrente = ContaCorrente;
+    public void setContaCorrente(String contaCorrente) {
+        this.contaCorrente = contaCorrente;
     }
 
     public String getContaPoupanca() {
-        return ContaPoupanca;
+        return contaPoupanca;
     }
 
-    public void setContaPoupanca(String ContaPoupanca) {
-        this.ContaPoupanca = ContaPoupanca;
+    public void setContaPoupanca(String contaPoupanca) {
+        this.contaPoupanca = contaPoupanca;
     }
 
     public Banco getBanco() {
@@ -115,4 +118,22 @@ public class ContaBancaria implements Serializable {
     public void setValor(BigDecimal valor) {
         this.valor = valor;
     }
+
+    public String getDigitoCorrente() {
+        return digitoCorrente;
+    }
+
+    public void setDigitoCorrente(String digitoCorrente) {
+        this.digitoCorrente = digitoCorrente;
+    }
+
+    public String getDigitoPoupanca() {
+        return digitoPoupanca;
+    }
+
+    public void setDigitoPoupanca(String digitoPoupanca) {
+        this.digitoPoupanca = digitoPoupanca;
+    }
+
+    
 }

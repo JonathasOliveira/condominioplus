@@ -108,7 +108,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             public Object getValor(Pagamento pagamento, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(pagamento.getData_lancamento());
+                        return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
                         return pagamento.getNumeroDocumento();
                     case 2:
@@ -182,7 +182,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             public Object getValor(Pagamento pagamento, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(pagamento.getData_lancamento());
+                        return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
                         return pagamento.getNumeroDocumento();
                     case 2:
@@ -274,7 +274,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             validador.exibirErros(this);
             return;
         }
-        pagamento.setData_lancamento(DataUtil.getCalendar(txtData.getValue()));
+        pagamento.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
         pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
         pagamento.setNumeroDocumento(txtNumeroDocumento.getText());
@@ -564,7 +564,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         txtNumeroDocumento.setName("Número Documento"); // NOI18N
 
-        jLabel1.setText("Data do Lançamento:");
+        jLabel1.setText("Data Lançamento:");
 
         txtData.setFocusable(false);
         txtData.setRequestFocusEnabled(false);

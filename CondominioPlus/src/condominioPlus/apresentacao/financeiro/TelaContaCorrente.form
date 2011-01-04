@@ -216,7 +216,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Data do Lan&#xe7;amento:"/>
+            <Property name="text" type="java.lang.String" value="Data Lan&#xe7;amento:"/>
           </Properties>
         </Component>
         <Component class="net.sf.nachocalendar.components.DateField" name="txtData">

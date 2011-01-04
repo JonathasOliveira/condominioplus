@@ -11,6 +11,7 @@ package condominioPlus.negocio.financeiro;
 import condominioPlus.negocio.Banco;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import logicpoint.util.Util;
 
@@ -26,6 +27,7 @@ public class DadosCheque extends DadosPagamento {
     private String conta;
     private String titular;
     private String agencia;
+    @OneToOne
     private Banco banco;
     @Column(name = "codigo_verificacao")
     private String codigoVerificacao;

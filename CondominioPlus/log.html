@@ -10597,3 +10597,67 @@ Internal Exception: line 1:147: unexpected token: null</td>
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.pathExpression(EJBQLParser.java:991)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	... 29 more
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>04/01/2011 03:32:29</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">
+Exception Description: Error compiling the query [PagamentosContaCorrente: SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento], line 1, column 83: unknown state or association field [data_lancamento] of class [condominioPlus.negocio.financeiro.Pagamento].</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-8030] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EJBQLException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: Error compiling the query [PagamentosContaCorrente: SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento], line 1, column 83: unknown state or association field [data_lancamento] of class [condominioPlus.negocio.financeiro.Pagamento].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.EJBQLException.unknownAttribute(EJBQLException.java:474)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.DotNode.validate(DotNode.java:101)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.OrderByItemNode.validate(OrderByItemNode.java:63)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.OrderByNode.validate(OrderByNode.java:96)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:211)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ParseTree.validate(ParseTree.java:201)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.EJBQLParseTree.populateReadQueryInternal(EJBQLParseTree.java:134)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.EJBQLParseTree.populateQuery(EJBQLParseTree.java:108)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EJBQueryImpl.buildEJBQLDatabaseQuery(EJBQueryImpl.java:219)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.EJBQLPlaceHolderQuery.processEjbQLQuery(EJBQLPlaceHolderQuery.java:111)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2059)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2046)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.postConnectDatasource(DatabaseSessionImpl.java:724)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.login(DatabaseSessionImpl.java:617)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.login(EntityManagerFactoryProvider.java:282)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.deploy(EntityManagerSetupImpl.java:229)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.getServerSession(EntityManagerFactoryImpl.java:93)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:126)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:120)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerFactoryImpl.createEntityManager(EntityManagerFactoryImpl.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.setFabrica(DAOGenerico.java:89)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:66)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+</td></tr>
