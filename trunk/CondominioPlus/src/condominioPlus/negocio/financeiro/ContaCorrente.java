@@ -93,7 +93,6 @@ public class ContaCorrente implements Serializable {
         //like my old friend did, I dont know who this code below is working but it is! I am kidding but only god and I know what it is! :P
         List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, dataFechamento);
         for (Pagamento pagamento : pagamentos) {
-            System.out.println("pagamento " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getData_lancamento()));
         }
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
 
@@ -104,7 +103,7 @@ public class ContaCorrente implements Serializable {
         Collections.sort(pagamentos, comparator);
         
            for (Pagamento pagamento : pagamentos) {
-            System.out.println("pagamento com comparatores " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getData_lancamento()));
+            System.out.println("pagamento com comparatores " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
         }
         for (int i = 0; i < pagamentos.size(); i++) {
             if (i != 0) {
@@ -116,7 +115,7 @@ public class ContaCorrente implements Serializable {
                 }
             }
 
-            System.out.println("pagamento comparado por codigo " + pagamentos.get(i).getCodigo() + " " + pagamentos.get(i).getHistorico() + " " + DataUtil.toString(pagamentos.get(i).getData_lancamento()));
+            System.out.println("pagamento comparado por codigo " + pagamentos.get(i).getCodigo() + " " + pagamentos.get(i).getHistorico() + " " + DataUtil.toString(pagamentos.get(i).getDataPagamento()));
         }
         new DAO().salvar(pagamentos);
 

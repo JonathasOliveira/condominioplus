@@ -28,9 +28,9 @@ import logicpoint.persistencia.Removivel;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.data_lancamento"),
-    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.data_lancamento >= ?2 order by c.data_lancamento"),
-    @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.data_lancamento"),
+    @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.dataPagamento"),
+    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 order by c.dataPagamento"),
+    @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento"),
     @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento")
 })
@@ -41,7 +41,7 @@ public class Pagamento implements Serializable, Removivel {
     private int codigo;
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "data_lancamento")
-    private Calendar data_lancamento;
+    private Calendar dataPagamento;
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "data_vencimento")
     private Calendar dataVencimento;
@@ -61,7 +61,7 @@ public class Pagamento implements Serializable, Removivel {
     @ManyToOne
     private ContaPagar contaPagar;
     private boolean removido;
-    private FormaPagamento forma = FormaPagamento.CHEQUE;
+    private FormaPagamento forma = FormaPagamento.DINHEIRO;
     @OneToOne
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
@@ -106,12 +106,12 @@ public class Pagamento implements Serializable, Removivel {
         this.conta = conta;
     }
 
-    public Calendar getData_lancamento() {
-        return data_lancamento;
+    public Calendar getDataPagamento() {
+        return dataPagamento;
     }
 
-    public void setData_lancamento(Calendar data_lancamento) {
-        this.data_lancamento = data_lancamento;
+    public void setDataPagamento(Calendar dataPagamento) {
+        this.dataPagamento = dataPagamento;
     }
 
     public Fornecedor getFornecedor() {
@@ -177,7 +177,7 @@ public class Pagamento implements Serializable, Removivel {
     }
 
     public void calcularSaldo() {
-        List<Pagamento> lista = new DAO().listar(Pagamento.class, "PagamentosPorData", this.getData_lancamento());
+        List<Pagamento> lista = new DAO().listar(Pagamento.class, "PagamentosPorData", this.getDataPagamento());
 
         Pagamento p = lista.get(lista.size() - 1);
 
