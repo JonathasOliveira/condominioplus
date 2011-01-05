@@ -66,9 +66,14 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         if (condominio.getContaCorrente() == null) {
             contaCorrente = new ContaCorrente();
             condominio.setContaCorrente(contaCorrente);
+            contaCorrente.setCondominio(condominio);
             new DAO().salvar(condominio);
         } else {
             contaCorrente = condominio.getContaCorrente();
+            if (contaCorrente.getCondominio() == null) {
+                contaCorrente.setCondominio(condominio);
+                new DAO().salvar(condominio);
+            }
         }
 
         initComponents();
