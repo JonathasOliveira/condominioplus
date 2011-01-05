@@ -10661,3 +10661,80 @@ Exception Description: Error compiling the query [PagamentosContaCorrente: SELEC
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>05/01/2011 01:06:26</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">
+Exception Description: Syntax error parsing the query [PagamentosPorFornecedor: SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento &lt;&gt; null and p.dataPagamento &gt;= ?2 and p.dataPagamento &lt;= ?3 order by p.dataPagamento], line 1, column 74: unexpected token [null].
+Internal Exception: line 1:74: unexpected token: null</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-8025] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.EJBQLException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception Description: Syntax error parsing the query [PagamentosPorFornecedor: SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento &lt;&gt; null and p.dataPagamento &gt;= ?2 and p.dataPagamento &lt;= ?3 order by p.dataPagamento], line 1, column 74: unexpected token [null].
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: line 1:74: unexpected token: null
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.EJBQLException.unexpectedToken(EJBQLException.java:389)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.EJBQLParser.handleANTLRException(EJBQLParser.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.EJBQLParser.addError(EJBQLParser.java:278)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.EJBQLParser.reportError(EJBQLParser.java:378)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.comparisonExpressionRightOperand(EJBQLParser.java:3322)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.comparisonExpression(EJBQLParser.java:2451)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.simpleConditionalExpressionRemainder(EJBQLParser.java:2346)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.simpleConditionalExpression(EJBQLParser.java:2283)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.conditionalPrimary(EJBQLParser.java:2218)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.conditionalFactor(EJBQLParser.java:2155)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.conditionalTerm(EJBQLParser.java:2037)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.conditionalExpression(EJBQLParser.java:1989)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.whereClause(EJBQLParser.java:507)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.selectStatement(EJBQLParser.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.document(EJBQLParser.java:135)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.EJBQLParser.parse(EJBQLParser.java:166)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.EJBQLParser.buildParseTree(EJBQLParser.java:127)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EJBQueryImpl.buildEJBQLDatabaseQuery(EJBQueryImpl.java:215)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.EJBQLPlaceHolderQuery.processEjbQLQuery(EJBQLPlaceHolderQuery.java:111)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2059)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.processEJBQLQueries(AbstractSession.java:2046)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.postConnectDatasource(DatabaseSessionImpl.java:724)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.login(DatabaseSessionImpl.java:617)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.login(EntityManagerFactoryProvider.java:282)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.deploy(EntityManagerSetupImpl.java:229)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.getServerSession(EntityManagerFactoryImpl.java:93)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:126)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:120)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerFactoryImpl.createEntityManager(EntityManagerFactoryImpl.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.setFabrica(DAOGenerico.java:89)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:66)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: line 1:74: unexpected token: null
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.parsing.ejbql.antlr273.EJBQLParser.comparisonExpressionRightOperand(EJBQLParser.java:3316)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 34 more
+</td></tr>

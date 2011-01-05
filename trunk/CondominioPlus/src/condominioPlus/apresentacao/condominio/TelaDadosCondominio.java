@@ -93,7 +93,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void carregarComboBanco() {
         modelo = new ComboModelo<Banco>(new DAO().listar(Banco.class), cmbBanco);
-        System.out.println("teste " + modelo.getSize());
         cmbBanco.setModel(modelo);
     }
 

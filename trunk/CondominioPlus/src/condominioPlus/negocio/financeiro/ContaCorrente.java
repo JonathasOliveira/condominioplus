@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio.financeiro;
 
+import condominioPlus.negocio.Condominio;
 import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import logicpoint.persistencia.DAO;
@@ -42,6 +44,8 @@ public class ContaCorrente implements Serializable {
     @Column(name = "data_fechamento")
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataFechamento;
+    @OneToOne
+    private Condominio condominio;
 
     public int getCodigo() {
         return codigo;
@@ -97,12 +101,12 @@ public class ContaCorrente implements Serializable {
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
 
         Collections.sort(pagamentos, comCod);
-        
+
         ComparatorPagamento comparator = new ComparatorPagamento();
-        
+
         Collections.sort(pagamentos, comparator);
-        
-           for (Pagamento pagamento : pagamentos) {
+
+        for (Pagamento pagamento : pagamentos) {
             System.out.println("pagamento com comparatores " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
         }
         for (int i = 0; i < pagamentos.size(); i++) {
@@ -119,6 +123,14 @@ public class ContaCorrente implements Serializable {
         }
         new DAO().salvar(pagamentos);
 
+    }
+
+    public Condominio getCondominio() {
+        return condominio;
+    }
+
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
     }
 }
     
