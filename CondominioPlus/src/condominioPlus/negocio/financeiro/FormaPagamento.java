@@ -15,10 +15,7 @@ package condominioPlus.negocio.financeiro;
 public enum FormaPagamento {
 
     DINHEIRO("Dinheiro", null),
-    CHEQUE("Cheque", DadosCheque.class),
-    DEPOSITO_EM_CONTA("Depósito em conta", DadosDeposito.class),
-    DOC("DOC", DadosDOC.class),
-    TED("TED", DadosTED.class);
+    CHEQUE("Cheque", DadosCheque.class);
     private String descricao = "";
     private Class<? extends DadosPagamento> classe;
 

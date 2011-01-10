@@ -10,11 +10,7 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
-import condominioPlus.Main;
 import condominioPlus.apresentacao.TelaPrincipal;
-import condominioPlus.negocio.Advogado;
-import condominioPlus.negocio.Condominio;
-import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
