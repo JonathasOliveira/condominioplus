@@ -145,18 +145,18 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 }
             }
         };
-        modeloTabela.setLargura(1, 200, 200, -1);
+        //modeloTabela.setLargura(1, 200, 200, -1);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(new RenderizadorFundo());
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(new RenderizadorFundo());
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(new RenderizadorFundo());
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(new RenderizadorFundo());
 
         tabelaContaCorrente.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(80);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setPreferredWidth(80);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setPreferredWidth(320);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setPreferredWidth(90);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setPreferredWidth(90);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(150);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setPreferredWidth(50);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setPreferredWidth(340);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setPreferredWidth(130);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setPreferredWidth(130);
 
     }
 
@@ -219,8 +219,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         tabelaCheque.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tabelaCheque.getColumn(modeloTabela2.getCampo(0)).setMaxWidth(80);
-        tabelaCheque.getColumn(modeloTabela2.getCampo(1)).setMinWidth(250);
-        tabelaCheque.getColumn(modeloTabela2.getCampo(2)).setMinWidth(325);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(1)).setMinWidth(260);
+        tabelaCheque.getColumn(modeloTabela2.getCampo(2)).setMinWidth(340);
         tabelaCheque.getColumn(modeloTabela2.getCampo(3)).setMinWidth(230);
     }
 

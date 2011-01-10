@@ -217,14 +217,10 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
 
         tblPagamentos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         tblPagamentos.getColumn(modeloTabela.getCampo(0)).setPreferredWidth(80);
-        tblPagamentos.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(100);
+        tblPagamentos.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(105);
         tblPagamentos.getColumn(modeloTabela.getCampo(2)).setPreferredWidth(100);
         tblPagamentos.getColumn(modeloTabela.getCampo(3)).setPreferredWidth(260);
 
-    }
-
-    private TabelaModelo<Pagamento> getModeloPagamentos() {
-        return (TabelaModelo<Pagamento>) tblPagamentos.getModel();
     }
 
     private List carregarPagamentos() {
@@ -248,6 +244,8 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
                 editarTelefone();
             } else if (e.getSource() == btnRemoverTelefone) {
                 removerTelefone();
+            }else if(e.getSource() == btnVoltar){
+                doDefaultCloseAction();
             }
         }
 
