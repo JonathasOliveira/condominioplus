@@ -10,13 +10,15 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import bemaJava.Bematech;
+import com.sun.jna.Native;
 import condominioPlus.Main;
-import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
@@ -31,6 +33,8 @@ import logicpoint.util.DataUtil;
 public class TelaPagarDocumento extends javax.swing.JDialog {
 
     List<Pagamento> pagamentos;
+    List<Pagamento> novaLista = new ArrayList<Pagamento>();
+    BigDecimal total = new BigDecimal(0);
 
     /** Creates new form TelaPagarDocumento */
     public TelaPagarDocumento(java.awt.Frame parent, List<Pagamento> pagamentos) {
@@ -60,6 +64,30 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
         }
     }
 
+    private String somarCheque() {
+        for (Pagamento pagamento : pagamentos) {
+            total = total.add(pagamento.getValor());
+        }
+        return String.valueOf(total);
+    }
+
+    private void imprimirCheques() {
+        int iRetorno;
+        Pagamento p = null;
+        if (!pagamentos.isEmpty()) {
+            p = pagamentos.get(0);
+        }
+
+        Bematech lib =
+                (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
+        iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
+        lib.Bematech_DP_IncluiAlteraBanco("555", "3,7,9,11,13,92,20,8,10,62,23,32,55");
+        String valor = somarCheque();
+        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor().getNome(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataPagamento()).toString("ddMMyy"), "");
+        System.out.println(iRetorno);
+
+    }
+
     private void preencherObjetos() {
         for (Pagamento pagamento : pagamentos) {
             pagamento.setNumeroDocumento(txtNumeroDocumento.getText());
@@ -86,6 +114,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
 
             } else if (origem == btnEfetivarPagamento) {
                 efetuarPagamento();
+                imprimirCheques();
                 dispose();
             }
         }
@@ -104,19 +133,19 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
 
         @Override
         public void focusLost(FocusEvent e) {
-            if (e.getSource() == txtNumeroDocumento && !txtNumeroDocumento.getText().isEmpty() && radioCheque.isSelected()) {
-                Long numero = Long.valueOf(txtNumeroDocumento.getText());
-                String juncaoInicial = Main.getCondominio().getContaBancaria().getContaCorrente() + Main.getCondominio().getDadosTalao().getNumeroInicial();
-                String juncaoFinal = Main.getCondominio().getContaBancaria().getContaCorrente() + Main.getCondominio().getDadosTalao().getNumeroFinal();
-                Long inicial = Long.valueOf(juncaoInicial);
-                Long numeroFinal = Long.valueOf(juncaoFinal);
-                if (numero <= inicial || numero >= numeroFinal) {
-                    ApresentacaoUtil.exibirInformacao("Digite um numero entre " + Main.getCondominio().getDadosTalao().getNumeroInicial() + " e "
-                            + Main.getCondominio().getDadosTalao().getNumeroFinal(), TelaPagarDocumento.this);
-                    txtNumeroDocumento.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51), 2));
-                }
-
-            }
+//            if (e.getSource() == txtNumeroDocumento && !txtNumeroDocumento.getText().isEmpty() && radioCheque.isSelected()) {
+//                Long numero = Long.valueOf(txtNumeroDocumento.getText());
+//                String juncaoInicial = Main.getCondominio().getContaBancaria().getContaCorrente() + Main.getCondominio().getDadosTalao().getNumeroInicial();
+//                String juncaoFinal = Main.getCondominio().getContaBancaria().getContaCorrente() + Main.getCondominio().getDadosTalao().getNumeroFinal();
+//                Long inicial = Long.valueOf(juncaoInicial);
+//                Long numeroFinal = Long.valueOf(juncaoFinal);
+//                if (numero <= inicial || numero >= numeroFinal) {
+//                    ApresentacaoUtil.exibirInformacao("Digite um numero entre " + Main.getCondominio().getDadosTalao().getNumeroInicial() + " e "
+//                            + Main.getCondominio().getDadosTalao().getNumeroFinal(), TelaPagarDocumento.this);
+//                    txtNumeroDocumento.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51), 2));
+//                }
+//
+//            }
         }
     }
 
