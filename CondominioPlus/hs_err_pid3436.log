@@ -1,0 +1,164 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x6d966941, pid=3436, tid=3368
+#
+# JRE version: 6.0_21-b07
+# Java VM: Java HotSpot(TM) Client VM (17.0-b17 mixed mode, sharing windows-x86 )
+# Problematic frame:
+# V  [jvm.dll+0xb6941]
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x02a6ac00):  VMThread [stack: 0x02b50000,0x02ba0000] [id=3368]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x00000000
+
+Registers:
+EAX=0x00000000, EBX=0x00000000, ECX=0x002924c0, EDX=0x002924c0
+ESP=0x02b9fad8, EBP=0x02b9faec, ESI=0x00000000, EDI=0x00000000
+EIP=0x6d966941, EFLAGS=0x00010246
+
+Top of Stack: (sp=0x02b9fad8)
+0x02b9fad8:   02b9fb48 02b9fb18 00000000 032be538
+0x02b9fae8:   00000000 02b9fb04 6d966a28 02b9fb18
+0x02b9faf8:   02b9fb48 6db124f0 6db124f0 02b9fc10
+0x02b9fb08:   6da945fe 02b9fb18 02b9fb48 02e94000
+0x02b9fb18:   0380fc90 008902cb 00890208 00000000
+0x02b9fb28:   0380fcb0 0380fc90 032be4f0 00899f25
+0x02b9fb38:   00892588 00000000 032be530 032be4f0
+0x02b9fb48:   00890005 02b9fb48 00010001 00000000 
+
+Instructions: (pc=0x6d966941)
+0x6d966931:   0f 3b f7 77 09 8b 56 08 03 d6 3b fa 72 02 33 f6
+0x6d966941:   8b 06 8b ce ff 50 04 f6 d8 1b c0 23 c6 8b c8 74 
+
+
+Stack: [0x02b50000,0x02ba0000],  sp=0x02b9fad8,  free space=13e02b9f654k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0xb6941]
+V  [jvm.dll+0xb6a28]
+V  [jvm.dll+0x1e45fe]
+V  [jvm.dll+0x1e491a]
+V  [jvm.dll+0x1c2d6f]
+V  [jvm.dll+0x1a7470]
+V  [jvm.dll+0x1a8095]
+V  [jvm.dll+0x1ff7c2]
+V  [jvm.dll+0x1ffce2]
+V  [jvm.dll+0x185f5c]
+C  [msvcr71.dll+0x9565]
+C  [kernel32.dll+0x26063]
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x00297400 JavaThread "DestroyJavaVM" [_thread_blocked, id=2948, stack(0x00840000,0x00890000)]
+  0x02f76c00 JavaThread "TimerQueue" daemon [_thread_blocked, id=208, stack(0x037c0000,0x03810000)]
+  0x02e94000 JavaThread "AWT-EventQueue-0" [_thread_in_native, id=3520, stack(0x03270000,0x032c0000)]
+  0x02df5000 JavaThread "AWT-Windows" daemon [_thread_blocked, id=628, stack(0x031a0000,0x031f0000)]
+  0x02e3a400 JavaThread "AWT-Shutdown" [_thread_blocked, id=2288, stack(0x03150000,0x031a0000)]
+  0x02e39800 JavaThread "Java2D Disposer" daemon [_thread_blocked, id=3564, stack(0x03100000,0x03150000)]
+  0x02ab8400 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=2224, stack(0x02d30000,0x02d80000)]
+  0x02ab2800 JavaThread "CompilerThread0" daemon [_thread_blocked, id=2504, stack(0x02ce0000,0x02d30000)]
+  0x02ab1000 JavaThread "Attach Listener" daemon [_thread_blocked, id=2680, stack(0x02c90000,0x02ce0000)]
+  0x02aafc00 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=4052, stack(0x02c40000,0x02c90000)]
+  0x02a6dc00 JavaThread "Finalizer" daemon [_thread_blocked, id=268, stack(0x02bf0000,0x02c40000)]
+  0x02a6c400 JavaThread "Reference Handler" daemon [_thread_blocked, id=2868, stack(0x02ba0000,0x02bf0000)]
+
+Other Threads:
+=>0x02a6ac00 VMThread [stack: 0x02b50000,0x02ba0000] [id=3368]
+  0x02ac3400 WatcherThread [stack: 0x02d80000,0x02dd0000] [id=3356]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x002964a8] Safepoint_lock - owner thread: 0x02a6ac00
+[0x00296510] Threads_lock - owner thread: 0x02a6ac00
+
+Heap
+ def new generation   total 4928K, used 3327K [0x228d0000, 0x22e20000, 0x27e20000)
+  eden space 4416K,  65% used [0x228d0000, 0x22ba45f8, 0x22d20000)
+  from space 512K,  83% used [0x22d20000, 0x22d8b6f0, 0x22da0000)
+  to   space 512K,   0% used [0x22da0000, 0x22da0000, 0x22e20000)
+ tenured generation   total 10944K, used 7501K [0x27e20000, 0x288d0000, 0x328d0000)
+   the space 10944K,  68% used [0x27e20000, 0x285735f0, 0x28573600, 0x288d0000)
+ compacting perm gen  total 12288K, used 11690K [0x328d0000, 0x334d0000, 0x368d0000)
+   the space 12288K,  95% used [0x328d0000, 0x3343a830, 0x3343aa00, 0x334d0000)
+    ro space 10240K,  54% used [0x368d0000, 0x36e4c0f0, 0x36e4c200, 0x372d0000)
+    rw space 12288K,  55% used [0x372d0000, 0x3796fb80, 0x3796fc00, 0x37ed0000)
+
+Dynamic libraries:
+0x00400000 - 0x00424000 	C:\Arquivos de programas\Java\jdk1.6.0_21\bin\java.exe
+0x7c910000 - 0x7c9d4000 	C:\WINDOWS\system32\ntdll.dll
+0x7c800000 - 0x7c90c000 	C:\WINDOWS\system32\kernel32.dll
+0x77d90000 - 0x77e3e000 	C:\WINDOWS\system32\ADVAPI32.dll
+0x77c40000 - 0x77cdf000 	C:\WINDOWS\system32\RPCRT4.dll
+0x7c340000 - 0x7c396000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\msvcr71.dll
+0x6d8b0000 - 0x6db57000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\client\jvm.dll
+0x77f40000 - 0x77fd2000 	C:\WINDOWS\system32\USER32.dll
+0x77bf0000 - 0x77c38000 	C:\WINDOWS\system32\GDI32.dll
+0x769c0000 - 0x769ee000 	C:\WINDOWS\system32\WINMM.dll
+0x6d860000 - 0x6d86c000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\verify.dll
+0x6d3e0000 - 0x6d3ff000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\java.dll
+0x6d340000 - 0x6d348000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\hpi.dll
+0x76a90000 - 0x76a9b000 	C:\WINDOWS\system32\PSAPI.DLL
+0x6d8a0000 - 0x6d8af000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\zip.dll
+0x6d0b0000 - 0x6d1fa000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\awt.dll
+0x72ec0000 - 0x72ee7000 	C:\WINDOWS\system32\WINSPOOL.DRV
+0x77b90000 - 0x77bea000 	C:\WINDOWS\system32\msvcrt.dll
+0x761b0000 - 0x761cd000 	C:\WINDOWS\system32\IMM32.dll
+0x77510000 - 0x77644000 	C:\WINDOWS\system32\ole32.dll
+0x77360000 - 0x77463000 	C:\WINDOWS\WinSxS\x86_Microsoft.Windows.Common-Controls_6595b64144ccf1df_6.0.3790.1830_x-ww_7AE38CCF\COMCTL32.dll
+0x77ee0000 - 0x77f32000 	C:\WINDOWS\system32\SHLWAPI.dll
+0x72580000 - 0x725d1000 	C:\WINDOWS\system32\MSCTF.dll
+0x7c9e0000 - 0x7d1ea000 	C:\WINDOWS\system32\shell32.dll
+0x6d2e0000 - 0x6d334000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\fontmanager.dll
+0x6d6c0000 - 0x6d6d3000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\net.dll
+0x71a50000 - 0x71a67000 	C:\WINDOWS\system32\WS2_32.dll
+0x71a40000 - 0x71a48000 	C:\WINDOWS\system32\WS2HELP.dll
+0x6d6e0000 - 0x6d6e9000 	C:\Arquivos de programas\Java\jdk1.6.0_21\jre\bin\nio.dll
+0x71970000 - 0x719b2000 	C:\WINDOWS\System32\mswsock.dll
+0x76df0000 - 0x76e1a000 	C:\WINDOWS\system32\DNSAPI.dll
+0x76e90000 - 0x76e97000 	C:\WINDOWS\System32\winrnr.dll
+0x76e30000 - 0x76e5f000 	C:\WINDOWS\system32\WLDAP32.dll
+0x76ea0000 - 0x76ea5000 	C:\WINDOWS\system32\rasadhlp.dll
+0x5c7e0000 - 0x5c839000 	C:\WINDOWS\system32\hnetcfg.dll
+0x71930000 - 0x71938000 	C:\WINDOWS\System32\wshtcpip.dll
+0x68000000 - 0x6802f000 	C:\WINDOWS\system32\rsaenh.dll
+0x76840000 - 0x76905000 	C:\WINDOWS\system32\USERENV.dll
+0x71a90000 - 0x71ae8000 	C:\WINDOWS\system32\netapi32.dll
+0x10000000 - 0x10055000 	C:\Documents and Settings\Administrador\Configurações locais\Temp\jna5590774192939229772.dll
+0x032c0000 - 0x032d8000 	C:\WINDOWS\system32\BEMADP32.dll
+
+VM Arguments:
+jvm_args: -Dfile.encoding=UTF-8 
+java_command: condominioPlus.Main
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+JAVA_HOME=C:\Arquivos de programas\Java\jre6
+PATH=C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\Arquivos de programas\Microsoft SQL Server\80\Tools\BINN;C:\Arquivos de programas\Java\jre6\bin
+USERNAME=Administrador
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=x86 Family 6 Model 23 Stepping 10, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows Server 2003 family Build 3790 Service Pack 1
+
+CPU:total 4 (4 cores per cpu, 1 threads per core) family 6 model 23 stepping 10, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1
+
+Memory: 4k page, physical 3397768k(1943820k free), swap 5339336k(3897920k free)
+
+vm_info: Java HotSpot(TM) Client VM (17.0-b17) for windows-x86 JRE (1.6.0_21-b07), built on Jul 17 2010 01:10:15 by "java_re" with MS VC++ 7.1 (VS2003)
+
+time: Mon Jan 17 16:59:50 2011
+elapsed time: 39 seconds
+
