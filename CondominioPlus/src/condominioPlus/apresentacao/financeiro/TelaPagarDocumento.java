@@ -110,11 +110,17 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 txtNumeroDocumento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
 
             } else if (origem == radioDocumento) {
-                txtNumeroDocumento.setText("");
+                txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
 
             } else if (origem == btnEfetivarPagamento) {
                 efetuarPagamento();
-                imprimirCheques();
+                if (radioCheque.isSelected()) {
+                    imprimirCheques();
+                } else {
+                    System.out.println("Documento!");
+                }
+                dispose();
+            } else if (origem == btnCancelar) {
                 dispose();
             }
         }
