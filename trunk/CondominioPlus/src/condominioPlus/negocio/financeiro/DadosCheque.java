@@ -23,7 +23,7 @@ import logicpoint.util.Util;
 @Table(name = "dados_cheque")
 public class DadosCheque extends DadosPagamento {
 
-    private String numero;
+    private String numero = "";
     private String conta;
     private String titular;
     private String agencia;
@@ -35,11 +35,11 @@ public class DadosCheque extends DadosPagamento {
     public DadosCheque() {
     }
 
-    public DadosCheque(String numero, String conta, String titular, String agencia, Banco banco) {
+    public DadosCheque(String numero, String conta, String titular, Banco banco) {
         this.numero = numero;
         this.conta = conta;
         this.titular = titular;
-        this.agencia = agencia;
+        this.agencia = banco.getAgencia();
         this.banco = banco;
     }
 

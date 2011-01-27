@@ -13,6 +13,8 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaCorrente;
+import condominioPlus.negocio.financeiro.DadosCheque;
+import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
@@ -116,7 +118,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
-                        return pagamento.getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque)pagamento.getDadosPagamento()).getNumero() : ((DadosDOC)pagamento.getDadosPagamento()).getNumeroDocumento();
                     case 2:
                         return pagamento.getConta().getCodigo();
                     case 3:
@@ -191,7 +193,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
-                        return pagamento.getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque)pagamento.getDadosPagamento()).getNumero() : ((DadosCheque)pagamento.getDadosPagamento()).getNumero();
                     case 2:
                         return pagamento.getHistorico();
                     case 3:
