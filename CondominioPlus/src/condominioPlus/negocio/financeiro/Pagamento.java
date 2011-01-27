@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -64,7 +65,7 @@ public class Pagamento implements Serializable, Removivel {
     private ContaPagar contaPagar;
     private boolean removido;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
-    @OneToOne
+    @OneToOne(cascade=CascadeType.ALL)
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
 

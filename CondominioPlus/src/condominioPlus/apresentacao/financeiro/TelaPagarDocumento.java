@@ -12,7 +12,11 @@ package condominioPlus.apresentacao.financeiro;
 
 import bemaJava.Bematech;
 import com.sun.jna.Native;
+import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import condominioPlus.Main;
+import condominioPlus.negocio.financeiro.DadosCheque;
+import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.DadosPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import java.awt.event.ActionEvent;
@@ -35,6 +39,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
     List<Pagamento> pagamentos;
     List<Pagamento> novaLista = new ArrayList<Pagamento>();
     BigDecimal total = new BigDecimal(0);
+    DadosPagamento dados;
 
     /** Creates new form TelaPagarDocumento */
     public TelaPagarDocumento(java.awt.Frame parent, List<Pagamento> pagamentos) {
@@ -51,12 +56,23 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
             if (radioCheque.isSelected()) {
                 preencherObjetos();
                 pagamento.setForma(FormaPagamento.CHEQUE);
+                if (dados == null) {
+                    pagamento.setDadosPagamento(dados = new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial(),
+                            Main.getCondominio().getContaBancaria().getBanco()));
+                } else {
+                    pagamento.setDadosPagamento(dados);
+                }
                 pagamento.setPago(true);
                 pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
                 new DAO().salvar(pagamento);
             } else {
                 preencherObjetos();
                 pagamento.setForma(FormaPagamento.DINHEIRO);
+                if (dados == null) {
+                    pagamento.setDadosPagamento(dados = new DadosDOC(txtNumeroDocumento.getText()));
+                }else{
+                    pagamento.setDadosPagamento(dados);
+                }
                 pagamento.setPago(true);
                 pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
                 new DAO().salvar(pagamento);
@@ -90,7 +106,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
 
     private void preencherObjetos() {
         for (Pagamento pagamento : pagamentos) {
-            pagamento.setNumeroDocumento(txtNumeroDocumento.getText());
+//            pagamento.setNumeroDocumento(txtNumeroDocumento.getText());
             pagamento.setDataPagamento(DataUtil.getCalendar(txtDataPagamento.getValue()));
 
         }
