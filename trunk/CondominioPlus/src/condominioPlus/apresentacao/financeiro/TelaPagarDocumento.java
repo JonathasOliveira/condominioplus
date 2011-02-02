@@ -12,7 +12,6 @@ package condominioPlus.apresentacao.financeiro;
 
 import bemaJava.Bematech;
 import com.sun.jna.Native;
-import com.sun.org.apache.bcel.internal.generic.INSTANCEOF;
 import condominioPlus.Main;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
@@ -57,8 +56,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 preencherObjetos();
                 pagamento.setForma(FormaPagamento.CHEQUE);
                 if (dados == null) {
-                    pagamento.setDadosPagamento(dados = new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial(),
-                            Main.getCondominio().getContaBancaria().getBanco()));
+                    pagamento.setDadosPagamento(dados = new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
                 } else {
                     pagamento.setDadosPagamento(dados);
                 }
@@ -70,7 +68,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 pagamento.setForma(FormaPagamento.DINHEIRO);
                 if (dados == null) {
                     pagamento.setDadosPagamento(dados = new DadosDOC(txtNumeroDocumento.getText()));
-                }else{
+                } else {
                     pagamento.setDadosPagamento(dados);
                 }
                 pagamento.setPago(true);
@@ -84,7 +82,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
         for (Pagamento pagamento : pagamentos) {
             total = total.add(pagamento.getValor());
         }
-        return String.valueOf(total);
+        return String.valueOf(total.negate());
     }
 
     private void imprimirCheques() {
@@ -98,7 +96,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
         iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
         lib.Bematech_DP_IncluiAlteraBanco("555", "3,7,9,11,13,92,20,8,10,62,23,32,55");
-        String valor = somarCheque();
+        String valor = somarCheque().replace('.', ',');
         iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor().getNome(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataPagamento()).toString("ddMMyy"), "");
         System.out.println(iRetorno);
 
@@ -126,6 +124,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 txtNumeroDocumento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
 
             } else if (origem == radioDocumento) {
+                System.out.println(" numero " + Pagamento.gerarNumeroDocumento());
                 txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
 
             } else if (origem == btnEfetivarPagamento) {
