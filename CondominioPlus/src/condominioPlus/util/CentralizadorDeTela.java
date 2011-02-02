@@ -18,4 +18,6 @@ public class CentralizadorDeTela {
         fr.setLocation((d.width - fr.getSize().width) / 2, (d.height - fr.getSize().height) / 2);
     }
 
+ 
+
 }

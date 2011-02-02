@@ -35,12 +35,10 @@ public class DadosCheque extends DadosPagamento {
     public DadosCheque() {
     }
 
-    public DadosCheque(String numero, String conta, String titular, Banco banco) {
+    public DadosCheque(String numero, String conta, String titular) {
         this.numero = numero;
         this.conta = conta;
         this.titular = titular;
-        this.agencia = banco.getAgencia();
-        this.banco = banco;
     }
 
     public DadosCheque(String numero, String conta, String titular, String agencia, Banco banco, String codigoVerificacao) {

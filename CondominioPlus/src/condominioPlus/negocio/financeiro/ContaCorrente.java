@@ -9,6 +9,7 @@ import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -94,10 +95,15 @@ public class ContaCorrente implements Serializable {
 
     public void calculaSaldo() {
 
-        //like my old friend did, I dont know who this code below is working but it is! I am kidding but only god and I know what it is! :P
-        List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, dataFechamento);
-        for (Pagamento pagamento : pagamentos) {
-        }
+        Calendar novaData = Calendar.getInstance();
+
+        novaData = DataUtil.getCalendar(dataFechamento);
+
+
+        novaData.add(Calendar.DAY_OF_MONTH, -1);
+
+        List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, novaData);
+
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
 
         Collections.sort(pagamentos, comCod);
@@ -106,21 +112,24 @@ public class ContaCorrente implements Serializable {
 
         Collections.sort(pagamentos, comparator);
 
-        for (Pagamento pagamento : pagamentos) {
-            System.out.println("pagamento com comparatores " + pagamento.getCodigo() + " " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
-        }
         for (int i = 0; i < pagamentos.size(); i++) {
             if (i != 0) {
                 Pagamento p1 = pagamentos.get(i);
-                if (p1.getConta().isCredito()) {
-                    p1.setSaldo(pagamentos.get(i - 1).getSaldo().add(pagamentos.get(i).getValor()));
-                } else {
-                    p1.setSaldo(pagamentos.get(i - 1).getSaldo().subtract(pagamentos.get(i).getValor()));
-                }
+                Pagamento pagamentoAnterior = pagamentos.get(i - 1);
+                p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
+
+//                if (p1.getConta().isCredito()) {
+//                    p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
+//                } else {
+//                    p1.setSaldo(pagamentoAnterior.getSaldo().subtract(p1.getValor()));
+//                }
+                condominio.getContaCorrente().setSaldo(p1.getSaldo());
             }
 
             System.out.println("pagamento comparado por codigo " + pagamentos.get(i).getCodigo() + " " + pagamentos.get(i).getHistorico() + " " + DataUtil.toString(pagamentos.get(i).getDataPagamento()));
+            System.out.println("data fechamento caixa " + DataUtil.getDateTime(dataFechamento));
         }
+
         new DAO().salvar(pagamentos);
 
     }

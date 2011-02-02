@@ -246,7 +246,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtSindico.setText(condominio.getSindico());
 
         if (condominio.getContaCorrente().getDataFechamento() != null) {
-            txtDataFechamentoCaixa.setValue(DataUtil.getDate(condominio.getDataCadastro().getTimeInMillis()));
+            txtDataFechamentoCaixa.setValue(DataUtil.getDate(condominio.getContaCorrente().getDataFechamento()));
         }
 
         txtRua.setText(condominio.getEndereco().getLogradouro());
@@ -340,6 +340,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             condominio.getContaCorrente().setDataFechamento(DataUtil.getCalendar(DataUtil.hoje()));
         } else {
             condominio.getContaCorrente().setDataFechamento(DataUtil.getCalendar(txtDataFechamentoCaixa.getValue()));
+            System.out.println("data fechamento " + DataUtil.getDateTime(condominio.getContaCorrente().getDataFechamento()));
         }
 
         if (condominio.getDadosTalao() != null) {
@@ -962,8 +963,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                     .addComponent(cmbBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel9Layout.createSequentialGroup()
                         .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -971,7 +971,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                             .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel14)
                             .addComponent(txtContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel13))
+                    .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel13)))
                 .addGap(37, 37, 37))
         );
 

@@ -30,14 +30,14 @@ import logicpoint.persistencia.Removivel;
 @Entity
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.dataPagamento"),
-    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 order by c.dataPagamento"),
+    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento"),
     @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorFornecedor", query = "SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
     @NamedQuery(name = "MaxNumeroDocumentoPagamentos", query = "SELECT Max(p.numeroDocumento) FROM Pagamento p WHERE p.forma = ?1")
 })
-public class Pagamento implements Serializable, Removivel {
+public class Pagamento implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,9 +63,8 @@ public class Pagamento implements Serializable, Removivel {
     private ContaCorrente contaCorrente;
     @ManyToOne
     private ContaPagar contaPagar;
-    private boolean removido;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
 
@@ -187,15 +186,6 @@ public class Pagamento implements Serializable, Removivel {
         this.setSaldo(this.valor.add(p.getSaldo()));
 
     }
-
-    public void setRemovido(boolean removido) {
-        this.removido = removido;
-    }
-
-    public boolean isRemovido() {
-        return removido;
-    }
-
     public boolean isPago() {
         return pago;
     }
@@ -221,11 +211,12 @@ public class Pagamento implements Serializable, Removivel {
     }
 
     public static String gerarNumeroDocumento() {
-        String valor = (String) new DAO().localizar("MaxNumeroDocumentoPagamentos", FormaPagamento.DINHEIRO);
-        int novoValor = Integer.parseInt(valor) + 1;
+        String valor = (String) new DAO().localizar("MaxNumeroDocumento");
         if (valor == null) {
             return "1";
         }
+        int novoValor = Integer.parseInt(valor) + 1;
+
         return String.valueOf(novoValor);
     }
 }
