@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
@@ -10,16 +9,23 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 /**
  *
  * @author Administrador
  */
 @Entity
+@NamedQueries(value = {
+    @NamedQuery(name = "ListarContas", query = "SELECT c FROM Conta c WHERE c.credito = ?1 order by c.codigo"),
+    @NamedQuery(name = "LocalizarContas", query = "SELECT c FROM Conta c WHERE c.codigo = ?1 and c.credito = ?2 order by c.codigo")
+})
+
 public class Conta implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     private String nome;
     private boolean credito;
@@ -73,8 +79,4 @@ public class Conta implements Serializable {
     public String toString() {
         return nome;
     }
-
-
-
-    
 }

@@ -40,15 +40,18 @@ public class LimitarCaracteres extends PlainDocument {
         }
     }
 
-    public void ValidaNumero(JTextField Numero) {
+    public boolean ValidaNumero(JTextField Numero) {
         long valor;
         if (Numero.getText().length() != 0) {
             try {
                 valor = Long.parseLong(Numero.getText());
             } catch (NumberFormatException ex) {
                 ApresentacaoUtil.exibirInformacao("Esse Campo só aceita números", null);
-                Numero.grabFocus();
+                return false;
+
             }
+            return true;
         }
+        return false;
     }
 }

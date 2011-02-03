@@ -30,13 +30,15 @@ public class DialogoConta extends javax.swing.JDialog {
 
     private TabelaModelo_2<Conta> modelo;
     private Conta conta;
+    private boolean credito;
 
     /** Creates new form DialogoConta */
-    public DialogoConta(java.awt.Frame parent, boolean modal) {
+    public DialogoConta(java.awt.Frame parent, boolean modal, boolean credito) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
+        this.credito = credito;
         carregarTipoBusca();
         carregarTabela();
     }
@@ -51,7 +53,7 @@ public class DialogoConta extends javax.swing.JDialog {
 
             @Override
             protected List<Conta> getCarregarObjetos() {
-                return new DAO().listar(Conta.class);
+                return getContas(credito);
             }
 
             @Override
@@ -140,6 +142,12 @@ public class DialogoConta extends javax.swing.JDialog {
         dispose();
     }
 
+    private List<Conta> getContas(boolean credito) {
+        return new DAO().listar("ListarContas", credito);
+
+
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
@@ -165,16 +173,18 @@ public class DialogoConta extends javax.swing.JDialog {
                 selecionarConta();
             } else if (source == btnPesquisar) {
                 modelo.filtrar();
-            } else if (source == btnCancelar){
+            } else if (source == btnCancelar) {
                 sair();
             }
             source = null;
         }
+
         @Override
         public void caretUpdate(CaretEvent e) {
             if (e.getSource() == txtNome) {
-                if(txtNome.getText().equals(""))
-                modelo.filtrar();
+                if (txtNome.getText().equals("")) {
+                    modelo.filtrar();
+                }
             }
         }
     }

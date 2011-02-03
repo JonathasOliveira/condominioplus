@@ -134,13 +134,13 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
             @Override
             public boolean getRemover(Pagamento pagamento) {
-                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Pagamento - " + pagamento.getNumeroDocumento() + " ?", TelaContaCorrente.this)) {
+                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Pagamento - " + pagamento.getHistorico() + " ?", TelaContaCorrente.this)) {
                     return false;
                 }
 
                 try {
                     new DAO().remover(condominio);
-                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Pagamento - " + pagamento.getNumeroDocumento());
+                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Pagamento - " + pagamento.getHistorico());
                     return true;
                 } catch (Throwable t) {
                     new TratadorExcecao(t, TelaContaCorrente.this);
@@ -206,13 +206,13 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
             @Override
             public boolean getRemover(Pagamento pagamento) {
-                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Pagamento - " + pagamento.getNumeroDocumento() + " ?", TelaContaCorrente.this)) {
+                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Pagamento - " + pagamento.getHistorico() + " ?", TelaContaCorrente.this)) {
                     return false;
                 }
 
                 try {
                     new DAO().remover(condominio);
-                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Pagamento - " + pagamento.getNumeroDocumento());
+                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Pagamento - " + pagamento.getHistorico());
                     return true;
                 } catch (Throwable t) {
                     new TratadorExcecao(t, TelaContaCorrente.this);
@@ -346,10 +346,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true);
+        DialogoConta c = new DialogoConta(null, true, true);
         c.setVisible(true);
-
-
         if (c.getConta() != null) {
             conta = c.getConta();
             txtConta.setText(String.valueOf(conta.getCodigo()));
@@ -358,8 +356,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             } else {
                 txtHistorico.setText(fixarHistorico());
             }
-
-
         }
     }
 
@@ -413,7 +409,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             for (Pagamento p : itensRemover) {
                 modeloTabela.remover(p);
                 modeloTabela.notificar();
-                    contaCorrente.setSaldo(contaCorrente.getSaldo().add(p.getValor()));
+                contaCorrente.setSaldo(contaCorrente.getSaldo().add(p.getValor()));
             }
             new DAO().remover(itensRemover);
             condominio.getContaCorrente().getPagamentos().removeAll(itensRemover);
