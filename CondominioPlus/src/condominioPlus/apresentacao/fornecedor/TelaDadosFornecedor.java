@@ -14,7 +14,9 @@ import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.Telefone;
-import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.DadosCheque;
+import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
@@ -189,7 +191,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
-                        return pagamento.getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
                     case 2:
                         return pagamento.getValor();
                     case 3:

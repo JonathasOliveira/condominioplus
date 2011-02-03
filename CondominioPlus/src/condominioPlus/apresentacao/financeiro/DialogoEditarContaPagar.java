@@ -10,11 +10,26 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import condominioPlus.Main;
+import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.fornecedor.Fornecedor;
+import condominioPlus.util.LimitarCaracteres;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JComboBox;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import logicpoint.apresentacao.ApresentacaoUtil;
+import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
@@ -27,13 +42,90 @@ import logicpoint.util.Util;
 public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
     private Pagamento pagamento;
+    private ComboModelo<Fornecedor> modelo;
+    private TabelaModelo_2 modeloTabela;
+    private ControladorEventosGenerico controlador;
+    private Conta conta;
+    List<Pagamento> listaPagamentos;
 
     /** Creates new form TelaBanco */
     public DialogoEditarContaPagar(Pagamento pagamento) {
         initComponents();
         this.pagamento = pagamento;
+        listaPagamentos = getPagamentos();
+        carregarFornecedor();
         preencherTela();
+        carregarTabela();
+        controlador = new ControladorEventos();
+    }
 
+    private void carregarTabela() {
+        modeloTabela = new TabelaModelo_2<Pagamento>(tabela, "Vencimento, Conta, Documento, Valor".split(",")) {
+
+            @Override
+            protected Pagamento getAdicionar() {
+                editar(new Pagamento());
+                return null;
+            }
+
+            @Override
+            public void editar(Pagamento pagamento) {
+//              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondominio(condominio));
+            }
+
+            @Override
+            protected List<Pagamento> getCarregarObjetos() {
+                return getPagamentos();
+            }
+
+//            @Override
+//            protected List<Pagamento> getFiltrar(List<Pagamento> pagamentos) {
+//                return filtrarListaPorNome(txtNome.getText(), pagamentos);
+//            }
+            @Override
+            public Object getValor(Pagamento pagamento, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return DataUtil.getDateTime(pagamento.getDataVencimento());
+                    case 1:
+                        return pagamento.getConta().getCodigo();
+                    case 2:
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+                    case 3:
+                        return pagamento.getValor();
+                    default:
+                        return null;
+                }
+            }
+        };
+
+
+        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabela.getColumn(modeloTabela.getCampo(1)).setCellRenderer(direita);
+        tabela.getColumn(modeloTabela.getCampo(2)).setCellRenderer(direita);
+        tabela.getColumn(modeloTabela.getCampo(3)).setCellRenderer(centralizado);
+//        tabela.getColumn(modeloTabela.getCampo(5)).setCellRenderer(direita);
+//        tabela.getColumn(modeloTabela.getCampo(3)).setMinWidth(180);
+//        tabela.getColumn(modeloTabela.getCampo(4)).setMinWidth(280);
+//        tabela.getColumn(modeloTabela.getCampo(5)).setMinWidth(110);
+    }
+
+    private List<Pagamento> getPagamentos() {
+        List<Pagamento> lista = new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
+        List<Pagamento> listaModificada = new ArrayList<Pagamento>();
+        for (Pagamento p2 : lista) {
+            if (p2.getCodigo() != pagamento.getCodigo()) {
+                listaModificada.add(p2);
+            }
+        }
+        return listaModificada;
     }
 
     private String compararForma() {
@@ -42,19 +134,156 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
     private void preencherTela() {
         txtData.setValue(DataUtil.getDate(pagamento.getDataVencimento()));
+        if (pagamento.getConta() != null) {
+            conta = pagamento.getConta();
+        }
         txtConta.setText(Util.IntegerToString(pagamento.getConta().getCodigo()));
         txtHistorico.setText(pagamento.getHistorico());
         txtNumeroDocumento.setText(compararForma());
         txtValor.setText(String.valueOf(pagamento.getValor().negate()));
-        cbFornecedores.setSelectedItem(pagamento.getFornecedor());
+        modelo.setSelectedItem(pagamento.getFornecedor());
 
     }
 
     private void preencherObjeto() {
+        pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
+        pagamento.setHistorico(txtHistorico.getText());
+        pagamento.setValor(new BigDecimal(txtValor.getText()));
+        pagamento.setFornecedor(modelo.getSelectedItem());
+        pagamento.setConta(conta);
+        selecionaFormaPagamento(pagamento);
+
+    }
+
+    private Pagamento selecionaFormaPagamento(Pagamento p) {
+        if (btnNumeroDocumento.isSelected()) {
+            p.setForma(FormaPagamento.CHEQUE);
+            p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            return p;
+        } else {
+            p.setForma(FormaPagamento.DINHEIRO);
+            p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            return p;
+        }
+
+    }
+
+    private void salvar() {
+        preencherObjeto();
+
+        if (!listaPagamentos.isEmpty()) {
+            System.out.println("teste");
+            for (Pagamento p : listaPagamentos) {
+                if (btnNumeroDocumento.isSelected()) {
+                    p.setForma(FormaPagamento.CHEQUE);
+                    p.setDadosPagamento(pagamento.getDadosPagamento());
+                } else {
+                    p.setForma(FormaPagamento.DINHEIRO);
+                    p.setDadosPagamento(pagamento.getDadosPagamento());
+                }
+            }
+            System.out.println("listta" + listaPagamentos);
+            new DAO().salvar(listaPagamentos);
+        }
+
+        new DAO().salvar(pagamento);
+        dispose();
+    }
+
+    private void trocarFormaPagamento() {
+        if (btnNumeroDocumento.isSelected()) {
+            btnNumeroDocumento.setText("Nº Cheque:");
+            txtNumeroDocumento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
+        } else {
+            btnNumeroDocumento.setText("Nº Doc:");
+            txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
+        }
+
+    }
+
+    private void pegarConta() {
+        DialogoConta c = new DialogoConta(null, true, false);
+        c.setVisible(true);
+
+        if (c.getConta() != null) {
+            conta = c.getConta();
+            txtConta.setText(String.valueOf(conta.getCodigo()));
+        }
+    }
+
+    private Conta pesquisarContaPorCodigo(int codigo) {
+        Conta c = null;
+        try {
+            c = (Conta) new DAO().localizar("LocalizarContas", codigo, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return c;
+    }
+
+    public void setConta(Conta conta) {
+        this.conta = conta;
     }
 
     private void carregarFornecedor() {
-        cbFornecedores.setModel(new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class)));
+        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
+        cbFornecedores.setModel(modelo);
+    }
+
+    private class ControladorEventos extends ControladorEventosGenerico {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() == btnSalvar) {
+                salvar();
+            } else if (e.getSource() == btnCancelar) {
+                dispose();
+            } else if (e.getSource() == btnImprimir) {
+            } else if (e.getSource() == btnConta) {
+                pegarConta();
+            } else if (e.getSource() == btnNumeroDocumento) {
+                trocarFormaPagamento();
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (e.getSource() == txtConta) {
+                Conta resultado = null;
+                if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
+                    if (!txtConta.getText().equals("") && txtConta.getText() != null) {
+                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        if (resultado != null) {
+                            conta = resultado;
+                            txtConta.setText(String.valueOf(conta.getCodigo()));
+                            txtHistorico.setText(conta.getNome());
+                        } else {
+                            ApresentacaoUtil.exibirErro("Código Inexistente!", DialogoEditarContaPagar.this);
+                            txtConta.setText("");
+                            txtConta.grabFocus();
+                            return;
+                        }
+                    }
+                } else {
+                    txtConta.setText("");
+                    txtConta.grabFocus();
+                }
+            }
+        }
+
+        @Override
+        public void configurar() {
+            ApresentacaoUtil.adicionarListener(
+                    ApresentacaoUtil.transferidorFocoEnter, DialogoEditarContaPagar.this, JTextField.class, JComboBox.class);
+            ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, DialogoEditarContaPagar.this, JTextField.class);
+
+            btnSalvar.addActionListener(this);
+            btnCancelar.addActionListener(this);
+            btnImprimir.addActionListener(this);
+            btnConta.addActionListener(this);
+            txtConta.addFocusListener(this);
+            btnNumeroDocumento.addActionListener(this);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -64,8 +293,9 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tabelaPagamentosRelacionados = new javax.swing.JTable();
-        jPanel3 = new javax.swing.JPanel();
+        tabela = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
+        painelContaPagar = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         txtData = new net.sf.nachocalendar.components.DateField();
@@ -79,13 +309,15 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         btnNumeroDocumento = new javax.swing.JToggleButton();
         jLabel4 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        btnIncluir = new javax.swing.JButton();
-        btnGravar = new javax.swing.JButton();
+        btnSalvar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Editar Conta a Pagar");
+        setModal(true);
 
-        tabelaPagamentosRelacionados.setModel(new javax.swing.table.DefaultTableModel(
+        tabela.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -96,26 +328,40 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tabelaPagamentosRelacionados);
+        tabela.setName("tabela"); // NOI18N
+        jScrollPane1.setViewportView(tabela);
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
+        jLabel5.setText("Atenção: Caso modifique o número do cheque/doc estes pagamentos também serão alterados!");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        painelContaPagar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel3.setText("Valor:");
 
         jLabel1.setText("Data Vencimento:");
 
         txtData.setFocusable(false);
+        txtData.setName("data"); // NOI18N
         txtData.setRequestFocusEnabled(false);
 
         txtValor.setName("Valor"); // NOI18N
@@ -132,7 +378,11 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
         txtHistorico.setName("Histórico"); // NOI18N
 
+        cbFornecedores.setName("fornecedor"); // NOI18N
+
         jLabel2.setText("Fornecedor:");
+
+        txtNumeroDocumento.setName("documento"); // NOI18N
 
         btnNumeroDocumento.setText("Nº Doc");
         btnNumeroDocumento.setToolTipText("Clique para alternar o tipo de Registro!");
@@ -147,19 +397,19 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
         jLabel4.setText("Histórico:");
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelContaPagarLayout = new javax.swing.GroupLayout(painelContaPagar);
+        painelContaPagar.setLayout(painelContaPagarLayout);
+        painelContaPagarLayout.setHorizontalGroup(
+            painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelContaPagarLayout.createSequentialGroup()
+                .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(txtHistorico))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addGap(10, 10, 10)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelContaPagarLayout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addGap(71, 71, 71)
                                 .addComponent(btnNumeroDocumento)
@@ -167,7 +417,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
                                 .addComponent(btnConta)
                                 .addGap(33, 33, 33)
                                 .addComponent(jLabel3))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGroup(painelContaPagarLayout.createSequentialGroup()
                                 .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(6, 6, 6)
                                 .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -175,40 +425,40 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
                                 .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel4))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel2))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(cbFornecedores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        painelContaPagarLayout.setVerticalGroup(
+            painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelContaPagarLayout.createSequentialGroup()
                 .addGap(5, 5, 5)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addGap(1, 1, 1)
                         .addComponent(btnNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnConta)
                     .addComponent(jLabel3))
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGroup(painelContaPagarLayout.createSequentialGroup()
                                 .addGap(1, 1, 1)
                                 .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
+                            .addGroup(painelContaPagarLayout.createSequentialGroup()
                                 .addGap(1, 1, 1)
                                 .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addGap(7, 7, 7)
                         .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -224,25 +474,25 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        btnIncluir.setText("Salvar");
-        btnIncluir.setToolTipText("Salvar");
-        btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnSalvar.setText("Salvar");
+        btnSalvar.setToolTipText("Salvar");
+        btnSalvar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.ipadx = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 72, 11, 0);
-        jPanel1.add(btnIncluir, gridBagConstraints);
+        jPanel1.add(btnSalvar, gridBagConstraints);
 
-        btnGravar.setText("Cancelar");
-        btnGravar.setToolTipText("Gravar Cheques");
+        btnCancelar.setText("Cancelar");
+        btnCancelar.setToolTipText("Gravar Cheques");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 44, 11, 0);
-        jPanel1.add(btnGravar, gridBagConstraints);
+        jPanel1.add(btnCancelar, gridBagConstraints);
 
         btnImprimir.setText("Imprimir");
         btnImprimir.setToolTipText("Imprimir Cheque");
@@ -258,21 +508,19 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 442, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, 0, 422, Short.MAX_VALUE)
+                    .addComponent(painelContaPagar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 381, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(14, Short.MAX_VALUE)
+                .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -289,30 +537,27 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     /**
      * @param args the command line arguments
      */
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnConta;
-    private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnImprimir;
-    private javax.swing.JButton btnIncluir;
     private javax.swing.JToggleButton btnNumeroDocumento;
+    private javax.swing.JButton btnSalvar;
     private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tabelaPagamentosRelacionados;
+    private javax.swing.JPanel painelContaPagar;
+    private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroDocumento;
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
-
-
 }

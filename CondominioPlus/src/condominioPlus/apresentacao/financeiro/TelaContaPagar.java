@@ -12,8 +12,7 @@ package condominioPlus.apresentacao.financeiro;
 
 import bemaJava.Bematech;
 import com.sun.jna.Native;
-import condominioPlus.apresentacao.TelaPrincipal;
-import condominioPlus.apresentacao.advogado.TelaAdvogado;
+import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaPagar;
@@ -26,25 +25,18 @@ import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
-import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.JLabel;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
-import logicpoint.apresentacao.ComboModelo_2;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
@@ -83,7 +75,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         new ControladorEventos();
         carregarFornecedor();
         carregarTabela();
-        new LimitarCaracteres(10).ValidaNumero(txtConta);
+//        new LimitarCaracteres(10).ValidaNumero(txtConta);
         txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
         painelCheques.setVisible(false);
         if (condominio != null) {
@@ -358,16 +350,25 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }
 
     private Pagamento selecionaFormaPagamento(Pagamento p) {
-        Pagamento p2 = p;
         if (btnNumeroDocumento.isSelected()) {
-            p2.setForma(FormaPagamento.CHEQUE);
-            p2.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
-            return p2;
+            p.setForma(FormaPagamento.CHEQUE);
+            p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
+            for (Pagamento cheque : cheques) {
+                if (((DadosCheque) cheque.getDadosPagamento()).getNumero().equals(((DadosCheque) p.getDadosPagamento()).getNumero())) {
+                    p.setDadosPagamento(((DadosCheque) cheque.getDadosPagamento()));
+                }
+            }
+            return p;
         } else {
-
-            p2.setForma(FormaPagamento.DINHEIRO);
-            p2.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
-            return p2;
+            p.setForma(FormaPagamento.DINHEIRO);
+            p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            List<Pagamento> documentos = new DAO().listar("PagamentosPorForma", Main.getCondominio().getContaPagar(), FormaPagamento.DINHEIRO);
+            for (Pagamento documento : documentos) {
+                if (((DadosDOC) documento.getDadosPagamento()).getNumeroDocumento().equals(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento())) {
+                    p.setDadosPagamento(((DadosDOC) documento.getDadosPagamento()));
+                }
+            }
+            return p;
         }
 
     }
@@ -392,7 +393,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true);
+        DialogoConta c = new DialogoConta(null, true, false);
         c.setVisible(true);
 
         if (c.getConta() != null) {
@@ -409,7 +410,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private Conta pesquisarContaPorCodigo(int codigo) {
         Conta c = null;
         try {
-            c = new DAO().localizar(Conta.class, codigo);
+            c = (Conta) new DAO().localizar("LocalizarContas", codigo, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -480,10 +481,11 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
     }
 
-    private void editarPagamento(){
-        DialogoEditarContaPagar tela = new DialogoEditarContaPagar((Pagamento)modeloTabela.getObjetoSelecionado());
+    private void editarPagamento() {
+        DialogoEditarContaPagar tela = new DialogoEditarContaPagar((Pagamento) modeloTabela.getObjetoSelecionado());
         tela.setLocationRelativeTo(this);
         tela.setVisible(true);
+        modeloTabela.carregarObjetos();
     }
 
     /** This method is called from within the constructor to
@@ -492,8 +494,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
      * always regenerated by the Form Editor.
      */
     private class ControladorEventos extends ControladorEventosGenerico {
-
-        int contador;
 
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -514,7 +514,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 gravarCheques();
             } else if (origem == btnImprimir) {
                 imprimirCheques();
-            } else if (origem == itemMenuEditarPagamento){
+            } else if (origem == itemMenuEditarPagamento) {
                 editarPagamento();
 
             }
@@ -561,20 +561,20 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         public void focusLost(FocusEvent e) {
             if (e.getSource() == txtConta) {
                 Conta resultado = null;
-                if (txtConta.getText() != null || !txtConta.getText().equals("")) {
-                    resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
-                }
-                if (resultado != null) {
-                    conta = resultado;
-                    if (txtConta.getText() != null || !txtConta.getText().equals("")) {
-                        txtConta.setText(String.valueOf(conta.getCodigo()));
-                        txtHistorico.setText(conta.getNome());
+                if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
+                    if (!txtConta.getText().equals("") && txtConta.getText() != null) {
+                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        if (resultado != null) {
+                            conta = resultado;
+                            txtConta.setText(String.valueOf(conta.getCodigo()));
+                            txtHistorico.setText(conta.getNome());
+                        } else {
+                            ApresentacaoUtil.exibirErro("Código Inexistente!", TelaContaPagar.this);
+                            txtConta.setText("");
+                            txtConta.grabFocus();
+                            return;
+                        }
                     }
-
-                } else {
-                    ApresentacaoUtil.exibirErro("Código Inexistente!", TelaContaPagar.this);
-                    txtConta.setText("");
-                    txtConta.grabFocus();
                 }
             }
         }
@@ -878,7 +878,5 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtNumeroDocumento;
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
-
-    
 }
 

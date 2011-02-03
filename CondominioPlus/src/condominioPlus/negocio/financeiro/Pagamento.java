@@ -21,7 +21,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import logicpoint.persistencia.DAO;
-import logicpoint.persistencia.Removivel;
 
 /**
  *
@@ -35,7 +34,9 @@ import logicpoint.persistencia.Removivel;
     @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento"),
     @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorFornecedor", query = "SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
-    @NamedQuery(name = "MaxNumeroDocumentoPagamentos", query = "SELECT Max(p.numeroDocumento) FROM Pagamento p WHERE p.forma = ?1")
+    @NamedQuery(name = "PagamentosPorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.dadosPagamento = ?2"),
+    @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2")
+
 })
 public class Pagamento implements Serializable{
 
@@ -55,8 +56,6 @@ public class Pagamento implements Serializable{
     private Fornecedor fornecedor;
     @ManyToOne
     private Conta conta;
-    @Column(name = "numero_documento")
-    private String numeroDocumento;
     @Column(precision = 20, scale = 2)
     private BigDecimal saldo = new BigDecimal(0);
     @ManyToOne
@@ -146,14 +145,6 @@ public class Pagamento implements Serializable{
 
     public void setForma(FormaPagamento forma) {
         this.forma = forma;
-    }
-
-    public String getNumeroDocumento() {
-        return numeroDocumento;
-    }
-
-    public void setNumeroDocumento(String numeroDocumento) {
-        this.numeroDocumento = numeroDocumento;
     }
 
     @Override
