@@ -56,7 +56,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 preencherObjetos();
                 pagamento.setForma(FormaPagamento.CHEQUE);
                 if (dados == null) {
-                    pagamento.setDadosPagamento(dados = new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+                    pagamento.setDadosPagamento(dados = new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
                 } else {
                     pagamento.setDadosPagamento(dados);
                 }
@@ -67,7 +67,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
                 preencherObjetos();
                 pagamento.setForma(FormaPagamento.DINHEIRO);
                 if (dados == null) {
-                    pagamento.setDadosPagamento(dados = new DadosDOC(txtNumeroDocumento.getText()));
+                    pagamento.setDadosPagamento(dados = new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
                 } else {
                     pagamento.setDadosPagamento(dados);
                 }

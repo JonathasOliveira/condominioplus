@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import logicpoint.util.Util;
 
 /**
  *
@@ -23,18 +22,13 @@ import logicpoint.util.Util;
 public class DadosDOC extends DadosPagamento {
 
     @Column(name = "numero_documento")
-    private String numeroDocumento = "";
+    private long numeroDocumento;
 
     public DadosDOC() {
     }
 
-    public DadosDOC(String numeroDocumento) {
+    public DadosDOC(long numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
-    }
-
-    @Override
-    public boolean verificar() {
-        return Util.verificar(numeroDocumento);
     }
 
     @Override
@@ -42,11 +36,11 @@ public class DadosDOC extends DadosPagamento {
         return new DadosDOC(numeroDocumento);
     }
 
-    public String getNumeroDocumento() {
+    public long getNumeroDocumento() {
         return numeroDocumento;
     }
 
-    public void setNumeroDocumento(String numeroDocumento) {
+    public void setNumeroDocumento(long numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
     }
 }

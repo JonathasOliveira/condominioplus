@@ -191,7 +191,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
-                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
                     case 2:
                         return pagamento.getValor();
                     case 3:

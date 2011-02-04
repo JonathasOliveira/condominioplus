@@ -10,6 +10,8 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import bemaJava.Bematech;
+import com.sun.jna.Native;
 import condominioPlus.Main;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosCheque;
@@ -21,6 +23,7 @@ import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -46,16 +49,18 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private TabelaModelo_2 modeloTabela;
     private ControladorEventosGenerico controlador;
     private Conta conta;
-    List<Pagamento> listaPagamentos;
+    private List<Pagamento> listaPagamentos;
+    private BigDecimal total = new BigDecimal(0);
 
     /** Creates new form TelaBanco */
     public DialogoEditarContaPagar(Pagamento pagamento) {
         initComponents();
         this.pagamento = pagamento;
-        listaPagamentos = getPagamentos();
+        listaPagamentos = getPagamentosSemOriginal();
         carregarFornecedor();
         preencherTela();
         carregarTabela();
+        setTotal();
         controlador = new ControladorEventos();
     }
 
@@ -75,7 +80,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
-                return getPagamentos();
+                return getPagamentosSemOriginal();
             }
 
 //            @Override
@@ -90,9 +95,9 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
                     case 1:
                         return pagamento.getConta().getCodigo();
                     case 2:
-                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
                     case 3:
-                        return pagamento.getValor();
+                        return pagamento.getValor().negate();
                     default:
                         return null;
                 }
@@ -118,6 +123,10 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private List<Pagamento> getPagamentos() {
+        return new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
+     }
+
+    private List<Pagamento> getPagamentosSemOriginal() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
         List<Pagamento> listaModificada = new ArrayList<Pagamento>();
         for (Pagamento p2 : lista) {
@@ -129,7 +138,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private String compararForma() {
-        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
     }
 
     private void preencherTela() {
@@ -148,7 +157,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private void preencherObjeto() {
         pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
-        pagamento.setValor(new BigDecimal(txtValor.getText()));
+        pagamento.setValor(new BigDecimal(txtValor.getText().replace(',', '.')).negate());
         pagamento.setFornecedor(modelo.getSelectedItem());
         pagamento.setConta(conta);
         selecionaFormaPagamento(pagamento);
@@ -158,13 +167,41 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
             return p;
         }
+
+    }
+
+    private void setTotal(){
+        lblTotal.setText(somarCheque());
+    }
+
+    private String somarCheque() {
+        for (Pagamento p : getPagamentos()) {
+            total = total.add(p.getValor());
+        }
+        return String.valueOf(total.negate());
+    }
+
+    private void imprimirCheques() {
+        int iRetorno;
+        Pagamento p = null;
+        if (!getPagamentos().isEmpty()) {
+            p = getPagamentos().get(0);
+        }
+
+        Bematech lib =
+                (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
+        iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
+        lib.Bematech_DP_IncluiAlteraBanco("555", "3,7,9,11,13,92,20,8,10,62,23,32,55");
+        String valor = somarCheque().replace('.', ',');
+        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor().getNome(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataVencimento()).toString("ddMMyy"), "");
+        System.out.println(iRetorno);
 
     }
 
@@ -239,6 +276,11 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
             } else if (e.getSource() == btnCancelar) {
                 dispose();
             } else if (e.getSource() == btnImprimir) {
+                if(getPagamentos().get(0).getForma() == FormaPagamento.CHEQUE){
+                    imprimirCheques();
+                }else{
+                    ApresentacaoUtil.exibirInformacao("Relatorio vai ser feito depois", DialogoEditarContaPagar.this);
+                }
             } else if (e.getSource() == btnConta) {
                 pegarConta();
             } else if (e.getSource() == btnNumeroDocumento) {
@@ -295,6 +337,8 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        lblTotal = new javax.swing.JLabel();
         painelContaPagar = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -331,26 +375,42 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         tabela.setName("tabela"); // NOI18N
         jScrollPane1.setViewportView(tabela);
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
         jLabel5.setText("Atenção: Caso modifique o número do cheque/doc estes pagamentos também serão alterados!");
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel6.setText("Total: R$");
+
+        lblTotal.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(255, 0, 0));
+        lblTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap()
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(18, Short.MAX_VALUE))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel6)
+                        .addGap(10, 10, 10)
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5))
         );
 
@@ -519,7 +579,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
+                .addContainerGap(13, Short.MAX_VALUE)
                 .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -549,9 +609,11 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblTotal;
     private javax.swing.JPanel painelContaPagar;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
