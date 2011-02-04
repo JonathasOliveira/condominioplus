@@ -23,7 +23,7 @@ import logicpoint.util.Util;
 @Table(name = "dados_cheque")
 public class DadosCheque extends DadosPagamento {
 
-    private String numero = "";
+    private long numero;
     private String conta;
     private String titular;
     private String agencia;
@@ -35,13 +35,13 @@ public class DadosCheque extends DadosPagamento {
     public DadosCheque() {
     }
 
-    public DadosCheque(String numero, String conta, String titular) {
+    public DadosCheque(long numero, String conta, String titular) {
         this.numero = numero;
         this.conta = conta;
         this.titular = titular;
     }
 
-    public DadosCheque(String numero, String conta, String titular, String agencia, Banco banco, String codigoVerificacao) {
+    public DadosCheque(long numero, String conta, String titular, String agencia, Banco banco, String codigoVerificacao) {
         this.numero = numero;
         this.conta = conta;
         this.titular = titular;
@@ -52,7 +52,7 @@ public class DadosCheque extends DadosPagamento {
 
     @Override
     public boolean verificar() {
-        return Util.verificar(numero) && Util.verificar(conta) &&
+        return  Util.verificar(conta) &&
                 Util.verificar(titular) && Util.verificar(agencia) &&
                 banco != null && Util.verificar(codigoVerificacao);
     }
@@ -86,11 +86,11 @@ public class DadosCheque extends DadosPagamento {
         this.conta = conta;
     }
 
-    public String getNumero() {
+    public long getNumero() {
         return numero;
     }
 
-    public void setNumero(String numero) {
+    public void setNumero(long numero) {
         this.numero = numero;
     }
 

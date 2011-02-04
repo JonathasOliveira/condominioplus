@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.financeiro;
 
 import bemaJava.Bematech;
 import com.sun.jna.Native;
+import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
@@ -27,6 +28,7 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Util;
 
 /**
  *
@@ -73,8 +76,12 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
         initComponents();
         new ControladorEventos();
+
         carregarFornecedor();
+
         carregarTabela();
+
+//        carregarComboFiltro();
 //        new LimitarCaracteres(10).ValidaNumero(txtConta);
         txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
         painelCheques.setVisible(false);
@@ -103,8 +110,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             }
 
 //            @Override
-//            protected List<Pagamento> getFiltrar(List<Pagamento> pagamentos) {
-//                return filtrarListaPorNome(txtNome.getText(), pagamentos);
+//            protected List<Pagamento> getFiltrar(List<Pagamento> lista) {
+//                return filtrarListaPorCredito(lista);
 //            }
             @Override
             public Object getValor(Pagamento pagamento, int indiceColuna) {
@@ -114,7 +121,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     case 1:
                         return pagamento.getConta().getCodigo();
                     case 2:
-                        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
                     case 3:
                         return pagamento.getFornecedor() != null ? pagamento.getFornecedor().getNome() : "";
                     case 4:
@@ -165,32 +172,17 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         modeloTabela2 = new TabelaModelo_2<Pagamento>(tabelaCheque, "Data, Cheque, Descrição, Valor".split(",")) {
 
             @Override
-            protected Pagamento getAdicionar() {
-                editar(new Pagamento());
-                return null;
-            }
-
-            @Override
-            public void editar(Pagamento pagamento) {
-//              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondominio(condominio));
-            }
-
-            @Override
             protected List<Pagamento> getCarregarObjetos() {
                 return cheques;
             }
 
-//            @Override
-//            protected List<Pagamento> getFiltrar(List<Pagamento> pagamentos) {
-//                return filtrarListaPorNome(txtNome.getText(), pagamentos);
-//            }
             @Override
             public Object getValor(Pagamento pagamento, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataVencimento());
                     case 1:
-                        return ((DadosCheque) pagamento.getDadosPagamento()).getNumero();
+                        return String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero());
                     case 2:
                         return pagamento.getHistorico();
                     case 3:
@@ -223,24 +215,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         tabelaContaPagar.getColumn(modeloTabela.getCampo(3)).setMinWidth(110);
     }
 
-//    private List<Condominio> filtrarListaPorNome(String sequencia, List<Condominio> condominios) {
-//        ArrayList<Condominio> listaFiltrada = new ArrayList<Condominio>();
-//
-//        String[] sequencias = sequencia.toUpperCase().split(" ", 0);
-//
-//        CONDOMINIOS:
-//        for (Condominio c : condominios) {
-//            for (String s : sequencias) {
-//                if (!c.getRazaoSocial().toUpperCase().contains(s)) {
-//                    continue CONDOMINIOS;
-//                }
-//            }
-//
-//            listaFiltrada.add(c);
-//        }
-//
-//        return listaFiltrada;
-//    }
     private void gravarCheques() {
         if (!cheques.isEmpty()) {
             condominio.getContaCorrente().getPagamentos().addAll(cheques);
@@ -301,7 +275,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         cbFornecedores.setModel(new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class)));
     }
 
-    private List getPagamentos() {
+    private List<Pagamento> getPagamentos() {
         Date datInicio = (Date) dataInicio.getValue();
         Date datTermino = (Date) dataTermino.getValue();
 
@@ -352,19 +326,19 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
+            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
             for (Pagamento cheque : cheques) {
-                if (((DadosCheque) cheque.getDadosPagamento()).getNumero().equals(((DadosCheque) p.getDadosPagamento()).getNumero())) {
+                if (((DadosCheque) cheque.getDadosPagamento()).getNumero() == ((DadosCheque) p.getDadosPagamento()).getNumero()) {
                     p.setDadosPagamento(((DadosCheque) cheque.getDadosPagamento()));
                 }
             }
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
             List<Pagamento> documentos = new DAO().listar("PagamentosPorForma", Main.getCondominio().getContaPagar(), FormaPagamento.DINHEIRO);
             for (Pagamento documento : documentos) {
-                if (((DadosDOC) documento.getDadosPagamento()).getNumeroDocumento().equals(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento())) {
+                if (((DadosDOC) documento.getDadosPagamento()).getNumeroDocumento() == ((DadosDOC) p.getDadosPagamento()).getNumeroDocumento()) {
                     p.setDadosPagamento(((DadosDOC) documento.getDadosPagamento()));
                 }
             }
@@ -488,6 +462,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         modeloTabela.carregarObjetos();
     }
 
+//    private void carregarComboFiltro() {
+//        cbFiltros.setModel(new ComboModelo<String>(Util.toList(new String[]{" ", "Crédito", "Débito"}), false));
+//    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -769,7 +746,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(228, 228, 228)
+                .addGap(266, 266, 266)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(dataInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -777,17 +754,17 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dataTermino, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(309, Short.MAX_VALUE))
+                .addContainerGap(271, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel4)
-                    .addComponent(dataTermino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(dataInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addContainerGap(4, Short.MAX_VALUE))
+                    .addComponent(jLabel5)
+                    .addComponent(dataTermino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabelaCheque.setModel(new javax.swing.table.DefaultTableModel(
