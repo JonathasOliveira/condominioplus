@@ -63,8 +63,6 @@ public class DialogoEndereco extends javax.swing.JDialog {
         return campos;
     }
 
-    private void setarCaracteresDocumento() {
-    }
 
     private void verificarEnderecoPadrao() {
         if (checkBoxPadrao.isSelected()) {
@@ -74,6 +72,7 @@ public class DialogoEndereco extends javax.swing.JDialog {
                         e.setPadrao(false);
                         try {
                             new DAO().salvar(e);
+                            new DAO().salvar(endereco);
                         } catch (NegocioException ex) {
                             new TratadorExcecao(ex, this);
                         }

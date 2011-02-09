@@ -13,6 +13,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -33,6 +34,7 @@ public class Endereco implements Serializable {
     private String estado = "";
     private String referencia = "";
     private boolean padrao;
+    @OneToOne
     private Condomino condomino;
 
     @Override

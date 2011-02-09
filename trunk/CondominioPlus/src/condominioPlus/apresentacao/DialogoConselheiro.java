@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
+import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ComboModelo_2;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.persistencia.DAO;
@@ -34,7 +35,6 @@ public class DialogoConselheiro extends javax.swing.JDialog {
     private Condominio condominio;
     private ControladorDeEventos controlador;
     private ComboModelo_2<Unidade> modelo;
-    private Condomino condomino;
 
     public DialogoConselheiro(Condominio condominio, java.awt.Frame pai, boolean modal) {
         super(pai, modal);
@@ -54,15 +54,16 @@ public class DialogoConselheiro extends javax.swing.JDialog {
         return true;
     }
 
-    private List listaCampos() {
-        List<Object> campos = new ArrayList<Object>();
-
-
-        return campos;
+    private boolean validarCampos() {
+        if (modelo.getObjetoSelecionado() == null && cmbTipo.getSelectedIndex() == -1) {
+            ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condômino ou tipo de Conselheiro", this);
+            return false;
+        }
+        return true;
     }
 
     private Condomino getCondomino() {
-        return condomino = modelo.getObjetoSelecionado().getCondomino();
+        return modelo.getObjetoSelecionado().getCondomino();
     }
 
     private void preencherObjeto() {
@@ -73,15 +74,15 @@ public class DialogoConselheiro extends javax.swing.JDialog {
 
     private void carregarComboConselheiros() {
         List<Unidade> unidades = new DAO().listar("CondominosPorUnidadeSemSindico", condominio.getCodigo());
-        List<Unidade> novas = new ArrayList<Unidade>();
-        UNIDADES:
-        for (Unidade unidade : unidades) {
-            if(unidade.isSindico()){
-                continue UNIDADES;
-            }
-            novas.add(unidade);
-        }
-        modelo = new ComboModelo_2(cmbCondomino, novas, true);
+//        List<Unidade> novas = new ArrayList<Unidade>();
+//        UNIDADES:
+//        for (Unidade unidade : unidades) {
+//            if(unidade.isSindico()){
+//                continue UNIDADES;
+//            }
+//            novas.add(unidade);
+//        }
+        modelo = new ComboModelo_2(cmbCondomino, unidades, true);
     }
 
     private void carregarComboTipo() {
@@ -89,9 +90,7 @@ public class DialogoConselheiro extends javax.swing.JDialog {
     }
 
     private void salvar() {
-        ValidadorGenerico validador = new ValidadorGenerico();
-        if (!validador.validar(listaCampos())) {
-            validador.exibirErros(null);
+        if (!validarCampos()) {
             return;
         }
         preencherObjeto();

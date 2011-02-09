@@ -39,9 +39,9 @@ public class Unidade implements Serializable {
     @OneToOne(cascade=CascadeType.ALL)
     private Inquilino inquilino = new Inquilino();
     @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)
-    private ProcessoJudicial processoJudicial = new ProcessoJudicial();
+    private ProcessoJudicial processoJudicial;
     @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)
-    private NotificacaoJudicial notificacaoJudicial =  new NotificacaoJudicial();
+    private NotificacaoJudicial notificacaoJudicial;
     private String unidade;
     private String descricao;
     private String iptu;

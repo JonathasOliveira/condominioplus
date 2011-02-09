@@ -10,7 +10,6 @@
  */
 package condominioPlus.apresentacao.condomino;
 
-import condominioPlus.Main;
 import condominioPlus.apresentacao.DialogoEndereco;
 import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
@@ -32,8 +31,6 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -51,7 +48,7 @@ import logicpoint.util.TabelaModelo;
  *
  * @author Administrador
  */
-public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Identificavel<Unidade> {
+public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     private Unidade unidade;
     private ControladorEventos controlador;
@@ -140,6 +137,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
     }
 
     private void salvar() {
+        DAO dao = new DAO(false);
         try {
 
             ValidadorGenerico validador = new ValidadorGenerico();
@@ -164,17 +162,31 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
             } else {
                 tipo = tipo.EDICAO;
             }
+            if (!checkBoxProcessoJuridico.isSelected() && unidade.getCodigo() != 0) {
+                if (unidade.getProcessoJudicial() != null) {
+                    dao.remover(unidade.getProcessoJudicial());
+                    ativarProcessoJuridico(false);
+                }
 
-            DAO dao = new DAO(false);
+            }
+
+            if (!checkboxNotificadoJudicialmente.isSelected() && unidade.getCodigo() != 0) {
+                if (unidade.getNotificacaoJudicial() != null) {
+                    dao.remover(unidade.getNotificacaoJudicial());
+                    ativarNotificacao(false);
+                }
+
+            }
             dao.salvar(unidade);
             dao.remover(getModeloTelefone().getObjetosRemovidos());
             dao.remover(getModeloEndereco().getObjetosRemovidos());
             dao.concluirTransacao();
 
+            System.out.println("valores " + unidade.getNotificacaoJudicial());
+            System.out.println("processo judicial " + unidade.getProcessoJudicial());
+
             TelaPrincipal.getInstancia().notificarClasse(unidade);
             TelaPrincipal.getInstancia().notificarClasse(condominio);
-            Main.setCondominio(condominio);
-
 
             String descricao = "Cadastro do Condominio " + unidade.getCondomino().getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
@@ -258,10 +270,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
         });
 
         tblEndereco.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblEndereco.getColumn(campos[0]).setMinWidth(100);
-        tblEndereco.getColumn(campos[0]).setPreferredWidth(200);
-        tblEndereco.getColumn(campos[2]).setMinWidth(100);
-        tblEndereco.getColumn(campos[2]).setPreferredWidth(200);
+        tblEndereco.getColumn(campos[0]).setMinWidth(180);
+        tblEndereco.getColumn(campos[2]).setMinWidth(50);
+        tblEndereco.getColumn(campos[2]).setMinWidth(150);
 
         tblEndereco.setFont(new Font("Verdana", Font.PLAIN, 11));
 
@@ -274,10 +285,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
 
     private void adicionarEndereco() {
         Endereco endereco = DialogoEndereco.getEndereco(new Endereco(unidade.getCondomino()), TelaPrincipal.getInstancia(), true);
-        if (endereco.getLogradouro().equals("")) {
-            return;
-        }
         getModeloEndereco().adicionar(endereco);
+        preencherTela(unidade);
     }
 
     private void editarEndereco() {
@@ -290,11 +299,27 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
     }
 
     private void removerEndereco() {
-        Endereco endereco = getModeloEndereco().getObjeto();
-        if (endereco == null) {
-            return;
+
+        if (getModeloEndereco().getObjeto() != null) {
+            if (getModeloEndereco().getObjeto().isPadrao()) {
+                if (unidade.getCondomino().getEnderecos().size() > 1) {
+                    for (Endereco e : unidade.getCondomino().getEnderecos()) {
+                        if (!e.equals(getModeloEndereco().getObjeto())) {
+                            e.setPadrao(true);
+                            getModeloEndereco().remover(getModeloEndereco().getObjeto());
+                            preencherTela(unidade);
+                        }
+                    }
+
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Adicione um novo endereço padrão ou edite esse!", this);
+                }
+            }
+
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione um endereço a ser removido!", this);
         }
-        getModeloEndereco().remover(endereco);
+
     }
 
     private void preencherTela(Unidade unidade) {
@@ -349,6 +374,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
         checkboxImpressaoCobranca.setSelected(unidade.isBloquearImpressaoCobranca());
 
         if (unidade.getNotificacaoJudicial() != null) {
+            System.out.println("here");
             ativarNotificacao(true);
             checkboxNotificadoJudicialmente.setSelected(true);
             modelo.setSelectedItem(unidade.getNotificacaoJudicial().getAdvogado());
@@ -488,10 +514,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
         }
     }
 
-    public Unidade getIdentificacao() {
-        return unidade;
-    }
-
     private void teste() {
         String comando = "C:/Arquivos de programas/Internet Explorer/IEXPLORE.EXE http://www.tjrj.jus.br/";
         Clipboard teclado = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -551,25 +573,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame implements Id
                 CnpjSelecionado();
             } else if (e.getSource() == checkboxNotificadoJudicialmente) {
                 boolean selecionado = checkboxNotificadoJudicialmente.isSelected();
-                if (selecionado) {
-                    ativarNotificacao(selecionado);
-                } else {
-                    ativarNotificacao(selecionado);
-                }
-            } else if (e.getSource() == checkboxNotificadoJudicialmente) {
-                boolean selecionado = checkboxNotificadoJudicialmente.isSelected();
-                if (selecionado) {
-                    ativarNotificacao(selecionado);
-                } else {
-                    ativarNotificacao(selecionado);
-                }
+                ativarNotificacao(selecionado);
             } else if (e.getSource() == checkBoxProcessoJuridico) {
                 boolean selecionado = checkBoxProcessoJuridico.isSelected();
-                if (selecionado) {
-                    ativarProcessoJuridico(selecionado);
-                } else {
-                    ativarProcessoJuridico(selecionado);
-                }
+                ativarProcessoJuridico(selecionado);
             } else if (e.getSource() == btnTeste) {
                 teste();
             }

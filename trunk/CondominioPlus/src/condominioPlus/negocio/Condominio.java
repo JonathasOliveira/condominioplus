@@ -71,8 +71,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaCorrente contaCorrente = new ContaCorrente();
     @OneToOne(cascade = CascadeType.ALL)
     private ContaPagar contaPagar = new ContaPagar();
-    @OneToOne(cascade=CascadeType.ALL)
-    private DadosTalaoCheque dadosTalao = new DadosTalaoCheque();
+    @OneToMany(mappedBy = "condominio")
+    private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
 
     public Condominio() {
     }
@@ -278,11 +278,11 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.contaPagar = contaPagar;
     }
 
-    public DadosTalaoCheque getDadosTalao() {
-        return dadosTalao;
+    public List<DadosTalaoCheque> getDadosTalaoCheques() {
+        return dadosTalaoCheques;
     }
 
-    public void setDadosTalao(DadosTalaoCheque dadosTalao) {
-        this.dadosTalao = dadosTalao;
+    public void setDadosTalaoCheques(List<DadosTalaoCheque> dadosTalaoCheques) {
+        this.dadosTalaoCheques = dadosTalaoCheques;
     }
 }

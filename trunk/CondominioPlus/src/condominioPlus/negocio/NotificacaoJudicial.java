@@ -27,7 +27,7 @@ public class NotificacaoJudicial implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int codigo;
     @ManyToOne
-    private Advogado advogado = new Advogado();
+    private Advogado advogado;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar data_inicio = Calendar.getInstance();
     @Temporal(javax.persistence.TemporalType.DATE)

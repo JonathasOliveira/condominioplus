@@ -10993,3 +10993,137 @@ th {background: #336699; color: #FFFFFF; text-align: left;}
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>08/02/2011 02:10:34</td>
+<td title="Carregar Funcionários thread">Carregar Funcionários</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">
+Internal Exception: org.postgresql.util.PSQLException: FATAL: banco de dados &quot;condominio_plus&quot; n�o existe
+Error Code: 0</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">Local Exception Stack: 
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: FATAL: banco de dados &quot;condominio_plus&quot; n�o existe
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.DatabaseException.sqlException(DatabaseException.java:305)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.sessions.DefaultConnector.connect(DefaultConnector.java:102)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.sessions.DatasourceLogin.connectToDatasource(DatasourceLogin.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatasourceAccessor.connect(DatasourceAccessor.java:233)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.connect(DatabaseAccessor.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatasourceAccessor.connect(DatasourceAccessor.java:309)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.threetier.ConnectionPool.buildConnection(ConnectionPool.java:117)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.threetier.ConnectionPool.startUp(ConnectionPool.java:339)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.threetier.ServerSession.connect(ServerSession.java:451)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.DatabaseSessionImpl.login(DatabaseSessionImpl.java:616)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider.login(EntityManagerFactoryProvider.java:282)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerSetupImpl.deploy(EntityManagerSetupImpl.java:229)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.getServerSession(EntityManagerFactoryImpl.java:93)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:126)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EntityManagerFactoryImpl.createEntityManagerImpl(EntityManagerFactoryImpl.java:120)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.EntityManagerFactoryImpl.createEntityManager(EntityManagerFactoryImpl.java:91)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.setFabrica(DAOGenerico.java:89)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:66)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:57)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.&lt;init&gt;(DAOGenerico.java:49)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:41)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.&lt;init&gt;(DAO.java:37)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.getDAO(PainelLogin.java:130)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin.access$600(PainelLogin.java:28)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: org.postgresql.util.PSQLException: FATAL: banco de dados &quot;condominio_plus&quot; n�o existe
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.ConnectionFactoryImpl.readStartupMessages(ConnectionFactoryImpl.java:444)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:99)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:66)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Connection.&lt;init&gt;(AbstractJdbc2Connection.java:124)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc3.AbstractJdbc3Connection.&lt;init&gt;(AbstractJdbc3Connection.java:30)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc3.Jdbc3Connection.&lt;init&gt;(Jdbc3Connection.java:24)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.Driver.makeConnection(Driver.java:386)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.Driver.connect(Driver.java:260)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.sql.DriverManager.getConnection(DriverManager.java:582)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.sql.DriverManager.getConnection(DriverManager.java:154)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.sessions.DefaultConnector.connect(DefaultConnector.java:100)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 24 more
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>09/02/2011 02:36:50</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">null</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">java.lang.NullPointerException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.concluir(DAOGenerico.java:108)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.concluirTransacao(DAO.java:75)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condomino.TelaDadosCondomino.salvar(TelaDadosCondomino.java:189)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condomino.TelaDadosCondomino.access$200(TelaDadosCondomino.java:53)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condomino.TelaDadosCondomino$ControladorEventos.actionPerformed(TelaDadosCondomino.java:557)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:236)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+</td></tr>
