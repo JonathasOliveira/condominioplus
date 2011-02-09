@@ -10,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
@@ -17,6 +20,7 @@ import javax.persistence.Table;
  * @author Administrador
  */
 @Entity
+@NamedQueries(@NamedQuery(name="TaloesPorCondominio" , query="SELECT d FROM DadosTalaoCheque d WHERE d.condominio.codigo= ?1"))
 @Table(name = "dados_talao_cheque")
 public class DadosTalaoCheque implements Serializable {
 
@@ -27,6 +31,8 @@ public class DadosTalaoCheque implements Serializable {
     private String numeroInicial;
     @Column(name="numero_final")
     private String numeroFinal;
+    @ManyToOne
+    private Condominio condominio;
 
     public int getCodigo() {
         return codigo;
@@ -51,4 +57,13 @@ public class DadosTalaoCheque implements Serializable {
     public void setNumeroInicial(String numeroInicial) {
         this.numeroInicial = numeroInicial;
     }
+
+    public Condominio getCondominio() {
+        return condominio;
+    }
+
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
+    }
+    
 }

@@ -15,6 +15,7 @@ import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Banco;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.DadosTalaoCheque;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
@@ -23,6 +24,7 @@ import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +64,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         carregarTabelaConselheiros();
 
         carregarComboBanco();
+
+        carregarTabelaDadosTalao();
 
         controlador = new ControladorEventos();
 
@@ -203,12 +207,31 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             }
         });
 
-        tblConselheiros.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblConselheiros.getColumn(campos[0]).setPreferredWidth(50);
+        tblConselheiros.getColumn(campos[0]).setMinWidth(50);
         tblConselheiros.getColumn(campos[1]).setMinWidth(300);
         tblConselheiros.getColumn(campos[2]).setMinWidth(200);
 
         tblConselheiros.setFont(new Font("Verdana", Font.PLAIN, 11));
+    }
+
+    private void carregarTabelaDadosTalao() {
+        String[] campos = "Inicial, Final, Terminou?".split(",");
+
+        tbTaloes.setModel(new TabelaModelo<DadosTalaoCheque>(carregarTaloes(), campos, tbTaloes) {
+
+            @Override
+            public Object getCampo(DadosTalaoCheque d, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return d.getNumeroInicial();
+                    case 1:
+                        return d.getNumeroFinal();
+                    default:
+                        return null;
+                }
+            }
+        });
+
     }
 
     private TabelaModelo<Unidade> getModeloConselheiros() {
@@ -220,7 +243,16 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         return unidades;
     }
 
+    private List carregarTaloes() {
+        List<DadosTalaoCheque> taloes = new DAO().listar("TaloesPorCondominio", condominio.getCodigo());
+        return taloes;
+    }
+
     private void adicionarConselheiro() {
+        if(condominio.getUnidades().isEmpty()){
+            ApresentacaoUtil.exibirInformacao("Não existem Unidades Cadastradas!", this);
+            return;
+        }
         boolean ok = DialogoConselheiro.getConselheiro(condominio, TelaPrincipal.getInstancia(), true);
         if (ok) {
             getModeloConselheiros().setObjetos(new DAO().listar("ConselheirosPorUnidade", condominio.getCodigo()));
@@ -230,6 +262,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void removerConselheiro() {
         Unidade unidade = getModeloConselheiros().getObjeto();
         if (unidade == null) {
+            ApresentacaoUtil.exibirInformacao("Não existe unidade selecionada!", this);
             return;
         }
         unidade.getCondomino().setConselheiro(false);
@@ -286,9 +319,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtAreaAnotacoes.setText(condominio.getAnotacoes());
 
 
-        txtPrimeiroCheque.setText(condominio.getDadosTalao().getNumeroInicial());
-        txtUltimoCheque.setText(condominio.getDadosTalao().getNumeroFinal());
-
     }
 
     private void preencherObjeto() {
@@ -343,12 +373,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             System.out.println("data fechamento " + DataUtil.getDateTime(condominio.getContaCorrente().getDataFechamento()));
         }
 
-        if (condominio.getDadosTalao() != null) {
-            condominio.getDadosTalao().setNumeroInicial(txtPrimeiroCheque.getText().trim());
-            condominio.getDadosTalao().setNumeroFinal(txtUltimoCheque.getText().trim());
-        }
-
-
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -381,6 +405,17 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         }
 
         @Override
+        public void mouseEntered(MouseEvent e) {
+            if (e.getSource() == painelBanco) {
+                if (modelo.getSelectedItem() == null) {
+                    carregarComboBanco();
+                }
+
+
+            }
+        }
+
+        @Override
         public void configurar() {
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaDadosCondominio.this, JTextField.class, JComboBox.class);
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, TelaDadosCondominio.this, JTextField.class);
@@ -393,6 +428,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             cmbBanco.addItemListener(this);
             btnAdicionarConselheiro.addActionListener(this);
             btnRemoverConselheiro.addActionListener(this);
+            painelBanco.addMouseListener(this);
         }
     }
 
@@ -462,7 +498,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         tblTelefone = new javax.swing.JTable();
         jLabel30 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
+        painelBanco = new javax.swing.JPanel();
         txtNumeroBanco = new javax.swing.JTextField();
         txtAgencia = new javax.swing.JTextField();
         txtContaCorrente = new javax.swing.JTextField();
@@ -500,6 +536,12 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jLabel32 = new javax.swing.JLabel();
         txtPrimeiroCheque = new javax.swing.JTextField();
         txtUltimoCheque = new javax.swing.JTextField();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tbTaloes = new javax.swing.JTable();
+        jLabel33 = new javax.swing.JLabel();
+        btnAdicionarTaloes = new javax.swing.JButton();
+        btnEditarTelefone1 = new javax.swing.JButton();
+        btnRemoverTelefone1 = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -891,7 +933,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         abas.addTab("Contatos", jPanel4);
 
-        jPanel9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
+        painelBanco.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
 
         txtNumeroBanco.setEditable(false);
 
@@ -907,71 +949,71 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         jLabel14.setText("Conta Poupança:");
 
-        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
-        jPanel9.setLayout(jPanel9Layout);
-        jPanel9Layout.setHorizontalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel9Layout.createSequentialGroup()
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel9Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelBancoLayout = new javax.swing.GroupLayout(painelBanco);
+        painelBanco.setLayout(painelBancoLayout);
+        painelBancoLayout.setHorizontalGroup(
+            painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelBancoLayout.createSequentialGroup()
+                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelBancoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel12)
                         .addGap(59, 59, 59)
                         .addComponent(cmbBanco, 0, 176, Short.MAX_VALUE))
-                    .addGroup(jPanel9Layout.createSequentialGroup()
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel9Layout.createSequentialGroup()
+                    .addGroup(painelBancoLayout.createSequentialGroup()
+                        .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelBancoLayout.createSequentialGroup()
                                 .addContainerGap()
-                                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel10)
                                     .addComponent(jLabel11))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(txtNumeroBanco)
                                     .addComponent(txtAgencia, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 54, Short.MAX_VALUE))
-                            .addGroup(jPanel9Layout.createSequentialGroup()
+                            .addGroup(painelBancoLayout.createSequentialGroup()
                                 .addGap(5, 5, 5)
-                                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel9Layout.createSequentialGroup()
+                                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(painelBancoLayout.createSequentialGroup()
                                         .addComponent(jLabel14)
                                         .addGap(14, 14, 14)
                                         .addComponent(txtContaPoupanca, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE))
-                                    .addGroup(jPanel9Layout.createSequentialGroup()
+                                    .addGroup(painelBancoLayout.createSequentialGroup()
                                         .addComponent(jLabel13)
                                         .addGap(18, 18, 18)
                                         .addComponent(txtContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(55, 55, 55))
         );
-        jPanel9Layout.setVerticalGroup(
-            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
+        painelBancoLayout.setVerticalGroup(
+            painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelBancoLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(txtNumeroBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(txtAgencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbBanco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelBancoLayout.createSequentialGroup()
                         .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel14)
                             .addComponent(txtContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(txtContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel13)))
                 .addGap(37, 37, 37))
@@ -1025,7 +1067,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
                     .addComponent(txtLimiteBanking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(52, Short.MAX_VALUE))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -1034,7 +1076,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(painelBanco, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -1044,7 +1086,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(painelBanco, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1138,6 +1180,36 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         jLabel32.setText("Último Cheque:");
 
+        tbTaloes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tbTaloes);
+
+        jLabel33.setText("Talões:");
+
+        btnAdicionarTaloes.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarTaloes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarTaloes.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTaloes.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTaloes.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnEditarTelefone1.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarTelefone1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarTelefone1.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefone1.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefone1.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverTelefone1.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverTelefone1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverTelefone1.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefone1.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefone1.setPreferredSize(new java.awt.Dimension(32, 32));
+
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
         jPanel15Layout.setHorizontalGroup(
@@ -1153,7 +1225,16 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                     .addComponent(txtDataFechamentoCaixa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtUltimoCheque)
                     .addComponent(txtPrimeiroCheque, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE))
-                .addContainerGap(458, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 244, Short.MAX_VALUE)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel33))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEditarTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAdicionarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1170,7 +1251,21 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel32)
                     .addComponent(txtUltimoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel15Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnAdicionarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEditarTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRemoverTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel15Layout.createSequentialGroup()
+                        .addComponent(jLabel33)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)))
+                .addGap(22, 22, 22))
         );
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
@@ -1186,8 +1281,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         abas.addTab("Caixa", jPanel14);
@@ -1247,10 +1342,13 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane abas;
     private javax.swing.JButton btnAdicionarConselheiro;
+    private javax.swing.JButton btnAdicionarTaloes;
     private javax.swing.JButton btnAdicionarTelefone;
     private javax.swing.JButton btnEditarTelefone;
+    private javax.swing.JButton btnEditarTelefone1;
     private javax.swing.JButton btnRemoverConselheiro;
     private javax.swing.JButton btnRemoverTelefone;
+    private javax.swing.JButton btnRemoverTelefone1;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JButton btnVoltar;
     private javax.swing.JCheckBox checkBoxAtivo;
@@ -1282,6 +1380,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1302,11 +1401,13 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblSite;
+    private javax.swing.JPanel painelBanco;
+    private javax.swing.JTable tbTaloes;
     private javax.swing.JTable tblConselheiros;
     private javax.swing.JTable tblTelefone;
     private javax.swing.JTextField txtAgencia;
