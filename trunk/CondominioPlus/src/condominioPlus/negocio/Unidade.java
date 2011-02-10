@@ -23,10 +23,10 @@ import javax.persistence.OneToOne;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "UnidadePorCondominio", query = "SELECT c FROM Unidade c WHERE c.condominio.codigo = ?1 order by c.codigo"),
-    @NamedQuery(name = "ConselheirosPorUnidade", query = "SELECT c FROM Unidade c WHERE c.condominio.codigo = ?1 AND c.condomino.conselheiro = true order by c.codigo"),
-    @NamedQuery(name = "CondominosPorUnidade", query = "SELECT c FROM Unidade c WHERE c.condominio.codigo = ?1 order by c.condomino.nome"),
-    @NamedQuery(name = "CondominosPorUnidadeSemSindico", query = "SELECT c FROM Unidade c WHERE c.condominio.codigo = ?1 AND c.condomino.conselheiro = false and c.sindico = false order by c.condomino.nome")
+    @NamedQuery(name = "UnidadePorCondominio", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 order by u.codigo"),
+    @NamedQuery(name = "ConselheirosPorUnidade", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 AND u.condomino.conselheiro = true order by u.codigo"),
+    @NamedQuery(name = "CondominosPorUnidade", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 order by u.condomino.nome"),
+    @NamedQuery(name = "CondominosPorUnidadeSemSindico", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 AND u.condomino.conselheiro = false and u.sindico = false order by u.condomino.nome")
     })
 public class Unidade implements Serializable {
     @Id
@@ -35,9 +35,9 @@ public class Unidade implements Serializable {
     @OneToOne(cascade=CascadeType.ALL)
     private Condomino condomino = new Condomino();
     @ManyToOne
-    private Condominio condominio = new Condominio();
+    private Condominio condominio;
     @OneToOne(cascade=CascadeType.ALL)
-    private Inquilino inquilino = new Inquilino();
+    private Inquilino inquilino;
     @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)
     private ProcessoJudicial processoJudicial;
     @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)

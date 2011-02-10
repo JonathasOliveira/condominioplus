@@ -12,7 +12,6 @@ package condominioPlus.apresentacao.financeiro;
 
 import bemaJava.Bematech;
 import com.sun.jna.Native;
-import com.sun.org.apache.bcel.internal.generic.ARRAYLENGTH;
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
@@ -28,7 +27,6 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,7 +43,6 @@ import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
-import logicpoint.util.Util;
 
 /**
  *
