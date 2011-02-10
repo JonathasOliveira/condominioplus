@@ -123,7 +123,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
     }
 
     private void carregarTabelaNotificacoes() {
-        String[] campos = "Condomínio,Unidade,Data Início, Data Término".split(",");
+        String[] campos = "Condomínio,Unidade,Inícial, Final".split(",");
 
         tblNotificacoes.setModel(new TabelaModelo<NotificacaoJudicial>(advogado.getNotificacaoJudiciais(), campos, tblNotificacoes) {
 
@@ -144,12 +144,12 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
             }
         });
 
-        tblNotificacoes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblNotificacoes.getColumn(campos[0]).setMinWidth(100);
-        tblNotificacoes.getColumn(campos[0]).setPreferredWidth(200);
-        tblNotificacoes.getColumn(campos[1]).setMinWidth(50);
-        tblNotificacoes.getColumn(campos[1]).setPreferredWidth(50);
-     }
+        tblNotificacoes.getColumn(campos[0]).setMinWidth(210);
+        tblNotificacoes.getColumn(campos[1]).setMinWidth(40);
+        tblNotificacoes.getColumn(campos[2]).setMinWidth(60);
+        tblNotificacoes.getColumn(campos[3]).setMinWidth(60);
+
+    }
 
     private void carregarTabelaProcessos() {
         String[] campos = "Condomínio,Unidade, Expira em".split(",");
@@ -171,12 +171,10 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
             }
         });
 
-        tblNotificacoes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblNotificacoes.getColumn(campos[0]).setMinWidth(100);
-        tblNotificacoes.getColumn(campos[0]).setPreferredWidth(200);
-        tblNotificacoes.getColumn(campos[1]).setMinWidth(50);
-        tblNotificacoes.getColumn(campos[1]).setPreferredWidth(50);
-     }
+        tblProcessos.getColumn(campos[0]).setMinWidth(250);
+        tblProcessos.getColumn(campos[1]).setMinWidth(50);
+        tblProcessos.getColumn(campos[2]).setMinWidth(60);
+    }
 
     private TabelaModelo<Telefone> getModeloTelefone() {
         return (TabelaModelo<Telefone>) tblTelefone.getModel();

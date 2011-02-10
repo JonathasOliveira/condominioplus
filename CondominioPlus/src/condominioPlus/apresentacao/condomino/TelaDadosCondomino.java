@@ -37,7 +37,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
-import logicpoint.apresentacao.Identificavel;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
@@ -54,7 +53,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private ControladorEventos controlador;
     private Condominio condominio;
     private List<Unidade> unidades;
-    ComboModelo<Advogado> modelo;
+    private ComboModelo<Advogado> modelo;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondomino(Unidade unidade) {
@@ -66,11 +65,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         modificarCamposInquilino(false);
 
         verificarCNPJ();
+        carregarTabelaTelefone();
+        carregarTabelaEndereco();
 
         carregarComboAdvogado();
 
-        carregarTabelaTelefone();
-        carregarTabelaEndereco();
 
         controlador = new ControladorEventos();
 
@@ -98,7 +97,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void verificarSindico() {
-        unidades = new DAO().listar("CondominosPorUnidade", condominio.getCodigo());
+//        unidades = new DAO().listar("CondominosPorUnidade", condominio.getCodigo());
+        unidades = condominio.getUnidades();
         if (checkBoxSindico.isSelected()) {
             for (Unidade u : unidades) {
                 if (u.isSindico() && !u.equals(unidade)) {
@@ -165,6 +165,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             if (!checkBoxProcessoJuridico.isSelected() && unidade.getCodigo() != 0) {
                 if (unidade.getProcessoJudicial() != null) {
                     dao.remover(unidade.getProcessoJudicial());
+                    unidade.setProcessoJudicial(null);
                     ativarProcessoJuridico(false);
                 }
 
@@ -173,6 +174,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             if (!checkboxNotificadoJudicialmente.isSelected() && unidade.getCodigo() != 0) {
                 if (unidade.getNotificacaoJudicial() != null) {
                     dao.remover(unidade.getNotificacaoJudicial());
+                    unidade.setNotificacaoJudicial(null);
                     ativarNotificacao(false);
                 }
 
@@ -286,7 +288,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void adicionarEndereco() {
         Endereco endereco = DialogoEndereco.getEndereco(new Endereco(unidade.getCondomino()), TelaPrincipal.getInstancia(), true);
         getModeloEndereco().adicionar(endereco);
-        preencherTela(unidade);
+        preencherPainelEndereco();
     }
 
     private void editarEndereco() {
@@ -318,6 +320,23 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione um endereço a ser removido!", this);
+        }
+
+    }
+
+    private void preencherPainelEndereco() {
+
+        for (Endereco e : unidade.getCondomino().getEnderecos()) {
+            if (e.isPadrao()) {
+                txtRua.setText(e.getLogradouro());
+                txtNumero.setText(e.getNumero());
+                txtComplemento.setText(e.getComplemento());
+                txtReferencia.setText(e.getReferencia());
+                txtBairro.setText(e.getBairro());
+                txtCidade.setText(e.getCidade());
+                txtUf.setText(e.getEstado());
+                txtCep.setText(e.getCep());
+            }
         }
 
     }
