@@ -237,6 +237,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void editarTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser editado!", this);
             return;
         }
         DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
@@ -246,6 +247,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void removerTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+             ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
             return;
         }
         getModeloTelefone().remover(telefone);
@@ -287,6 +289,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     private void adicionarEndereco() {
         Endereco endereco = DialogoEndereco.getEndereco(new Endereco(unidade.getCondomino()), TelaPrincipal.getInstancia(), true);
+        if (endereco.getLogradouro().equals("")){
+            return;
+        }
         getModeloEndereco().adicionar(endereco);
         preencherPainelEndereco();
     }
@@ -294,6 +299,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void editarEndereco() {
         Endereco endereco = getModeloEndereco().getObjeto();
         if (endereco == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o endereço a ser editado!", this);
             return;
         }
         DialogoEndereco.getEndereco(endereco, TelaPrincipal.getInstancia(), true);
@@ -319,7 +325,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             }
 
         } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione um endereço a ser removido!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione o endereço a ser removido!", this);
         }
 
     }
@@ -989,7 +995,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tblEndereco);
 
-        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1275,7 +1281,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                     .addComponent(jLabel35)
                     .addComponent(jLabel31)
                     .addComponent(txtUfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Inquilino", jPanel5);
@@ -1368,7 +1374,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addComponent(dateProcessoJuridico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                         .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbAdvogado1, 0, 189, Short.MAX_VALUE)
+                            .addComponent(cmbAdvogado1, 0, 187, Short.MAX_VALUE)
                             .addGroup(jPanel10Layout.createSequentialGroup()
                                 .addComponent(txtNumeroProcesso, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1495,7 +1501,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
                                 .addComponent(checkboxImpressaoCertificado))
                             .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1531,7 +1537,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
