@@ -62,6 +62,9 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
+           campos.add(txtOab);
+           campos.add(txtNome);
+     
         return campos;
     }
 
@@ -181,7 +184,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
 
     private void adicionarTelefone() {
         Telefone telefone = DialogoTelefone.getTelefone(new Telefone(advogado), TelaPrincipal.getInstancia(), true);
-        if (telefone == null) {
+        if (telefone.getNumero().equals("")) {
             return;
         }
         getModeloTelefone().adicionar(telefone);
@@ -190,6 +193,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
     private void editarTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser editado!", this);
             return;
         }
         DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
@@ -199,6 +203,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
     private void removerTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
             return;
         }
         getModeloTelefone().remover(telefone);
@@ -261,7 +266,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
         txtCidade = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
-        txtNumero1 = new javax.swing.JTextField();
+        txtNumero = new javax.swing.JTextField();
         txtCep = new javax.swing.JFormattedTextField();
         txtComplemento = new javax.swing.JTextField();
         jLabel23 = new javax.swing.JLabel();
@@ -271,7 +276,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
         txtRua = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         txtReferencia = new javax.swing.JTextField();
-        txtNumero = new javax.swing.JTextField();
+        txtNome = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         txtOab = new javax.swing.JTextField();
@@ -339,7 +344,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
 
         jLabel25.setText("Compl.:");
 
-        txtNumero1.setName("numero"); // NOI18N
+        txtNumero.setName("numero"); // NOI18N
 
         try {
             txtCep.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.###-###")));
@@ -366,7 +371,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
 
         txtReferencia.setName("referencia"); // NOI18N
 
-        txtNumero.setName("nome"); // NOI18N
+        txtNome.setName("nome"); // NOI18N
 
         jLabel1.setText("Nome:");
 
@@ -394,7 +399,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel24)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                        .addComponent(txtNumero1, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(painelDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelDadosLayout.createSequentialGroup()
                             .addComponent(txtBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -417,7 +422,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
                                     .addComponent(jLabel28)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                     .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addComponent(txtNumero, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
+                    .addComponent(txtNome, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
                     .addComponent(txtOab, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -430,13 +435,13 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
                     .addComponent(txtOab, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(painelDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtRua, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel24)
-                    .addComponent(txtNumero1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel23))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelDadosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -528,7 +533,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 122, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -562,7 +567,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -591,7 +596,7 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -657,8 +662,8 @@ public class TelaDadosAdvogado extends javax.swing.JInternalFrame implements Ide
     private javax.swing.JFormattedTextField txtCep;
     private javax.swing.JTextField txtCidade;
     private javax.swing.JTextField txtComplemento;
+    private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtNumero;
-    private javax.swing.JTextField txtNumero1;
     private javax.swing.JTextField txtOab;
     private javax.swing.JTextField txtReferencia;
     private javax.swing.JTextField txtRua;

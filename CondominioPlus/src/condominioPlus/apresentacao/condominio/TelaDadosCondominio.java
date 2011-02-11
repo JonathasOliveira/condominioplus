@@ -122,6 +122,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             dao.remover(getModeloTelefone().getObjetosRemovidos());
             dao.salvar(getModeloConselheiros().getObjetos());
             dao.remover(getModeloConselheiros().getObjetosRemovidos());
+            dao.remover(getModeloTalao().getObjetosRemovidos());
             dao.concluirTransacao();
 
             TelaPrincipal.getInstancia().notificarClasse(condominio);
@@ -168,7 +169,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void adicionarTelefone() {
         Telefone telefone = DialogoTelefone.getTelefone(new Telefone(condominio), TelaPrincipal.getInstancia(), true);
-        if (telefone == null) {
+        if (telefone.getNumero().equals("")) {
             return;
         }
         getModeloTelefone().adicionar(telefone);
@@ -177,6 +178,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void editarTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser editado!", this);
             return;
         }
         DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
@@ -186,6 +188,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void removerTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+             ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
             return;
         }
         getModeloTelefone().remover(telefone);
@@ -242,7 +245,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void adicionarTaloes() {
         DadosTalaoCheque dados = DialogoTaloesCheque.getDadosTalao(new DadosTalaoCheque(), null, closable);
-        if (dados == null) {
+        if (dados.getCodigo() == 0) {
             return;
         }
         getModeloTalao().adicionar(dados);
@@ -251,6 +254,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void editarTaloes() {
         DadosTalaoCheque dados = getModeloTalao().getObjeto();
         if (dados == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o talão a ser editado!", this);
             return;
         }
         DialogoTaloesCheque.getDadosTalao(dados, null, closable);
@@ -260,6 +264,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void removerTaloes() {
         DadosTalaoCheque dados = getModeloTalao().getObjeto();
         if (dados == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o talão a ser removido!", this);
             return;
         }
         getModeloTalao().remover(dados);
@@ -851,7 +856,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblSite)
                     .addComponent(txtSite, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jPanel8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
@@ -953,16 +958,16 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+                            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
                             .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGap(1, 1, 1)
                         .addComponent(jLabel30)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(33, Short.MAX_VALUE)
+                .addContainerGap(30, Short.MAX_VALUE)
                 .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1179,7 +1184,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                         .addComponent(btnRemoverConselheiro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel6Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -1202,11 +1207,11 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 169, Short.MAX_VALUE)
+            .addGap(0, 166, Short.MAX_VALUE)
             .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel13Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
@@ -1322,7 +1327,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGap(10, 10, 10)
                 .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel14Layout.setVerticalGroup(

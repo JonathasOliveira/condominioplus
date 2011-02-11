@@ -173,7 +173,7 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace pref="12" max="32767" attributes="0"/>
-                                      <Component id="txtNumero1" min="-2" pref="59" max="-2" attributes="0"/>
+                                      <Component id="txtNumero" min="-2" pref="59" max="-2" attributes="0"/>
                                   </Group>
                                   <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                                       <Group type="102" alignment="0" attributes="1">
@@ -204,7 +204,7 @@
                                           </Group>
                                       </Group>
                                   </Group>
-                                  <Component id="txtNumero" alignment="1" pref="292" max="32767" attributes="1"/>
+                                  <Component id="txtNome" alignment="1" pref="292" max="32767" attributes="1"/>
                                   <Component id="txtOab" alignment="0" min="-2" pref="96" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -221,14 +221,14 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="txtNumero" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtNome" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
                                   <Component id="txtRua" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel24" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="txtNumero1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="txtNumero" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel23" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -288,7 +288,7 @@
                         <Property name="text" type="java.lang.String" value="Compl.:"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtNumero1">
+                    <Component class="javax.swing.JTextField" name="txtNumero">
                       <Properties>
                         <Property name="name" type="java.lang.String" value="numero" noResource="true"/>
                       </Properties>
@@ -343,7 +343,7 @@
                         <Property name="name" type="java.lang.String" value="referencia" noResource="true"/>
                       </Properties>
                     </Component>
-                    <Component class="javax.swing.JTextField" name="txtNumero">
+                    <Component class="javax.swing.JTextField" name="txtNome">
                       <Properties>
                         <Property name="name" type="java.lang.String" value="nome" noResource="true"/>
                       </Properties>
@@ -402,7 +402,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="125" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="122" max="32767" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Component id="btnAdicionarTelefone" min="-2" max="-2" attributes="0"/>
@@ -513,7 +513,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" pref="168" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="165" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -561,7 +561,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" pref="168" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" pref="165" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>

@@ -135,7 +135,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
 
     private void adicionarTelefone() {
         Telefone telefone = DialogoTelefone.getTelefone(new Telefone(fornecedor), TelaPrincipal.getInstancia(), true);
-        if (telefone == null) {
+        if (telefone.getNumero().equals("")) {
             return;
         }
         getModeloTelefone().adicionar(telefone);
@@ -144,6 +144,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
     private void editarTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser editado!", this);
             return;
         }
         DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
@@ -153,6 +154,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
     private void removerTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
             return;
         }
         getModeloTelefone().remover(telefone);
@@ -245,7 +247,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
                 editarTelefone();
             } else if (e.getSource() == btnRemoverTelefone) {
                 removerTelefone();
-            }else if(e.getSource() == btnVoltar){
+            } else if (e.getSource() == btnVoltar) {
                 doDefaultCloseAction();
             }
         }
