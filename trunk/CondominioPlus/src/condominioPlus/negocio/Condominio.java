@@ -73,6 +73,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaPagar contaPagar = new ContaPagar();
     @OneToMany(mappedBy = "condominio", cascade=CascadeType.ALL)
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
+    @Column(name="numero_minimo_taloes")
+    private int numeroMinimoTaloes = 0;
 
     public Condominio() {
     }
@@ -284,5 +286,13 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setDadosTalaoCheques(List<DadosTalaoCheque> dadosTalaoCheques) {
         this.dadosTalaoCheques = dadosTalaoCheques;
+    }
+
+    public int getNumeroMinimoTaloes() {
+        return numeroMinimoTaloes;
+    }
+
+    public void setNumeroMinimoTaloes(int numeroMinimoTaloes) {
+        this.numeroMinimoTaloes = numeroMinimoTaloes;
     }
 }
