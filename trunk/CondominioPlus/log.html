@@ -11255,3 +11255,165 @@ Exception Description: Error compiling the query [CondominosPorUnidadeSemSindico
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.usuario.PainelLogin$2.run(PainelLogin.java:113)
 <br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.lang.Thread.run(Thread.java:619)
 </td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>11/02/2011 11:07:49</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">Falha na operação com a Base de Dados!</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">logicpoint.exception.PersistenciaException: Falha na operação com a Base de Dados!
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.tratarExcecao(DAO.java:264)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.listar(DAO.java:258)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.listar(DAOGenerico.java:301)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.carregarTaloes(TelaDadosCondominio.java:276)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.carregarTabelaDadosTalao(TelaDadosCondominio.java:224)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.condominio.TelaDadosCondominio.&lt;init&gt;(TelaDadosCondominio.java:68)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.TelaPrincipal$ControladorEventos.actionPerformed(TelaPrincipal.java:301)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicButtonListener.mouseReleased(BasicButtonListener.java:236)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.AWTEventMulticaster.mouseReleased(AWTEventMulticaster.java:272)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: Exception [TOPLINK-4002] (Oracle TopLink Essentials - 2.0.1 (Build b09d-fcs (12/06/2007))): oracle.toplink.essentials.exceptions.DatabaseException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Internal Exception: org.postgresql.util.PSQLException: ERRO: coluna t0.em_uso não existe
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Error Code: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Call: SELECT t0.CODIGO, t0.em_uso, t0.NOVO, t0.numero_final, t0.USADO, t0.numero_inicial, t0.CONDOMINIO_CODIGO FROM dados_talao_cheque t0, CONDOMINIO t1 WHERE ((t1.CODIGO = ?) AND (t1.CODIGO = t0.CONDOMINIO_CODIGO))
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	bind =&gt; [1]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Query: ReportQuery(condominioPlus.negocio.DadosTalaoCheque)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.exceptions.DatabaseException.sqlException(DatabaseException.java:319)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.basicExecuteCall(DatabaseAccessor.java:566)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeCall(DatabaseAccessor.java:452)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.threetier.ServerSession.executeCall(ServerSession.java:473)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:228)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeCall(DatasourceCallQueryMechanism.java:214)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.executeSelectCall(DatasourceCallQueryMechanism.java:285)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.DatasourceCallQueryMechanism.selectAllRows(DatasourceCallQueryMechanism.java:615)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.ExpressionQueryMechanism.selectAllRowsFromTable(ExpressionQueryMechanism.java:2416)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.queryframework.ExpressionQueryMechanism.selectAllReportQueryRows(ExpressionQueryMechanism.java:2382)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ReportQuery.executeDatabaseQuery(ReportQuery.java:802)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.DatabaseQuery.execute(DatabaseQuery.java:628)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelReadQuery.execute(ObjectLevelReadQuery.java:692)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.queryframework.ObjectLevelReadQuery.executeInUnitOfWork(ObjectLevelReadQuery.java:746)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.UnitOfWorkImpl.internalExecuteQuery(UnitOfWorkImpl.java:2233)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:952)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.sessions.AbstractSession.executeQuery(AbstractSession.java:924)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EJBQueryImpl.executeReadQuery(EJBQueryImpl.java:367)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.ejb.cmp3.base.EJBQueryImpl.getResultList(EJBQueryImpl.java:478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.getResultList(DAOGenerico.java:263)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAOGenerico.listar(DAOGenerico.java:285)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at logicpoint.persistencia.DAO.listar(DAO.java:255)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 31 more
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Caused by: org.postgresql.util.PSQLException: ERRO: coluna t0.em_uso não existe
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.receiveErrorResponse(QueryExecutorImpl.java:1592)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.processResults(QueryExecutorImpl.java:1327)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.core.v3.QueryExecutorImpl.execute(QueryExecutorImpl.java:192)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.execute(AbstractJdbc2Statement.java:451)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeWithFlags(AbstractJdbc2Statement.java:350)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at org.postgresql.jdbc2.AbstractJdbc2Statement.executeQuery(AbstractJdbc2Statement.java:254)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.executeSelect(DatabaseAccessor.java:726)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at oracle.toplink.essentials.internal.databaseaccess.DatabaseAccessor.basicExecuteCall(DatabaseAccessor.java:501)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	... 51 more
+</td></tr>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Log</title>
+<style type="text/css">
+<!--
+body, table {font-family: verdana; font-size: x-small;}
+th {background: #336699; color: #FFFFFF; text-align: left;}
+-->
+</style>
+</head>
+<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">
+<table cellspacing="0" cellpadding="4" border="1" bordercolor="#224466" width="100%">
+<tr>
+<th>Data/Hora</th>
+<th>Thread</th>
+<th>N�vel de Log</th>
+<th>Classe</th>
+<th>Mensagem</th>
+</tr>
+
+<tr>
+<td>11/02/2011 11:47:10</td>
+<td title="AWT-EventQueue-0 thread">AWT-EventQueue-0</td>
+<td title="Level"><font color="#993300"><strong>ERROR</strong></font></td>
+<td title="logicpoint.persistencia.DAO category">logicpoint.persistencia.DAO</td>
+<td title="Message">null</td>
+</tr>
+<tr><td bgcolor="white" style="color:black; {font-family: arial; font-size: xx-small;}" colspan="6">java.lang.NullPointerException
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.negocio.financeiro.Pagamento.gerarNumeroDocumento(Pagamento.java:205)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.financeiro.TelaContaPagar.&lt;init&gt;(TelaContaPagar.java:83)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at condominioPlus.apresentacao.TelaPrincipal$ControladorEventos.actionPerformed(TelaPrincipal.java:341)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.fireActionPerformed(AbstractButton.java:1995)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton$Handler.actionPerformed(AbstractButton.java:2318)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.fireActionPerformed(DefaultButtonModel.java:387)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.DefaultButtonModel.setPressed(DefaultButtonModel.java:242)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.AbstractButton.doClick(AbstractButton.java:357)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicMenuItemUI.doClick(BasicMenuItemUI.java:1223)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.plaf.basic.BasicMenuItemUI$Handler.mouseReleased(BasicMenuItemUI.java:1264)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processMouseEvent(Component.java:6267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at javax.swing.JComponent.processMouseEvent(JComponent.java:3267)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.processEvent(Component.java:6032)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.processEvent(Container.java:2041)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEventImpl(Component.java:4630)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2099)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.retargetMouseEvent(Container.java:4577)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.processMouseEvent(Container.java:4238)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.LightweightDispatcher.dispatchEvent(Container.java:4168)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Container.dispatchEventImpl(Container.java:2085)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Window.dispatchEventImpl(Window.java:2478)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.Component.dispatchEvent(Component.java:4460)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventQueue.dispatchEvent(EventQueue.java:599)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:269)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:184)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:174)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:169)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:161)
+<br>&nbsp;&nbsp;&nbsp;&nbsp;	at java.awt.EventDispatchThread.run(EventDispatchThread.java:122)
+</td></tr>

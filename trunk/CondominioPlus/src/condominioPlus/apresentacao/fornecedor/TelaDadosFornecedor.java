@@ -217,11 +217,10 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
 //            }
         };
 
-        tblPagamentos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        tblPagamentos.getColumn(modeloTabela.getCampo(0)).setPreferredWidth(80);
-        tblPagamentos.getColumn(modeloTabela.getCampo(1)).setPreferredWidth(105);
-        tblPagamentos.getColumn(modeloTabela.getCampo(2)).setPreferredWidth(100);
-        tblPagamentos.getColumn(modeloTabela.getCampo(3)).setPreferredWidth(260);
+        tblPagamentos.getColumn(modeloTabela.getCampo(0)).setMinWidth(80);
+        tblPagamentos.getColumn(modeloTabela.getCampo(1)).setMinWidth(105);
+        tblPagamentos.getColumn(modeloTabela.getCampo(2)).setMinWidth(100);
+        tblPagamentos.getColumn(modeloTabela.getCampo(3)).setMinWidth(260);
 
     }
 

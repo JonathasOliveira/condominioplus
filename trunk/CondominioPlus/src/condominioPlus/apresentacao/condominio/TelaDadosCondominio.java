@@ -13,6 +13,7 @@ package condominioPlus.apresentacao.condominio;
 import condominioPlus.apresentacao.DialogoConselheiro;
 import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
+import condominioPlus.apresentacao.financeiro.DialogoTaloesCheque;
 import condominioPlus.negocio.Banco;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.DadosTalaoCheque;
@@ -161,6 +162,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         return (TabelaModelo<Telefone>) tblTelefone.getModel();
     }
 
+    private TabelaModelo<DadosTalaoCheque> getModeloTalao() {
+        return (TabelaModelo<DadosTalaoCheque>) tbTaloes.getModel();
+    }
+
     private void adicionarTelefone() {
         Telefone telefone = DialogoTelefone.getTelefone(new Telefone(condominio), TelaPrincipal.getInstancia(), true);
         if (telefone == null) {
@@ -214,7 +219,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     }
 
     private void carregarTabelaDadosTalao() {
-        String[] campos = "Inicial, Final, Terminou?".split(",");
+        String[] campos = "Inicial, Final, Status".split(",");
 
         tbTaloes.setModel(new TabelaModelo<DadosTalaoCheque>(carregarTaloes(), campos, tbTaloes) {
 
@@ -225,12 +230,39 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                         return d.getNumeroInicial();
                     case 1:
                         return d.getNumeroFinal();
+                    case 2:
+                        return d.getStatus();
                     default:
                         return null;
                 }
             }
         });
 
+    }
+
+    private void adicionarTaloes() {
+        DadosTalaoCheque dados = DialogoTaloesCheque.getDadosTalao(new DadosTalaoCheque(), null, closable);
+        if (dados == null) {
+            return;
+        }
+        getModeloTalao().adicionar(dados);
+    }
+
+    private void editarTaloes() {
+        DadosTalaoCheque dados = getModeloTalao().getObjeto();
+        if (dados == null) {
+            return;
+        }
+        DialogoTaloesCheque.getDadosTalao(dados, null, closable);
+        getModeloTalao().notificarLinha(getModeloTalao().getObjetos().indexOf(dados));
+    }
+
+    private void removerTaloes() {
+        DadosTalaoCheque dados = getModeloTalao().getObjeto();
+        if (dados == null) {
+            return;
+        }
+        getModeloTalao().remover(dados);
     }
 
     private TabelaModelo<Unidade> getModeloConselheiros() {
@@ -248,7 +280,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     }
 
     private void adicionarConselheiro() {
-        if(condominio.getUnidades().isEmpty()){
+        if (condominio.getUnidades().isEmpty()) {
             ApresentacaoUtil.exibirInformacao("Não existem Unidades Cadastradas!", this);
             return;
         }
@@ -392,6 +424,12 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 adicionarConselheiro();
             } else if (e.getSource() == btnRemoverConselheiro) {
                 removerConselheiro();
+            }else if (e.getSource() == btnAdicionarTaloes){
+                adicionarTaloes();
+            }else if (e.getSource() == btnEditarTaloes){
+                editarTaloes();
+            }else if (e.getSource() ==  btnRemoverTaloes){
+                removerTaloes();
             }
         }
 
@@ -428,6 +466,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             btnAdicionarConselheiro.addActionListener(this);
             btnRemoverConselheiro.addActionListener(this);
             painelBanco.addMouseListener(this);
+            btnAdicionarTaloes.addActionListener(this);
+            btnEditarTaloes.addActionListener(this);
+            btnRemoverTaloes.addActionListener(this);
         }
     }
 
@@ -535,12 +576,12 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jLabel32 = new javax.swing.JLabel();
         txtPrimeiroCheque = new javax.swing.JTextField();
         txtUltimoCheque = new javax.swing.JTextField();
+        jPanel9 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tbTaloes = new javax.swing.JTable();
-        jLabel33 = new javax.swing.JLabel();
         btnAdicionarTaloes = new javax.swing.JButton();
-        btnEditarTelefone1 = new javax.swing.JButton();
-        btnRemoverTelefone1 = new javax.swing.JButton();
+        btnEditarTaloes = new javax.swing.JButton();
+        btnRemoverTaloes = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -1179,36 +1220,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         jLabel32.setText("Último Cheque:");
 
-        tbTaloes.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane4.setViewportView(tbTaloes);
-
-        jLabel33.setText("Talões:");
-
-        btnAdicionarTaloes.setFont(new java.awt.Font("Tahoma", 0, 10));
-        btnAdicionarTaloes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnAdicionarTaloes.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTaloes.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTaloes.setPreferredSize(new java.awt.Dimension(32, 32));
-
-        btnEditarTelefone1.setFont(new java.awt.Font("Tahoma", 0, 10));
-        btnEditarTelefone1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
-        btnEditarTelefone1.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefone1.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefone1.setPreferredSize(new java.awt.Dimension(32, 32));
-
-        btnRemoverTelefone1.setFont(new java.awt.Font("Tahoma", 0, 10));
-        btnRemoverTelefone1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnRemoverTelefone1.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefone1.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefone1.setPreferredSize(new java.awt.Dimension(32, 32));
-
         javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
         jPanel15.setLayout(jPanel15Layout);
         jPanel15Layout.setHorizontalGroup(
@@ -1224,16 +1235,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                     .addComponent(txtDataFechamentoCaixa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtUltimoCheque)
                     .addComponent(txtPrimeiroCheque, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 244, Short.MAX_VALUE)
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel33))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnEditarTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAdicionarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoverTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(21, 21, 21))
+                .addContainerGap(213, Short.MAX_VALUE))
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1250,21 +1252,66 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel32)
                     .addComponent(txtUltimoCheque, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(43, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
-                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel15Layout.createSequentialGroup()
-                        .addContainerGap()
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Talões"));
+
+        tbTaloes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tbTaloes);
+
+        btnAdicionarTaloes.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarTaloes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarTaloes.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTaloes.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTaloes.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnEditarTaloes.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarTaloes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarTaloes.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarTaloes.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarTaloes.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverTaloes.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverTaloes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverTaloes.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTaloes.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTaloes.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAdicionarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEditarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addGap(7, 7, 7)
                         .addComponent(btnAdicionarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEditarTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnEditarTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRemoverTelefone1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel15Layout.createSequentialGroup()
-                        .addComponent(jLabel33)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE)))
-                .addGap(22, 22, 22))
+                        .addComponent(btnRemoverTaloes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
@@ -1272,16 +1319,20 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jPanel14Layout.setHorizontalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         abas.addTab("Caixa", jPanel14);
@@ -1343,11 +1394,11 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JButton btnAdicionarConselheiro;
     private javax.swing.JButton btnAdicionarTaloes;
     private javax.swing.JButton btnAdicionarTelefone;
+    private javax.swing.JButton btnEditarTaloes;
     private javax.swing.JButton btnEditarTelefone;
-    private javax.swing.JButton btnEditarTelefone1;
     private javax.swing.JButton btnRemoverConselheiro;
+    private javax.swing.JButton btnRemoverTaloes;
     private javax.swing.JButton btnRemoverTelefone;
-    private javax.swing.JButton btnRemoverTelefone1;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JButton btnVoltar;
     private javax.swing.JCheckBox checkBoxAtivo;
@@ -1379,7 +1430,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1400,6 +1450,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;

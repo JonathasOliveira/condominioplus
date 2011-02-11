@@ -71,7 +71,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaCorrente contaCorrente = new ContaCorrente();
     @OneToOne(cascade = CascadeType.ALL)
     private ContaPagar contaPagar = new ContaPagar();
-    @OneToMany(mappedBy = "condominio")
+    @OneToMany(mappedBy = "condominio", cascade=CascadeType.ALL)
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
 
     public Condominio() {

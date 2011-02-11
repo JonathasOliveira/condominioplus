@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.util.DataUtil;
@@ -45,6 +46,16 @@ public class ValidadorGenerico extends ValidadorAbstrato {
                 }
             } else if (o instanceof JCheckBox) {
                 JCheckBox txt = (JCheckBox) o;
+                if (!txt.isSelected() || txt == null) {
+                    if (AvantViewUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
+                        txt.setSelected(true);
+                    } else {
+                        txt.setSelected(false);
+                    }
+                }
+            }
+            else if (o instanceof JRadioButton) {
+                JRadioButton txt = (JRadioButton) o;
                 if (!txt.isSelected() || txt == null) {
                     if (AvantViewUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
                         txt.setSelected(true);
