@@ -14,6 +14,7 @@ import bemaJava.Bematech;
 import com.sun.jna.Native;
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.DadosTalaoCheque;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaPagar;
 import condominioPlus.negocio.financeiro.DadosCheque;
@@ -82,6 +83,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 //        new LimitarCaracteres(10).ValidaNumero(txtConta);
         txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
         painelCheques.setVisible(false);
+        btnGravar.setEnabled(false);
+        btnImprimir.setEnabled(false);
         if (condominio != null) {
             this.setTitle("Contas a Pagar - " + condominio.getRazaoSocial());
         }
@@ -281,6 +284,19 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         return pagamentos;
     }
 
+    private DadosTalaoCheque getDadosTalaoCheque() {
+        if (!condominio.getDadosTalaoCheques().isEmpty()) {
+            for (DadosTalaoCheque dados : condominio.getDadosTalaoCheques()) {
+                if (dados.isEmUso()) {
+                    return dados;
+                }
+            }
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Não existem cheques Cadastrados", this);
+        }
+        return null;
+    }
+
     private void preencherPagamento() {
         pagamento = new Pagamento();
         ValidadorGenerico validador = new ValidadorGenerico();
@@ -292,6 +308,13 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirAdvertencia("Escolha um Fornecedor para esta conta a pagar!", this);
             return;
         }
+        if(btnNumeroDocumento.isSelected()){
+            if(!getDadosTalaoCheque().verificarIntervaloCheque(txtNumeroDocumento.getText())){
+                ApresentacaoUtil.exibirAdvertencia("Digite um numero entre " + getDadosTalaoCheque().getNumeroInicial() + " - " + getDadosTalaoCheque().getNumeroFinal(), this);
+                return;
+            }
+        }
+
         pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText().toUpperCase());
         pagamento.setConta(conta);
@@ -397,10 +420,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }
 
     private void apagarItensSelecionados() {
-        if (!ApresentacaoUtil.perguntar("Deseja remover os pagamentos?", this)) {
-            return;
-        }
-        if (modeloTabela.getLinhaSelecionada() > -1) {
+        if (modeloTabela.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        } else if (ApresentacaoUtil.perguntar("Deseja remover os pagamentos?", this)) {
             List<Pagamento> itensRemover = modeloTabela.getObjetosSelecionados();
 
             for (Pagamento p : itensRemover) {
@@ -410,28 +432,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 new DAO().remover(itensRemover);
 //                condominio.getContaCorrente().getPagamentos().removeAll(itensRemover);
                 new DAO().salvar(contaPagar);
-                ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
             }
-        } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
-        }
-
-    }
-
-    private void pagarItensSelecionados() {
-        if (!ApresentacaoUtil.perguntar("Deseja pagar estes selecionados?", this)) {
-            return;
-        }
-        if (modeloTabela.getLinhaSelecionada() > -1) {
-            List<Pagamento> itensPagar = modeloTabela.getObjetosSelecionados();
-            TelaPagarDocumento tela = new TelaPagarDocumento(null, itensPagar);
-            tela.setVisible(true);
-            if (tela.atualizar()) {
-                modeloTabela.carregarObjetos();
-            }
-
-        } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
         }
     }
 
@@ -453,10 +455,25 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }
 
     private void editarPagamento() {
-        DialogoEditarContaPagar tela = new DialogoEditarContaPagar((Pagamento) modeloTabela.getObjetoSelecionado());
-        tela.setLocationRelativeTo(this);
-        tela.setVisible(true);
-        modeloTabela.carregarObjetos();
+        if (!modeloTabela.getObjetosSelecionados().isEmpty()) {
+            DialogoEditarContaPagar tela = new DialogoEditarContaPagar((Pagamento) modeloTabela.getObjetoSelecionado());
+            tela.setLocationRelativeTo(this);
+            tela.setVisible(true);
+            modeloTabela.carregarObjetos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+        }
+    }
+
+    private void PagarPagamento() {
+        if (!modeloTabela.getObjetosSelecionados().isEmpty()) {
+            DialogoPagarContaPagar tela = new DialogoPagarContaPagar((Pagamento) modeloTabela.getObjetoSelecionado());
+            tela.setLocationRelativeTo(this);
+            tela.setVisible(true);
+            modeloTabela.carregarObjetos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+        }
     }
 
 //    private void carregarComboFiltro() {
@@ -480,7 +497,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuApagarSelecionados) {
                 apagarItensSelecionados();
             } else if (origem == itemMenuPagarSelecionados) {
-                pagarItensSelecionados();
+                PagarPagamento();
             } else if (origem == btnFixarHistórico) {
             } else if (origem == btnNumeroDocumento) {
                 trocarFormaPagamento();
@@ -507,7 +524,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             itemMenuEditarPagamento.addActionListener(this);
             dataInicio.addChangeListener(this);
             dataTermino.addChangeListener(this);
-            itemMenuApagarSelecionados.addActionListener(this);
             itemMenuPagarSelecionados.addActionListener(this);
             txtConta.addFocusListener(this);
             btnNumeroDocumento.addActionListener(this);
@@ -518,6 +534,15 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
+                System.out.println("released");
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                System.out.println("pressed");
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }

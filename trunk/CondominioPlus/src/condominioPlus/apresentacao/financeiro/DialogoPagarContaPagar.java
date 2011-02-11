@@ -4,7 +4,7 @@
  */
 
 /*
- * DialogoEditarContaPagar.java
+ * DialogoEditarContaPagar2.java
  *
  * Created on 02/02/2011, 17:04:42
  */
@@ -41,7 +41,7 @@ import logicpoint.util.Util;
  *
  * @author Administrador
  */
-public class DialogoEditarContaPagar extends javax.swing.JDialog {
+public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     private Pagamento pagamento;
     private ComboModelo<Fornecedor> modelo;
@@ -52,15 +52,27 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private BigDecimal total = new BigDecimal(0);
 
     /** Creates new form TelaBanco */
-    public DialogoEditarContaPagar(Pagamento pagamento) {
+
+    public DialogoPagarContaPagar(Pagamento pagamento) {
         initComponents();
         this.pagamento = pagamento;
         listaPagamentos = getPagamentosSemOriginal();
         carregarFornecedor();
         preencherTela();
         carregarTabela();
+        bloquearCampos();
         setTotal();
         controlador = new ControladorEventos();
+    }
+
+    private void bloquearCampos() {
+        txtConta.setEnabled(false);
+        txtHistorico.setEnabled(false);
+        txtData.setEnabled(false);
+        txtNumeroDocumento.setEnabled(false);
+        txtValor.setEnabled(false);
+        cbFornecedores.setEnabled(false);
+
     }
 
     private void carregarTabela() {
@@ -205,28 +217,6 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
     }
 
-    private void salvar() {
-        preencherObjeto();
-
-        if (!listaPagamentos.isEmpty()) {
-            System.out.println("teste");
-            for (Pagamento p : listaPagamentos) {
-                if (btnNumeroDocumento.isSelected()) {
-                    p.setForma(FormaPagamento.CHEQUE);
-                    p.setDadosPagamento(pagamento.getDadosPagamento());
-                } else {
-                    p.setForma(FormaPagamento.DINHEIRO);
-                    p.setDadosPagamento(pagamento.getDadosPagamento());
-                }
-            }
-            System.out.println("listta" + listaPagamentos);
-            new DAO().salvar(listaPagamentos);
-        }
-
-        new DAO().salvar(pagamento);
-        dispose();
-    }
-
     private void trocarFormaPagamento() {
         if (btnNumeroDocumento.isSelected()) {
             btnNumeroDocumento.setText("Nº Cheque:");
@@ -267,19 +257,33 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         cbFornecedores.setModel(modelo);
     }
 
+    private void efetuarPagamento() {
+        List<Pagamento> novaLista = getPagamentos();
+        for (Pagamento p : novaLista) {
+            p.setPago(true);
+            p.setContaCorrente(Main.getCondominio().getContaCorrente());
+            p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+            System.out.println("pagamento " + p.isPago());
+        }
+
+        new DAO().salvar(novaLista);
+        ApresentacaoUtil.exibirInformacao("Pagamentos efetuados com sucesso!", this);
+        dispose();
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == btnSalvar) {
-                salvar();
+            if (e.getSource() == btnPagar) {
+                efetuarPagamento();
             } else if (e.getSource() == btnCancelar) {
                 dispose();
             } else if (e.getSource() == btnImprimir) {
                 if (getPagamentos().get(0).getForma() == FormaPagamento.CHEQUE) {
                     imprimirCheques();
                 } else {
-                    ApresentacaoUtil.exibirInformacao("Relatorio vai ser feito depois", DialogoEditarContaPagar.this);
+                    ApresentacaoUtil.exibirInformacao("Relatorio vai ser feito depois", DialogoPagarContaPagar.this);
                 }
             } else if (e.getSource() == btnConta) {
                 pegarConta();
@@ -300,7 +304,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
                             txtConta.setText(String.valueOf(conta.getCodigo()));
                             txtHistorico.setText(conta.getNome());
                         } else {
-                            ApresentacaoUtil.exibirErro("Código Inexistente!", DialogoEditarContaPagar.this);
+                            ApresentacaoUtil.exibirErro("Código Inexistente!", DialogoPagarContaPagar.this);
                             txtConta.setText("");
                             txtConta.grabFocus();
                             return;
@@ -316,10 +320,10 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         @Override
         public void configurar() {
             ApresentacaoUtil.adicionarListener(
-                    ApresentacaoUtil.transferidorFocoEnter, DialogoEditarContaPagar.this, JTextField.class, JComboBox.class);
-            ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, DialogoEditarContaPagar.this, JTextField.class);
+                    ApresentacaoUtil.transferidorFocoEnter, DialogoPagarContaPagar.this, JTextField.class, JComboBox.class);
+            ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, DialogoPagarContaPagar.this, JTextField.class);
 
-            btnSalvar.addActionListener(this);
+            btnPagar.addActionListener(this);
             btnCancelar.addActionListener(this);
             btnImprimir.addActionListener(this);
             btnConta.addActionListener(this);
@@ -353,7 +357,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         btnNumeroDocumento = new javax.swing.JToggleButton();
         jLabel4 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        btnSalvar = new javax.swing.JButton();
+        btnPagar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
@@ -377,7 +381,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         jScrollPane1.setViewportView(tabela);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
-        jLabel5.setText("Atenção: Caso modifique o número do cheque/doc estes pagamentos também serão alterados!");
+        jLabel5.setText("Atenção: Todos os pagamentos com mesmo número serão pagos automaticamente!");
 
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel6.setText("Total: R$");
@@ -535,16 +539,16 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        btnSalvar.setText("Salvar");
-        btnSalvar.setToolTipText("Salvar");
-        btnSalvar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnPagar.setText("Pagar");
+        btnPagar.setToolTipText("Salvar");
+        btnPagar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.ipadx = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 72, 11, 0);
-        jPanel1.add(btnSalvar, gridBagConstraints);
+        jPanel1.add(btnPagar, gridBagConstraints);
 
         btnCancelar.setText("Cancelar");
         btnCancelar.setToolTipText("Gravar Cheques");
@@ -585,7 +589,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -608,7 +612,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JToggleButton btnNumeroDocumento;
-    private javax.swing.JButton btnSalvar;
+    private javax.swing.JButton btnPagar;
     private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

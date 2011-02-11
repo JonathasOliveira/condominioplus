@@ -202,9 +202,13 @@ public class Pagamento implements Serializable{
     }
 
     public static String gerarNumeroDocumento() {
-        long numero = (Long)new DAO().localizar("MaxNumeroDocumento");
+        Long resultado = (Long) new DAO().localizar("MaxNumeroDocumento");
 
-        String valor = String.valueOf(numero);
+        if(resultado == null){
+            resultado = (long)0;
+        }
+
+        String valor = String.valueOf(resultado);
 
         if (valor == null) {
             return "1";
