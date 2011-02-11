@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.CaretEvent;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.DadosTalaoCheque;
 import javax.swing.JTable;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -104,9 +105,22 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
             Main.setCondominio(modelo.getObjetoSelecionado());
             TelaPrincipal.preencherCondominio(Main.getCondominio());
             sair();
+            verificarNumeroTaloes();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Você precisa selecionar um condominio para usar o sistema!", this);
 
+        }
+    }
+
+    private void verificarNumeroTaloes() {
+        List<DadosTalaoCheque> listaTaloes = new ArrayList<DadosTalaoCheque>();
+        for (DadosTalaoCheque dados : Main.getCondominio().getDadosTalaoCheques()) {
+            if (dados.isEmUso() || dados.isNovo()) {
+                listaTaloes.add(dados);
+            }
+        }
+        if (listaTaloes.size() < Main.getCondominio().getNumeroMinimoTaloes()) {
+            ApresentacaoUtil.exibirAdvertencia("Atenção: O número de talões é menor que o desejado, providencie novos talões!", null);
         }
     }
 
