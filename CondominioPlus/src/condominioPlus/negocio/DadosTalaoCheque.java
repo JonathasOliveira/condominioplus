@@ -105,5 +105,30 @@ public class DadosTalaoCheque implements Serializable {
         }
         return "";
     }
+
+    public boolean verificarIntervaloCheque(String valor) {
+        long novoValor = 0;
+        long novoNumeroInicial = 0;
+        long novoNumeroFinal = 0;
+        if (valor != null) {
+            novoValor = Long.parseLong(valor);
+        }
+        if (numeroInicial != null) {
+            novoNumeroInicial = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroInicial);
+        }
+        if (numeroFinal != null) {
+            novoNumeroFinal = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroFinal);
+        }
+        System.out.println(novoValor);
+        System.out.println(novoNumeroInicial);
+        System.out.println(novoNumeroFinal);
+        if (novoValor >= novoNumeroInicial && novoValor <= novoNumeroFinal) {
+            System.out.println("here maneh");
+            return true;
+        }
+        return false;
+
+
+    }
 }
 
