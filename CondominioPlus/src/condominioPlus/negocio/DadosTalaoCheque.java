@@ -20,17 +20,22 @@ import javax.persistence.Table;
  * @author Administrador
  */
 @Entity
-@NamedQueries(@NamedQuery(name="TaloesPorCondominio" , query="SELECT d FROM DadosTalaoCheque d WHERE d.condominio.codigo= ?1"))
+@NamedQueries(
+@NamedQuery(name = "TaloesPorCondominio", query = "SELECT d FROM DadosTalaoCheque d WHERE d.condominio.codigo= ?1"))
 @Table(name = "dados_talao_cheque")
 public class DadosTalaoCheque implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
-    @Column(name="numero_inicial")
+    @Column(name = "numero_inicial")
     private String numeroInicial;
-    @Column(name="numero_final")
+    @Column(name = "numero_final")
     private String numeroFinal;
+    @Column(name = "em_uso")
+    private boolean emUso;
+    private boolean novo;
+    private boolean usado;
     @ManyToOne
     private Condominio condominio;
 
@@ -65,5 +70,40 @@ public class DadosTalaoCheque implements Serializable {
     public void setCondominio(Condominio condominio) {
         this.condominio = condominio;
     }
-    
+
+    public boolean isEmUso() {
+        return emUso;
+    }
+
+    public void setEmUso(boolean emUso) {
+        this.emUso = emUso;
+    }
+
+    public boolean isNovo() {
+        return novo;
+    }
+
+    public void setNovo(boolean novo) {
+        this.novo = novo;
+    }
+
+    public boolean isUsado() {
+        return usado;
+    }
+
+    public void setUsado(boolean usado) {
+        this.usado = usado;
+    }
+
+    public String getStatus() {
+        if (isEmUso()) {
+            return "Em Uso";
+        } else if (isNovo()) {
+            return "Novo";
+        } else if (isUsado()) {
+            return "Usado";
+        }
+        return "";
+    }
 }
+
