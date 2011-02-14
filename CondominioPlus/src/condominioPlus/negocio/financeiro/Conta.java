@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -31,6 +32,8 @@ public class Conta implements Serializable {
     private boolean credito;
     private boolean vinculada = false;
     private String nomeVinculo = "";
+    @OneToOne
+    private Conta conta;
 
     public Conta() {
     }
@@ -73,6 +76,14 @@ public class Conta implements Serializable {
 
     public void setVinculada(boolean vinculada) {
         this.vinculada = vinculada;
+    }
+
+    public Conta getConta() {
+        return conta;
+    }
+
+    public void setConta(Conta conta) {
+        this.conta = conta;
     }
 
     @Override
