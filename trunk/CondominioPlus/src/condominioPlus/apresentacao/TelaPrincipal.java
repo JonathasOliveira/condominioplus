@@ -237,6 +237,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         abrirFrame(frame);
     }
 
+    private boolean validarContaCorrente() {
+        if (Main.getCondominio().getContaBancaria().getContaCorrente().equals("")) {
+            ApresentacaoUtil.exibirAdvertencia("Preencha o condomínio com uma conta corrente!", this);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private static void abrirFrame(JInternalFrame frame) {
         frame.moveToFront();
         frame.setVisible(true);
@@ -332,13 +341,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 //                    criarFrame(new TelaRelatorioEstorno());
                 } else if (source == menuItemContaCorrente) {
                     if (Main.getCondominio() != null) {
-                        criarFrame(new TelaContaCorrente(Main.getCondominio()));
+                        if (validarContaCorrente()) {
+                            criarFrame(new TelaContaCorrente(Main.getCondominio()));
+                        }
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
                 } else if (source == menuItemContaPagar) {
                     if (Main.getCondominio() != null) {
-                        criarFrame(new TelaContaPagar(Main.getCondominio()));
+                        if (validarContaCorrente()) {
+                            criarFrame(new TelaContaPagar(Main.getCondominio()));
+                        }
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
