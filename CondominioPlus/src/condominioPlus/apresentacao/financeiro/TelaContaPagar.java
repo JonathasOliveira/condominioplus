@@ -308,9 +308,11 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirAdvertencia("Escolha um Fornecedor para esta conta a pagar!", this);
             return;
         }
-        if(btnNumeroDocumento.isSelected()){
-            if(!getDadosTalaoCheque().verificarIntervaloCheque(txtNumeroDocumento.getText())){
-                ApresentacaoUtil.exibirAdvertencia("Digite um numero entre " + getDadosTalaoCheque().getNumeroInicial() + " - " + getDadosTalaoCheque().getNumeroFinal(), this);
+        if (btnNumeroDocumento.isSelected()) {
+            if (!getDadosTalaoCheque().verificarIntervaloCheque(txtNumeroDocumento.getText())) {
+                ApresentacaoUtil.exibirAdvertencia("Número do cheque incorreto! Digite um numero entre " + getDadosTalaoCheque().getNumeroInicial() + " - " + getDadosTalaoCheque().getNumeroFinal(), this);
+                txtNumeroDocumento.grabFocus();
+                txtNumeroDocumento.selectAll();
                 return;
             }
         }
@@ -443,7 +445,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             painelCheques.setVisible(true);
             btnGravar.setEnabled(true);
             btnImprimir.setEnabled(true);
-            txtNumeroDocumento.setText(condominio.getContaBancaria().getContaCorrente());
         } else {
             btnNumeroDocumento.setText("Nº Doc:");
             btnGravar.setEnabled(false);
