@@ -130,5 +130,26 @@ public class DadosTalaoCheque implements Serializable {
 
 
     }
+
+    public boolean verificarIntervaloChequeSemContaCorrente(String valor) {
+        long novoValor = 0;
+        long novoNumeroInicial = 0;
+        long novoNumeroFinal = 0;
+        if (valor != null) {
+            novoValor = Long.parseLong(valor);
+        }
+        if (numeroInicial != null) {
+            novoNumeroInicial = Long.parseLong(numeroInicial);
+        }
+        if (numeroFinal != null) {
+            novoNumeroFinal = Long.parseLong(numeroFinal);
+        }
+        if (novoValor >= novoNumeroInicial && novoValor <= novoNumeroFinal) {
+            return true;
+        }
+        return false;
+
+
+    }
 }
 
