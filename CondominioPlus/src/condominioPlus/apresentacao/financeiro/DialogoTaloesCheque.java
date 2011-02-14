@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.exception.TratadorExcecao;
-import logicpoint.persistencia.DAO;
 
 /**
  *
@@ -44,7 +43,6 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
 
         this.setLocationRelativeTo(null);
 
-        controlador.preencher(dados);
         preencherTela();
     }
 
@@ -72,8 +70,12 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             if (radioUsado.isSelected()) {
                 dados.setUsado(true);
             }
+
+            dados.setCondominio(Main.getCondominio());
+            dados.setNumeroInicial(txtNumeroInicial.getText());
+            dados.setNumeroFinal(txtNumeroFinal.getText());
         }
-        dados.setCondominio(Main.getCondominio());
+        
     }
 
     private void preencherTela() {
@@ -82,6 +84,8 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             radioEmUso.setSelected(dados.isEmUso());
             radioNovo.setSelected(dados.isNovo());
             radioUsado.setSelected(dados.isUsado());
+            txtNumeroInicial.setText(dados.getNumeroInicial());
+            txtNumeroFinal.setText(dados.getNumeroFinal());
         }
     }
 
@@ -98,7 +102,6 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
                 validador.exibirErros(null);
                 return;
             }
-            controlador.capturar(dados);
             preencherObjeto();
 
             TipoAcesso tipo = null;
@@ -107,10 +110,10 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             } else {
                 tipo = tipo.EDICAO;
             }
-
-            DAO dao = new DAO(false);
-            dao.salvar(dados);
-            dao.concluirTransacao();
+//
+//            DAO dao = new DAO();
+//            dao.salvar(Main.getCondominio());
+//            dao.salvar(dados);
 
 
             String descricao = "Cadastro do Talão " + dados.getNumeroInicial() + " - " + dados.getNumeroFinal() + ".";
