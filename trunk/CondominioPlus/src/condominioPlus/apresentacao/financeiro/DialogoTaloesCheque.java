@@ -75,7 +75,7 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             dados.setNumeroInicial(txtNumeroInicial.getText());
             dados.setNumeroFinal(txtNumeroFinal.getText());
         }
-        
+
     }
 
     private void preencherTela() {
@@ -94,6 +94,32 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
         return dados;
     }
 
+    private boolean validarIntervalo(){
+
+        List<DadosTalaoCheque> lista = Main.getCondominio().getDadosTalaoCheques();
+        for (DadosTalaoCheque d : lista) {
+            if (d.verificarIntervaloChequeSemContaCorrente(txtNumeroInicial.getText()) || d.verificarIntervaloChequeSemContaCorrente(txtNumeroFinal.getText())) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    private boolean verificarStatus() {
+
+        List<DadosTalaoCheque> lista = Main.getCondominio().getDadosTalaoCheques();
+        for (DadosTalaoCheque d : lista) {
+            if (d.isEmUso() && radioEmUso.isSelected()) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
     private void salvar() {
         try {
 
@@ -102,6 +128,17 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
                 validador.exibirErros(null);
                 return;
             }
+
+            if (validarIntervalo()){
+                ApresentacaoUtil.exibirAdvertencia("Verifique o intervalo de cheques", this);
+                return;
+            }
+
+            if (verificarStatus()) {
+                ApresentacaoUtil.exibirAdvertencia("Já existe um talão de cheque em uso!", this);
+                return;
+            }
+
             preencherObjeto();
 
             TipoAcesso tipo = null;
@@ -110,11 +147,6 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             } else {
                 tipo = tipo.EDICAO;
             }
-//
-//            DAO dao = new DAO();
-//            dao.salvar(Main.getCondominio());
-//            dao.salvar(dados);
-
 
             String descricao = "Cadastro do Talão " + dados.getNumeroInicial() + " - " + dados.getNumeroFinal() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
