@@ -23,7 +23,6 @@ import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ComboModelo_2;
 import logicpoint.apresentacao.ControladorEventosGenerico;
-import logicpoint.apresentacao.Identificavel;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 
@@ -127,9 +126,40 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
     }
 
+    private void autoRelacionar() {
+
+//        Conta contaJaVinculada = new Conta();
+
+        if (modelo.getLinhaSelecionada() != -1) {
+            Conta contaVinculo = modelo.getSelectedItem();
+            Conta contaJaVinculada = conta.getConta();
+            conta.setConta(contaVinculo);
+            if (contaVinculo != null) {
+                contaVinculo.setConta(conta);
+
+                if (contaJaVinculada != null) {
+                    contaJaVinculada.setConta(null);
+//                    new DAO().(contaJaVinculada);
+                   System.out.println("conta vinculada1 " + contaJaVinculada.getNome());
+                }
+
+            } else {
+                if (contaJaVinculada != null) {
+                    contaJaVinculada.setConta(null);
+//                    new DAO().salvar(contaJaVinculada);
+                    System.out.println("conta vinculada2 " + contaJaVinculada.getNome());
+                }
+            }
+
+        }
+
+
+    }
 
     private void preencherObjeto() {
         conta.setNome(txtNome.getText());
+
+        autoRelacionar();
 
         if (radioCredito.isSelected()) {
             conta.setCredito(true);
