@@ -127,13 +127,9 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
     }
 
-    private void autoRelacionarConta() {
-    }
 
     private void preencherObjeto() {
         conta.setNome(txtNome.getText());
-
-        autoRelacionarConta();
 
         if (radioCredito.isSelected()) {
             conta.setCredito(true);
