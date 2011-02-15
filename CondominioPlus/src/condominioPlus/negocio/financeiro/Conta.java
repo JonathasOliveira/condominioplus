@@ -5,6 +5,7 @@
 package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,7 +33,7 @@ public class Conta implements Serializable {
     private boolean credito;
     private boolean vinculada = false;
     private String nomeVinculo = "";
-    @OneToOne
+    @OneToOne(cascade=CascadeType.ALL)
     private Conta conta;
 
     public Conta() {
