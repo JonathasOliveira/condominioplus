@@ -56,7 +56,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
 
             @Override
             public void editar(Conta conta) {
-              TelaPrincipal.getInstancia().criarFrame(new TelaDadosConta(conta));
+                TelaPrincipal.getInstancia().criarFrame(new TelaDadosConta(conta));
             }
 
             @Override
@@ -143,7 +143,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false);
     }
 
-   private class ControladorEventos extends ControladorEventosGenerico {
+    private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
         public void configurar() {

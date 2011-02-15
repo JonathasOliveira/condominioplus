@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import logicpoint.persistencia.DAO;
 
 /**
  *
@@ -23,7 +24,6 @@ import javax.persistence.OneToOne;
     @NamedQuery(name = "ListarContas", query = "SELECT c FROM Conta c WHERE c.credito = ?1 order by c.codigo"),
     @NamedQuery(name = "LocalizarContas", query = "SELECT c FROM Conta c WHERE c.codigo = ?1 and c.credito = ?2 order by c.codigo")
 })
-
 public class Conta implements Serializable {
 
     @Id
@@ -33,7 +33,7 @@ public class Conta implements Serializable {
     private boolean credito;
     private boolean vinculada = false;
     private String nomeVinculo = "";
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Conta conta;
 
     public Conta() {
