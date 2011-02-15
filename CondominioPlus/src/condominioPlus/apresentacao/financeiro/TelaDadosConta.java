@@ -21,21 +21,21 @@ import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
+import logicpoint.apresentacao.ComboModelo_2;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.Identificavel;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
-import logicpoint.util.ComboModelo;
 
 /**
  *
  * @author Administrador
  */
-public class TelaDadosConta extends javax.swing.JInternalFrame implements Identificavel<Conta> {
+public class TelaDadosConta extends javax.swing.JInternalFrame {
 
     private Conta conta;
     private ControladorEventos controlador;
-    private ComboModelo<Conta> modelo;
+    private ComboModelo_2<Conta> modelo;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosConta(Conta conta) {
@@ -122,19 +122,18 @@ public class TelaDadosConta extends javax.swing.JInternalFrame implements Identi
         } else {
             RadioDebito.setSelected(true);
         }
-        if(conta.getConta() != null){
+        if (conta.getConta() != null) {
             modelo.setSelectedItem(conta.getConta());
         }
+    }
+
+    private void autoRelacionarConta() {
     }
 
     private void preencherObjeto() {
         conta.setNome(txtNome.getText());
 
-        if (cmbContaVinculada.getSelectedIndex() != -1) {
-            Conta contaVinculada = modelo.getSelectedItem();
-            conta.setConta(contaVinculada);
-            contaVinculada.setConta(conta);
-        }
+        autoRelacionarConta();
 
         if (radioCredito.isSelected()) {
             conta.setCredito(true);
@@ -180,12 +179,9 @@ public class TelaDadosConta extends javax.swing.JInternalFrame implements Identi
         }
     }
 
-    public Conta getIdentificacao() {
-        return conta;
-    }
-
     private void carregarComboConta() {
-        modelo = new ComboModelo<Conta>(new DAO().listar(Conta.class), cmbContaVinculada);
+        modelo = new ComboModelo_2<Conta>(cmbContaVinculada, new DAO().listar(Conta.class));
+        modelo.isPermitirSelecaoNula();
         cmbContaVinculada.setModel(modelo);
     }
 
@@ -195,6 +191,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame implements Identi
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == btnSalvar) {
                 salvar();
+                TelaPrincipal.getInstancia().notificarClasse(conta);
             } else if (e.getSource() == checkBoxVinculada) {
                 estaVinculada();
             } else if (e.getSource() == btnVoltar) {
