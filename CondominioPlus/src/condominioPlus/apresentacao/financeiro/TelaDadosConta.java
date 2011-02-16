@@ -121,33 +121,39 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         } else {
             RadioDebito.setSelected(true);
         }
-        if (conta.getConta() != null) {
-            modelo.setSelectedItem(conta.getConta());
-        }
+        if (conta.getContaVinculada() != null) {
+            modelo.setSelectedItem(conta.getContaVinculada());
+           }
     }
 
     private void autoRelacionar() {
 
-//        Conta contaJaVinculada = new Conta();
-
         if (modelo.getLinhaSelecionada() != -1) {
-            Conta contaVinculo = modelo.getSelectedItem();
-            Conta contaJaVinculada = conta.getConta();
-            conta.setConta(contaVinculo);
-            if (contaVinculo != null) {
-                contaVinculo.setConta(conta);
+            Conta contaVinculo = modelo.getObjetoSelecionado();
+            if (conta.getCodigo() == 0 && contaVinculo != null) {
+                conta.setContaVinculada(contaVinculo);
+                new DAO().salvar(conta);
+                contaVinculo.setContaVinculada(conta);
+                new DAO().salvar(contaVinculo);
 
-                if (contaJaVinculada != null) {
-                    contaJaVinculada.setConta(null);
-//                    new DAO().(contaJaVinculada);
-                   System.out.println("conta vinculada1 " + contaJaVinculada.getNome());
-                }
 
             } else {
-                if (contaJaVinculada != null) {
-                    contaJaVinculada.setConta(null);
-//                    new DAO().salvar(contaJaVinculada);
-                    System.out.println("conta vinculada2 " + contaJaVinculada.getNome());
+                Conta contaJaVinculada = conta.getContaVinculada();
+                conta.setContaVinculada(contaVinculo);
+                if (contaVinculo != null) {
+                    contaVinculo.setContaVinculada(conta);
+
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        System.out.println("conta vinculada1 " + contaJaVinculada.getNome());
+                    }
+
+                } else {
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaJaVinculada);
+                        System.out.println("conta vinculada2 " + contaJaVinculada.getNome());
+                    }
                 }
             }
 
@@ -159,13 +165,13 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private void preencherObjeto() {
         conta.setNome(txtNome.getText());
 
-        autoRelacionar();
-
         if (radioCredito.isSelected()) {
             conta.setCredito(true);
         } else {
             conta.setCredito(false);
         }
+
+        autoRelacionar();
     }
 
     private void desativarRadios() {
