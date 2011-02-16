@@ -4,7 +4,6 @@
  */
 package condominioPlus.validadores;
 
-import avant.view.AvantViewUtil;
 import br.com.caelum.stella.MessageProducer;
 import br.com.caelum.stella.ResourceBundleMessageProducer;
 import br.com.caelum.stella.ValidationMessage;
@@ -47,7 +46,7 @@ public class ValidadorGenerico extends ValidadorAbstrato {
             } else if (o instanceof JCheckBox) {
                 JCheckBox txt = (JCheckBox) o;
                 if (!txt.isSelected() || txt == null) {
-                    if (AvantViewUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
+                    if (ApresentacaoUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
                         txt.setSelected(true);
                     } else {
                         txt.setSelected(false);
@@ -57,7 +56,7 @@ public class ValidadorGenerico extends ValidadorAbstrato {
             else if (o instanceof JRadioButton) {
                 JRadioButton txt = (JRadioButton) o;
                 if (!txt.isSelected() || txt == null) {
-                    if (AvantViewUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
+                    if (ApresentacaoUtil.perguntar(txt.getName() + " está desmarcado. Deseja marcá-lo automaticamente?", null)) {
                         txt.setSelected(true);
                     } else {
                         txt.setSelected(false);
@@ -167,7 +166,7 @@ public class ValidadorGenerico extends ValidadorAbstrato {
             System.out.println("erros " + erro);
             sb.append("\n - " + erro);
         }
-        AvantViewUtil.exibirAdvertencia(sb.toString(), objeto);
+        ApresentacaoUtil.exibirAdvertencia(sb.toString(), objeto);
         return;
     }
 
