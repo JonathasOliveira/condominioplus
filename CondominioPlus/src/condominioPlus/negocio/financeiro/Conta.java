@@ -34,7 +34,7 @@ public class Conta implements Serializable {
     private boolean vinculada = false;
     private String nomeVinculo = "";
     @OneToOne(cascade = CascadeType.ALL)
-    private Conta conta;
+    private Conta contaVinculada;
 
     public Conta() {
     }
@@ -79,12 +79,12 @@ public class Conta implements Serializable {
         this.vinculada = vinculada;
     }
 
-    public Conta getConta() {
-        return conta;
+    public Conta getContaVinculada() {
+        return contaVinculada;
     }
 
-    public void setConta(Conta conta) {
-        this.conta = conta;
+    public void setContaVinculada(Conta contaVinculada) {
+        this.contaVinculada = contaVinculada;
     }
 
     @Override
