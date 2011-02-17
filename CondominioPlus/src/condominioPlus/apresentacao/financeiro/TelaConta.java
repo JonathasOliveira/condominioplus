@@ -31,6 +31,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
     private ControladorEventos controlador;
     private TabelaModelo_2<Conta> modelo;
     private Conta conta;
+    private List<Conta> listaContas;
 
     /** Creates new form TelaFuncionario */
     public TelaConta() {
@@ -39,6 +40,9 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         controlador = new ControladorEventos();
 
         carregarTabela();
+
+
+
     }
 
     public void notificarClasse(Conta conta) {
@@ -56,12 +60,18 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
 
             @Override
             public void editar(Conta conta) {
-                TelaPrincipal.getInstancia().criarFrame(new TelaDadosConta(conta));
+                TelaPrincipal.getInstancia().criarFrame(new TelaDadosConta(conta, modelo));
             }
 
             @Override
             protected List<Conta> getCarregarObjetos() {
-                return new DAO().listar(Conta.class);
+                listaContas = carregarContas();
+                for (Conta conta : listaContas) {
+
+                    System.out.println("conta: " + conta + " conta vinculada: " + conta.getContaVinculada());
+
+                }
+                return listaContas;
             }
 
             @Override
@@ -126,6 +136,11 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         }
 
         return listaFiltrada;
+    }
+
+    private List<Conta> carregarContas() {
+
+        return new DAO().listar(Conta.class);
     }
 
     private void imprimir() {
