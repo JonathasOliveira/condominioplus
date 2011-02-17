@@ -124,6 +124,9 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         if (conta.getContaVinculada() != null) {
             modelo.setSelectedItem(conta.getContaVinculada());
         }
+
+        System.out.println("conta: " + conta);
+        System.out.println("conta vinculada: " + conta.getContaVinculada());
     }
 
     private void autoRelacionar() {
@@ -145,7 +148,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 new DAO().salvar(conta);
                 contaVinculo.setContaVinculada(conta);
                 new DAO().salvar(contaVinculo);
-
+                TelaPrincipal.getInstancia().notificarClasse(contaVinculo);
 
             } else if (conta.getCodigo() != 0){
                 Conta contaJaVinculada = conta.getContaVinculada();
@@ -156,12 +159,14 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
                         new DAO().salvar(contaJaVinculada);
+                        TelaPrincipal.getInstancia().notificarClasse(contaJaVinculada);
                     }
 
                 } else {
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
                         new DAO().salvar(contaJaVinculada);
+                        TelaPrincipal.getInstancia().notificarClasse(contaJaVinculada);
                     }
                 }
             }
