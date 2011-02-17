@@ -10,7 +10,6 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
-import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
@@ -23,6 +22,7 @@ import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ComboModelo_2;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 
@@ -35,10 +35,13 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private Conta conta;
     private ControladorEventos controlador;
     private ComboModelo_2<Conta> modelo;
+    private TabelaModelo_2 tabelaModelo;
 
     /** Creates new form TelaDadosCondominio */
-    public TelaDadosConta(Conta conta) {
+    public TelaDadosConta(Conta conta, TabelaModelo_2 modelo) {
         this.conta = conta;
+
+        this.tabelaModelo = modelo;
 
         initComponents();
         desativarRadios();
@@ -71,6 +74,24 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 return;
             }
 
+            Conta contaVinculo = modelo.getObjetoSelecionado();
+            if (contaVinculo != null) {
+                if (conta.verificarNome(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar vinculada a ela mesma!", this);
+                    return;
+                }
+                if (conta.verificarTipo(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                    return;
+                }
+                if (contaVinculo.getContaVinculada() != null) {
+
+                    System.out.println("conta vinculo: " + contaVinculo.getContaVinculada());
+                    ApresentacaoUtil.exibirAdvertencia("Essa conta já está associada a outra!", this);
+                    return;
+                }
+            }
+
             preencherObjeto();
 
             TipoAcesso tipo = null;
@@ -84,10 +105,12 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             dao.salvar(conta);
             dao.concluirTransacao();
 
-            TelaPrincipal.getInstancia().notificarClasse(conta);
+            tabelaModelo.carregarObjetos();
 
             String descricao = "Cadastro do Contas " + conta.getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
+
+            conta = null;
 
             sair();
         } catch (Throwable t) {
@@ -125,32 +148,19 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             modelo.setSelectedItem(conta.getContaVinculada());
         }
 
-        System.out.println("conta: " + conta);
-        System.out.println("conta vinculada: " + conta.getContaVinculada());
     }
 
     private void autoRelacionar() {
 
         if (modelo.getLinhaSelecionada() != -1) {
             Conta contaVinculo = modelo.getObjetoSelecionado();
-            if (contaVinculo != null) {
-                if (conta.verificarNome(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar vinculada a ela mesma!", this);
-                    return;
-                }
-                if (conta.verificarTipo(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
-                    return;
-                }
-            }
             if (conta.getCodigo() == 0 && contaVinculo != null) {
                 conta.setContaVinculada(contaVinculo);
                 new DAO().salvar(conta);
                 contaVinculo.setContaVinculada(conta);
                 new DAO().salvar(contaVinculo);
-                TelaPrincipal.getInstancia().notificarClasse(contaVinculo);
 
-            } else if (conta.getCodigo() != 0){
+            } else if (conta.getCodigo() != 0) {
                 Conta contaJaVinculada = conta.getContaVinculada();
                 conta.setContaVinculada(contaVinculo);
                 if (contaVinculo != null) {
@@ -159,14 +169,12 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
                         new DAO().salvar(contaJaVinculada);
-                        TelaPrincipal.getInstancia().notificarClasse(contaJaVinculada);
                     }
 
                 } else {
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
                         new DAO().salvar(contaJaVinculada);
-                        TelaPrincipal.getInstancia().notificarClasse(contaJaVinculada);
                     }
                 }
             }
@@ -236,7 +244,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == btnSalvar) {
                 salvar();
-                TelaPrincipal.getInstancia().notificarClasse(conta);
             } else if (e.getSource() == checkBoxVinculada) {
                 estaVinculada();
             } else if (e.getSource() == btnVoltar) {
