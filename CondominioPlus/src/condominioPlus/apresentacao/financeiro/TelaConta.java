@@ -97,14 +97,31 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
 
             @Override
             public boolean getRemover(Conta conta) {
-                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
-                    return false;
-                }
-
                 try {
-                    new DAO().remover(conta);
-                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção da Conta - " + conta.getNome());
-                    return true;
+                    if (conta.getContaVinculada() != null) {
+                        if (!ApresentacaoUtil.perguntar("Deseja excluir a conta  " + conta.getNome() + "e a conta associada? " + conta.getContaVinculada().getNome() + " ?", TelaConta.this)) {
+                            return false;
+                        }
+
+                        Conta contaVinculada = conta.getContaVinculada();
+                        conta.setContaVinculada(null);
+                        contaVinculada.setContaVinculada(null);
+                        new DAO().remover(conta);
+                        new DAO().remover(contaVinculada);
+                        return true;
+
+                    } else {
+                        if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
+                            return false;
+                        }
+                        Conta contaVinculada = conta.getContaVinculada();
+                        contaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaVinculada);
+                        conta.setContaVinculada(null);
+                        new DAO().remover(conta);
+
+                        return true;
+                    }
                 } catch (Throwable t) {
                     new TratadorExcecao(t, TelaConta.this);
                     return false;
