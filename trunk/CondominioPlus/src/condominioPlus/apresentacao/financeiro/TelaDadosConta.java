@@ -123,13 +123,23 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
         if (conta.getContaVinculada() != null) {
             modelo.setSelectedItem(conta.getContaVinculada());
-           }
+        }
     }
 
     private void autoRelacionar() {
 
         if (modelo.getLinhaSelecionada() != -1) {
             Conta contaVinculo = modelo.getObjetoSelecionado();
+            if (contaVinculo != null) {
+                if (conta.verificarNome(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar vinculada a ela mesma!", this);
+                    return;
+                }
+                if (conta.verificarTipo(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                    return;
+                }
+            }
             if (conta.getCodigo() == 0 && contaVinculo != null) {
                 conta.setContaVinculada(contaVinculo);
                 new DAO().salvar(conta);
@@ -137,7 +147,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 new DAO().salvar(contaVinculo);
 
 
-            } else {
+            } else if (conta.getCodigo() != 0){
                 Conta contaJaVinculada = conta.getContaVinculada();
                 conta.setContaVinculada(contaVinculo);
                 if (contaVinculo != null) {
@@ -145,20 +155,18 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
-                        System.out.println("conta vinculada1 " + contaJaVinculada.getNome());
+                        new DAO().salvar(contaJaVinculada);
                     }
 
                 } else {
                     if (contaJaVinculada != null) {
                         contaJaVinculada.setContaVinculada(null);
                         new DAO().salvar(contaJaVinculada);
-                        System.out.println("conta vinculada2 " + contaJaVinculada.getNome());
                     }
                 }
             }
 
         }
-
 
     }
 
