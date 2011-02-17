@@ -91,4 +91,28 @@ public class Conta implements Serializable {
     public String toString() {
         return nome;
     }
+
+    public boolean verificarTipo(Conta c){
+
+        if (isCredito()){
+            if (c.isCredito()){
+                return true;
+            }
+        } else if(!isCredito()){
+            if(!c.isCredito()){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean verificarNome(Conta c){
+
+        if (nome.equals(c.getNome())){
+            return true;
+        }
+
+        return false;
+    }
 }
