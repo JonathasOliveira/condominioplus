@@ -5,13 +5,11 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
-import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.event.CaretEvent;
-import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.util.Relatorios;
@@ -98,31 +96,42 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             @Override
             public boolean getRemover(Conta conta) {
                 try {
-                    if (conta.getContaVinculada() != null) {
-                        if (!ApresentacaoUtil.perguntar("Deseja excluir a conta  " + conta.getNome() + "e a conta associada " + conta.getContaVinculada().getNome() + " ?", TelaConta.this)) {
-                            if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
-                                return false;
-                            }
-                            Conta contaVinculada = conta.getContaVinculada();
-                            contaVinculada.setContaVinculada(null);
-                            new DAO().salvar(contaVinculada);
-                            conta.setContaVinculada(null);
-                            new DAO().salvar(conta);
-                            new DAO().remover(conta);
-
-                            return true;
+                    if (conta.getContaVinculada() == null) {
+                        if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
+                            return false;
                         }
-
-                        Conta contaVinculada = conta.getContaVinculada();
-                        conta.setContaVinculada(null);
-                        contaVinculada.setContaVinculada(null);
-                        new DAO().salvar(conta);
                         new DAO().remover(conta);
-                        new DAO().remover(contaVinculada);
-                        modelo.notificar(contaVinculada);
+                        ApresentacaoUtil.exibirInformacao("Conta removida com sucesso!", tabela);
                         return true;
+                    } else {
+                        if (ApresentacaoUtil.perguntar("Deseja excluir a conta  " + conta.getNome() + " e a conta associada " + conta.getContaVinculada().getNome() + " ?", TelaConta.this)) {
 
+                            Conta contaVinculada = conta.getContaVinculada();
+                            conta.setContaVinculada(null);
+                            contaVinculada.setContaVinculada(null);
+                            new DAO().salvar(conta);
+                            new DAO().salvar(contaVinculada);
+                            modelo.remover(contaVinculada);
+                            new DAO().remover(contaVinculada);
+                            new DAO().remover(conta);
+                            return true;
+
+                        } else {
+                            if (ApresentacaoUtil.perguntar("Deseja excluir somente a conta " + conta.getNome() + " ?", TelaConta.this)) {
+                                Conta contaVinculada = conta.getContaVinculada();
+                                conta.setContaVinculada(null);
+                                contaVinculada.setContaVinculada(null);
+                                new DAO().salvar(conta);
+                                new DAO().salvar(contaVinculada);
+                                new DAO().remover(conta);
+                                ApresentacaoUtil.exibirInformacao("Conta removida com sucesso!", tabela);
+                                return true;
+                            }
+
+
+                        }
                     }
+
                 } catch (Throwable t) {
                     new TratadorExcecao(t, TelaConta.this);
                     return false;
