@@ -143,8 +143,11 @@ public class DialogoConta extends javax.swing.JDialog {
     }
 
     private List<Conta> getContas(boolean credito) {
-        return new DAO().listar("ListarContas", credito);
-
+        if (credito) {
+            return new DAO().listar(Conta.class);
+        } else {
+            return new DAO().listar("ListarContas", credito);
+        }
 
     }
 
