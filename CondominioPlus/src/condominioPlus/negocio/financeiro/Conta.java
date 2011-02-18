@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import logicpoint.persistencia.Removivel;
 
 /**
  *
@@ -23,7 +24,7 @@ import javax.persistence.OneToOne;
     @NamedQuery(name = "ListarContas", query = "SELECT c FROM Conta c WHERE c.credito = ?1 order by c.codigo"),
     @NamedQuery(name = "LocalizarContas", query = "SELECT c FROM Conta c WHERE c.codigo = ?1 and c.credito = ?2 order by c.codigo")
 })
-public class Conta implements Serializable {
+public class Conta implements Serializable, Removivel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -34,6 +35,7 @@ public class Conta implements Serializable {
     private String nomeVinculo = "";
     @OneToOne(cascade = CascadeType.ALL)
     private Conta contaVinculada;
+    private boolean removido;
 
     public Conta() {
     }
@@ -113,5 +115,13 @@ public class Conta implements Serializable {
         }
 
         return false;
+    }
+
+    public void setRemovido(boolean removido) {
+        this.removido = removido;
+    }
+
+    public boolean isRemovido() {
+        return removido;
     }
 }
