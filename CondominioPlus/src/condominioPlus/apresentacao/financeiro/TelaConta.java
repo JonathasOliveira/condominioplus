@@ -64,11 +64,6 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             @Override
             protected List<Conta> getCarregarObjetos() {
                 listaContas = carregarContas();
-                for (Conta conta : listaContas) {
-
-                    System.out.println("conta: " + conta + " conta vinculada: " + conta.getContaVinculada());
-
-                }
                 return listaContas;
             }
 
