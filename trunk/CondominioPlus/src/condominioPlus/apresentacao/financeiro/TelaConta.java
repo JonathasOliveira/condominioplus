@@ -99,33 +99,35 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             public boolean getRemover(Conta conta) {
                 try {
                     if (conta.getContaVinculada() != null) {
-                        if (!ApresentacaoUtil.perguntar("Deseja excluir a conta  " + conta.getNome() + "e a conta associada? " + conta.getContaVinculada().getNome() + " ?", TelaConta.this)) {
-                            return false;
+                        if (!ApresentacaoUtil.perguntar("Deseja excluir a conta  " + conta.getNome() + "e a conta associada " + conta.getContaVinculada().getNome() + " ?", TelaConta.this)) {
+                            if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
+                                return false;
+                            }
+                            Conta contaVinculada = conta.getContaVinculada();
+                            contaVinculada.setContaVinculada(null);
+                            new DAO().salvar(contaVinculada);
+                            conta.setContaVinculada(null);
+                            new DAO().salvar(conta);
+                            new DAO().remover(conta);
+
+                            return true;
                         }
 
                         Conta contaVinculada = conta.getContaVinculada();
                         conta.setContaVinculada(null);
                         contaVinculada.setContaVinculada(null);
+                        new DAO().salvar(conta);
                         new DAO().remover(conta);
                         new DAO().remover(contaVinculada);
+                        modelo.notificar(contaVinculada);
                         return true;
 
-                    } else {
-                        if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir a conta " + conta.getNome() + " ?", TelaConta.this)) {
-                            return false;
-                        }
-                        Conta contaVinculada = conta.getContaVinculada();
-                        contaVinculada.setContaVinculada(null);
-                        new DAO().salvar(contaVinculada);
-                        conta.setContaVinculada(null);
-                        new DAO().remover(conta);
-
-                        return true;
                     }
                 } catch (Throwable t) {
                     new TratadorExcecao(t, TelaConta.this);
                     return false;
                 }
+                return false;
             }
         };
 
