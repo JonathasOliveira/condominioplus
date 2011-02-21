@@ -4,8 +4,10 @@
  */
 package condominioPlus.negocio;
 
+import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaPagar;
+import condominioPlus.negocio.financeiro.Poupanca;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -70,7 +72,11 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     @OneToOne(cascade = CascadeType.ALL)
     private ContaCorrente contaCorrente = new ContaCorrente();
     @OneToOne(cascade = CascadeType.ALL)
-    private ContaPagar contaPagar = new ContaPagar();
+    private ContaPagar contaPagar;
+    @OneToOne(cascade=CascadeType.ALL)
+    private AplicacaoFinanceira aplicacao;
+    @OneToOne(cascade=CascadeType.ALL)
+    private Poupanca poupanca = new Poupanca();
     @OneToMany(mappedBy = "condominio", cascade=CascadeType.ALL)
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
     @Column(name="numero_minimo_taloes")
@@ -295,4 +301,22 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setNumeroMinimoTaloes(int numeroMinimoTaloes) {
         this.numeroMinimoTaloes = numeroMinimoTaloes;
     }
+
+    public AplicacaoFinanceira getAplicacao() {
+        return aplicacao;
+    }
+
+    public void setAplicacao(AplicacaoFinanceira aplicacao) {
+        this.aplicacao = aplicacao;
+    }
+
+    public Poupanca getPoupanca() {
+        return poupanca;
+    }
+
+    public void setPoupanca(Poupanca poupanca) {
+        this.poupanca = poupanca;
+    }
+
+    
 }
