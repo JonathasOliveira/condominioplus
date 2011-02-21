@@ -22,7 +22,7 @@ import javax.persistence.OneToMany;
 public class TransacaoBancaria implements Serializable {
     @Id
     private int codigo;
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade=CascadeType.ALL, mappedBy="transacaoBancaria")
     private List<Pagamento> pagamentos;
 
     public int getCodigo() {
