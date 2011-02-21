@@ -31,14 +31,16 @@ public class DialogoConta extends javax.swing.JDialog {
     private TabelaModelo_2<Conta> modelo;
     private Conta conta;
     private boolean credito;
+    private boolean selecaoNula;
 
     /** Creates new form DialogoConta */
-    public DialogoConta(java.awt.Frame parent, boolean modal, boolean credito) {
+    public DialogoConta(java.awt.Frame parent, boolean modal, boolean credito, boolean selecaoNula) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
         this.credito = credito;
+        this.selecaoNula = selecaoNula;
         carregarTipoBusca();
         carregarTabela();
     }
@@ -130,7 +132,11 @@ public class DialogoConta extends javax.swing.JDialog {
             conta = modelo.getObjetoSelecionado();
             sair();
         } else {
-            ApresentacaoUtil.exibirAdvertencia("Você precisa selecionar uma conta!", this);
+            if (!selecaoNula) {
+                ApresentacaoUtil.exibirAdvertencia("Você precisa selecionar uma conta!", this);
+            } else {
+                sair();
+            }
         }
     }
 

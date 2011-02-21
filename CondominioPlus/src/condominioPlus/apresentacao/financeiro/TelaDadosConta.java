@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -13,10 +13,8 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
-import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -91,11 +89,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 return false;
             }
 
-            if (contaVinculo.isVinculada() && checkBoxVinculada.isSelected()) {
-                ApresentacaoUtil.exibirAdvertencia("Não pode ter as duas contas relacionadas a aplicação, poupanca, etc!", this);
-                return false;
-            }
-
             return true;
         }
         return true;
@@ -111,9 +104,16 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             }
 
             preencherObjeto();
+
+            if (!verificarNomeConta()) {
+                return;
+            }
+
             if (conta.getContaVinculada() != null) {
                 if (conta.getContaVinculada().isVinculada() && conta.isVinculada()) {
                     ApresentacaoUtil.exibirAdvertencia("Não pode ter as duas contas relacionadas a aplicação, poupanca, etc!", this);
+                    conta.setVinculada(false);
+                    conta.setNomeVinculo("");
                     return;
                 }
             }
@@ -173,36 +173,54 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
     }
 
-    private void autoRelacionar(Conta conta) {
+    private void autoRelacionar(Conta c) {
 
-        Conta contaVinculo = conta;
-        if (conta.getCodigo() == 0 && contaVinculo != null) {
-            conta.setContaVinculada(contaVinculo);
-            new DAO().salvar(conta);
-            contaVinculo.setContaVinculada(conta);
-            new DAO().salvar(contaVinculo);
-
-        } else if (conta.getCodigo() != 0) {
-            if (!conta.equals(conta.getContaVinculada())) {
-                Conta contaJaVinculada = conta.getContaVinculada();
+        Conta contaVinculo = c;
+        if (verificarNomeConta()) {
+            if (conta.getCodigo() == 0 && contaVinculo != null) {
+                preencherObjeto();
                 conta.setContaVinculada(contaVinculo);
-                if (contaVinculo != null) {
-                    contaVinculo.setContaVinculada(conta);
-                    if (contaJaVinculada != null) {
-                        contaJaVinculada.setContaVinculada(null);
-                        new DAO().salvar(contaJaVinculada);
-                    }
-                } else {
-                    if (contaJaVinculada != null) {
-                        contaJaVinculada.setContaVinculada(null);
-                        new DAO().salvar(contaJaVinculada);
+                new DAO().salvar(conta);
+                contaVinculo.setContaVinculada(conta);
+                new DAO().salvar(contaVinculo);
+
+            } else if (conta.getCodigo() != 0) {
+                if (!conta.equals(conta.getContaVinculada())) {
+                    Conta contaJaVinculada = conta.getContaVinculada();
+                    conta.setContaVinculada(contaVinculo);
+                    if (contaVinculo != null) {
+                        contaVinculo.setContaVinculada(conta);
+                        if (contaJaVinculada != null) {
+                            contaJaVinculada.setContaVinculada(null);
+                            new DAO().salvar(contaJaVinculada);
+                        }
+                    } else {
+                        if (contaJaVinculada != null) {
+                            contaJaVinculada.setContaVinculada(null);
+                            new DAO().salvar(contaJaVinculada);
+                        }
                     }
                 }
             }
+        } else {
+            return;
         }
     }
 
+    private boolean verificarNomeConta() {
+
+        List<Conta> lista = new DAO().listar(Conta.class);
+        for (Conta c : lista) {
+            if (c.getNome().equalsIgnoreCase(txtNome.getText()) && !c.isRemovido()) {
+                ApresentacaoUtil.exibirAdvertencia("Já existe uma conta com essa descrição", this);
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void preencherObjeto() {
+
         conta.setNome(txtNome.getText());
 
         if (radioCredito.isSelected()) {
@@ -258,7 +276,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true);
+        DialogoConta c = new DialogoConta(null, true, true, true);
         c.setVisible(true);
 
         if (c.getConta() != null) {
@@ -268,21 +286,9 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 autoRelacionar(contaRelacionada);
             }
         } else {
-            conta.setContaVinculada(null);
+            autoRelacionar(null);
             txtContaRelacionada.setText("");
-
-
         }
-    }
-
-    private Conta pesquisarContaPorCodigo(int codigo) {
-        Conta c = null;
-        try {
-            c = (Conta) new DAO().localizar("LocalizarContas", codigo, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return c;
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -301,27 +307,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
 
         @Override
-        public void focusLost(FocusEvent e) {
-            if (e.getSource() == txtContaRelacionada) {
-                Conta resultado = null;
-                if (new LimitarCaracteres(10).ValidaNumero(txtContaRelacionada)) {
-                    if (!txtContaRelacionada.getText().equals("") && txtContaRelacionada.getText() != null) {
-                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtContaRelacionada.getText()));
-                        if (resultado != null) {
-                            conta = resultado;
-                            txtContaRelacionada.setText(String.valueOf(conta.getCodigo()));
-                        } else {
-                            ApresentacaoUtil.exibirErro("Código Inexistente!", TelaDadosConta.this);
-                            txtContaRelacionada.setText("");
-                            txtContaRelacionada.grabFocus();
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
         public void configurar() {
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaDadosConta.this, JTextField.class, JComboBox.class);
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, TelaDadosConta.this, JTextField.class);
@@ -330,7 +315,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             btnVoltar.addActionListener(this);
             checkBoxVinculada.addActionListener(this);
             btnConta.addActionListener(this);
-            txtContaRelacionada.addFocusListener(this);
         }
     }
 
