@@ -290,7 +290,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true);
+        DialogoConta c = new DialogoConta(null, true, true, false);
         c.setVisible(true);
         if (c.getConta() != null) {
             conta = c.getConta();
