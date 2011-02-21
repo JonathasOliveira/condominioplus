@@ -35,9 +35,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
     private Conta conta;
     private ControladorEventos controlador;
-//    private ComboModelo_2<Conta> modelo;
     private TabelaModelo_2 tabelaModelo;
-    private Conta contaRelacionada;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosConta(Conta conta, TabelaModelo_2 modelo) {
@@ -47,8 +45,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
         initComponents();
         desativarRadios();
-
-//        carregarComboConta();
 
         controlador = new ControladorEventos();
 
@@ -64,37 +60,63 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         return campos;
     }
 
+    private boolean verificarConta(Conta c) {
+        Conta contaVinculo = c;
+        if (contaVinculo != null) {
+            if (conta.getCodigo() != 0) {
+                if (conta.verificarNome(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
+                    return false;
+                }
+                if (conta.verificarTipo(contaVinculo)) {
+                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                    return false;
+                }
+            }
+            if (contaVinculo.getContaVinculada() != null) {
+
+                System.out.println("conta vinculo: " + contaVinculo.getContaVinculada());
+                ApresentacaoUtil.exibirAdvertencia("Essa conta já está associada a outra!", this);
+                return false;
+            }
+            if (txtNome.getText().equals(contaVinculo.getNome())) {
+                ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
+                return false;
+            }
+            if (radioCredito.isSelected() && contaVinculo.isCredito()) {
+                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                return false;
+            } else if (radioDebito.isSelected() && !contaVinculo.isCredito()) {
+                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                return false;
+            }
+
+            if (contaVinculo.isVinculada() && checkBoxVinculada.isSelected()) {
+                ApresentacaoUtil.exibirAdvertencia("Não pode ter as duas contas relacionadas a aplicação, poupanca, etc!", this);
+                return false;
+            }
+
+            return true;
+        }
+        return true;
+    }
+
     private void salvar() {
         try {
 
-            if (estaVinculada()) {
-                salvarVinculo();
-            }
             ValidadorGenerico validador = new ValidadorGenerico();
             if (!validador.validar(listaCampos())) {
                 validador.exibirErros(this);
                 return;
             }
 
-            Conta contaVinculo = contaRelacionada;
-            if (contaVinculo != null) {
-                if (conta.verificarNome(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar vinculada a ela mesma!", this);
-                    return;
-                }
-                if (conta.verificarTipo(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
-                    return;
-                }
-                if (contaVinculo.getContaVinculada() != null) {
-
-                    System.out.println("conta vinculo: " + contaVinculo.getContaVinculada());
-                    ApresentacaoUtil.exibirAdvertencia("Essa conta já está associada a outra!", this);
+            preencherObjeto();
+            if (conta.getContaVinculada() != null) {
+                if (conta.getContaVinculada().isVinculada() && conta.isVinculada()) {
+                    ApresentacaoUtil.exibirAdvertencia("Não pode ter as duas contas relacionadas a aplicação, poupanca, etc!", this);
                     return;
                 }
             }
-
-            preencherObjeto();
 
             TipoAcesso tipo = null;
             if (conta.getCodigo() == 0) {
@@ -112,8 +134,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             String descricao = "Cadastro do Contas " + conta.getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
-            conta = null;
-
             sair();
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
@@ -127,6 +147,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private void preencherTela(Conta conta) {
         txtCodigo.setText(Integer.toString(conta.getCodigo()));
         txtNome.setText(conta.getNome());
+
         if (conta.isVinculada()) {
             checkBoxVinculada.setSelected(true);
             ativarRadios();
@@ -144,19 +165,17 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         if (conta.isCredito()) {
             radioCredito.setSelected(true);
         } else {
-            RadioDebito.setSelected(true);
+            radioDebito.setSelected(true);
         }
         if (conta.getContaVinculada() != null) {
-//            modelo.setSelectedItem(conta.getContaVinculada());
             txtContaRelacionada.setText(conta.getContaVinculada().getNome());
         }
 
     }
 
-    private void autoRelacionar() {
+    private void autoRelacionar(Conta conta) {
 
-//        if (modelo.getLinhaSelecionada() != -1) {
-        Conta contaVinculo = contaRelacionada;
+        Conta contaVinculo = conta;
         if (conta.getCodigo() == 0 && contaVinculo != null) {
             conta.setContaVinculada(contaVinculo);
             new DAO().salvar(conta);
@@ -164,26 +183,23 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             new DAO().salvar(contaVinculo);
 
         } else if (conta.getCodigo() != 0) {
-            Conta contaJaVinculada = conta.getContaVinculada();
-            conta.setContaVinculada(contaVinculo);
-            if (contaVinculo != null) {
-                contaVinculo.setContaVinculada(conta);
-
-                if (contaJaVinculada != null) {
-                    contaJaVinculada.setContaVinculada(null);
-                    new DAO().salvar(contaJaVinculada);
-                }
-
-            } else {
-                if (contaJaVinculada != null) {
-                    contaJaVinculada.setContaVinculada(null);
-                    new DAO().salvar(contaJaVinculada);
+            if (!conta.equals(conta.getContaVinculada())) {
+                Conta contaJaVinculada = conta.getContaVinculada();
+                conta.setContaVinculada(contaVinculo);
+                if (contaVinculo != null) {
+                    contaVinculo.setContaVinculada(conta);
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaJaVinculada);
+                    }
+                } else {
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaJaVinculada);
+                    }
                 }
             }
         }
-
-//        }
-
     }
 
     private void preencherObjeto() {
@@ -195,7 +211,10 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             conta.setCredito(false);
         }
 
-        autoRelacionar();
+        if (estaVinculada()) {
+            salvarVinculo();
+        }
+
     }
 
     private void desativarRadios() {
@@ -229,24 +248,30 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             conta.setVinculada(true);
             ativarRadios();
             return true;
-        } else {
+        } else if (!checkBoxVinculada.isSelected()) {
             desativarRadios();
+            conta.setVinculada(false);
+            conta.setNomeVinculo("");
             return false;
         }
+        return false;
     }
 
-//    private void carregarComboConta() {
-//        modelo = new ComboModelo_2<Conta>(cmbContaVinculada, new DAO().listar(Conta.class));
-//        modelo.isPermitirSelecaoNula();
-//        cmbContaVinculada.setModel(modelo);
-//    }
     private void pegarConta() {
         DialogoConta c = new DialogoConta(null, true, true);
         c.setVisible(true);
 
         if (c.getConta() != null) {
-            contaRelacionada = c.getConta();
-            txtContaRelacionada.setText(String.valueOf(contaRelacionada.getCodigo()));
+            Conta contaRelacionada = c.getConta();
+            if (verificarConta(contaRelacionada)) {
+                txtContaRelacionada.setText(String.valueOf(contaRelacionada.getNome()));
+                autoRelacionar(contaRelacionada);
+            }
+        } else {
+            conta.setContaVinculada(null);
+            txtContaRelacionada.setText("");
+
+
         }
     }
 
@@ -329,7 +354,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         radioCredito = new javax.swing.JRadioButton();
-        RadioDebito = new javax.swing.JRadioButton();
+        radioDebito = new javax.swing.JRadioButton();
         checkBoxVinculada = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
         radioPoupanca = new javax.swing.JRadioButton();
@@ -339,6 +364,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         txtNome = new javax.swing.JTextField();
         btnConta = new javax.swing.JButton();
         txtContaRelacionada = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -374,8 +400,8 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         radioCredito.setSelected(true);
         radioCredito.setText("Crédito");
 
-        btnGroupTipo.add(RadioDebito);
-        RadioDebito.setText("Débito");
+        btnGroupTipo.add(radioDebito);
+        radioDebito.setText("Débito");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -385,7 +411,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(radioCredito)
-                    .addComponent(RadioDebito))
+                    .addComponent(radioDebito))
                 .addContainerGap(32, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -394,7 +420,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(radioCredito)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(RadioDebito)
+                .addComponent(radioDebito)
                 .addContainerGap(40, Short.MAX_VALUE))
         );
 
@@ -427,7 +453,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(radioEmprestimos)
                     .addComponent(radioConsignacoes))
-                .addContainerGap(101, Short.MAX_VALUE))
+                .addContainerGap(94, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -445,38 +471,50 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
         txtNome.setName("Descrição"); // NOI18N
 
-        btnConta.setText("Conta Relacionada:");
-        btnConta.setBorder(null);
-        btnConta.setBorderPainted(false);
+        btnConta.setText("...");
+        btnConta.setToolTipText("Clique para selecionar uma conta!");
+        btnConta.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnConta.setContentAreaFilled(false);
         btnConta.setFocusable(false);
         btnConta.setRequestFocusEnabled(false);
         btnConta.setVerifyInputWhenFocusTarget(false);
+
+        txtContaRelacionada.setEditable(false);
+
+        jLabel3.setText("Conta Relacionada:");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(checkBoxVinculada)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(btnConta))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtContaRelacionada, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(139, 139, 139)
+                        .addComponent(checkBoxVinculada))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                            .addGap(139, 139, 139)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(jLabel1)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(txtCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGap(18, 18, 18)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel3)
+                                .addComponent(jLabel2))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel3Layout.createSequentialGroup()
+                                    .addComponent(txtContaRelacionada, javax.swing.GroupLayout.PREFERRED_SIZE, 243, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnConta, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -492,8 +530,9 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnConta)
-                            .addComponent(txtContaRelacionada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel3)
+                            .addComponent(txtContaRelacionada, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnConta))
                         .addGap(7, 7, 7)
                         .addComponent(checkBoxVinculada)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -527,10 +566,10 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel12, 0, 0, Short.MAX_VALUE))
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel12, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -539,7 +578,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -547,7 +586,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton RadioDebito;
     private javax.swing.JButton btnConta;
     private javax.swing.ButtonGroup btnGroupContaVinculada;
     private javax.swing.ButtonGroup btnGroupTipo;
@@ -556,6 +594,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private javax.swing.JCheckBox checkBoxVinculada;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
@@ -565,6 +604,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton radioAplicacoesFinancas;
     private javax.swing.JRadioButton radioConsignacoes;
     private javax.swing.JRadioButton radioCredito;
+    private javax.swing.JRadioButton radioDebito;
     private javax.swing.JRadioButton radioEmprestimos;
     private javax.swing.JRadioButton radioPoupanca;
     private javax.swing.JTextField txtCodigo;
