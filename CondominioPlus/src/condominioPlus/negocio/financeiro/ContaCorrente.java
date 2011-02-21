@@ -9,7 +9,6 @@ import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;

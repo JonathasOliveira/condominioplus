@@ -93,14 +93,14 @@ public class Conta implements Serializable, Removivel {
         return nome;
     }
 
-    public boolean verificarTipo(Conta c){
+    public boolean verificarTipo(Conta c) {
 
-        if (isCredito()){
-            if (c.isCredito()){
+        if (isCredito()) {
+            if (c.isCredito()) {
                 return true;
             }
-        } else if(!isCredito()){
-            if(!c.isCredito()){
+        } else if (!isCredito()) {
+            if (!c.isCredito()) {
                 return true;
             }
         }
@@ -108,12 +108,10 @@ public class Conta implements Serializable, Removivel {
         return false;
     }
 
-    public boolean verificarNome(Conta c){
-
-        if (nome.equals(c.getNome())){
+    public boolean verificarNome(Conta c) {
+        if (getNome().equals(c.getNome())) {
             return true;
         }
-
         return false;
     }
 
@@ -124,4 +122,5 @@ public class Conta implements Serializable, Removivel {
     public boolean isRemovido() {
         return removido;
     }
+
 }
