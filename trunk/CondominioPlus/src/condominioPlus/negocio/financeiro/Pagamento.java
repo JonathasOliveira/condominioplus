@@ -35,10 +35,11 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorFornecedor", query = "SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosPorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.dadosPagamento = ?2"),
-    @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2")
-
+    @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2"),
+    @NamedQuery(name = "PagamentosAplicacaoFinanceira", query = "SELECT c FROM Pagamento c WHERE c.aplicacao = ?1"),
+    @NamedQuery(name = "PagamentosPoupanca", query = "SELECT c FROM Pagamento c WHERE c.poupanca = ?1")
 })
-public class Pagamento implements Serializable{
+public class Pagamento implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -62,10 +63,16 @@ public class Pagamento implements Serializable{
     private ContaCorrente contaCorrente;
     @ManyToOne
     private ContaPagar contaPagar;
+    @ManyToOne
+    private AplicacaoFinanceira aplicacao;
+    @ManyToOne
+    private Poupanca poupanca;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
     @OneToOne(cascade = CascadeType.ALL)
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
+    @ManyToOne
+    private TransacaoBancaria transacaoBancaria;
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -177,6 +184,7 @@ public class Pagamento implements Serializable{
         this.setSaldo(this.valor.add(p.getSaldo()));
 
     }
+
     public boolean isPago() {
         return pago;
     }
@@ -204,8 +212,8 @@ public class Pagamento implements Serializable{
     public static String gerarNumeroDocumento() {
         Long resultado = (Long) new DAO().localizar("MaxNumeroDocumento");
 
-        if(resultado == null){
-            resultado = (long)0;
+        if (resultado == null) {
+            resultado = (long) 0;
         }
 
         String valor = String.valueOf(resultado);
@@ -217,5 +225,30 @@ public class Pagamento implements Serializable{
 
         return String.valueOf(novoValor);
     }
+
+    public AplicacaoFinanceira getAplicacao() {
+        return aplicacao;
+    }
+
+    public void setAplicacao(AplicacaoFinanceira aplicacao) {
+        this.aplicacao = aplicacao;
+    }
+
+    public TransacaoBancaria getTransacaoBancaria() {
+        return transacaoBancaria;
+    }
+
+    public void setTransacaoBancaria(TransacaoBancaria transacaoBancaria) {
+        this.transacaoBancaria = transacaoBancaria;
+    }
+
+    public Poupanca getPoupanca() {
+        return poupanca;
+    }
+
+    public void setPoupanca(Poupanca poupanca) {
+        this.poupanca = poupanca;
+    }
+    
 }
 
