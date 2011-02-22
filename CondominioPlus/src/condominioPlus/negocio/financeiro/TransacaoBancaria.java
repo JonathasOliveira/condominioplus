@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
@@ -11,18 +10,20 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  *
  * @author Administrador
  */
 // Guarda os pagamentos relacionados na transação de transferencias entre contas investimento, emprestimo e poupanca!
-
 @Entity
+@Table(name="transacao_bancaria")
 public class TransacaoBancaria implements Serializable {
+
     @Id
     private int codigo;
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="transacaoBancaria")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "transacaoBancaria")
     private List<Pagamento> pagamentos;
 
     public int getCodigo() {
@@ -40,5 +41,4 @@ public class TransacaoBancaria implements Serializable {
     public void setPagamentos(List<Pagamento> pagamentos) {
         this.pagamentos = pagamentos;
     }
-
 }
