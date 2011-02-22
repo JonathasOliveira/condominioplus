@@ -5,9 +5,13 @@
 package condominioPlus.negocio.financeiro;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.util.ComparadorPagamentoCodigo;
+import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +21,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import logicpoint.persistencia.DAO;
 
 /**
  *
@@ -66,6 +71,45 @@ public class Poupanca implements Serializable {
 
     public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
+    }
+
+    public void adicionarPagamento(Pagamento pagamento) {
+        if (pagamento != null) {
+            pagamento.setPoupanca(this);
+            pagamentos.add(pagamento);
+        }
+    }
+
+    public void calculaSaldo() {
+
+        Calendar novaData = Calendar.getInstance();
+
+  
+        novaData.add(Calendar.DAY_OF_MONTH, -1);
+
+        List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPoupancaOrdenados", this);
+
+        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+
+        Collections.sort(pagamentos, comCod);
+
+        ComparatorPagamento comparator = new ComparatorPagamento();
+
+        Collections.sort(pagamentos, comparator);
+
+        for (int i = 0; i < pagamentos.size(); i++) {
+            if (i != 0) {
+                Pagamento p1 = pagamentos.get(i);
+                Pagamento pagamentoAnterior = pagamentos.get(i - 1);
+                p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
+
+                condominio.getPoupanca().setSaldo(p1.getSaldo());
+            }
+
+        }
+
+        new DAO().salvar(pagamentos);
+
     }
    
 }
