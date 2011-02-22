@@ -31,6 +31,8 @@
     <class>condominioPlus.negocio.financeiro.DadosTED</class>
     <class>condominioPlus.negocio.DadosTalaoCheque</class>
     <class>condominioPlus.negocio.financeiro.TransacaoBancaria</class>
+    <class>condominioPlus.negocio.financeiro.AplicacaoFinanceira</class>
+    <class>condominioPlus.negocio.financeiro.Poupanca</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>

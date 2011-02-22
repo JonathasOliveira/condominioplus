@@ -31,10 +31,10 @@ import condominioPlus.apresentacao.condominio.TelaCondominio;
 import condominioPlus.apresentacao.condominio.TelaDadosCondominio;
 import condominioPlus.apresentacao.condominio.TelaSelecionarCondominio;
 import condominioPlus.apresentacao.condomino.TelaCondomino;
+import condominioPlus.apresentacao.financeiro.TelaAplicacaoFinanceira;
 import condominioPlus.apresentacao.financeiro.TelaConta;
 import condominioPlus.apresentacao.financeiro.TelaContaCorrente;
 import condominioPlus.apresentacao.financeiro.TelaContaPagar;
-import condominioPlus.apresentacao.financeiro.TelaPoupanca;
 import condominioPlus.apresentacao.fornecedor.TelaFornecedor;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.funcionario.CaracteristicaAcesso;
@@ -106,6 +106,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                             try {
                                 ((NotificavelClasse) frames[i]).notificarClasse(o);
                             } catch (ClassCastException ex) {
+                                ex.printStackTrace();
                             }
                         }
                     }
@@ -357,13 +358,17 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
                 } else if (source == menuItemPoupanca) {
+//                    if (Main.getCondominio() != null) {
+//                        criarFrame(new TelaPoupanca(Main.getCondominio()));
+//                    } else {
+//                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+//                    }
+                } else if (source == menuItemAplicacao) {
                     if (Main.getCondominio() != null) {
-                        criarFrame(new TelaPoupanca(Main.getCondominio()));
+                        criarFrame(new TelaAplicacaoFinanceira(Main.getCondominio()));
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
-                } else if (source == menuItemExtratoBancario) {
-//                    criarFrame(new TelaPagamento());
                 } else if (source == menuItemComissao) {
 //                    criarFrame(new TelaComissao());
                 } else if (source == menuItemBanco) {
@@ -418,6 +423,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemFornecedores.addActionListener(this);
             menuItemContaPagar.addActionListener(this);
             menuItemPoupanca.addActionListener(this);
+            menuItemAplicacao.addActionListener(this);
             menuLogoff.addMouseListener(new MouseAdapter() {
 
                 @Override
