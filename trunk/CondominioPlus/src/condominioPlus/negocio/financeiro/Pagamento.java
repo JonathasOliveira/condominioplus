@@ -26,6 +26,7 @@ import logicpoint.persistencia.DAO;
  *
  * @author Administrador
  */
+
 @Entity
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.dataPagamento"),
@@ -37,7 +38,8 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosPorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.dadosPagamento = ?2"),
     @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2"),
     @NamedQuery(name = "PagamentosAplicacaoFinanceira", query = "SELECT c FROM Pagamento c WHERE c.aplicacao = ?1"),
-    @NamedQuery(name = "PagamentosPoupanca", query = "SELECT c FROM Pagamento c WHERE c.poupanca = ?1")
+    @NamedQuery(name = "PagamentosPoupanca", query = "SELECT c FROM Pagamento c WHERE c.poupanca = ?1"),
+    @NamedQuery(name = "PagamentosPoupancaOrdenados", query="SELECT p FROM Pagamento p WHERE p.poupanca = ?1 order by p.dataPagamento")
 })
 public class Pagamento implements Serializable {
 
@@ -45,7 +47,7 @@ public class Pagamento implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     @Temporal(javax.persistence.TemporalType.DATE)
-    @Column(name = "data_lancamento")
+    @Column(name = "data_pagamento")
     private Calendar dataPagamento;
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "data_vencimento")
@@ -71,7 +73,7 @@ public class Pagamento implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     private TransacaoBancaria transacaoBancaria;
 
     public Calendar getDataVencimento() {
