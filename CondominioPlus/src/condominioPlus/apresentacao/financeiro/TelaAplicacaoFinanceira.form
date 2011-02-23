@@ -85,7 +85,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnImprimir" linkSize="7" min="-2" pref="37" max="-2" attributes="0"/>
                   <EmptySpace pref="6" max="32767" attributes="0"/>
-                  <Component id="btnRecalcular" linkSize="7" min="-2" pref="33" max="-2" attributes="0"/>
+                  <Component id="btnCalcular" linkSize="7" min="-2" pref="33" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -99,7 +99,7 @@
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="btnImprimir" linkSize="8" alignment="1" max="32767" attributes="1"/>
-                                  <Component id="btnRecalcular" linkSize="8" alignment="1" min="-2" max="-2" attributes="2"/>
+                                  <Component id="btnCalcular" linkSize="8" alignment="1" min="-2" max="-2" attributes="2"/>
                                   <Component id="btnIncluir" linkSize="8" alignment="1" min="-2" max="-2" attributes="1"/>
                               </Group>
                               <Component id="txtData" min="-2" pref="22" max="-2" attributes="0"/>
@@ -176,7 +176,7 @@
             <Property name="text" type="java.lang.String" value="Hist&#xf3;rico:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JButton" name="btnRecalcular">
+        <Component class="javax.swing.JButton" name="btnCalcular">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/condominioPlus/recursos/imagens/calculadora.png"/>
