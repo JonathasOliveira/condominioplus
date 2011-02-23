@@ -86,7 +86,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             this.setTitle("Conta Corrente - " + condominio.getRazaoSocial());
         }
     }
-
+ //doida da claudia
     private void carregarTabela() {
         modeloTabela = new TabelaModelo_2<Pagamento>(tabelaContaCorrente, "Data, Documento, Conta, Descrição, Valor, Saldo ".split(",")) {
 
