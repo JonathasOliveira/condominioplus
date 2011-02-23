@@ -5,6 +5,7 @@
 package condominioPlus.negocio;
 
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
+import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaPagar;
 import condominioPlus.negocio.financeiro.Poupanca;
@@ -77,6 +78,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private AplicacaoFinanceira aplicacao;
     @OneToOne(cascade=CascadeType.ALL)
     private Poupanca poupanca = new Poupanca();
+     @OneToOne(cascade=CascadeType.ALL)
+    private Consignacao consignacao = new Consignacao();
     @OneToMany(mappedBy = "condominio", cascade=CascadeType.ALL)
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
     @Column(name="numero_minimo_taloes")
@@ -316,6 +319,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setPoupanca(Poupanca poupanca) {
         this.poupanca = poupanca;
+    }
+
+     public Consignacao getConsignacao() {
+        return consignacao;
+    }
+
+    public void setConsignacao(Consignacao consignacao) {
+        this.consignacao = consignacao;
     }
 
     
