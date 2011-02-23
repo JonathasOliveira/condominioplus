@@ -33,6 +33,7 @@
     <class>condominioPlus.negocio.financeiro.TransacaoBancaria</class>
     <class>condominioPlus.negocio.financeiro.AplicacaoFinanceira</class>
     <class>condominioPlus.negocio.financeiro.Poupanca</class>
+    <class>condominioPlus.negocio.financeiro.Consignacao</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>
