@@ -24,6 +24,7 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -177,9 +178,6 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 TransacaoBancaria transacao = new TransacaoBancaria();
                 Pagamento pagamentoRelacionado = new Pagamento();
 
-
-//                new DAO().salvar(transacao);
-
                 pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
                 pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
                 pagamentoRelacionado.setConta(conta.getContaVinculada());
@@ -244,14 +242,49 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
             String descricao = "Cadastro do Condominio " + condominio.getRazaoSocial() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
-//            sair();
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
         }
     }
 
-    private void sair() {
-        this.doDefaultCloseAction();
+    private void apagarItensSelecionados() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+            return;
+        }
+        if (modeloTabela.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
+            List<Pagamento> itensRemoverPoupanca = modeloTabela.getObjetosSelecionados();
+            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
+
+            for (Pagamento p : itensRemoverPoupanca) {
+                if (p.getTransacaoBancaria() != null) {
+                    TransacaoBancaria transacao = p.getTransacaoBancaria();
+                    Pagamento pagamentoRelacionado = new Pagamento();
+                    for (Pagamento p2 : transacao.getPagamentos()) {
+                        if (!p.equals(p2)) {
+                            pagamentoRelacionado = p2;
+                            pagamentoRelacionado.setDadosPagamento(null);
+                            itensRelacionadosRemover.add(pagamentoRelacionado);
+                        }
+                    }
+                    new DAO().remover(transacao);
+                }
+                modeloTabela.remover(p);
+                modeloTabela.notificar();
+                poupanca.setSaldo(poupanca.getSaldo().add(p.getValor()));
+            }
+            if (!itensRelacionadosRemover.isEmpty()) {
+                new DAO().remover(itensRelacionadosRemover);
+                condominio.getContaCorrente().getPagamentos().removeAll(itensRelacionadosRemover);
+            }
+            new DAO().remover(itensRemoverPoupanca);
+            condominio.getPoupanca().getPagamentos().removeAll(itensRemoverPoupanca);
+            new DAO().salvar(condominio);
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+
     }
 
     private void pegarConta() {
@@ -283,6 +316,8 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
             btnIncluir.addActionListener(this);
             btnCalcular.addActionListener(this);
             txtConta.addFocusListener(this);
+            tabelaPoupanca.addMouseListener(this);
+            itemMenuRemoverSelecionados.addActionListener(this);
         }
 
         @Override
@@ -298,6 +333,8 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 poupanca.calculaSaldo();
                 carregarTabela();
                 new DAO().salvar(poupanca);
+            } else if (origem == itemMenuRemoverSelecionados) {
+                apagarItensSelecionados();
             }
 
         }
@@ -323,6 +360,13 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 }
             }
         }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -334,6 +378,9 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuImprimirPoupanca = new javax.swing.JMenuItem();
+        itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -348,6 +395,12 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
         btnIncluir = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaPoupanca = new javax.swing.JTable();
+
+        itemMenuImprimirPoupanca.setText("Imprimir Conta Poupança");
+        popupMenu.add(itemMenuImprimirPoupanca);
+
+        itemMenuRemoverSelecionados.setText("Deletar Itens Selecionados");
+        popupMenu.add(itemMenuRemoverSelecionados);
 
         setClosable(true);
         setTitle("Poupança");
@@ -475,7 +528,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 427, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -486,11 +539,14 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
+    private javax.swing.JMenuItem itemMenuImprimirPoupanca;
+    private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaPoupanca;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
