@@ -69,6 +69,8 @@ public class Pagamento implements Serializable {
     private AplicacaoFinanceira aplicacao;
     @ManyToOne
     private Poupanca poupanca;
+    @ManyToOne
+    private Consignacao consignacao;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
     @OneToOne(cascade = CascadeType.ALL)
     private DadosPagamento dadosPagamento;
@@ -251,6 +253,13 @@ public class Pagamento implements Serializable {
     public void setPoupanca(Poupanca poupanca) {
         this.poupanca = poupanca;
     }
-    
+
+    public Consignacao getConsignacao() {
+        return consignacao;
+    }
+
+    public void setConsignacao(Consignacao consignacao) {
+        this.consignacao = consignacao;
+    }
 }
 
