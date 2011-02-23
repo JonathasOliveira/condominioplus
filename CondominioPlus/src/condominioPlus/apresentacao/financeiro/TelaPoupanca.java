@@ -133,7 +133,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
 
         }
     }
-
+    // salvador da patria!
     private void verificarDataPagamentoContaCorrente(Pagamento p2) {
         if (condominio.getContaCorrente().getPagamentos().isEmpty()) {
             p2.setSaldo(p2.getValor());
