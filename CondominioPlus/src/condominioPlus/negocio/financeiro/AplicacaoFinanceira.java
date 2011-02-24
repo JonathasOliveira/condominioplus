@@ -80,7 +80,7 @@ public class AplicacaoFinanceira implements Serializable {
         }
     }
 
-    public void calculaSaldo() {
+    public void calculaSaldo(AplicacaoFinanceira aplicacao) {
 
 
         List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosAplicacaoOrdenados", this);
@@ -104,7 +104,7 @@ public class AplicacaoFinanceira implements Serializable {
 
         }
 
-        new DAO().salvar(pagamentos);
+        aplicacao.setPagamentos(pagamentos);
 
     }
 }
