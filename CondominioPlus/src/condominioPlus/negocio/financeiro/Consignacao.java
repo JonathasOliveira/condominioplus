@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro;
 
 import condominioPlus.negocio.Condominio;
@@ -28,9 +27,8 @@ import logicpoint.persistencia.DAO;
  *
  * @author Administrador
  */
-
 @Entity
-public class Consignacao implements Serializable{
+public class Consignacao implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -99,8 +97,10 @@ public class Consignacao implements Serializable{
         Collections.sort(pagamentos, comparator);
 
         for (int i = 0; i < pagamentos.size(); i++) {
-            if (i != 0) {
-                Pagamento p1 = pagamentos.get(i);
+            Pagamento p1 = pagamentos.get(i);
+            if (i == 0) {
+                p1.setSaldo(p1.getValor());
+            } else if (i != 0) {
                 Pagamento pagamentoAnterior = pagamentos.get(i - 1);
                 p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
 
@@ -112,5 +112,4 @@ public class Consignacao implements Serializable{
         new DAO().salvar(pagamentos);
 
     }
-
 }

@@ -27,7 +27,6 @@ import logicpoint.persistencia.DAO;
  *
  * @author Administrador
  */
-
 @Entity
 public class Poupanca implements Serializable {
 
@@ -84,7 +83,7 @@ public class Poupanca implements Serializable {
 
         Calendar novaData = Calendar.getInstance();
 
-  
+
         novaData.add(Calendar.DAY_OF_MONTH, -1);
 
         List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPoupancaOrdenados", this);
@@ -98,8 +97,10 @@ public class Poupanca implements Serializable {
         Collections.sort(pagamentos, comparator);
 
         for (int i = 0; i < pagamentos.size(); i++) {
-            if (i != 0) {
-                Pagamento p1 = pagamentos.get(i);
+            Pagamento p1 = pagamentos.get(i);
+            if (i == 0) {
+                p1.setSaldo(p1.getValor());
+            } else if (i != 0) {
                 Pagamento pagamentoAnterior = pagamentos.get(i - 1);
                 p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
 
@@ -111,5 +112,4 @@ public class Poupanca implements Serializable {
         new DAO().salvar(pagamentos);
 
     }
-   
 }
