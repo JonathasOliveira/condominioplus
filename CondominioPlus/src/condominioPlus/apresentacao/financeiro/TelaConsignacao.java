@@ -70,7 +70,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
-        consignacao.calculaSaldo();
+        consignacao.calculaSaldo(consignacao);
         carregarTabela();
 
         if (condominio != null) {
@@ -331,7 +331,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
                 carregarTabela();
             } else if (origem == btnCalcular) {
                 verificarLista();
-                consignacao.calculaSaldo();
+                consignacao.calculaSaldo(consignacao);
                 carregarTabela();
                 new DAO().salvar(consignacao);
             } else if (origem == itemMenuRemoverSelecionados) {

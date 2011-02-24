@@ -367,9 +367,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 carregarTabela();
             } else if (origem == btnCalcular) {
                 verificarLista();
-                contaCorrente.calculaSaldo();
+                contaCorrente.calculaSaldo(contaCorrente);
                 carregarTabela();
-                new DAO().salvar(contaCorrente);
             } else if (origem == btnGravar) {
 //                gravarCheques();
             } else if (origem == itemMenuApagarSelecionados) {
