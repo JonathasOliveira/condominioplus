@@ -79,7 +79,7 @@ public class Consignacao implements Serializable {
         }
     }
 
-    public void calculaSaldo() {
+    public void calculaSaldo(Consignacao consignacao) {
 
         Calendar novaData = Calendar.getInstance();
 
@@ -109,7 +109,7 @@ public class Consignacao implements Serializable {
 
         }
 
-        new DAO().salvar(pagamentos);
+        consignacao.setPagamentos(pagamentos);
 
     }
 }

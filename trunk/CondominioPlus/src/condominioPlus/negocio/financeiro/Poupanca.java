@@ -79,7 +79,7 @@ public class Poupanca implements Serializable {
         }
     }
 
-    public void calculaSaldo() {
+    public void calculaSaldo(Poupanca poupanca) {
 
         Calendar novaData = Calendar.getInstance();
 
@@ -109,7 +109,7 @@ public class Poupanca implements Serializable {
 
         }
 
-        new DAO().salvar(pagamentos);
+        poupanca.setPagamentos(pagamentos);
 
     }
 }

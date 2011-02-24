@@ -92,7 +92,7 @@ public class ContaCorrente implements Serializable {
         this.dataFechamento = dataFechamento;
     }
 
-    public void calculaSaldo() {
+    public void calculaSaldo(ContaCorrente contaCorrente) {
 
         Calendar novaData = Calendar.getInstance();
 
@@ -124,13 +124,10 @@ public class ContaCorrente implements Serializable {
 //                }
                 condominio.getContaCorrente().setSaldo(p1.getSaldo());
             }
-
-            System.out.println("pagamento comparado por codigo " + pagamentos.get(i).getCodigo() + " " + pagamentos.get(i).getHistorico() + " " + DataUtil.toString(pagamentos.get(i).getDataPagamento()));
-            System.out.println("data fechamento caixa " + DataUtil.getDateTime(dataFechamento));
         }
 
-        new DAO().salvar(pagamentos);
-
+        contaCorrente.setPagamentos(pagamentos);
+        new DAO().salvar(contaCorrente);
     }
 
     public Condominio getCondominio() {
