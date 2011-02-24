@@ -69,7 +69,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
-        poupanca.calculaSaldo();
+        poupanca.calculaSaldo(poupanca);
         carregarTabela();
 
         if (condominio != null) {
@@ -330,7 +330,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 carregarTabela();
             } else if (origem == btnCalcular) {
                 verificarLista();
-                poupanca.calculaSaldo();
+                poupanca.calculaSaldo(poupanca);
                 carregarTabela();
                 new DAO().salvar(poupanca);
             } else if (origem == itemMenuRemoverSelecionados) {
