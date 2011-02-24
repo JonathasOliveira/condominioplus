@@ -68,7 +68,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
-        aplicacao.calculaSaldo();
+        aplicacao.calculaSaldo(aplicacao);
         carregarTabela();
 
         if (condominio != null) {
@@ -295,7 +295,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 carregarTabela();
             } else if (origem == btnCalcular) {
                 verificarLista();
-                aplicacao.calculaSaldo();
+                aplicacao.calculaSaldo(aplicacao);
                 carregarTabela();
                 new DAO().salvar(aplicacao);
             }
