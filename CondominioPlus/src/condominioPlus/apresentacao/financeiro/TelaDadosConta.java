@@ -53,6 +53,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     }
 
     private void preencherObjeto() {
+        conta.setNome(txtNome.getText());
         conta.setCodigo(Integer.valueOf(txtCodigo.getText()));
         conta.setCredito(radioCredito.isSelected());
         conta.setVinculada(checkBoxVinculada.isSelected());
@@ -61,7 +62,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 conta.setNomeVinculo("AF");
             } else if (radioConsignacoes.isSelected()) {
                 conta.setNomeVinculo("CO");
-            } else if (radioEmprestimos.isEnabled()) {
+            } else if (radioEmprestimos.isSelected()) {
                 conta.setNomeVinculo("EM");
             } else if (radioPoupanca.isSelected()) {
                 conta.setNomeVinculo("PO");
@@ -85,7 +86,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             radioDebito.setSelected(true);
         }
 
-        if(conta.getContaVinculada() != null){
+        if (conta.getContaVinculada() != null) {
             txtContaRelacionada.setText(conta.getContaVinculada().getNome());
         }
 
@@ -117,15 +118,46 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
         if (c.getConta() != null) {
             contaVinculo = c.getConta();
+            if (!verificarContaVinculada(contaVinculo)) {
+                return;
+            }
             txtContaRelacionada.setText(contaVinculo.getNome());
-        }else{
+        } else {
             txtContaRelacionada.setText("");
         }
     }
 
+    private boolean verificarContaVinculada(Conta contaVinculo) {
+        if (contaVinculo.getContaVinculada() != null) {
+            ApresentacaoUtil.exibirAdvertencia("Essa conta já está associada a outra!", this);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean verificarDadosContaVinculada() {
+        if (contaVinculo != null) {
+            if (conta.getNome().equalsIgnoreCase(contaVinculo.getNome())) {
+                ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
+                return false;
+            }
+            if (conta.isCredito() && contaVinculo.isCredito()) {
+                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                return false;
+            } else if (!conta.isCredito() && !contaVinculo.isCredito()) {
+                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
+                return false;
+            }
+            if (conta.isVinculada() && contaVinculo.isVinculada()) {
+                ApresentacaoUtil.exibirAdvertencia("Não pode ter duas contas relacionadas a aplicação, poupanca, etc!", this);
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void relacionarContaVinculada() {
 
-//        if (verificarNomeConta()) {
         if (conta.getCodigo() == 0 && contaVinculo != null) {
             preencherObjeto();
             conta.setContaVinculada(contaVinculo);
@@ -153,6 +185,19 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
     }
 
+    private boolean verificarNomeConta() {
+        List<Conta> lista = new DAO().listar(Conta.class);
+        for (Conta c : lista) {
+            if (c.getCodigo() != conta.getCodigo()) {
+                if (c.getNome().equalsIgnoreCase(txtNome.getText()) && !c.isRemovido()) {
+                    ApresentacaoUtil.exibirAdvertencia("Já existe uma conta com essa descrição", this);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private void salvar() {
         try {
 
@@ -164,12 +209,15 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
             preencherObjeto();
 
+            if (!verificarNomeConta()) {
+                return;
+            }
+
+            if (!verificarDadosContaVinculada()) {
+                return;
+            }
+
             relacionarContaVinculada();
-
-            System.out.println("conta " + conta.getNome());
-            if(conta.getContaVinculada() != null)
-            System.out.println("conta vinculo " + conta.getContaVinculada().getNome());
-
 
             TipoAcesso tipo = null;
             if (conta.getCodigo() == 0) {
