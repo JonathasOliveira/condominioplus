@@ -351,6 +351,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                             txtConta.setText(String.valueOf(conta.getCodigo()));
                             txtHistorico.setText(conta.getNome());
                         } else {
+
                             ApresentacaoUtil.exibirErro("Código Inexistente!", TelaPoupanca.this);
                             txtConta.setText("");
                             txtConta.grabFocus();
