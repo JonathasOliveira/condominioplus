@@ -35,6 +35,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     private ControladorEventos controlador;
     private TabelaModelo_2 modelo;
     private Conta contaVinculo = null;
+    private Conta contaVinculada;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosConta(Conta conta, TabelaModelo_2 modelo) {
@@ -47,6 +48,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
         if (conta != null) {
             preencherTela();
+            contaVinculada = conta.getContaVinculada();
         }
 
         controlador = new ControladorEventos();
@@ -123,6 +125,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             }
             txtContaRelacionada.setText(contaVinculo.getNome());
         } else {
+            contaVinculo = null;
             txtContaRelacionada.setText("");
         }
     }
@@ -214,6 +217,16 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             }
 
             if (!verificarDadosContaVinculada()) {
+                if (contaVinculada == null) {
+                    txtContaRelacionada.setText("");
+                } else {
+                    txtContaRelacionada.setText(contaVinculada.getNome());
+                }
+                contaVinculo.setContaVinculada(contaVinculada);
+
+
+
+
                 return;
             }
 
