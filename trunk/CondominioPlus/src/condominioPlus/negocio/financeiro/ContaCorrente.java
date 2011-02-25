@@ -123,6 +123,7 @@ public class ContaCorrente implements Serializable {
 //                    p1.setSaldo(pagamentoAnterior.getSaldo().subtract(p1.getValor()));
 //                }
                 condominio.getContaCorrente().setSaldo(p1.getSaldo());
+                new DAO().salvar(p1);
             }
         }
 

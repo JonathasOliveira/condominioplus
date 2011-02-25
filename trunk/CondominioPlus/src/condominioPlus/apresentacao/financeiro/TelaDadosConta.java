@@ -33,65 +33,124 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
     private Conta conta;
     private ControladorEventos controlador;
-    private TabelaModelo_2 tabelaModelo;
+    private TabelaModelo_2 modelo;
+    private Conta contaVinculo = null;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosConta(Conta conta, TabelaModelo_2 modelo) {
         this.conta = conta;
 
-        this.tabelaModelo = modelo;
+        this.modelo = modelo;
 
         initComponents();
-        desativarRadios();
+        habilitarVinculo(false);
+
+        if (conta != null) {
+            preencherTela();
+        }
 
         controlador = new ControladorEventos();
+    }
 
-        if (this.conta != null) {
-            preencherTela(this.conta);
+    private void preencherObjeto() {
+        conta.setCodigo(Integer.valueOf(txtCodigo.getText()));
+        conta.setCredito(radioCredito.isSelected());
+        conta.setVinculada(checkBoxVinculada.isSelected());
+        if (checkBoxVinculada.isSelected()) {
+            if (radioAplicacoesFinancas.isSelected()) {
+                conta.setNomeVinculo("AF");
+            } else if (radioConsignacoes.isSelected()) {
+                conta.setNomeVinculo("CO");
+            } else if (radioEmprestimos.isEnabled()) {
+                conta.setNomeVinculo("EM");
+            } else if (radioPoupanca.isSelected()) {
+                conta.setNomeVinculo("PO");
+            }
+        } else {
+            conta.setNomeVinculo("");
+        }
+    }
+
+    private void preencherTela() {
+        txtCodigo.setText(String.valueOf(conta.getCodigo()));
+        txtNome.setText(conta.getNome());
+        if (conta.isVinculada()) {
+            habilitarVinculo(true);
+            checkBoxVinculada.setSelected(true);
+            selecionarVinculo(conta);
+        }
+        if (conta.isCredito()) {
+            radioCredito.setSelected(true);
+        } else {
+            radioDebito.setSelected(true);
+        }
+
+        if(conta.getContaVinculada() != null){
+            txtContaRelacionada.setText(conta.getContaVinculada().getNome());
         }
 
     }
 
-    private List listaCampos() {
-        List<Object> campos = new ArrayList<Object>();
-        campos.add(txtNome);
-        return campos;
+    private void habilitarVinculo(boolean valor) {
+        checkBoxVinculada.setSelected(valor);
+        radioAplicacoesFinancas.setEnabled(valor);
+        radioConsignacoes.setEnabled(valor);
+        radioEmprestimos.setEnabled(valor);
+        radioPoupanca.setEnabled(valor);
     }
 
-    private boolean verificarConta(Conta c) {
-        Conta contaVinculo = c;
-        if (contaVinculo != null) {
-            if (conta.getCodigo() != 0) {
-                if (conta.verificarNome(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
-                    return false;
-                }
-                if (conta.verificarTipo(contaVinculo)) {
-                    ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
-                    return false;
-                }
-            }
-            if (contaVinculo.getContaVinculada() != null) {
-
-                System.out.println("conta vinculo: " + contaVinculo.getContaVinculada());
-                ApresentacaoUtil.exibirAdvertencia("Essa conta já está associada a outra!", this);
-                return false;
-            }
-            if (txtNome.getText().equals(contaVinculo.getNome())) {
-                ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
-                return false;
-            }
-            if (radioCredito.isSelected() && contaVinculo.isCredito()) {
-                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
-                return false;
-            } else if (radioDebito.isSelected() && !contaVinculo.isCredito()) {
-                ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
-                return false;
-            }
-
-            return true;
+    private void selecionarVinculo(Conta c) {
+        if (c.getNomeVinculo().equals("EM")) {
+            radioEmprestimos.setSelected(true);
+        } else if (c.getNomeVinculo().equals("CO")) {
+            radioConsignacoes.setSelected(true);
+        } else if (c.getNomeVinculo().equals("PO")) {
+            radioPoupanca.setSelected(true);
+        } else if (c.getNomeVinculo().equals("AF")) {
+            radioAplicacoesFinancas.setSelected(true);
         }
-        return true;
+    }
+
+    private void pegarConta() {
+        DialogoConta c = new DialogoConta(null, true, true, true);
+        c.setVisible(true);
+
+        if (c.getConta() != null) {
+            contaVinculo = c.getConta();
+            txtContaRelacionada.setText(contaVinculo.getNome());
+        }else{
+            txtContaRelacionada.setText("");
+        }
+    }
+
+    private void relacionarContaVinculada() {
+
+//        if (verificarNomeConta()) {
+        if (conta.getCodigo() == 0 && contaVinculo != null) {
+            preencherObjeto();
+            conta.setContaVinculada(contaVinculo);
+            new DAO().salvar(conta);
+            contaVinculo.setContaVinculada(conta);
+            new DAO().salvar(contaVinculo);
+
+        } else if (conta.getCodigo() != 0) {
+            if (!conta.equals(conta.getContaVinculada())) {
+                Conta contaJaVinculada = conta.getContaVinculada();
+                conta.setContaVinculada(contaVinculo);
+                if (contaVinculo != null) {
+                    contaVinculo.setContaVinculada(conta);
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaJaVinculada);
+                    }
+                } else {
+                    if (contaJaVinculada != null) {
+                        contaJaVinculada.setContaVinculada(null);
+                        new DAO().salvar(contaJaVinculada);
+                    }
+                }
+            }
+        }
     }
 
     private void salvar() {
@@ -105,18 +164,12 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
             preencherObjeto();
 
-            if (!verificarNomeConta()) {
-                return;
-            }
+            relacionarContaVinculada();
 
-            if (conta.getContaVinculada() != null) {
-                if (conta.getContaVinculada().isVinculada() && conta.isVinculada()) {
-                    ApresentacaoUtil.exibirAdvertencia("Não pode ter as duas contas relacionadas a aplicação, poupanca, etc!", this);
-                    conta.setVinculada(false);
-                    conta.setNomeVinculo("");
-                    return;
-                }
-            }
+            System.out.println("conta " + conta.getNome());
+            if(conta.getContaVinculada() != null)
+            System.out.println("conta vinculo " + conta.getContaVinculada().getNome());
+
 
             TipoAcesso tipo = null;
             if (conta.getCodigo() == 0) {
@@ -129,7 +182,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             dao.salvar(conta);
             dao.concluirTransacao();
 
-            tabelaModelo.carregarObjetos();
+            modelo.carregarObjetos();
 
             String descricao = "Cadastro do Contas " + conta.getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
@@ -140,162 +193,14 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         }
     }
 
+    private List listaCampos() {
+        List<Object> campos = new ArrayList<Object>();
+        campos.add(txtNome);
+        return campos;
+    }
+
     private void sair() {
         this.doDefaultCloseAction();
-    }
-
-    private void preencherTela(Conta conta) {
-        txtCodigo.setText(Integer.toString(conta.getCodigo()));
-        txtNome.setText(conta.getNome());
-
-        if (conta.isVinculada()) {
-            checkBoxVinculada.setSelected(true);
-            ativarRadios();
-            if (conta.getNomeVinculo().equals("CO")) {
-                radioConsignacoes.setSelected(true);
-            } else if (conta.getNomeVinculo().equals("EM")) {
-                radioEmprestimos.setSelected(true);
-            } else if (conta.getNomeVinculo().equals("PO")) {
-                radioPoupanca.setSelected(true);
-            } else if (conta.getNomeVinculo().equals("AF")) {
-                radioAplicacoesFinancas.setSelected(true);
-            }
-        }
-
-        if (conta.isCredito()) {
-            radioCredito.setSelected(true);
-        } else {
-            radioDebito.setSelected(true);
-        }
-        if (conta.getContaVinculada() != null) {
-            txtContaRelacionada.setText(conta.getContaVinculada().getNome());
-        }
-
-    }
-
-    private void autoRelacionar(Conta c) {
-
-        Conta contaVinculo = c;
-        if (verificarNomeConta()) {
-            if (conta.getCodigo() == 0 && contaVinculo != null) {
-                preencherObjeto();
-                conta.setContaVinculada(contaVinculo);
-                new DAO().salvar(conta);
-                contaVinculo.setContaVinculada(conta);
-                new DAO().salvar(contaVinculo);
-
-            } else if (conta.getCodigo() != 0) {
-                if (!conta.equals(conta.getContaVinculada())) {
-                    Conta contaJaVinculada = conta.getContaVinculada();
-                    conta.setContaVinculada(contaVinculo);
-                    if (contaVinculo != null) {
-                        contaVinculo.setContaVinculada(conta);
-                        if (contaJaVinculada != null) {
-                            contaJaVinculada.setContaVinculada(null);
-                            new DAO().salvar(contaJaVinculada);
-                        }
-                    } else {
-                        if (contaJaVinculada != null) {
-                            contaJaVinculada.setContaVinculada(null);
-                            new DAO().salvar(contaJaVinculada);
-                        }
-                    }
-                }
-            }
-        } else {
-            return;
-        }
-    }
-
-    private boolean verificarNomeConta() {
-
-        List<Conta> lista = new DAO().listar(Conta.class);
-        for (Conta c : lista) {
-            if (!c.equals(conta)) {
-                if (c.getNome().equalsIgnoreCase(txtNome.getText()) && !c.isRemovido()) {
-                    ApresentacaoUtil.exibirAdvertencia("Já existe uma conta com essa descrição", this);
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private void preencherObjeto() {
-
-        conta.setNome(txtNome.getText());
-
-        if (radioCredito.isSelected()) {
-            if (conta.getContaVinculada() != null) {
-                conta.getContaVinculada().setCredito(false);
-                new DAO().salvar(conta.getContaVinculada());
-            } else {
-                conta.setCredito(true);
-            }
-        } else {
-            conta.setCredito(false);
-        }
-
-        if (estaVinculada()) {
-            salvarVinculo();
-        }
-
-    }
-
-    private void desativarRadios() {
-        radioAplicacoesFinancas.setEnabled(false);
-        radioConsignacoes.setEnabled(false);
-        radioEmprestimos.setEnabled(false);
-        radioPoupanca.setEnabled(false);
-    }
-
-    private void ativarRadios() {
-        radioAplicacoesFinancas.setEnabled(true);
-        radioConsignacoes.setEnabled(true);
-        radioEmprestimos.setEnabled(true);
-        radioPoupanca.setEnabled(true);
-    }
-
-    private void salvarVinculo() {
-        if (radioPoupanca.isSelected()) {
-            conta.setNomeVinculo("PO");
-        } else if (radioAplicacoesFinancas.isSelected()) {
-            conta.setNomeVinculo("AF");
-        } else if (radioConsignacoes.isSelected()) {
-            conta.setNomeVinculo("CO");
-        } else if (radioEmprestimos.isSelected()) {
-            conta.setNomeVinculo("EM");
-        }
-    }
-
-    private boolean estaVinculada() {
-        if (checkBoxVinculada.isSelected()) {
-            conta.setVinculada(true);
-            ativarRadios();
-            return true;
-        } else if (!checkBoxVinculada.isSelected()) {
-            desativarRadios();
-            conta.setVinculada(false);
-            conta.setNomeVinculo("");
-            return false;
-        }
-        return false;
-    }
-
-    private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, true);
-        c.setVisible(true);
-
-        if (c.getConta() != null) {
-            Conta contaRelacionada = c.getConta();
-            if (verificarConta(contaRelacionada)) {
-                txtContaRelacionada.setText(String.valueOf(contaRelacionada.getNome()));
-                autoRelacionar(contaRelacionada);
-            }
-        } else {
-            autoRelacionar(null);
-            txtContaRelacionada.setText("");
-        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -305,7 +210,11 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
             if (e.getSource() == btnSalvar) {
                 salvar();
             } else if (e.getSource() == checkBoxVinculada) {
-                estaVinculada();
+                if (checkBoxVinculada.isSelected()) {
+                    habilitarVinculo(true);
+                } else {
+                    habilitarVinculo(false);
+                }
             } else if (e.getSource() == btnVoltar) {
                 sair();
             } else if (e.getSource() == btnConta) {
