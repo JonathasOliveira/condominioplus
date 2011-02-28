@@ -221,7 +221,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 } else {
                     txtContaRelacionada.setText(contaVinculada.getNome());
                 }
-                contaVinculo.setContaVinculada(contaVinculada);
+                contaVinculo = contaVinculada;
 
                 return;
             }
