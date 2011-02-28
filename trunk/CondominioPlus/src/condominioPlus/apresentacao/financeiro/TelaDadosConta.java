@@ -49,6 +49,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         if (conta != null) {
             preencherTela();
             contaVinculada = conta.getContaVinculada();
+            contaVinculo = conta.getContaVinculada();
         }
 
         controlador = new ControladorEventos();
@@ -140,18 +141,18 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
     private boolean verificarDadosContaVinculada() {
         if (contaVinculo != null) {
-            if (conta.getNome().equalsIgnoreCase(contaVinculo.getNome())) {
+            if (txtNome.getText().equalsIgnoreCase(contaVinculo.getNome())) {
                 ApresentacaoUtil.exibirAdvertencia("Uma conta não pode estar associada a ela mesma!", this);
                 return false;
             }
-            if (conta.isCredito() && contaVinculo.isCredito()) {
+            if (radioCredito.isSelected() && contaVinculo.isCredito()) {
                 ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
                 return false;
-            } else if (!conta.isCredito() && !contaVinculo.isCredito()) {
+            } else if (radioDebito.isSelected() && !contaVinculo.isCredito()) {
                 ApresentacaoUtil.exibirAdvertencia("Essa conta só pode estar associada a outra com tipo diferente!", this);
                 return false;
             }
-            if (conta.isVinculada() && contaVinculo.isVinculada()) {
+            if (checkBoxVinculada.isSelected() && contaVinculo.isVinculada()) {
                 ApresentacaoUtil.exibirAdvertencia("Não pode ter duas contas relacionadas a aplicação, poupanca, etc!", this);
                 return false;
             }
@@ -210,8 +211,6 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 return;
             }
 
-            preencherObjeto();
-
             if (!verificarNomeConta()) {
                 return;
             }
@@ -224,11 +223,10 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 }
                 contaVinculo.setContaVinculada(contaVinculada);
 
-
-
-
                 return;
             }
+
+            preencherObjeto();
 
             relacionarContaVinculada();
 
