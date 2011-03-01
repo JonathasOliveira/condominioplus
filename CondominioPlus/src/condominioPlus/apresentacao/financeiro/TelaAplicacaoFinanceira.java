@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import com.sun.org.apache.xalan.internal.xsltc.dom.BitArray;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conta;
@@ -24,6 +25,7 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +43,7 @@ import logicpoint.util.DataUtil;
  */
 public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
 
-   private AplicacaoFinanceira aplicacao;
+    private AplicacaoFinanceira aplicacao;
     private Condominio condominio;
     private Conta conta;
     private Pagamento pagamento;
@@ -127,6 +129,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
 
     private void verificarDataPagamento(Pagamento p2) {
         if (condominio.getAplicacao().getPagamentos().isEmpty()) {
+            System.out.println("lista " + condominio.getAplicacao().getPagamentos().size());
             p2.setSaldo(p2.getValor());
             condominio.getAplicacao().setSaldo(p2.getValor());
 
@@ -150,6 +153,20 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         }
     }
 
+    private boolean calcularRendimento() {
+        if (checkBoxCalcularDoTotal.isSelected()) {
+            if (pagamento.getConta().isCredito()) {
+                BigDecimal valor = new BigDecimal(txtValor.getText().replace(",", "."));
+                pagamento.setValor(valor.subtract(aplicacao.getSaldo()));
+                return true;
+            } else {
+                ApresentacaoUtil.exibirAdvertencia("Escolha uma conta do tipo crédito!", this);
+                return false;
+            }
+        }
+        return false;
+    }
+
     private void preencherObjeto() {
         if (conta.getNomeVinculo().equals("AF")) {
             pagamento = new Pagamento();
@@ -157,10 +174,16 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             pagamento.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
             pagamento.setHistorico(txtHistorico.getText());
             pagamento.setConta(conta);
-            if (pagamento.getConta().isCredito()) {
-                pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-            } else {
-                pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+            if (calcularRendimento()) {
+                ApresentacaoUtil.exibirInformacao("Rendimento calculado com sucesso!", this);
+            } else if (!calcularRendimento()) {
+                return;
+            } else if (!checkBoxCalcularDoTotal.isSelected()) {
+                if (pagamento.getConta().isCredito()) {
+                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+                } else {
+                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+                }
             }
             pagamento.setSaldo(new BigDecimal(0));
             pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
@@ -171,6 +194,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             verificarDataPagamento(pagamento);
 
             condominio.getAplicacao().adicionarPagamento(pagamento);
+            condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamento.getValor()));
 
             if (conta.getContaVinculada() != null) {
 
@@ -195,12 +219,12 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 pagamentoRelacionado.setContaCorrente(condominio.getContaCorrente());
                 pagamentoRelacionado.setPago(true);
 
-
                 transacao.adicionarPagamento(pagamento);
                 transacao.adicionarPagamento(pagamentoRelacionado);
 
                 verificarDataPagamentoContaCorrente(pagamentoRelacionado);
                 condominio.getContaCorrente().adicionarPagamento(pagamentoRelacionado);
+                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamentoRelacionado.getValor()));
 
                 System.out.println("Transacao Bancária: " + transacao);
 
@@ -211,7 +235,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             new DAO().salvar(condominio);
             limparCampos();
         } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada à Poupança!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada à Aplicação Financeira!", this);
             return;
         }
 
@@ -244,14 +268,50 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             String descricao = "Pagamento em Aplicação Financeira adicionado! " + pagamento.getHistorico() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
-//            sair();
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
         }
     }
 
-    private void sair() {
-        this.doDefaultCloseAction();
+    private void apagarItensSelecionados() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+            return;
+        }
+        if (modeloTabela.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
+            List<Pagamento> itensRemoverAplicacao = modeloTabela.getObjetosSelecionados();
+            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
+
+            for (Pagamento p : itensRemoverAplicacao) {
+                if (p.getTransacaoBancaria() != null) {
+                    TransacaoBancaria transacao = p.getTransacaoBancaria();
+                    Pagamento pagamentoRelacionado = new Pagamento();
+                    for (Pagamento p2 : transacao.getPagamentos()) {
+                        if (!p.equals(p2)) {
+                            pagamentoRelacionado = p2;
+                            pagamentoRelacionado.setDadosPagamento(null);
+                            condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            itensRelacionadosRemover.add(pagamentoRelacionado);
+                        }
+                    }
+                    new DAO().remover(transacao);
+                }
+                modeloTabela.remover(p);
+                modeloTabela.notificar();
+                aplicacao.setSaldo(aplicacao.getSaldo().subtract(p.getValor()));
+            }
+            if (!itensRelacionadosRemover.isEmpty()) {
+                new DAO().remover(itensRelacionadosRemover);
+                condominio.getContaCorrente().getPagamentos().removeAll(itensRelacionadosRemover);
+            }
+            new DAO().remover(itensRemoverAplicacao);
+            condominio.getAplicacao().getPagamentos().removeAll(itensRemoverAplicacao);
+            new DAO().salvar(condominio);
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+
     }
 
     private void pegarConta() {
@@ -283,6 +343,8 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             btnIncluir.addActionListener(this);
             btnCalcular.addActionListener(this);
             txtConta.addFocusListener(this);
+            tabela.addMouseListener(this);
+            itemMenuRemoverSelecionados.addActionListener(this);
         }
 
         @Override
@@ -298,6 +360,8 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 aplicacao.calculaSaldo(aplicacao);
                 carregarTabela();
                 new DAO().salvar(aplicacao);
+            } else if (origem == itemMenuRemoverSelecionados) {
+                apagarItensSelecionados();
             }
 
         }
@@ -323,11 +387,22 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 }
             }
         }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
+        itemMenuImprimirAplicacao = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         txtData = new net.sf.nachocalendar.components.DateField();
         jLabel1 = new javax.swing.JLabel();
@@ -340,8 +415,15 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         btnCalcular = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
         btnIncluir = new javax.swing.JButton();
+        checkBoxCalcularDoTotal = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
+
+        itemMenuRemoverSelecionados.setText("Deletar Itens Selecionados");
+        popupMenu.add(itemMenuRemoverSelecionados);
+
+        itemMenuImprimirAplicacao.setText("Imprimir Poupança");
+        popupMenu.add(itemMenuImprimirAplicacao);
 
         setClosable(true);
         setIconifiable(true);
@@ -382,6 +464,8 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         btnIncluir.setToolTipText("Incluir Conta");
         btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
+        checkBoxCalcularDoTotal.setText("Digitar Total para Calcular Rendimento");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -389,27 +473,32 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnConta)
-                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addGap(10, 10, 10)
-                .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
-                .addComponent(btnCalcular, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(checkBoxCalcularDoTotal)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnConta)
+                            .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addGap(10, 10, 10)
+                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                        .addComponent(btnCalcular, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16))))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir});
@@ -438,7 +527,8 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                             .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(checkBoxCalcularDoTotal))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir});
@@ -460,11 +550,11 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -472,9 +562,9 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -484,11 +574,15 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
+    private javax.swing.JCheckBox checkBoxCalcularDoTotal;
+    private javax.swing.JMenuItem itemMenuImprimirAplicacao;
+    private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;

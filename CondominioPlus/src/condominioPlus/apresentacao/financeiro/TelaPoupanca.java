@@ -134,6 +134,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
         }
     }
     // salvador da patria!
+
     private void verificarDataPagamentoContaCorrente(Pagamento p2) {
         if (condominio.getContaCorrente().getPagamentos().isEmpty()) {
             p2.setSaldo(p2.getValor());
@@ -172,6 +173,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
             verificarDataPagamento(pagamento);
 
             condominio.getPoupanca().adicionarPagamento(pagamento);
+            condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().add(pagamento.getValor()));
 
             if (conta.getContaVinculada() != null) {
 
@@ -199,6 +201,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
 
                 verificarDataPagamentoContaCorrente(pagamentoRelacionado);
                 condominio.getContaCorrente().adicionarPagamento(pagamentoRelacionado);
+                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamentoRelacionado.getValor()));
 
                 System.out.println("Transacao Bancária: " + transacao);
 
@@ -264,6 +267,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                         if (!p.equals(p2)) {
                             pagamentoRelacionado = p2;
                             pagamentoRelacionado.setDadosPagamento(null);
+                            condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().subtract(pagamentoRelacionado.getValor()));
                             itensRelacionadosRemover.add(pagamentoRelacionado);
                         }
                     }
@@ -271,7 +275,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 }
                 modeloTabela.remover(p);
                 modeloTabela.notificar();
-                poupanca.setSaldo(poupanca.getSaldo().add(p.getValor()));
+                poupanca.setSaldo(poupanca.getSaldo().subtract(p.getValor()));
             }
             if (!itensRelacionadosRemover.isEmpty()) {
                 new DAO().remover(itensRelacionadosRemover);

@@ -8,7 +8,6 @@
  *
  * Created on 23/02/2011, 16:12:10
  */
-
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
@@ -173,6 +172,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
             verificarDataPagamento(pagamento);
 
             condominio.getConsignacao().adicionarPagamento(pagamento);
+            condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamento.getValor()));
 
             if (conta.getContaVinculada() != null) {
 
@@ -200,6 +200,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
 
                 verificarDataPagamentoContaCorrente(pagamentoRelacionado);
                 condominio.getContaCorrente().adicionarPagamento(pagamentoRelacionado);
+                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamentoRelacionado.getValor()));
 
                 System.out.println("Transacao Bancária: " + transacao);
 
@@ -265,6 +266,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
                         if (!p.equals(p2)) {
                             pagamentoRelacionado = p2;
                             pagamentoRelacionado.setDadosPagamento(null);
+                            condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().subtract(pagamentoRelacionado.getValor()));
                             itensRelacionadosRemover.add(pagamentoRelacionado);
                         }
                     }
@@ -272,7 +274,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
                 }
                 modeloTabela.remover(p);
                 modeloTabela.notificar();
-                consignacao.setSaldo(consignacao.getSaldo().add(p.getValor()));
+                consignacao.setSaldo(consignacao.getSaldo().subtract(p.getValor()));
             }
             if (!itensRelacionadosRemover.isEmpty()) {
                 new DAO().remover(itensRelacionadosRemover);
@@ -531,8 +533,6 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnConta;
@@ -551,5 +551,4 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
-
 }
