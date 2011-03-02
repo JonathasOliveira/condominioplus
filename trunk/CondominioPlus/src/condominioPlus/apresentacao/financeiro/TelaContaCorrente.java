@@ -260,6 +260,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             TransacaoBancaria transacao = new TransacaoBancaria();
             Pagamento pagamentoRelacionado = new Pagamento();
 
+            System.out.println("Aqui!");
+
 
 //                new DAO().salvar(transacao);
 
@@ -273,7 +275,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             }
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(pagamento.getDadosPagamento());
-            
+
             String nome = pagamentoRelacionado.getConta().getNomeVinculo();
 
             if (nome.equals("AF")) {
@@ -409,15 +411,58 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         }
         if (modeloTabela.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
-            List<Pagamento> itensRemover = modeloTabela.getObjetosSelecionados();
+            List<Pagamento> itensRemoverContaCorrente = modeloTabela.getObjetosSelecionados();
+            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
 
-            for (Pagamento p : itensRemover) {
+            for (Pagamento p : itensRemoverContaCorrente) {
+                if (p.getTransacaoBancaria() != null) {
+                    TransacaoBancaria transacao = p.getTransacaoBancaria();
+                    Pagamento pagamentoRelacionado = new Pagamento();
+                    for (Pagamento p2 : transacao.getPagamentos()) {
+                        if (!p.equals(p2)) {
+                            pagamentoRelacionado = p2;
+                            pagamentoRelacionado.setDadosPagamento(null);
+
+                            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
+
+                            if (nome.equals("AF")) {
+                                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("PO")) {
+                                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("CO")) {
+                                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("EM")) {
+                            }
+                            //verificar
+
+                            itensRelacionadosRemover.add(pagamentoRelacionado);
+                        }
+                    }
+                    new DAO().remover(transacao);
+                }
                 modeloTabela.remover(p);
                 modeloTabela.notificar();
                 contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
             }
-            new DAO().remover(itensRemover);
-            condominio.getContaCorrente().getPagamentos().removeAll(itensRemover);
+            if (!itensRelacionadosRemover.isEmpty()) {
+                for (Pagamento p : itensRelacionadosRemover) {
+
+                    String nome = p.getConta().getNomeVinculo();
+
+                    if (nome.equals("AF")) {
+                        condominio.getAplicacao().getPagamentos().remove(p);
+                    } else if (nome.equals("PO")) {
+                        condominio.getPoupanca().getPagamentos().remove(p);
+                    } else if (nome.equals("CO")) {
+                        condominio.getConsignacao().getPagamentos().remove(p);
+                    } else if (nome.equals("EM")) {
+                    }
+                }
+                new DAO().remover(itensRelacionadosRemover);
+                //verificar
+            }
+            new DAO().remover(itensRemoverContaCorrente);
+            condominio.getContaCorrente().getPagamentos().removeAll(itensRemoverContaCorrente);
             new DAO().salvar(condominio);
             ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
         } else {
