@@ -197,8 +197,18 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             if (conta.getContaVinculada() != null) {
 
                 TransacaoBancaria transacao = new TransacaoBancaria();
-                Pagamento pagamentoRelacionado = new Pagamento();
+                if (pagamento.getTransacaoBancaria() != null) {
+                    transacao = pagamento.getTransacaoBancaria();
+                }
 
+                Pagamento pagamentoRelacionado = new Pagamento();
+                if (transacao.getPagamentos() != null) {
+                    for (Pagamento p : transacao.getPagamentos()) {
+                        if (!p.equals(pagamento)) {
+                            pagamentoRelacionado = p;
+                        }
+                    }
+                }
 
 //                new DAO().salvar(transacao);
 
@@ -254,8 +264,8 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 validador.exibirErros(this);
                 return;
             }
-            if(!preencherObjeto()){
-               return;
+            if (!preencherObjeto()) {
+                return;
             }
 
             TipoAcesso tipo = null;
