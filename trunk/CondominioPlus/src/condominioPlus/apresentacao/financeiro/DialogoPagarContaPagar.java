@@ -13,11 +13,13 @@ package condominioPlus.apresentacao.financeiro;
 import bemaJava.Bematech;
 import com.sun.jna.Native;
 import condominioPlus.Main;
+import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
@@ -50,9 +52,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private Conta conta;
     private List<Pagamento> listaPagamentos;
     private BigDecimal total = new BigDecimal(0);
+    private Condominio condominio = Main.getCondominio();
 
     /** Creates new form TelaBanco */
-
     public DialogoPagarContaPagar(Pagamento pagamento) {
         initComponents();
         this.pagamento = pagamento;
@@ -166,15 +168,15 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     }
 
-    private void preencherObjeto() {
-        pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
-        pagamento.setHistorico(txtHistorico.getText());
-        pagamento.setValor(new BigDecimal(txtValor.getText().replace(',', '.')).negate());
-        pagamento.setFornecedor(modelo.getSelectedItem());
-        pagamento.setConta(conta);
-        selecionaFormaPagamento(pagamento);
-
-    }
+//    private void preencherObjeto() {
+//        pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
+//        pagamento.setHistorico(txtHistorico.getText());
+//        pagamento.setValor(new BigDecimal(txtValor.getText().replace(',', '.')).negate());
+//        pagamento.setFornecedor(modelo.getSelectedItem());
+//        pagamento.setConta(conta);
+//        selecionaFormaPagamento(pagamento);
+//
+//    }
 
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
@@ -263,12 +265,111 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             p.setPago(true);
             p.setContaCorrente(Main.getCondominio().getContaCorrente());
             p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
-            System.out.println("pagamento " + p.isPago());
+            p.getContaCorrente().setSaldo(p.getContaCorrente().getSaldo().add(p.getValor()));
+            verificarVinculo(p);
         }
 
         new DAO().salvar(novaLista);
+        new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Pagamentos efetuados com sucesso!", this);
         dispose();
+    }
+
+    private void verificarVinculo(Pagamento p1) {
+        if (p1.getConta().getContaVinculada() != null) {
+            TransacaoBancaria transacao = new TransacaoBancaria();
+            if (p1.getTransacaoBancaria() != null) {
+                transacao = p1.getTransacaoBancaria();
+            }
+
+            Pagamento pagamentoRelacionado = new Pagamento();
+            if (transacao.getPagamentos() != null) {
+                for (Pagamento p : transacao.getPagamentos()) {
+                    if (!p.equals(p1)) {
+                        pagamentoRelacionado = p;
+                    }
+                }
+            }
+
+
+
+//                new DAO().salvar(transacao);
+
+            pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
+            pagamentoRelacionado.setHistorico(p1.getConta().getContaVinculada().getNome());
+            pagamentoRelacionado.setConta(p1.getConta().getContaVinculada());
+            if (pagamentoRelacionado.getConta().isCredito()) {
+                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+            } else {
+                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+            }
+            pagamentoRelacionado.setSaldo(new BigDecimal(0));
+            pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
+
+            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
+
+            if (nome.equals("AF")) {
+                pagamentoRelacionado.setAplicacao(condominio.getAplicacao());
+            } else if (nome.equals("PO")) {
+                pagamentoRelacionado.setPoupanca(condominio.getPoupanca());
+            } else if (nome.equals("CO")) {
+                pagamentoRelacionado.setConsignacao(condominio.getConsignacao());
+            } else if (nome.equals("EM")) {
+            }
+
+            pagamentoRelacionado.setPago(true);
+
+
+            transacao.adicionarPagamento(p1);
+            transacao.adicionarPagamento(pagamentoRelacionado);
+
+            if (nome.equals("AF")) {
+
+                verificarDataPagamentoAplicacao(pagamentoRelacionado);
+                condominio.getAplicacao().adicionarPagamento(pagamentoRelacionado);
+                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamentoRelacionado.getValor()));
+
+            } else if (nome.equals("PO")) {
+
+                verificarDataPagamentoPoupanca(pagamentoRelacionado);
+                condominio.getPoupanca().adicionarPagamento(pagamentoRelacionado);
+                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().add(pagamentoRelacionado.getValor()));
+
+            } else if (nome.equals("CO")) {
+
+                verificarDataPagamentoConsignacao(pagamentoRelacionado);
+                condominio.getConsignacao().adicionarPagamento(pagamentoRelacionado);
+                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamentoRelacionado.getValor()));
+
+            } else if (nome.equals("EM")) {
+            }
+
+            System.out.println("Transacao Bancária: " + transacao);
+
+            pagamento.setTransacaoBancaria(transacao);
+            pagamentoRelacionado.setTransacaoBancaria(transacao);
+        }
+    }
+
+    private void verificarDataPagamentoAplicacao(Pagamento p2) {
+        if (condominio.getAplicacao().getPagamentos().isEmpty()) {
+            p2.setSaldo(p2.getValor());
+            condominio.getAplicacao().setSaldo(p2.getValor());
+        }
+    }
+
+    private void verificarDataPagamentoPoupanca(Pagamento p2) {
+        if (condominio.getPoupanca().getPagamentos().isEmpty()) {
+            p2.setSaldo(p2.getValor());
+            condominio.getPoupanca().setSaldo(p2.getValor());
+        }
+    }
+
+    private void verificarDataPagamentoConsignacao(Pagamento p2) {
+        if (condominio.getConsignacao().getPagamentos().isEmpty()) {
+            p2.setSaldo(p2.getValor());
+            condominio.getConsignacao().setSaldo(p2.getValor());
+        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

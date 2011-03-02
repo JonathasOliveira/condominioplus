@@ -256,11 +256,20 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     private void verificarVinculo() {
         if (conta.getContaVinculada() != null) {
-
             TransacaoBancaria transacao = new TransacaoBancaria();
-            Pagamento pagamentoRelacionado = new Pagamento();
+            if (pagamento.getTransacaoBancaria() != null) {
+                transacao = pagamento.getTransacaoBancaria();
+            }
 
-            System.out.println("Aqui!");
+            Pagamento pagamentoRelacionado = new Pagamento();
+            if(transacao.getPagamentos() != null){
+                for (Pagamento p : transacao.getPagamentos()) {
+                    if(!p.equals(pagamento)){
+                        pagamentoRelacionado = p;
+                    }
+                }
+            }
+
 
 
 //                new DAO().salvar(transacao);

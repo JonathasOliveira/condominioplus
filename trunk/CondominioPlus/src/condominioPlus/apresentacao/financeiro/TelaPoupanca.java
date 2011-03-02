@@ -178,7 +178,18 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
             if (conta.getContaVinculada() != null) {
 
                 TransacaoBancaria transacao = new TransacaoBancaria();
+                if (pagamento.getTransacaoBancaria() != null) {
+                    transacao = pagamento.getTransacaoBancaria();
+                }
+
                 Pagamento pagamentoRelacionado = new Pagamento();
+                if (transacao.getPagamentos() != null) {
+                    for (Pagamento p : transacao.getPagamentos()) {
+                        if (!p.equals(pagamento)) {
+                            pagamentoRelacionado = p;
+                        }
+                    }
+                }
 
                 pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
                 pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
