@@ -167,7 +167,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         return false;
     }
 
-    private void preencherObjeto() {
+    private boolean preencherObjeto() {
         if (conta.getNomeVinculo().equals("AF")) {
             pagamento = new Pagamento();
 
@@ -176,8 +176,6 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             pagamento.setConta(conta);
             if (calcularRendimento()) {
                 ApresentacaoUtil.exibirInformacao("Rendimento calculado com sucesso!", this);
-            } else if (!calcularRendimento()) {
-                return;
             } else if (!checkBoxCalcularDoTotal.isSelected()) {
                 if (pagamento.getConta().isCredito()) {
                     pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
@@ -234,9 +232,10 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
 
             new DAO().salvar(condominio);
             limparCampos();
+            return true;
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada à Aplicação Financeira!", this);
-            return;
+            return false;
         }
 
     }
@@ -255,7 +254,9 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 validador.exibirErros(this);
                 return;
             }
-            preencherObjeto();
+            if(!preencherObjeto()){
+               return;
+            }
 
             TipoAcesso tipo = null;
             if (condominio.getCodigo() == 0) {
