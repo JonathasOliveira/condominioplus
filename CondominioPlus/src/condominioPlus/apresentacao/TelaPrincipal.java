@@ -36,6 +36,7 @@ import condominioPlus.apresentacao.financeiro.TelaConsignacao;
 import condominioPlus.apresentacao.financeiro.TelaConta;
 import condominioPlus.apresentacao.financeiro.TelaContaCorrente;
 import condominioPlus.apresentacao.financeiro.TelaContaPagar;
+import condominioPlus.apresentacao.financeiro.TelaEmprestimo;
 import condominioPlus.apresentacao.financeiro.TelaPoupanca;
 import condominioPlus.apresentacao.fornecedor.TelaFornecedor;
 import condominioPlus.negocio.Condominio;
@@ -377,7 +378,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
-                }else if (source == menuItemComissao) {
+                } else if (source == menuItemEmprestimo) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaEmprestimo(Main.getCondominio()));
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
+                } else if (source == menuItemComissao) {
 //                    criarFrame(new TelaComissao());
                 } else if (source == menuItemBanco) {
                     criarFrame(new TelaBanco());
@@ -433,6 +440,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemPoupanca.addActionListener(this);
             menuItemAplicacao.addActionListener(this);
             menuItemConsignacao.addActionListener(this);
+            menuItemEmprestimo.addActionListener(this);
             menuLogoff.addMouseListener(new MouseAdapter() {
 
                 @Override
