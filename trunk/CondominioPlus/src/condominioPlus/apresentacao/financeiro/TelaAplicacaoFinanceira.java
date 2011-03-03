@@ -10,7 +10,6 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
-import com.sun.org.apache.xalan.internal.xsltc.dom.BitArray;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conta;

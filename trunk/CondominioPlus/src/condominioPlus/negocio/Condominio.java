@@ -8,6 +8,7 @@ import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaPagar;
+import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.Poupanca;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -74,15 +75,17 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaCorrente contaCorrente = new ContaCorrente();
     @OneToOne(cascade = CascadeType.ALL)
     private ContaPagar contaPagar;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private AplicacaoFinanceira aplicacao;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Poupanca poupanca = new Poupanca();
-     @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Consignacao consignacao = new Consignacao();
-    @OneToMany(mappedBy = "condominio", cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    private Emprestimo emprestimo = new Emprestimo();
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
-    @Column(name="numero_minimo_taloes")
+    @Column(name = "numero_minimo_taloes")
     private int numeroMinimoTaloes = 0;
 
     public Condominio() {
@@ -321,7 +324,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.poupanca = poupanca;
     }
 
-     public Consignacao getConsignacao() {
+    public Consignacao getConsignacao() {
         return consignacao;
     }
 
@@ -329,5 +332,11 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.consignacao = consignacao;
     }
 
-    
+    public Emprestimo getEmprestimo() {
+        return emprestimo;
+    }
+
+    public void setEmprestimo(Emprestimo emprestimo) {
+        this.emprestimo = emprestimo;
+    }
 }

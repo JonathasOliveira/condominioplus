@@ -80,6 +80,8 @@ public class Pagamento implements Serializable {
     private boolean pago = false;
     @ManyToOne(cascade=CascadeType.ALL)
     private TransacaoBancaria transacaoBancaria;
+    @ManyToOne(cascade=CascadeType.ALL)
+    private ContratoEmprestimo contratoEmprestimo;
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -264,5 +266,14 @@ public class Pagamento implements Serializable {
     public void setConsignacao(Consignacao consignacao) {
         this.consignacao = consignacao;
     }
+
+    public ContratoEmprestimo getContratoEmprestimo() {
+        return contratoEmprestimo;
+    }
+
+    public void setContratoEmprestimo(ContratoEmprestimo contratoEmprestimo) {
+        this.contratoEmprestimo = contratoEmprestimo;
+    }
+    
 }
 
