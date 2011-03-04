@@ -8,15 +8,25 @@
  *
  * Created on 28/02/2011, 12:07:28
  */
-
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.Emprestimo;
+import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
+import logicpoint.util.DataUtil;
 
 /**
  *
@@ -27,8 +37,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private Emprestimo emprestimo;
     private ContratoEmprestimo contrato;
-    private Pagamento pagamento;
-    private List<Pagamento> pagamentos;
+    private List<ContratoEmprestimo> contratos;
+    private TabelaModelo_2<ContratoEmprestimo> modelo;
+    private Conta conta;
 
     /** Creates new form TelaEmprestimo */
     public TelaEmprestimo(Condominio condominio) {
@@ -47,6 +58,121 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
         }
         initComponents();
+
+        new ControladorEventos();
+
+        carregarTabela();
+    }
+
+    private void carregarTabela() {
+        modelo = new TabelaModelo_2<ContratoEmprestimo>(tabela, "Data, Descrição, Parcelas, Valor".split(",")) {
+
+            @Override
+            protected List<ContratoEmprestimo> getCarregarObjetos() {
+                return getContratos();
+            }
+
+            @Override
+            public Object getValor(ContratoEmprestimo c, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return DataUtil.getDateTime(c.getDataContrato());
+                    case 1:
+                        return c.getDescricao();
+                    case 2:
+                        return c.getNumeroParcelas();
+                    case 3:
+                        return c.getValor();
+                    default:
+                        return null;
+
+                }
+            }
+        };
+
+    }
+
+    private List<ContratoEmprestimo> getContratos() {
+        contratos = new DAO().listar("ContratosPorData");
+        return contratos;
+
+    }
+
+    private List listaCampos() {
+        List<Object> campos = new ArrayList<Object>();
+
+        campos.add(txtConta);
+        campos.add(txtHistorico);
+        campos.add(txtNumeroParcelas);
+        campos.add(txtValor);
+        campos.add(txtValorParcelas);
+
+        return campos;
+
+    }
+
+    private void preencherObjeto() {
+        contrato = new ContratoEmprestimo();
+        contrato.setDataContrato(DataUtil.getCalendar(txtData.getValue()));
+        contrato.setDescricao(txtHistorico.getText());
+        contrato.setEmprestimo(emprestimo);
+        if (radioAVista.isSelected()) {
+            contrato.setForma(FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA);
+        } else if (radioConformeDisponibilidade.isSelected()) {
+            contrato.setForma(FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE);
+        } else if (radioParcelado.isSelected()) {
+            contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
+        }
+
+        contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
+        contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+
+        if (contrato.getNumeroParcelas() > 0) {
+            if (contrato.getNumeroParcelas() == 1) {
+                Pagamento pagamento = new Pagamento();
+                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPagamento.getValue()));
+                if (conta != null) {
+                    pagamento.setConta(conta);
+                }
+            }
+
+        }
+    }
+
+    private void salvar() {
+    }
+
+    private void remover() {
+    }
+
+    private void limparCampos() {
+    }
+
+    private class ControladorEventos extends ControladorEventosGenerico {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        }
+
+        @Override
+        public void configurar() {
+            btnCalcular.addActionListener(this);
+            btnConta.addActionListener(this);
+            btnImprimir.addActionListener(this);
+            btnIncluir.addActionListener(this);
+            tabela.addMouseListener(this);
+            txtConta.addFocusListener(this);
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            super.focusLost(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+        }
     }
 
     /** This method is called from within the constructor to
@@ -58,6 +184,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         txtData = new net.sf.nachocalendar.components.DateField();
         jLabel1 = new javax.swing.JLabel();
@@ -74,6 +201,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtNumeroParcelas = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtValorParcelas = new javax.swing.JTextField();
+        radioAVista = new javax.swing.JRadioButton();
+        radioParcelado = new javax.swing.JRadioButton();
+        radioConformeDisponibilidade = new javax.swing.JRadioButton();
+        jLabel6 = new javax.swing.JLabel();
+        txtDataPagamento = new net.sf.nachocalendar.components.DateField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
 
@@ -120,25 +252,51 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         txtValorParcelas.setName("Valor"); // NOI18N
 
+        buttonGroup1.add(radioAVista);
+        radioAVista.setText("À vista");
+
+        buttonGroup1.add(radioParcelado);
+        radioParcelado.setText("Parcelado");
+
+        buttonGroup1.add(radioConformeDisponibilidade);
+        radioConformeDisponibilidade.setText("Conforme Disponibilidade");
+
+        jLabel6.setText("Data 1º Pagamento:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtData, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel4)
-                    .addComponent(txtNumeroParcelas))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtValorParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txtData, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
+                            .addComponent(jLabel3)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtDataPagamento, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                            .addComponent(jLabel4))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtValorParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioAVista)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioParcelado)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioConformeDisponibilidade))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnConta)
                             .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -182,14 +340,23 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                                 .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtValorParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtValorParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(radioAVista)
+                            .addComponent(radioParcelado)
+                            .addComponent(radioConformeDisponibilidade)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtDataPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(9, 9, 9))
         );
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
@@ -212,7 +379,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -228,27 +395,30 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JRadioButton radioAVista;
+    private javax.swing.JRadioButton radioConformeDisponibilidade;
+    private javax.swing.JRadioButton radioParcelado;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
+    private net.sf.nachocalendar.components.DateField txtDataPagamento;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroParcelas;
     private javax.swing.JTextField txtValor;
     private javax.swing.JTextField txtValorParcelas;
     // End of variables declaration//GEN-END:variables
-
 }
