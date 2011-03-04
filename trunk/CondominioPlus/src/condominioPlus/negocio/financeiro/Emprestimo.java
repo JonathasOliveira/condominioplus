@@ -82,6 +82,7 @@ public class Emprestimo implements Serializable {
 
         for (ContratoEmprestimo contrato : emprestimo.getContratos()){
             for (Pagamento p: contrato.getPagamentos()){
+                if(!p.isPago())
                 pagamentos.add(p);
             }
         }

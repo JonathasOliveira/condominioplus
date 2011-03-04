@@ -5,6 +5,7 @@
 package condominioPlus.negocio.financeiro;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -15,6 +16,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -24,6 +27,8 @@ import javax.persistence.Temporal;
  * @author Administrador
  */
 @Entity
+@NamedQueries(value = {
+    @NamedQuery(name = "ContratosPorData", query = "SELECT c FROM ContratoEmprestimo c ORDER BY c.dataContrato")})
 @Table(name = "contrato_emprestimo")
 public class ContratoEmprestimo implements Serializable {
 
@@ -39,7 +44,9 @@ public class ContratoEmprestimo implements Serializable {
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
     @ManyToOne(cascade = CascadeType.ALL)
     private Emprestimo emprestimo;
-
+    private BigDecimal valor;
+    private String descricao;
+    private FormaPagamentoEmprestimo forma;
     public int getCodigo() {
         return codigo;
     }
@@ -86,4 +93,31 @@ public class ContratoEmprestimo implements Serializable {
             pagamentos.add(pagamento);
         }
     }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
+    }
+
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
+    public FormaPagamentoEmprestimo getForma() {
+        return forma;
+    }
+
+    public void setForma(FormaPagamentoEmprestimo forma) {
+        this.forma = forma;
+    }
+
+    
+
 }
