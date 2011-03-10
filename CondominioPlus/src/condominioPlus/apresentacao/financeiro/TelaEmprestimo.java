@@ -18,6 +18,10 @@ import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
+import condominioPlus.negocio.funcionario.FuncionarioUtil;
+import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.util.LimitarCaracteres;
+import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
@@ -27,8 +31,10 @@ import java.util.List;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
+import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -114,7 +120,28 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     }
 
-    private void preencherObjeto() {
+    private void pegarConta() {
+        DialogoConta c = new DialogoConta(null, true, true, false);
+        c.setVisible(true);
+
+        if (c.getConta() != null) {
+            conta = c.getConta();
+            txtConta.setText(String.valueOf(conta.getCodigo()));
+            txtHistorico.setText(conta.getNome());
+        }
+    }
+
+    private Conta pesquisarContaPorCodigo(int codigo) {
+        Conta c = null;
+        try {
+            c = (Conta) new DAO().localizar(Conta.class, codigo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return c;
+    }
+
+    private boolean preencherObjeto() {
         if (conta.getNomeVinculo().equals("EM")) {
             contrato = new ContratoEmprestimo();
             contrato.setDataContrato(DataUtil.getCalendar(txtData.getValue()));
@@ -132,7 +159,24 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
             if (contrato.getNumeroParcelas() > 0) {
-                if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO) {
+                if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
+                    for (int i = 0; i < contrato.getNumeroParcelas(); i++) {
+                        pagamento = new Pagamento();
+                        if (i == 0) {
+                            pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
+                        } else {
+                            pagamento.setDataVencimento(DataUtil.getCalendar(new DateTime(txtDataPrimeiroPagamento.getValue()).plusMonths(i)));
+                        }
+                        pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
+                        pagamento.setConta(conta);
+                        pagamento.setContratoEmprestimo(contrato);
+                        pagamento.setHistorico(txtHistorico.getText());
+                        pagamento.setForma(FormaPagamento.DINHEIRO);
+
+                        verificarVinculo(pagamento);
+
+                    }
+
                 } else {
                     pagamento = new Pagamento();
                     pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
@@ -142,32 +186,35 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     pagamento.setHistorico(txtHistorico.getText());
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
-                    verificarVinculo();
+                    verificarVinculo(pagamento);
 
-                    new DAO().salvar(condominio);
-                    limparCampos();
                 }
 
+                new DAO().salvar(condominio);
+                limparCampos();
+                return true;
 
             }
         } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada à Empréstimo!", this);
-            return;
+            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada a Empréstimo!", this);
+            return false;
         }
+
+        return false;
     }
 
-    private void verificarVinculo() {
+    private void verificarVinculo(Pagamento p1) {
         if (conta.getContaVinculada() != null) {
 
             TransacaoBancaria transacao = new TransacaoBancaria();
-            if (pagamento.getTransacaoBancaria() != null) {
-                transacao = pagamento.getTransacaoBancaria();
+            if (p1.getTransacaoBancaria() != null) {
+                transacao = p1.getTransacaoBancaria();
             }
 
             Pagamento pagamentoRelacionado = new Pagamento();
             if (transacao.getPagamentos() != null) {
                 for (Pagamento p : transacao.getPagamentos()) {
-                    if (!p.equals(pagamento)) {
+                    if (!p.equals(p1)) {
                         pagamentoRelacionado = p;
                     }
                 }
@@ -182,39 +229,91 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
             }
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
-            pagamentoRelacionado.setDadosPagamento(pagamento.getDadosPagamento());
+            pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
 
 
             pagamentoRelacionado.setContaPagar(condominio.getContaPagar());
             pagamentoRelacionado.setPago(false);
 
 
-            transacao.adicionarPagamento(pagamento);
+            transacao.adicionarPagamento(p1);
             transacao.adicionarPagamento(pagamentoRelacionado);
 
             condominio.getContaPagar().adicionarPagamento(pagamentoRelacionado);
 
             System.out.println("Transacao Bancária: " + transacao);
 
-            pagamento.setTransacaoBancaria(transacao);
+            p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
         }
 
     }
 
     private void salvar() {
+        try {
+
+            ValidadorGenerico validador = new ValidadorGenerico();
+            if (!validador.validar(listaCampos())) {
+                validador.exibirErros(this);
+                return;
+            }
+            if (!preencherObjeto()) {
+                return;
+            }
+
+            TipoAcesso tipo = null;
+            if (condominio.getCodigo() == 0) {
+                tipo = tipo.INSERCAO;
+            } else {
+                tipo = tipo.EDICAO;
+            }
+
+
+            String descricao = "Pagamento em Empréstimo adicionado! " + pagamento.getHistorico() + ".";
+            FuncionarioUtil.registrar(tipo, descricao);
+
+        } catch (Throwable t) {
+            new TratadorExcecao(t, this, true);
+        }
     }
 
     private void remover() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover o(s) contrato(s)?", this)) {
+            return;
+        }
+        if (modelo.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modelo.getLinhasSelecionadas());
+            List<ContratoEmprestimo> itensRemover = modelo.getObjetosSelecionados();
+            new DAO().remover(itensRemover);
+            condominio.getEmprestimo().getContratos().removeAll(itensRemover);
+            new DAO().salvar(condominio);
+            ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+
     }
 
     private void limparCampos() {
+        txtValor.setText("");
+        txtConta.setText("");
+        txtHistorico.setText("");
+        txtNumeroParcelas.setText("");
+        txtValorParcelas.setText("");
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Object origem = e.getSource();
+            if (origem == btnIncluir) {
+                salvar();
+            } else if (origem == itemMenuRemoverSelecionados) {
+                remover();
+            } else if (origem == btnConta) {
+                pegarConta();
+            }
         }
 
         @Override
@@ -225,16 +324,36 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             btnIncluir.addActionListener(this);
             tabela.addMouseListener(this);
             txtConta.addFocusListener(this);
+            itemMenuRemoverSelecionados.addActionListener(this);
         }
 
         @Override
         public void focusLost(FocusEvent e) {
-            super.focusLost(e);
+            if (e.getSource() == txtConta) {
+                Conta resultado = null;
+                if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
+                    if (!txtConta.getText().equals("") && txtConta.getText() != null) {
+                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        if (resultado != null) {
+                            conta = resultado;
+                            txtConta.setText(String.valueOf(conta.getCodigo()));
+                            txtHistorico.setText(conta.getNome());
+                        } else {
+                            ApresentacaoUtil.exibirErro("Código Inexistente!", TelaEmprestimo.this);
+                            txtConta.setText("");
+                            txtConta.grabFocus();
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            super.mouseReleased(e);
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
     }
 
@@ -248,6 +367,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
+        itemMenuImprimir = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         txtData = new net.sf.nachocalendar.components.DateField();
         jLabel1 = new javax.swing.JLabel();
@@ -271,6 +393,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtDataPrimeiroPagamento = new net.sf.nachocalendar.components.DateField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
+
+        itemMenuRemoverSelecionados.setText("Remover Selecionados");
+        popupMenu.add(itemMenuRemoverSelecionados);
+
+        itemMenuImprimir.setText("Imprimir");
+        popupMenu.add(itemMenuImprimir);
 
         setClosable(true);
 
@@ -419,7 +547,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDataPrimeiroPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(9, 9, 9))
+                .addGap(13, 13, 13))
         );
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
@@ -464,6 +592,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JMenuItem itemMenuImprimir;
+    private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -472,6 +602,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JRadioButton radioAVista;
     private javax.swing.JRadioButton radioConformeDisponibilidade;
     private javax.swing.JRadioButton radioParcelado;
