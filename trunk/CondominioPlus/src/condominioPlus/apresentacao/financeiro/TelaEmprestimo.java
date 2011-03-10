@@ -13,6 +13,7 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
+import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
@@ -172,6 +173,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         pagamento.setContratoEmprestimo(contrato);
                         pagamento.setHistorico(txtHistorico.getText());
                         pagamento.setForma(FormaPagamento.DINHEIRO);
+                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
 
                         verificarVinculo(pagamento);
 
@@ -239,7 +241,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 }
             }
 
-            pagamentoRelacionado.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
+            pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
             pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
             pagamentoRelacionado.setConta(conta.getContaVinculada());
             if (pagamentoRelacionado.getConta().isCredito()) {
@@ -465,7 +467,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtValorParcelas.setName("Valor"); // NOI18N
 
         buttonGroup1.add(radioAVista);
-        radioAVista.setText("À vista");
+        radioAVista.setSelected(true);
+        radioAVista.setText("1 Parcela");
 
         buttonGroup1.add(radioParcelado);
         radioParcelado.setText("Parcelado");
