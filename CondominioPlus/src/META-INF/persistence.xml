@@ -34,6 +34,8 @@
     <class>condominioPlus.negocio.financeiro.AplicacaoFinanceira</class>
     <class>condominioPlus.negocio.financeiro.Poupanca</class>
     <class>condominioPlus.negocio.financeiro.Consignacao</class>
+    <class>condominioPlus.negocio.financeiro.ContratoEmprestimo</class>
+    <class>condominioPlus.negocio.financeiro.Emprestimo</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>

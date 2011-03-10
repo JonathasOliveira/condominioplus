@@ -466,7 +466,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         }
     }
 
-    private void PagarPagamento() {
+    private void pagarPagamento() {
         if (!modeloTabela.getObjetosSelecionados().isEmpty()) {
             DialogoPagarContaPagar tela = new DialogoPagarContaPagar((Pagamento) modeloTabela.getObjetoSelecionado());
             tela.setLocationRelativeTo(this);
@@ -498,7 +498,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuApagarSelecionados) {
                 apagarItensSelecionados();
             } else if (origem == itemMenuPagarSelecionados) {
-                PagarPagamento();
+                pagarPagamento();
             } else if (origem == btnFixarHistórico) {
             } else if (origem == btnNumeroDocumento) {
                 trocarFormaPagamento();
