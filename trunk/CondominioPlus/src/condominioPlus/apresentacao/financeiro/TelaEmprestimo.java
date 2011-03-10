@@ -14,15 +14,17 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.Emprestimo;
+import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
@@ -36,6 +38,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     private Condominio condominio;
     private Emprestimo emprestimo;
+    private Pagamento pagamento;
     private ContratoEmprestimo contrato;
     private List<ContratoEmprestimo> contratos;
     private TabelaModelo_2<ContratoEmprestimo> modelo;
@@ -112,31 +115,91 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private void preencherObjeto() {
-        contrato = new ContratoEmprestimo();
-        contrato.setDataContrato(DataUtil.getCalendar(txtData.getValue()));
-        contrato.setDescricao(txtHistorico.getText());
-        contrato.setEmprestimo(emprestimo);
-        if (radioAVista.isSelected()) {
-            contrato.setForma(FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA);
-        } else if (radioConformeDisponibilidade.isSelected()) {
-            contrato.setForma(FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE);
-        } else if (radioParcelado.isSelected()) {
-            contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
-        }
+        if (conta.getNomeVinculo().equals("EM")) {
+            contrato = new ContratoEmprestimo();
+            contrato.setDataContrato(DataUtil.getCalendar(txtData.getValue()));
+            contrato.setDescricao(txtHistorico.getText());
+            contrato.setEmprestimo(emprestimo);
+            if (radioAVista.isSelected()) {
+                contrato.setForma(FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA);
+            } else if (radioConformeDisponibilidade.isSelected()) {
+                contrato.setForma(FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE);
+            } else if (radioParcelado.isSelected()) {
+                contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
+            }
 
-        contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
-        contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+            contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
+            contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
-        if (contrato.getNumeroParcelas() > 0) {
-            if (contrato.getNumeroParcelas() == 1) {
-                Pagamento pagamento = new Pagamento();
-                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPagamento.getValue()));
-                if (conta != null) {
+            if (contrato.getNumeroParcelas() > 0) {
+                if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO) {
+                } else {
+                    pagamento = new Pagamento();
+                    pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
+                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
                     pagamento.setConta(conta);
+                    pagamento.setContratoEmprestimo(contrato);
+                    pagamento.setHistorico(txtHistorico.getText());
+                    pagamento.setForma(FormaPagamento.DINHEIRO);
+
+                    verificarVinculo();
+
+                    new DAO().salvar(condominio);
+                    limparCampos();
+                }
+
+
+            }
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada à Empréstimo!", this);
+            return;
+        }
+    }
+
+    private void verificarVinculo() {
+        if (conta.getContaVinculada() != null) {
+
+            TransacaoBancaria transacao = new TransacaoBancaria();
+            if (pagamento.getTransacaoBancaria() != null) {
+                transacao = pagamento.getTransacaoBancaria();
+            }
+
+            Pagamento pagamentoRelacionado = new Pagamento();
+            if (transacao.getPagamentos() != null) {
+                for (Pagamento p : transacao.getPagamentos()) {
+                    if (!p.equals(pagamento)) {
+                        pagamentoRelacionado = p;
+                    }
                 }
             }
 
+            pagamentoRelacionado.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
+            pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
+            pagamentoRelacionado.setConta(conta.getContaVinculada());
+            if (pagamentoRelacionado.getConta().isCredito()) {
+                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+            } else {
+                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+            }
+            pagamentoRelacionado.setSaldo(new BigDecimal(0));
+            pagamentoRelacionado.setDadosPagamento(pagamento.getDadosPagamento());
+
+
+            pagamentoRelacionado.setContaPagar(condominio.getContaPagar());
+            pagamentoRelacionado.setPago(false);
+
+
+            transacao.adicionarPagamento(pagamento);
+            transacao.adicionarPagamento(pagamentoRelacionado);
+
+            condominio.getContaPagar().adicionarPagamento(pagamentoRelacionado);
+
+            System.out.println("Transacao Bancária: " + transacao);
+
+            pagamento.setTransacaoBancaria(transacao);
+            pagamentoRelacionado.setTransacaoBancaria(transacao);
         }
+
     }
 
     private void salvar() {
@@ -205,7 +268,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         radioParcelado = new javax.swing.JRadioButton();
         radioConformeDisponibilidade = new javax.swing.JRadioButton();
         jLabel6 = new javax.swing.JLabel();
-        txtDataPagamento = new net.sf.nachocalendar.components.DateField();
+        txtDataPrimeiroPagamento = new net.sf.nachocalendar.components.DateField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
 
@@ -280,7 +343,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             .addComponent(jLabel3)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtDataPagamento, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtDataPrimeiroPagamento, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -355,7 +418,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             .addComponent(jLabel4)
                             .addComponent(jLabel5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDataPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtDataPrimeiroPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(9, 9, 9))
         );
 
@@ -415,7 +478,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
-    private net.sf.nachocalendar.components.DateField txtDataPagamento;
+    private net.sf.nachocalendar.components.DateField txtDataPrimeiroPagamento;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroParcelas;
     private javax.swing.JTextField txtValor;

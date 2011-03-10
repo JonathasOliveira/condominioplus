@@ -77,7 +77,7 @@
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                              <Component id="txtDataPagamento" alignment="0" max="32767" attributes="1"/>
+                              <Component id="txtDataPrimeiroPagamento" alignment="0" max="32767" attributes="1"/>
                               <Component id="jLabel6" alignment="0" max="32767" attributes="1"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
@@ -174,7 +174,7 @@
                               <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDataPagamento" min="-2" max="-2" attributes="0"/>
+                          <Component id="txtDataPrimeiroPagamento" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
@@ -303,7 +303,7 @@
             <Property name="text" type="java.lang.String" value="Data 1&#xba; Pagamento:"/>
           </Properties>
         </Component>
-        <Component class="net.sf.nachocalendar.components.DateField" name="txtDataPagamento">
+        <Component class="net.sf.nachocalendar.components.DateField" name="txtDataPrimeiroPagamento">
         </Component>
       </SubComponents>
     </Container>
