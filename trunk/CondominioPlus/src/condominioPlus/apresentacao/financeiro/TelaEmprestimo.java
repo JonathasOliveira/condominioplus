@@ -190,6 +190,25 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
                 }
 
+                Pagamento p = new Pagamento();
+                p.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
+                p.setHistorico(conta.getContaVinculada().getNome());
+                p.setConta(conta.getContaVinculada());
+                if (p.getConta().isCredito()) {
+                    p.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
+                } else {
+                    p.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
+                }
+                p.setSaldo(new BigDecimal(0));
+                p.setDadosPagamento(pagamento.getDadosPagamento());
+
+                p.setContaCorrente(condominio.getContaCorrente());
+                p.setPago(true);
+
+                condominio.getContaCorrente().adicionarPagamento(p);
+                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(p.getValor()));
+
+
                 new DAO().salvar(condominio);
                 limparCampos();
                 return true;
@@ -270,7 +289,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
 
-            String descricao = "Pagamento em Empréstimo adicionado! " + pagamento.getHistorico() + ".";
+            String descricao = "Contrato de Empréstimo adicionado! " + contrato.getDescricao() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
         } catch (Throwable t) {
