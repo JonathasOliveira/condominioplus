@@ -224,9 +224,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
             pagamentoRelacionado.setConta(conta.getContaVinculada());
             if (pagamentoRelacionado.getConta().isCredito()) {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+                pagamentoRelacionado.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
             } else {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+                pagamentoRelacionado.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
             }
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
@@ -245,6 +245,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
             p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
+
         }
 
     }
@@ -309,6 +310,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             Object origem = e.getSource();
             if (origem == btnIncluir) {
                 salvar();
+                carregarTabela();
             } else if (origem == itemMenuRemoverSelecionados) {
                 remover();
             } else if (origem == btnConta) {
