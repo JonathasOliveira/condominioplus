@@ -242,7 +242,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
-            pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
+            pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + conta.getContaVinculada().getNome());
             pagamentoRelacionado.setConta(conta.getContaVinculada());
             if (pagamentoRelacionado.getConta().isCredito()) {
                 pagamentoRelacionado.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
