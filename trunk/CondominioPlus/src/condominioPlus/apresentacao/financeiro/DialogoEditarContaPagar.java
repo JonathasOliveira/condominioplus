@@ -80,7 +80,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
-                return getPagamentosSemOriginal();
+                return listaPagamentos;
             }
 
 //            @Override
@@ -127,14 +127,16 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private List<Pagamento> getPagamentosSemOriginal() {
-        List<Pagamento> lista = new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
+        List<Pagamento> lista = getPagamentos();
         System.out.println("listaaaa  " + lista);
         List<Pagamento> listaModificada = new ArrayList<Pagamento>();
         for (Pagamento p2 : lista) {
             if (p2.getCodigo() != pagamento.getCodigo()) {
+                System.out.println("I'm hereeeee");
                 listaModificada.add(p2);
             }
         }
+        System.out.println("lista modificada " + listaModificada);
         return listaModificada;
     }
 

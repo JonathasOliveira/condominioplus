@@ -40,7 +40,7 @@ public class ContratoEmprestimo implements Serializable {
     private Calendar dataContrato;
     @Column(name = "numero_parcela")
     private int numeroParcelas;
-    @OneToMany(mappedBy = "contratoEmprestimo")
+    @OneToMany(mappedBy = "contratoEmprestimo", cascade=CascadeType.ALL)
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
     @ManyToOne(cascade = CascadeType.ALL)
     private Emprestimo emprestimo;

@@ -14,6 +14,7 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.DadosPagamento;
 import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
@@ -159,36 +160,52 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
             contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
+            DadosPagamento dados = new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()));
+
             if (contrato.getNumeroParcelas() > 0) {
+                String texto = "";
                 if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
                     for (int i = 0; i < contrato.getNumeroParcelas(); i++) {
+                        texto = "PAGAMENTO PARCELA " + (i + 1);
                         pagamento = new Pagamento();
                         if (i == 0) {
                             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
                         } else {
                             pagamento.setDataVencimento(DataUtil.getCalendar(new DateTime(txtDataPrimeiroPagamento.getValue()).plusMonths(i)));
                         }
-                        pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
-                        pagamento.setConta(conta);
-                        pagamento.setContratoEmprestimo(contrato);
-                        pagamento.setHistorico(txtHistorico.getText());
-                        pagamento.setForma(FormaPagamento.DINHEIRO);
-                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                        pagamento.setConta(conta.getContaVinculada());
+                        if (pagamento.getConta().isCredito()) {
+                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
+                        } else {
+                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
+                        }
 
-                        verificarVinculo(pagamento);
+                        pagamento.setContratoEmprestimo(contrato);
+                        pagamento.setHistorico(texto + " " + pagamento.getConta().getNome());
+                        pagamento.setForma(FormaPagamento.DINHEIRO);
+                        pagamento.setDadosPagamento(dados);
+
+                        verificarVinculo(pagamento, texto);
 
                     }
 
                 } else {
+                    texto = "PAGAMENTO ";
                     pagamento = new Pagamento();
                     pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
-                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-                    pagamento.setConta(conta);
+                    pagamento.setConta(conta.getContaVinculada());
+                    if (pagamento.getConta().isCredito()) {
+                        pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+                    } else {
+                        pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+                    }
+
                     pagamento.setContratoEmprestimo(contrato);
-                    pagamento.setHistorico(txtHistorico.getText());
+                    pagamento.setHistorico(texto + " " + pagamento.getConta().getNome());
+                    pagamento.setDadosPagamento(dados);
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
-                    verificarVinculo(pagamento);
+                    verificarVinculo(pagamento, texto);
 
                 }
 
@@ -196,13 +213,14 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 p.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
                 p.setHistorico(conta.getContaVinculada().getNome());
                 p.setConta(conta.getContaVinculada());
+                p.setContratoEmprestimo(contrato);
                 if (p.getConta().isCredito()) {
                     p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
                 } else {
                     p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
                 }
                 p.setSaldo(new BigDecimal(0));
-                p.setDadosPagamento(pagamento.getDadosPagamento());
+                p.setDadosPagamento(dados);
 
                 p.setContaCorrente(condominio.getContaCorrente());
                 p.setPago(true);
@@ -224,7 +242,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         return false;
     }
 
-    private void verificarVinculo(Pagamento p1) {
+    private void verificarVinculo(Pagamento p1, String texto) {
         if (conta.getContaVinculada() != null) {
 
             TransacaoBancaria transacao = new TransacaoBancaria();
@@ -242,8 +260,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
-            pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + conta.getContaVinculada().getNome());
-            pagamentoRelacionado.setConta(conta.getContaVinculada());
+            pagamentoRelacionado.setHistorico(texto + " " + txtConta.getText());
+            pagamentoRelacionado.setConta(conta);
+            pagamentoRelacionado.setContratoEmprestimo(contrato);
 
             pagamentoRelacionado.setValor(p1.getValor().negate());
 
@@ -304,6 +323,26 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         if (modelo.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modelo.getLinhasSelecionadas());
             List<ContratoEmprestimo> itensRemover = modelo.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (ContratoEmprestimo c : itensRemover) {
+                    c.setEmprestimo(null);
+                    modelo.remover(c);
+                    for (Pagamento p : c.getPagamentos()) {
+                        p.setContratoEmprestimo(null);
+                        if (p.getTransacaoBancaria() != null) {
+                            TransacaoBancaria transacao = p.getTransacaoBancaria();
+                            Pagamento pagamentoRelacionado;
+                            for (Pagamento p2 : transacao.getPagamentos()) {
+                                if (!p.equals(p2)) {
+                                    pagamentoRelacionado = p2;
+                                    pagamentoRelacionado.setDadosPagamento(null);
+                                }
+                            }
+                            new DAO().remover(transacao);
+                        }
+                    }
+                }
+            }
             new DAO().remover(itensRemover);
             condominio.getEmprestimo().getContratos().removeAll(itensRemover);
             new DAO().salvar(condominio);

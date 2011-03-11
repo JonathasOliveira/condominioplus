@@ -295,7 +295,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             for (Pagamento p : itensRemoverAplicacao) {
                 if (p.getTransacaoBancaria() != null) {
                     TransacaoBancaria transacao = p.getTransacaoBancaria();
-                    Pagamento pagamentoRelacionado = new Pagamento();
+                    Pagamento pagamentoRelacionado;
                     for (Pagamento p2 : transacao.getPagamentos()) {
                         if (!p.equals(p2)) {
                             pagamentoRelacionado = p2;

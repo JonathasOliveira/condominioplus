@@ -144,7 +144,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         System.out.println("listaaaa  " + lista);
         List<Pagamento> listaModificada = new ArrayList<Pagamento>();
         for (Pagamento p2 : lista) {
-            if (p2.getCodigo() != pagamento.getCodigo()) {
+            if (p2.getCodigo() != pagamento.getCodigo() && DataUtil.compararData(DataUtil.getDateTime(p2.getDataVencimento()), DataUtil.getDateTime(pagamento.getDataVencimento())) == 0)  {
                 listaModificada.add(p2);
             }
         }
@@ -177,7 +177,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //        selecionaFormaPagamento(pagamento);
 //
 //    }
-
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
