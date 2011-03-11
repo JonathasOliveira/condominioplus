@@ -197,9 +197,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 p.setHistorico(conta.getContaVinculada().getNome());
                 p.setConta(conta.getContaVinculada());
                 if (p.getConta().isCredito()) {
-                    p.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
+                    p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
                 } else {
-                    p.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
+                    p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
                 }
                 p.setSaldo(new BigDecimal(0));
                 p.setDadosPagamento(pagamento.getDadosPagamento());
@@ -244,11 +244,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
             pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + conta.getContaVinculada().getNome());
             pagamentoRelacionado.setConta(conta.getContaVinculada());
-            if (pagamentoRelacionado.getConta().isCredito()) {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
-            } else {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
-            }
+
+            pagamentoRelacionado.setValor(p1.getValor().negate());
+
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
 
