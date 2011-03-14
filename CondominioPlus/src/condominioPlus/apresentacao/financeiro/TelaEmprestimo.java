@@ -376,8 +376,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     public List<Pagamento> listarPagamentos() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorContratoEmprestimo", contrato);
         List<Pagamento> novaLista = new ArrayList<Pagamento>();
-        for (Pagamento p : lista){
-            if (p.getContaCorrente() == null && p.getContaPagar() == null){
+        for (Pagamento p : lista) {
+            if (p.getContaCorrente() == null && p.getContaPagar() == null) {
                 novaLista.add(p);
             }
         }
@@ -424,7 +424,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private void cancelar() {
         painelDadosContrato.setVisible(false);
         carregarTabela();
-//        contrato = null;
     }
 
     public void preencherPainelContrato(ContratoEmprestimo c) {
@@ -498,12 +497,10 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            exibirPainelPagamentos(modelo.getObjetoSelecionado());
+            if (painelDadosContrato.isVisible()) {
+                exibirPainelPagamentos(modelo.getObjetoSelecionado());
+            }
         }
-
-
-
-
     }
 
     /** This method is called from within the constructor to
