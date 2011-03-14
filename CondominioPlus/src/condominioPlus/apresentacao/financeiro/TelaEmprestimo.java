@@ -190,6 +190,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
                         pagamento.setContratoEmprestimo(contrato);
                         pagamento.setHistorico(texto + " " + pagamento.getConta().getNome());
+                        System.out.println("pagamento historico " + pagamento.getHistorico());
                         pagamento.setForma(FormaPagamento.DINHEIRO);
                         pagamento.setDadosPagamento(dados);
 
@@ -268,7 +269,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
-            pagamentoRelacionado.setHistorico(texto + " " + txtConta.getText());
+            pagamentoRelacionado.setHistorico(texto + " " + txtHistorico.getText());
             pagamentoRelacionado.setConta(conta);
             pagamentoRelacionado.setContratoEmprestimo(contrato);
 
