@@ -144,7 +144,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         System.out.println("listaaaa  " + lista);
         List<Pagamento> listaModificada = new ArrayList<Pagamento>();
         for (Pagamento p2 : lista) {
-            if (p2.getCodigo() != pagamento.getCodigo() && DataUtil.compararData(DataUtil.getDateTime(p2.getDataVencimento()), DataUtil.getDateTime(pagamento.getDataVencimento())) == 0)  {
+            if (p2.getCodigo() != pagamento.getCodigo()) {
                 listaModificada.add(p2);
             }
         }
@@ -259,19 +259,39 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private void efetuarPagamento() {
-        List<Pagamento> novaLista = getPagamentos();
-        for (Pagamento p : novaLista) {
-            p.setPago(true);
-            p.setContaCorrente(Main.getCondominio().getContaCorrente());
-            p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
-            p.getContaCorrente().setSaldo(p.getContaCorrente().getSaldo().add(p.getValor()));
-            verificarVinculo(p);
-        }
+        if (pagamento.getContratoEmprestimo() != null) {
+            pagamento.setPago(true);
+            pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
+            pagamento.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+            pagamento.getContaCorrente().setSaldo(pagamento.getContaCorrente().getSaldo().add(pagamento.getValor()));
+            pagarPagamentoRelacionado(pagamento);
+            new DAO().salvar(pagamento);
+        } else {
+            List<Pagamento> novaLista = getPagamentos();
+            for (Pagamento p : novaLista) {
+                p.setPago(true);
+                p.setContaCorrente(Main.getCondominio().getContaCorrente());
+                p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+                p.getContaCorrente().setSaldo(p.getContaCorrente().getSaldo().add(p.getValor()));
+                verificarVinculo(p);
+            }
 
-        new DAO().salvar(novaLista);
+            new DAO().salvar(novaLista);
+        }
         new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Pagamentos efetuados com sucesso!", this);
         dispose();
+    }
+
+    private void pagarPagamentoRelacionado(Pagamento p) {
+        for (Pagamento p2 : p.getTransacaoBancaria().getPagamentos()) {
+            if (!p2.equals(p)) {
+                p2.setPago(true);
+                p2.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+            }
+            new DAO().salvar(p2);
+
+        }
     }
 
     private void verificarVinculo(Pagamento p1) {
