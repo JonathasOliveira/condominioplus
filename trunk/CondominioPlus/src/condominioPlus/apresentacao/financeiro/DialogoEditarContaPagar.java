@@ -123,7 +123,24 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private List<Pagamento> getPagamentos() {
-        return new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
+        List<Pagamento> lista = Main.getCondominio().getContaPagar().getPagamentos();
+        List<Pagamento> novaLista = new ArrayList<Pagamento>();
+        for (Pagamento p : lista) {
+            if (pagamento.getForma() == FormaPagamento.CHEQUE && p.getForma() == FormaPagamento.CHEQUE) {
+                if (((DadosCheque) pagamento.getDadosPagamento()).getNumero() == ((DadosCheque) p.getDadosPagamento()).getNumero()) {
+                    novaLista.add(p);
+                }
+            } else if (pagamento.getForma() == FormaPagamento.DINHEIRO && p.getForma() == FormaPagamento.DINHEIRO) {
+                if (((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento() == ((DadosDOC) p.getDadosPagamento()).getNumeroDocumento()) {
+                    novaLista.add(p);
+                }
+            }
+        }
+
+        if(novaLista.isEmpty()){
+            novaLista.add(pagamento);
+        }
+        return novaLista;
     }
 
     private List<Pagamento> getPagamentosSemOriginal() {
@@ -132,7 +149,6 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         List<Pagamento> listaModificada = new ArrayList<Pagamento>();
         for (Pagamento p2 : lista) {
             if (p2.getCodigo() != pagamento.getCodigo()) {
-                System.out.println("I'm hereeeee");
                 listaModificada.add(p2);
             }
         }
@@ -218,6 +234,10 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         if (!getPagamentos().isEmpty()) {
             p = getPagamentos().get(0);
         }
+        if (pagamento.getFornecedor() == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione um Fornecedor/Favorecido!", this);
+            return;
+        }
 
         Bematech lib =
                 (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
@@ -250,15 +270,24 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
             for (Pagamento p : listaPagamentos) {
                 if (btnNumeroDocumento.isSelected()) {
-                    p.setForma(FormaPagamento.CHEQUE);
-                    p.setDadosPagamento(pagamento.getDadosPagamento());
+                    if (pagamento.getContratoEmprestimo() == null) {
+                        p.setForma(FormaPagamento.CHEQUE);
+                        if (p.getDadosPagamento() != null) {
+                            p.setDadosPagamento(pagamento.getDadosPagamento());
+                        }
+
+                        p.setFornecedor(pagamento.getFornecedor());
+                    }
 
 
                 } else {
-                    p.setForma(FormaPagamento.DINHEIRO);
-                    p.setDadosPagamento(pagamento.getDadosPagamento());
+                    if (pagamento.getContratoEmprestimo() == null) {
+                        p.setForma(FormaPagamento.DINHEIRO);
+                        p.setDadosPagamento(pagamento.getDadosPagamento());
+                        p.setFornecedor(pagamento.getFornecedor());
 
 
+                    }
                 }
             }
             System.out.println("listta" + listaPagamentos);
@@ -302,29 +331,16 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
     private Conta pesquisarContaPorCodigo(int codigo) {
         Conta c = null;
-
-
         try {
             c = (Conta) new DAO().localizar("LocalizarContas", codigo, false);
-
-
         } catch (Exception e) {
             e.printStackTrace();
-
-
         }
         return c;
-
-
     }
 
     public void setConta(Conta conta) {
         this.conta = conta;
-
-
-
-
-
     }
 
     private void carregarFornecedor() {

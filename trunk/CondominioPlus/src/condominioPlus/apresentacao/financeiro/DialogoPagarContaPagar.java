@@ -208,6 +208,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             p = getPagamentos().get(0);
         }
 
+        if (pagamento.getFornecedor() == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione um Fornecedor/Favorecido!", this);
+            return;
+        }
+
         Bematech lib =
                 (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
         iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
