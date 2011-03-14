@@ -277,10 +277,10 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
 
-
-            pagamentoRelacionado.setContaPagar(condominio.getContaPagar());
+            if (!pagamentoRelacionado.getConta().isCredito()) {
+                pagamentoRelacionado.setContaPagar(condominio.getContaPagar());
+            }
             pagamentoRelacionado.setPago(false);
-
 
             transacao.adicionarPagamento(p1);
             transacao.adicionarPagamento(pagamentoRelacionado);
