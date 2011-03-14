@@ -158,7 +158,15 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
             contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
-            contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+
+            if (conta != null) {
+                if (conta.isCredito()) {
+                    contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+                } else {
+                    contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+                }
+            }
+
 
             DadosPagamento dados = new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()));
 
