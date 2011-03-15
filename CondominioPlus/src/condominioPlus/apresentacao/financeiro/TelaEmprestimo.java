@@ -386,7 +386,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     public void carregarTabelaPagamentos() {
 
-        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
+        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data Vencimento, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
@@ -407,7 +407,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     case 4:
                         return pagamento.getConta().isCredito() ? "C" : "D";
                     case 5:
-                        return DataUtil.getDateTime(pagamento.getDataPagamento());
+                        return pagamento.isPago() ? DataUtil.getDateTime(pagamento.getDataPagamento()) : "Não pago";
                     default:
                         return null;
                 }
