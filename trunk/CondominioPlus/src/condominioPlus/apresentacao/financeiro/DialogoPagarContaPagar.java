@@ -18,6 +18,7 @@ import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
+import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.fornecedor.Fornecedor;
@@ -64,7 +65,33 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         carregarTabela();
         bloquearCampos();
         setTotal();
+        verificarConformeDisponibilidade();
         controlador = new ControladorEventos();
+    }
+
+    private void verificarConformeDisponibilidade(){
+        if(pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
+            if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)){
+                painelNovoPagamento.setEnabled(false);
+
+            }else{
+                jTabbedPane1.setSelectedIndex(1);
+
+            }
+        }
+    }
+
+    private void novoPagamento(){
+        Pagamento p = new Pagamento();
+
+        p.setDataVencimento(pagamento.getDataVencimento());
+        p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+        p.setContaCorrente(condominio.getContaCorrente());
+        p.setContratoEmprestimo(pagamento.getContratoEmprestimo());
+        p.setConta(pagamento.getConta());
+        p.setHistorico("PAGAMENTO PARCELO " + (pagamento.getContratoEmprestimo().getPagamentos().size()+1) + pagamento.getConta().getNome());
+        
+
     }
 
     private void bloquearCampos() {
@@ -265,6 +292,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     private void efetuarPagamento() {
         if (pagamento.getContratoEmprestimo() != null) {
+            if(pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
+                
+            }
             pagamento.setPago(true);
             pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
             pagamento.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
@@ -462,12 +492,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jPanel2 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tabela = new javax.swing.JTable();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        lblTotal = new javax.swing.JLabel();
         painelContaPagar = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -485,64 +509,33 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         btnPagar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tabela = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        lblTotal = new javax.swing.JLabel();
+        painelNovoPagamento = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        txtHistoricoNovoPagamento = new javax.swing.JTextField();
+        btnConta1 = new javax.swing.JButton();
+        txtContaNovoPagamento = new javax.swing.JTextField();
+        txtValorNovoPagamento = new javax.swing.JTextField();
+        txtDataNovoPagamento = new net.sf.nachocalendar.components.DateField();
         jLabel7 = new javax.swing.JLabel();
+        txtNumeroDocumentoNovoPagamento = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        btnNumeroDocumentoNovoPagamento = new javax.swing.JToggleButton();
+        jLabel9 = new javax.swing.JLabel();
+        cbFornecedoresNovoPagamento = new javax.swing.JComboBox();
+        jLabel10 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        btnCancelarNovoPagamento = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Editar Conta a Pagar");
         setModal(true);
-
-        tabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tabela.setName("tabela"); // NOI18N
-        jScrollPane1.setViewportView(tabela);
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
-        jLabel5.setText("Atenção: Todos os pagamentos com mesmo número serão pagos automaticamente!");
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
-        jLabel6.setText("Total: R$");
-
-        lblTotal.setFont(new java.awt.Font("Tahoma", 0, 12));
-        lblTotal.setForeground(new java.awt.Color(255, 0, 0));
-        lblTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addComponent(jLabel6)
-                            .addGap(10, 10, 10)
-                            .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 422, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 116, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5))
-        );
 
         painelContaPagar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -624,7 +617,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                     .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(cbFornecedores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
         painelContaPagarLayout.setVerticalGroup(
             painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -694,7 +687,219 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(11, 45, 11, 54);
         jPanel1.add(btnImprimir, gridBagConstraints);
 
-        jLabel7.setText("Pagamentos Relacionados:");
+        tabela.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tabela.setName("tabela"); // NOI18N
+        jScrollPane1.setViewportView(tabela);
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
+        jLabel6.setText("Total: R$");
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
+        jLabel5.setText("Atenção: Todos os pagamentos com mesmo número serão pagos automaticamente!");
+
+        lblTotal.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(255, 0, 0));
+        lblTotal.setText("10.000,00");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTotal)
+                    .addComponent(jLabel6))
+                .addGap(11, 11, 11)
+                .addComponent(jLabel5)
+                .addGap(22, 22, 22))
+        );
+
+        jTabbedPane1.addTab("Pagamentos Relacionados", jPanel3);
+
+        txtHistoricoNovoPagamento.setName("Histórico"); // NOI18N
+
+        btnConta1.setText("Conta:");
+        btnConta1.setBorder(null);
+        btnConta1.setBorderPainted(false);
+        btnConta1.setContentAreaFilled(false);
+        btnConta1.setFocusable(false);
+        btnConta1.setRequestFocusEnabled(false);
+        btnConta1.setVerifyInputWhenFocusTarget(false);
+
+        txtContaNovoPagamento.setName("Conta"); // NOI18N
+
+        txtValorNovoPagamento.setName("Valor"); // NOI18N
+
+        txtDataNovoPagamento.setFocusable(false);
+        txtDataNovoPagamento.setName("data"); // NOI18N
+        txtDataNovoPagamento.setRequestFocusEnabled(false);
+
+        jLabel7.setText("Histórico:");
+
+        txtNumeroDocumentoNovoPagamento.setName("documento"); // NOI18N
+
+        jLabel8.setText("Valor:");
+
+        btnNumeroDocumentoNovoPagamento.setText("Nº Doc");
+        btnNumeroDocumentoNovoPagamento.setToolTipText("Clique para alternar o tipo de Registro!");
+        btnNumeroDocumentoNovoPagamento.setBorderPainted(false);
+        btnNumeroDocumentoNovoPagamento.setContentAreaFilled(false);
+        btnNumeroDocumentoNovoPagamento.setFocusPainted(false);
+        btnNumeroDocumentoNovoPagamento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNumeroDocumentoNovoPagamentoActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setText("Data Pagamento:");
+
+        cbFornecedoresNovoPagamento.setName("fornecedor"); // NOI18N
+
+        jLabel10.setText("Fornecedor:");
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        jButton1.setToolTipText("Adicionar");
+
+        btnCancelarNovoPagamento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnCancelarNovoPagamento.setToolTipText("Cancelar");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(130, 130, 130)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(67, 67, 67)
+                .addComponent(btnCancelarNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(132, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(cbFornecedoresNovoPagamento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(txtHistoricoNovoPagamento, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel7)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel9)
+                                    .addComponent(txtDataNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(btnNumeroDocumentoNovoPagamento)
+                                        .addGap(33, 33, 33)
+                                        .addComponent(btnConta1)
+                                        .addGap(33, 33, 33)
+                                        .addComponent(jLabel8))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(6, 6, 6)
+                                        .addComponent(txtContaNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addContainerGap())))
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addGap(9, 9, 9)
+                        .addComponent(txtDataNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(btnNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(btnConta1)
+                            .addComponent(jLabel8))
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel5Layout.createSequentialGroup()
+                                        .addGap(1, 1, 1)
+                                        .addComponent(txtContaNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addGap(7, 7, 7)
+                                .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtHistoricoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbFornecedoresNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnCancelarNovoPagamento)
+                    .addComponent(jButton1))
+                .addContainerGap())
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCancelarNovoPagamento, jButton1});
+
+        javax.swing.GroupLayout painelNovoPagamentoLayout = new javax.swing.GroupLayout(painelNovoPagamento);
+        painelNovoPagamento.setLayout(painelNovoPagamentoLayout);
+        painelNovoPagamentoLayout.setHorizontalGroup(
+            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelNovoPagamentoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        painelNovoPagamentoLayout.setVerticalGroup(
+            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelNovoPagamentoLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Novo Pagamento Conforme Disponibilidade", painelNovoPagamento);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -702,25 +907,21 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, 0, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel2, 0, 422, Short.MAX_VALUE)
-                    .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                    .addComponent(painelContaPagar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -729,33 +930,53 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void btnNumeroDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNumeroDocumentoActionPerformed
         // TODO add your handling code here:
 }//GEN-LAST:event_btnNumeroDocumentoActionPerformed
+
+    private void btnNumeroDocumentoNovoPagamentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNumeroDocumentoNovoPagamentoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNumeroDocumentoNovoPagamentoActionPerformed
     /**
      * @param args the command line arguments
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnCancelarNovoPagamento;
     private javax.swing.JButton btnConta;
+    private javax.swing.JButton btnConta1;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JToggleButton btnNumeroDocumento;
+    private javax.swing.JToggleButton btnNumeroDocumentoNovoPagamento;
     private javax.swing.JButton btnPagar;
     private javax.swing.JComboBox cbFornecedores;
+    private javax.swing.JComboBox cbFornecedoresNovoPagamento;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JPanel painelContaPagar;
+    private javax.swing.JPanel painelNovoPagamento;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
+    private javax.swing.JTextField txtContaNovoPagamento;
     private net.sf.nachocalendar.components.DateField txtData;
+    private net.sf.nachocalendar.components.DateField txtDataNovoPagamento;
     private javax.swing.JTextField txtHistorico;
+    private javax.swing.JTextField txtHistoricoNovoPagamento;
     private javax.swing.JTextField txtNumeroDocumento;
+    private javax.swing.JTextField txtNumeroDocumentoNovoPagamento;
     private javax.swing.JTextField txtValor;
+    private javax.swing.JTextField txtValorNovoPagamento;
     // End of variables declaration//GEN-END:variables
 }
