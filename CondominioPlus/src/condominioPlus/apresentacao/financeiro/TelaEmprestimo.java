@@ -71,11 +71,27 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         }
         initComponents();
 
+        desabilitarBotoesUmaParcela();
+
         painelDadosContrato.setVisible(false);
 
         new ControladorEventos();
 
         carregarTabela();
+    }
+
+    private void desabilitarBotoesUmaParcela() {
+        if (radioAVista.isSelected() || radioConformeDisponibilidade.isSelected()) {
+            txtNumeroParcelas.setText("1");
+            txtValorParcelas.setText(txtValor.getText());
+            txtNumeroParcelas.setEnabled(false);
+            txtValorParcelas.setEnabled(false);
+        } else if (radioParcelado.isSelected()) {
+            txtValorParcelas.setText("");
+            txtNumeroParcelas.setText("");
+            txtNumeroParcelas.setEnabled(true);
+            txtValorParcelas.setEnabled(true);
+        }
     }
 
     private void carregarTabela() {
@@ -413,7 +429,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 }
             }
         };
-
     }
 
     private void exibirPainelPagamentos(ContratoEmprestimo c) {
@@ -452,6 +467,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 exibirPainelPagamentos(modelo.getObjetoSelecionado());
             } else if (origem == btnVoltar) {
                 cancelar();
+            } else if (origem == radioAVista) {
+                desabilitarBotoesUmaParcela();
+            } else if (origem == radioConformeDisponibilidade) {
+                desabilitarBotoesUmaParcela();
+            } else if (origem == radioParcelado) {
+                desabilitarBotoesUmaParcela();
             }
         }
 
@@ -466,6 +487,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             itemMenuRemoverSelecionados.addActionListener(this);
             itemMenuVisualizarContrato.addActionListener(this);
             btnVoltar.addActionListener(this);
+            radioAVista.addActionListener(this);
+            txtValor.addFocusListener(this);
+            radioConformeDisponibilidade.addActionListener(this);
+            radioParcelado.addActionListener(this);
+            btnSalvar.addActionListener(this);
         }
 
         @Override
@@ -485,6 +511,21 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             txtConta.grabFocus();
                             return;
                         }
+                    }
+                }
+            }
+            if (e.getSource() == txtValor) {
+                if (radioAVista.isSelected() || radioConformeDisponibilidade.isSelected()) {
+                    String resultado = null;
+                    if (!txtValor.getText().equals("") && txtValor.getText() != null) {
+                        resultado = txtValor.getText();
+                        if (resultado != null) {
+                            txtValorParcelas.setText(resultado);
+                        } else {
+                            ApresentacaoUtil.exibirErro("Digíte um valor para o empréstimo!", TelaEmprestimo.this);
+                            return;
+                        }
+
                     }
                 }
             }

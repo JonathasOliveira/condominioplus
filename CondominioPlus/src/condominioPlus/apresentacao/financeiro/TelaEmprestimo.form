@@ -53,7 +53,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="732" max="32767" attributes="1"/>
+                  <Component id="jScrollPane1" alignment="0" pref="734" max="32767" attributes="1"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="2"/>
                   <Component id="painelDadosContrato" alignment="0" max="32767" attributes="0"/>
               </Group>
@@ -109,7 +109,7 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtNumeroParcelas" pref="79" max="32767" attributes="1"/>
+                              <Component id="txtNumeroParcelas" pref="81" max="32767" attributes="1"/>
                               <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="1"/>
                           </Group>
                       </Group>
@@ -385,7 +385,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane2" alignment="0" pref="708" max="32767" attributes="1"/>
+                              <Component id="jScrollPane2" alignment="0" pref="710" max="32767" attributes="1"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
