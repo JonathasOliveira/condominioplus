@@ -30,6 +30,8 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -389,6 +391,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtValorParcelas.setText("");
     }
 
+
     public List<Pagamento> listarPagamentos() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorContratoEmprestimo", contrato);
         List<Pagamento> novaLista = new ArrayList<Pagamento>();
@@ -429,12 +432,37 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 }
             }
         };
+
+        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
+
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(1)).setMinWidth(300);
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setMaxWidth(140);
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(3)).setMaxWidth(140);
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setMaxWidth(50);
+
+    }
+
+    private void desabilitarCamposContrato() {
+        txtDataContrato.setEnabled(false);
+        txtCodigoContrato.setEnabled(false);
+        txtParcelasContrato.setEnabled(false);
+        txtValorContrato.setEnabled(false);
     }
 
     private void exibirPainelPagamentos(ContratoEmprestimo c) {
         painelDadosContrato.setVisible(true);
-        preencherPainelContrato(c);
         contrato = c;
+        desabilitarCamposContrato();
+        preencherPainelContrato(c);
         carregarTabelaPagamentos();
     }
 
@@ -449,6 +477,26 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtDescricao.setText(c.getDescricao());
         txtParcelasContrato.setText(String.valueOf(c.getNumeroParcelas()));
         txtValorContrato.setText(c.getValor().toString());
+    }
+
+    private void editarPagamentoContrato() {
+        if (!modeloTabelaPagamentos.getObjetosSelecionados().isEmpty()) {
+            DialogoEditarPagamentoContrato tela = new DialogoEditarPagamentoContrato((Pagamento) modeloTabelaPagamentos.getObjetoSelecionado());
+            tela.setLocationRelativeTo(this);
+            tela.setVisible(true);
+            modeloTabelaPagamentos.carregarObjetos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+        }
+    }
+
+    private void salvarContrato() {
+        contrato = modelo.getObjetoSelecionado();
+        contrato.setDescricao(txtDescricao.getText());
+        new DAO().salvar(contrato);
+        carregarTabela();
+
+        ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -473,6 +521,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 desabilitarBotoesUmaParcela();
             } else if (origem == radioParcelado) {
                 desabilitarBotoesUmaParcela();
+            } else if (origem == btnSalvar) {
+                salvarContrato();
             }
         }
 
@@ -492,6 +542,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             radioConformeDisponibilidade.addActionListener(this);
             radioParcelado.addActionListener(this);
             btnSalvar.addActionListener(this);
+            tabelaPagamentos.addMouseListener(this);
         }
 
         @Override
@@ -540,8 +591,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (painelDadosContrato.isVisible()) {
+            Object origem = e.getSource();
+            if (origem == tabela && painelDadosContrato.isVisible()) {
                 exibirPainelPagamentos(modelo.getObjetoSelecionado());
+            } else if (origem == tabelaPagamentos && e.getClickCount() == 2) {
+                editarPagamentoContrato();
             }
         }
     }
@@ -689,7 +743,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.DEFAULT_SIZE, 81, Short.MAX_VALUE)
                             .addComponent(jLabel4))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -800,6 +854,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tabelaPagamentos.setToolTipText("Clique no pagamento para editá-lo.");
         jScrollPane2.setViewportView(tabelaPagamentos);
 
         btnVoltar.setText("Voltar");
@@ -820,7 +875,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     .addGroup(painelDadosContratoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 708, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 710, Short.MAX_VALUE)
                             .addGroup(painelDadosContratoLayout.createSequentialGroup()
                                 .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel7)
@@ -880,7 +935,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(painelDadosContrato, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -891,7 +946,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
                 .addGap(13, 13, 13)
                 .addComponent(painelDadosContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
