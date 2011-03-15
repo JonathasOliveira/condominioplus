@@ -386,7 +386,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     public void carregarTabelaPagamentos() {
 
-        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data, Histórico, Valor, Conta, Tipo".split(",")) {
+        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
@@ -397,7 +397,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             public Object getValor(Pagamento pagamento, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(pagamento.getDataPagamento());
+                        return DataUtil.getDateTime(pagamento.getDataVencimento());
                     case 1:
                         return pagamento.getHistorico();
                     case 2:
@@ -406,6 +406,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         return pagamento.getConta().getCodigo();
                     case 4:
                         return pagamento.getConta().isCredito() ? "C" : "D";
+                    case 5:
+                        return DataUtil.getDateTime(pagamento.getDataPagamento());
                     default:
                         return null;
                 }
