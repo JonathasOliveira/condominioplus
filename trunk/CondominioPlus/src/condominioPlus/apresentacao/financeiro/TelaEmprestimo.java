@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -514,9 +515,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     private class ControladorEventos extends ControladorEventosGenerico {
 
+        Object origem;
+
         @Override
         public void actionPerformed(ActionEvent e) {
-            Object origem = e.getSource();
+            origem = e.getSource();
             if (origem == btnIncluir) {
                 salvar();
                 carregarTabela();
@@ -556,6 +559,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             radioParcelado.addActionListener(this);
             btnSalvar.addActionListener(this);
             tabelaPagamentos.addMouseListener(this);
+            txtData.addChangeListener(this);
         }
 
         @Override
@@ -604,13 +608,22 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            Object origem = e.getSource();
+            origem = e.getSource();
             if (origem == tabela && painelDadosContrato.isVisible()) {
                 exibirPainelPagamentos(modelo.getObjetoSelecionado());
             } else if (origem == tabelaPagamentos && e.getClickCount() == 2) {
                 editarPagamentoContrato();
             }
         }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            origem = e.getSource();
+            if (origem == txtData){
+                txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
+            }
+        }
+
     }
 
     /** This method is called from within the constructor to
