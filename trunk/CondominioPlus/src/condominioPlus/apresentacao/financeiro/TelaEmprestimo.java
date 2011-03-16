@@ -79,7 +79,13 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         new ControladorEventos();
 
+        preencherTela();
+
         carregarTabela();
+    }
+
+    private void preencherTela(){
+        txtDataPrimeiroPagamento.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
     }
 
     private void desabilitarBotoesUmaParcela() {
@@ -458,11 +464,16 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private void exibirPainelPagamentos(ContratoEmprestimo c) {
-        painelDadosContrato.setVisible(true);
-        contrato = c;
-        desabilitarCamposContrato();
-        preencherPainelContrato(c);
-        carregarTabelaPagamentos();
+        if (c != null) {
+            painelDadosContrato.setVisible(true);
+            contrato = c;
+            desabilitarCamposContrato();
+            preencherPainelContrato(c);
+            carregarTabelaPagamentos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione um contrato!", this);
+        }
+
     }
 
     private void cancelar() {
@@ -582,7 +593,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger()) {
+            if (e.isPopupTrigger() && e.getSource() == tabela) {
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }
