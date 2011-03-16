@@ -82,6 +82,10 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         preencherTela();
 
         carregarTabela();
+
+        if (condominio != null) {
+            this.setTitle("Empréstimos - " + condominio.getRazaoSocial());
+        }
     }
 
     private void preencherTela(){
@@ -183,7 +187,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             } else if (radioParcelado.isSelected()) {
                 contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
             }
-
+ 
             contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
 
             if (conta != null) {
