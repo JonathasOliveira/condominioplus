@@ -391,7 +391,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtValorParcelas.setText("");
     }
 
-
     public List<Pagamento> listarPagamentos() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorContratoEmprestimo", contrato);
         List<Pagamento> novaLista = new ArrayList<Pagamento>();
@@ -481,7 +480,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     private void editarPagamentoContrato() {
         if (!modeloTabelaPagamentos.getObjetosSelecionados().isEmpty()) {
-            DialogoEditarPagamentoContrato tela = new DialogoEditarPagamentoContrato((Pagamento) modeloTabelaPagamentos.getObjetoSelecionado());
+            DialogoEditarPagamentoContrato tela = new DialogoEditarPagamentoContrato(modeloTabelaPagamentos.getObjetoSelecionado());
             tela.setLocationRelativeTo(this);
             tela.setVisible(true);
             modeloTabelaPagamentos.carregarObjetos();
@@ -491,7 +490,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private void salvarContrato() {
-        contrato = modelo.getObjetoSelecionado();
         contrato.setDescricao(txtDescricao.getText());
         new DAO().salvar(contrato);
         carregarTabela();
