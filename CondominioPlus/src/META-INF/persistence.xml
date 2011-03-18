@@ -26,9 +26,7 @@
     <class>condominioPlus.negocio.financeiro.ContaPagar</class>
     <class>condominioPlus.negocio.financeiro.DadosCheque</class>
     <class>condominioPlus.negocio.financeiro.DadosDOC</class>
-    <class>condominioPlus.negocio.financeiro.DadosDeposito</class>
     <class>condominioPlus.negocio.financeiro.DadosPagamento</class>
-    <class>condominioPlus.negocio.financeiro.DadosTED</class>
     <class>condominioPlus.negocio.DadosTalaoCheque</class>
     <class>condominioPlus.negocio.financeiro.TransacaoBancaria</class>
     <class>condominioPlus.negocio.financeiro.AplicacaoFinanceira</class>

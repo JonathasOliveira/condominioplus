@@ -26,6 +26,7 @@ import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -39,6 +40,7 @@ import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Util;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -48,6 +50,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     private Pagamento pagamento;
     private ComboModelo<Fornecedor> modelo;
+    private ComboModelo<Fornecedor> modelo2;
     private TabelaModelo_2 modeloTabela;
     private ControladorEventosGenerico controlador;
     private Conta conta;
@@ -66,32 +69,59 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         bloquearCampos();
         setTotal();
         verificarConformeDisponibilidade();
+        carregarFornecedorNovoPagamento();
         controlador = new ControladorEventos();
     }
 
-    private void verificarConformeDisponibilidade(){
-        if(pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
-            if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)){
+    private void verificarConformeDisponibilidade() {
+        if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
+            if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)) {
                 painelNovoPagamento.setEnabled(false);
 
-            }else{
+            } else {
                 jTabbedPane1.setSelectedIndex(1);
 
             }
         }
     }
 
-    private void novoPagamento(){
+    private void novoPagamento() {
         Pagamento p = new Pagamento();
 
         p.setDataVencimento(pagamento.getDataVencimento());
         p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
         p.setContaCorrente(condominio.getContaCorrente());
         p.setContratoEmprestimo(pagamento.getContratoEmprestimo());
+        p.setPago(true);
+        p.setFornecedor(modelo2.getObjeto());
         p.setConta(pagamento.getConta());
-        p.setHistorico("PAGAMENTO PARCELO " + (pagamento.getContratoEmprestimo().getPagamentos().size()+1) + pagamento.getConta().getNome());
-        
+        System.out.println("p " + p.getConta());
+        if (p.getConta().isCredito()) {
+            p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")));
+        } else {
+            p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
+        }
 
+        selecionaFormaPagamento(p);
+        p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getNome());
+        verificarVinculo(p);
+        new DAO().salvar(pagamento.getContratoEmprestimo());
+
+    }
+
+    private int calcularNumeroParcela() {
+        int resultado = 0;
+        for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
+            if (p.getContaCorrente() == null && p.getContaPagar() == null) {
+                resultado = +1;
+            }
+        }
+        return resultado;
+    }
+
+    private void carregarFornecedorNovoPagamento() {
+        modelo2 = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedoresNovoPagamento);
+        cbFornecedoresNovoPagamento.setModel(modelo2);
     }
 
     private void bloquearCampos() {
@@ -205,13 +235,13 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //
 //    }
     private Pagamento selecionaFormaPagamento(Pagamento p) {
-        if (btnNumeroDocumento.isSelected()) {
+        if (btnNumeroDocumentoNovoPagamento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumentoNovoPagamento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
+            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumentoNovoPagamento.getText())));
             return p;
         }
 
@@ -251,12 +281,12 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private void trocarFormaPagamento() {
-        if (btnNumeroDocumento.isSelected()) {
-            btnNumeroDocumento.setText("Nº Cheque:");
-            txtNumeroDocumento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
+        if (btnNumeroDocumentoNovoPagamento.isSelected()) {
+            btnNumeroDocumentoNovoPagamento.setText("Nº Cheque:");
+            txtNumeroDocumentoNovoPagamento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
         } else {
-            btnNumeroDocumento.setText("Nº Doc:");
-            txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
+            btnNumeroDocumentoNovoPagamento.setText("Nº Doc:");
+            txtNumeroDocumentoNovoPagamento.setText(Pagamento.gerarNumeroDocumento());
         }
 
     }
@@ -292,8 +322,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     private void efetuarPagamento() {
         if (pagamento.getContratoEmprestimo() != null) {
-            if(pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
-                
+            if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
             }
             pagamento.setPago(true);
             pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
@@ -349,13 +378,24 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
 //                new DAO().salvar(transacao);
 
-            pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
-            pagamentoRelacionado.setHistorico(p1.getConta().getContaVinculada().getNome());
-            pagamentoRelacionado.setConta(p1.getConta().getContaVinculada());
-            if (pagamentoRelacionado.getConta().isCredito()) {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+            pagamentoRelacionado.setDataPagamento(p1.getDataPagamento());
+            if (jTabbedPane1.getSelectedIndex() == 1) {
+                pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + p1.getConta().getNome());
+                pagamentoRelacionado.setConta(p1.getConta());
+                if (pagamentoRelacionado.getConta().isCredito()) {
+                    pagamentoRelacionado.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")));
+                } else {
+                    pagamentoRelacionado.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
+                }
             } else {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+
+                pagamentoRelacionado.setHistorico(p1.getConta().getContaVinculada().getNome());
+                pagamentoRelacionado.setConta(p1.getConta().getContaVinculada());
+                if (pagamentoRelacionado.getConta().isCredito()) {
+                    pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+                } else {
+                    pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+                }
             }
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
@@ -369,6 +409,10 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             } else if (nome.equals("CO")) {
                 pagamentoRelacionado.setConsignacao(condominio.getConsignacao());
             } else if (nome.equals("EM")) {
+                System.out.println("here 1");
+                pagamentoRelacionado.setContratoEmprestimo(pagamento.getContratoEmprestimo());
+                p1.getContratoEmprestimo().getPagamentos().get(0).setValor(p1.getContratoEmprestimo().getPagamentos().get(0).getValor().add(pagamentoRelacionado.getValor()));
+                p1.getContratoEmprestimo().getPagamentos().get(0).setDataVencimento(DataUtil.getCalendar(new DateTime(DataUtil.hoje()).plusMonths(1)));
             }
 
             pagamentoRelacionado.setPago(true);
@@ -396,6 +440,8 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamentoRelacionado.getValor()));
 
             } else if (nome.equals("EM")) {
+                System.out.println("here2");
+                pagamento.getContratoEmprestimo().getPagamentos().add(pagamentoRelacionado);
             }
 
             System.out.println("Transacao Bancária: " + transacao);
@@ -444,6 +490,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 pegarConta();
             } else if (e.getSource() == btnNumeroDocumento) {
                 trocarFormaPagamento();
+            } else if (e.getSource() == btnNumeroDocumentoNovoPagamento) {
+                trocarFormaPagamento();
+            } else if (e.getSource() == btnAdicionarNovoPagamento) {
+                novoPagamento();
+
             }
         }
 
@@ -484,6 +535,10 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             btnConta.addActionListener(this);
             txtConta.addFocusListener(this);
             btnNumeroDocumento.addActionListener(this);
+            btnAdicionarNovoPagamento.addActionListener(this);
+            btnCancelarNovoPagamento.addActionListener(this);
+            btnImprimirNovoPagamento.addActionListener(this);
+            btnNumeroDocumentoNovoPagamento.addActionListener(this);
         }
     }
 
@@ -505,10 +560,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         txtNumeroDocumento = new javax.swing.JTextField();
         btnNumeroDocumento = new javax.swing.JToggleButton();
         jLabel4 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        btnPagar = new javax.swing.JButton();
-        btnCancelar = new javax.swing.JButton();
-        btnImprimir = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -518,20 +569,19 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         lblTotal = new javax.swing.JLabel();
         painelNovoPagamento = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        txtHistoricoNovoPagamento = new javax.swing.JTextField();
-        btnConta1 = new javax.swing.JButton();
-        txtContaNovoPagamento = new javax.swing.JTextField();
         txtValorNovoPagamento = new javax.swing.JTextField();
-        txtDataNovoPagamento = new net.sf.nachocalendar.components.DateField();
-        jLabel7 = new javax.swing.JLabel();
         txtNumeroDocumentoNovoPagamento = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        btnNumeroDocumentoNovoPagamento = new javax.swing.JToggleButton();
-        jLabel9 = new javax.swing.JLabel();
         cbFornecedoresNovoPagamento = new javax.swing.JComboBox();
         jLabel10 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnAdicionarNovoPagamento = new javax.swing.JButton();
         btnCancelarNovoPagamento = new javax.swing.JButton();
+        btnImprimirNovoPagamento = new javax.swing.JButton();
+        btnNumeroDocumentoNovoPagamento = new javax.swing.JToggleButton();
+        jPanel1 = new javax.swing.JPanel();
+        btnPagar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        btnImprimir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Editar Conta a Pagar");
@@ -580,6 +630,175 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
         jLabel4.setText("Histórico:");
 
+        tabela.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tabela.setName("tabela"); // NOI18N
+        jScrollPane1.setViewportView(tabela);
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
+        jLabel6.setText("Total: R$");
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
+        jLabel5.setText("Atenção: Todos os pagamentos com mesmo número serão pagos automaticamente!");
+
+        lblTotal.setFont(new java.awt.Font("Tahoma", 1, 14));
+        lblTotal.setForeground(new java.awt.Color(255, 0, 0));
+        lblTotal.setText("10.000,00");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 394, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTotal)
+                    .addComponent(jLabel6))
+                .addGap(11, 11, 11)
+                .addComponent(jLabel5)
+                .addGap(27, 27, 27))
+        );
+
+        jTabbedPane1.addTab("Pagamentos Relacionados", jPanel3);
+
+        txtValorNovoPagamento.setName("Valor"); // NOI18N
+
+        txtNumeroDocumentoNovoPagamento.setName("documento"); // NOI18N
+
+        jLabel8.setText("Valor:");
+
+        cbFornecedoresNovoPagamento.setName("fornecedor"); // NOI18N
+
+        jLabel10.setText("Fornecedor:");
+
+        btnAdicionarNovoPagamento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarNovoPagamento.setToolTipText("Adicionar");
+
+        btnCancelarNovoPagamento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnCancelarNovoPagamento.setToolTipText("Cancelar");
+
+        btnImprimirNovoPagamento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
+        btnImprimirNovoPagamento.setToolTipText("Imprimir");
+
+        btnNumeroDocumentoNovoPagamento.setText("Nº Doc");
+        btnNumeroDocumentoNovoPagamento.setToolTipText("Clique para alternar o tipo de Registro!");
+        btnNumeroDocumentoNovoPagamento.setBorderPainted(false);
+        btnNumeroDocumentoNovoPagamento.setContentAreaFilled(false);
+        btnNumeroDocumentoNovoPagamento.setFocusPainted(false);
+        btnNumeroDocumentoNovoPagamento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNumeroDocumentoNovoPagamentoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addGap(130, 130, 130)
+                            .addComponent(btnAdicionarNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnCancelarNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(10, 10, 10)
+                            .addComponent(btnImprimirNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(btnNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(76, 76, 76)
+                                    .addComponent(jLabel8))
+                                .addGroup(jPanel5Layout.createSequentialGroup()
+                                    .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(32, 32, 32)
+                                    .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel10))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(cbFornecedoresNovoPagamento, 0, 364, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnAdicionarNovoPagamento, btnCancelarNovoPagamento, btnImprimirNovoPagamento});
+
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(btnNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbFornecedoresNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAdicionarNovoPagamento, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+                    .addComponent(btnImprimirNovoPagamento, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCancelarNovoPagamento, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE))
+                .addGap(19, 19, 19))
+        );
+
+        jPanel5Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnAdicionarNovoPagamento, btnCancelarNovoPagamento, btnImprimirNovoPagamento});
+
+        javax.swing.GroupLayout painelNovoPagamentoLayout = new javax.swing.GroupLayout(painelNovoPagamento);
+        painelNovoPagamento.setLayout(painelNovoPagamentoLayout);
+        painelNovoPagamentoLayout.setHorizontalGroup(
+            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelNovoPagamentoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        painelNovoPagamentoLayout.setVerticalGroup(
+            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelNovoPagamentoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(2, 2, 2))
+        );
+
+        jTabbedPane1.addTab("Novo Pagamento Conforme Disponibilidade", painelNovoPagamento);
+
         javax.swing.GroupLayout painelContaPagarLayout = new javax.swing.GroupLayout(painelContaPagar);
         painelContaPagar.setLayout(painelContaPagarLayout);
         painelContaPagarLayout.setHorizontalGroup(
@@ -618,11 +837,14 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                         .addContainerGap()
                         .addComponent(cbFornecedores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(11, Short.MAX_VALUE))
+            .addGroup(painelContaPagarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1, 0, 0, Short.MAX_VALUE))
         );
         painelContaPagarLayout.setVerticalGroup(
             painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelContaPagarLayout.createSequentialGroup()
-                .addGap(5, 5, 5)
+                .addGap(21, 21, 21)
                 .addGroup(painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addGroup(painelContaPagarLayout.createSequentialGroup()
@@ -652,7 +874,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -687,241 +911,25 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(11, 45, 11, 54);
         jPanel1.add(btnImprimir, gridBagConstraints);
 
-        tabela.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tabela.setName("tabela"); // NOI18N
-        jScrollPane1.setViewportView(tabela);
-
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
-        jLabel6.setText("Total: R$");
-
-        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 9));
-        jLabel5.setText("Atenção: Todos os pagamentos com mesmo número serão pagos automaticamente!");
-
-        lblTotal.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        lblTotal.setForeground(new java.awt.Color(255, 0, 0));
-        lblTotal.setText("10.000,00");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 394, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(16, 16, 16)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 115, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTotal)
-                    .addComponent(jLabel6))
-                .addGap(11, 11, 11)
-                .addComponent(jLabel5)
-                .addGap(22, 22, 22))
-        );
-
-        jTabbedPane1.addTab("Pagamentos Relacionados", jPanel3);
-
-        txtHistoricoNovoPagamento.setName("Histórico"); // NOI18N
-
-        btnConta1.setText("Conta:");
-        btnConta1.setBorder(null);
-        btnConta1.setBorderPainted(false);
-        btnConta1.setContentAreaFilled(false);
-        btnConta1.setFocusable(false);
-        btnConta1.setRequestFocusEnabled(false);
-        btnConta1.setVerifyInputWhenFocusTarget(false);
-
-        txtContaNovoPagamento.setName("Conta"); // NOI18N
-
-        txtValorNovoPagamento.setName("Valor"); // NOI18N
-
-        txtDataNovoPagamento.setFocusable(false);
-        txtDataNovoPagamento.setName("data"); // NOI18N
-        txtDataNovoPagamento.setRequestFocusEnabled(false);
-
-        jLabel7.setText("Histórico:");
-
-        txtNumeroDocumentoNovoPagamento.setName("documento"); // NOI18N
-
-        jLabel8.setText("Valor:");
-
-        btnNumeroDocumentoNovoPagamento.setText("Nº Doc");
-        btnNumeroDocumentoNovoPagamento.setToolTipText("Clique para alternar o tipo de Registro!");
-        btnNumeroDocumentoNovoPagamento.setBorderPainted(false);
-        btnNumeroDocumentoNovoPagamento.setContentAreaFilled(false);
-        btnNumeroDocumentoNovoPagamento.setFocusPainted(false);
-        btnNumeroDocumentoNovoPagamento.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNumeroDocumentoNovoPagamentoActionPerformed(evt);
-            }
-        });
-
-        jLabel9.setText("Data Pagamento:");
-
-        cbFornecedoresNovoPagamento.setName("fornecedor"); // NOI18N
-
-        jLabel10.setText("Fornecedor:");
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        jButton1.setToolTipText("Adicionar");
-
-        btnCancelarNovoPagamento.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnCancelarNovoPagamento.setToolTipText("Cancelar");
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(130, 130, 130)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(67, 67, 67)
-                .addComponent(btnCancelarNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(132, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(cbFornecedoresNovoPagamento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(txtHistoricoNovoPagamento, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10)
-                            .addComponent(jLabel7)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel9)
-                                    .addComponent(txtDataNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(btnNumeroDocumentoNovoPagamento)
-                                        .addGap(33, 33, 33)
-                                        .addComponent(btnConta1)
-                                        .addGap(33, 33, 33)
-                                        .addComponent(jLabel8))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(6, 6, 6)
-                                        .addComponent(txtContaNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addContainerGap())))
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addGap(9, 9, 9)
-                        .addComponent(txtDataNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(1, 1, 1)
-                                .addComponent(btnNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnConta1)
-                            .addComponent(jLabel8))
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addGap(1, 1, 1)
-                                        .addComponent(txtNumeroDocumentoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addGap(1, 1, 1)
-                                        .addComponent(txtContaNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGap(7, 7, 7)
-                                .addComponent(txtValorNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtHistoricoNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbFornecedoresNovoPagamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnCancelarNovoPagamento)
-                    .addComponent(jButton1))
-                .addContainerGap())
-        );
-
-        jPanel5Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCancelarNovoPagamento, jButton1});
-
-        javax.swing.GroupLayout painelNovoPagamentoLayout = new javax.swing.GroupLayout(painelNovoPagamento);
-        painelNovoPagamento.setLayout(painelNovoPagamentoLayout);
-        painelNovoPagamentoLayout.setHorizontalGroup(
-            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelNovoPagamentoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        painelNovoPagamentoLayout.setVerticalGroup(
-            painelNovoPagamentoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelNovoPagamentoLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("Novo Pagamento Conforme Disponibilidade", painelNovoPagamento);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-                    .addComponent(painelContaPagar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, 0, 0, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelContaPagar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -938,17 +946,17 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdicionarNovoPagamento;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnCancelarNovoPagamento;
     private javax.swing.JButton btnConta;
-    private javax.swing.JButton btnConta1;
     private javax.swing.JButton btnImprimir;
+    private javax.swing.JButton btnImprimirNovoPagamento;
     private javax.swing.JToggleButton btnNumeroDocumento;
     private javax.swing.JToggleButton btnNumeroDocumentoNovoPagamento;
     private javax.swing.JButton btnPagar;
     private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JComboBox cbFornecedoresNovoPagamento;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
@@ -956,9 +964,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
@@ -969,11 +975,8 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private javax.swing.JPanel painelNovoPagamento;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtConta;
-    private javax.swing.JTextField txtContaNovoPagamento;
     private net.sf.nachocalendar.components.DateField txtData;
-    private net.sf.nachocalendar.components.DateField txtDataNovoPagamento;
     private javax.swing.JTextField txtHistorico;
-    private javax.swing.JTextField txtHistoricoNovoPagamento;
     private javax.swing.JTextField txtNumeroDocumento;
     private javax.swing.JTextField txtNumeroDocumentoNovoPagamento;
     private javax.swing.JTextField txtValor;
