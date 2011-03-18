@@ -427,6 +427,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 pagamentoAuxiliar.setDataVencimento(DataUtil.getCalendar(new DateTime(DataUtil.hoje().plusMonths(1))));
 //                System.out.println("Valor alterado pagamento auxiliar: " + pagamentoAuxiliar.getValor());
 //                System.out.println("Data vencimento alterada pagamento auxiliar: " + pagamentoAuxiliar.getDataVencimento());
+                pagamento.setValor(pagamento.getValor().subtract(pagamentoRelacionado.getValor()));
                 new DAO().salvar(pagamentoAuxiliar);
             }
 
