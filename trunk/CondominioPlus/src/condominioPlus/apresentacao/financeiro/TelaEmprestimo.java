@@ -436,7 +436,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     case 4:
                         return pagamento.getConta().isCredito() ? "C" : "D";
                     case 5:
-                        return pagamento.isPago() ? DataUtil.getDateTime(pagamento.getDataPagamento()) : "Não pago";
+                        return pagamento.isPago() ? DataUtil.toString(DataUtil.getDateTime(pagamento.getDataPagamento())) : "Não pago";
                     default:
                         return null;
                 }

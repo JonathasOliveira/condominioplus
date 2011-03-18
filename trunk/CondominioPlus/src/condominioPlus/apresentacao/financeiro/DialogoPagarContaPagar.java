@@ -15,6 +15,7 @@ import com.sun.jna.Native;
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
@@ -103,7 +104,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         }
 
         selecionaFormaPagamento(p);
-        p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getNome());
+        p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
         verificarVinculo(p);
         new DAO().salvar(pagamento.getContratoEmprestimo());
 
@@ -380,8 +381,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
             pagamentoRelacionado.setDataPagamento(p1.getDataPagamento());
             if (jTabbedPane1.getSelectedIndex() == 1) {
-                pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + p1.getConta().getNome());
-                pagamentoRelacionado.setConta(p1.getConta());
+                pagamentoRelacionado.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + p1.getConta().getContaVinculada().getNome());
+                pagamentoRelacionado.setDataVencimento(pagamentoRelacionado.getDataPagamento());
+                pagamentoRelacionado.setConta(p1.getConta().getContaVinculada());
                 if (pagamentoRelacionado.getConta().isCredito()) {
                     pagamentoRelacionado.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")));
                 } else {
@@ -408,11 +410,24 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 pagamentoRelacionado.setPoupanca(condominio.getPoupanca());
             } else if (nome.equals("CO")) {
                 pagamentoRelacionado.setConsignacao(condominio.getConsignacao());
-            } else if (nome.equals("EM")) {
-                System.out.println("here 1");
+            } else if (p1.getContratoEmprestimo() != null) {
+
+                TransacaoBancaria transacaoAuxiliar = pagamento.getTransacaoBancaria();
+                Pagamento pagamentoAuxiliar = new Pagamento();
+                for (Pagamento p2: transacaoAuxiliar.getPagamentos()){
+                    if(!pagamento.equals(p2)){
+                        pagamentoAuxiliar = p2;
+                    }
+                }
+
+//                System.out.println("here 1");
                 pagamentoRelacionado.setContratoEmprestimo(pagamento.getContratoEmprestimo());
-                p1.getContratoEmprestimo().getPagamentos().get(0).setValor(p1.getContratoEmprestimo().getPagamentos().get(0).getValor().add(pagamentoRelacionado.getValor()));
-                p1.getContratoEmprestimo().getPagamentos().get(0).setDataVencimento(DataUtil.getCalendar(new DateTime(DataUtil.hoje()).plusMonths(1)));
+//                System.out.println("Pagamento Auxiliar: " + pagamentoAuxiliar.getValor());
+                pagamentoAuxiliar.setValor(pagamentoAuxiliar.getValor().subtract(pagamentoRelacionado.getValor()));
+                pagamentoAuxiliar.setDataVencimento(DataUtil.getCalendar(new DateTime(DataUtil.hoje().plusMonths(1))));
+//                System.out.println("Valor alterado pagamento auxiliar: " + pagamentoAuxiliar.getValor());
+//                System.out.println("Data vencimento alterada pagamento auxiliar: " + pagamentoAuxiliar.getDataVencimento());
+                new DAO().salvar(pagamentoAuxiliar);
             }
 
             pagamentoRelacionado.setPago(true);
@@ -439,14 +454,14 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 condominio.getConsignacao().adicionarPagamento(pagamentoRelacionado);
                 condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamentoRelacionado.getValor()));
 
-            } else if (nome.equals("EM")) {
+            } else if (p1.getContratoEmprestimo() != null) {
                 System.out.println("here2");
                 pagamento.getContratoEmprestimo().getPagamentos().add(pagamentoRelacionado);
             }
 
             System.out.println("Transacao Bancária: " + transacao);
 
-            pagamento.setTransacaoBancaria(transacao);
+            p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
         }
     }
