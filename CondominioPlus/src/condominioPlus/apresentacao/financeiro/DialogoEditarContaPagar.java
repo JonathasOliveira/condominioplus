@@ -172,7 +172,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
         }
         txtHistorico.setText(pagamento.getHistorico());
         txtNumeroDocumento.setText(compararForma());
-        txtValor.setText(String.valueOf(pagamento.getValor().negate()));
+        txtValor.setText(String.valueOf(pagamento.getValor()));
         modelo.setSelectedItem(pagamento.getFornecedor());
 
     }

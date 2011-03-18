@@ -15,7 +15,6 @@ import com.sun.jna.Native;
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
-import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
@@ -27,7 +26,6 @@ import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -114,9 +112,12 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         int resultado = 0;
         for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
             if (p.getContaCorrente() == null && p.getContaPagar() == null) {
-                resultado = +1;
+                resultado = resultado +  1;
+                System.out.println("here");
+                System.out.println("resultadooo " + resultado);
             }
         }
+        System.out.println("resultado fora do for " + resultado);
         return resultado;
     }
 
@@ -221,7 +222,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         txtConta.setText(Util.IntegerToString(pagamento.getConta().getCodigo()));
         txtHistorico.setText(pagamento.getHistorico());
         txtNumeroDocumento.setText(compararForma());
-        txtValor.setText(String.valueOf(pagamento.getValor().negate()));
+        txtValor.setText(String.valueOf(pagamento.getValor()));
         modelo.setSelectedItem(pagamento.getFornecedor());
 
     }
@@ -427,7 +428,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 pagamentoAuxiliar.setDataVencimento(DataUtil.getCalendar(new DateTime(DataUtil.hoje().plusMonths(1))));
 //                System.out.println("Valor alterado pagamento auxiliar: " + pagamentoAuxiliar.getValor());
 //                System.out.println("Data vencimento alterada pagamento auxiliar: " + pagamentoAuxiliar.getDataVencimento());
-                pagamento.setValor(pagamento.getValor().subtract(pagamentoRelacionado.getValor()));
+                pagamento.setValor(pagamento.getValor().add(pagamentoRelacionado.getValor()));
                 new DAO().salvar(pagamentoAuxiliar);
             }
 
