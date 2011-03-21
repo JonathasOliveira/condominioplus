@@ -85,26 +85,31 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private void novoPagamento() {
-        Pagamento p = new Pagamento();
+        if (pagamento.getValor().negate().compareTo(new BigDecimal(txtValorNovoPagamento.getText().replace(",", "."))) == 1 && new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).doubleValue() > 0) {
+            Pagamento p = new Pagamento();
 
-        p.setDataVencimento(pagamento.getDataVencimento());
-        p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
-        p.setContaCorrente(condominio.getContaCorrente());
-        p.setContratoEmprestimo(pagamento.getContratoEmprestimo());
-        p.setPago(true);
-        p.setFornecedor(modelo2.getObjeto());
-        p.setConta(pagamento.getConta());
-        System.out.println("p " + p.getConta());
-        if (p.getConta().isCredito()) {
-            p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")));
+            p.setDataVencimento(pagamento.getDataVencimento());
+            p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+            p.setContaCorrente(condominio.getContaCorrente());
+            p.setContratoEmprestimo(pagamento.getContratoEmprestimo());
+            p.setPago(true);
+            p.setFornecedor(modelo2.getObjeto());
+            p.setConta(pagamento.getConta());
+            System.out.println("p " + p.getConta());
+            if (p.getConta().isCredito()) {
+                p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")));
+            } else {
+                p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
+            }
+
+            selecionaFormaPagamento(p);
+            p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
+            verificarVinculo(p);
+            new DAO().salvar(pagamento.getContratoEmprestimo());
         } else {
-            p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
+            ApresentacaoUtil.exibirAdvertencia("Informe um valor menor do que R$ " + pagamento.getValor().negate().toString().replace(".", ",") + " e maior que 0.", this);
+            return;
         }
-
-        selecionaFormaPagamento(p);
-        p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
-        verificarVinculo(p);
-        new DAO().salvar(pagamento.getContratoEmprestimo());
 
     }
 
@@ -112,7 +117,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         int resultado = 0;
         for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
             if (p.getContaCorrente() == null && p.getContaPagar() == null) {
-                resultado = resultado +  1;
+                resultado = resultado + 1;
                 System.out.println("here");
                 System.out.println("resultadooo " + resultado);
             }
@@ -415,8 +420,8 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
                 TransacaoBancaria transacaoAuxiliar = pagamento.getTransacaoBancaria();
                 Pagamento pagamentoAuxiliar = new Pagamento();
-                for (Pagamento p2: transacaoAuxiliar.getPagamentos()){
-                    if(!pagamento.equals(p2)){
+                for (Pagamento p2 : transacaoAuxiliar.getPagamentos()) {
+                    if (!pagamento.equals(p2)) {
                         pagamentoAuxiliar = p2;
                     }
                 }
