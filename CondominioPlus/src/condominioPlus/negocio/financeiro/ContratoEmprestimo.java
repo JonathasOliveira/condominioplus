@@ -28,7 +28,7 @@ import javax.persistence.Temporal;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "ContratosPorData", query = "SELECT c FROM ContratoEmprestimo c ORDER BY c.dataContrato")})
+    @NamedQuery(name = "ContratosPorData", query = "SELECT c FROM ContratoEmprestimo c WHERE c.emprestimo = ?1 ORDER BY c.dataContrato")})
 @Table(name = "contrato_emprestimo")
 public class ContratoEmprestimo implements Serializable {
 

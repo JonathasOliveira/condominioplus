@@ -89,12 +89,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         }
     }
 
-    private void preencherTela(){
+    private void preencherTela() {
         txtDataPrimeiroPagamento.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
     }
 
     private void desabilitarBotoesUmaParcela() {
-        if (radioAVista.isSelected() || radioConformeDisponibilidade.isSelected()) {
+        if (radioAVista.isSelected()) {
             txtNumeroParcelas.setText("1");
             txtValorParcelas.setText(txtValor.getText());
             txtNumeroParcelas.setEnabled(false);
@@ -104,6 +104,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             txtNumeroParcelas.setText("");
             txtNumeroParcelas.setEnabled(true);
             txtValorParcelas.setEnabled(true);
+        } else if (radioConformeDisponibilidade.isSelected()) {
+            txtNumeroParcelas.setText("0");
+            txtValorParcelas.setText(txtValor.getText());
+            txtNumeroParcelas.setEnabled(false);
+            txtValorParcelas.setEnabled(false);
         }
     }
 
@@ -136,7 +141,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private List<ContratoEmprestimo> getContratos() {
-        contratos = new DAO().listar("ContratosPorData");
+        contratos = new DAO().listar("ContratosPorData", emprestimo);
         return contratos;
 
     }
@@ -188,7 +193,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             } else if (radioParcelado.isSelected()) {
                 contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
             }
- 
+
             contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
 
             if (conta != null) {
@@ -619,11 +624,10 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         @Override
         public void stateChanged(ChangeEvent e) {
             origem = e.getSource();
-            if (origem == txtData){
+            if (origem == txtData) {
                 txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
             }
         }
-
     }
 
     /** This method is called from within the constructor to
