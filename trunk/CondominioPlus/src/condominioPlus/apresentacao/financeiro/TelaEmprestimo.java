@@ -306,8 +306,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
-            pagamentoRelacionado.setHistorico(texto + " " + txtHistorico.getText());
             pagamentoRelacionado.setConta(conta);
+            pagamentoRelacionado.setHistorico(texto + " " + conta.getContaVinculada().getNome());
             pagamentoRelacionado.setContratoEmprestimo(contrato);
 
             pagamentoRelacionado.setValor(p1.getValor().negate());
@@ -387,10 +387,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             new DAO().remover(transacao);
                         }
                     }
+                    new DAO().remover(c);
                 }
             }
-            new DAO().remover(itensRemover);
             condominio.getEmprestimo().getContratos().removeAll(itensRemover);
+//            new DAO().remover(itensRemover);
             new DAO().salvar(condominio);
             ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
         } else {
