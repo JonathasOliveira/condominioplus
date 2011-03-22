@@ -60,6 +60,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     /** Creates new form TelaBanco */
     public DialogoPagarContaPagar(Pagamento pagamento) {
         initComponents();
+        desabilitarPainelNovoPagamento();
         this.pagamento = pagamento;
         listaPagamentos = getPagamentosSemOriginal();
         carregarFornecedor();
@@ -75,13 +76,32 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void verificarConformeDisponibilidade() {
         if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
             if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)) {
-                painelNovoPagamento.setEnabled(false);
+                desabilitarPainelNovoPagamento();
 
             } else {
                 jTabbedPane1.setSelectedIndex(1);
-
+                habilitarPainelNovoPagamento();
+                txtNumeroDocumentoNovoPagamento.grabFocus();
             }
         }
+    }
+
+    private void desabilitarPainelNovoPagamento() {
+        txtNumeroDocumentoNovoPagamento.setEnabled(false);
+        txtValorNovoPagamento.setEnabled(false);
+        cbFornecedoresNovoPagamento.setEnabled(false);
+        btnAdicionarNovoPagamento.setEnabled(false);
+        btnCancelarNovoPagamento.setEnabled(false);
+        btnImprimirNovoPagamento.setEnabled(false);
+    }
+
+    private void habilitarPainelNovoPagamento() {
+        txtNumeroDocumentoNovoPagamento.setEnabled(true);
+        txtValorNovoPagamento.setEnabled(true);
+        cbFornecedoresNovoPagamento.setEnabled(true);
+        btnAdicionarNovoPagamento.setEnabled(true);
+        btnCancelarNovoPagamento.setEnabled(true);
+        btnImprimirNovoPagamento.setEnabled(true);
     }
 
     private void novoPagamento() {
@@ -104,8 +124,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
             selecionaFormaPagamento(p);
             p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
+            p.getContratoEmprestimo().setNumeroParcelas(calcularNumeroParcela() + 1);
             verificarVinculo(p);
             new DAO().salvar(pagamento.getContratoEmprestimo());
+            ApresentacaoUtil.exibirInformacao("Pagamento efetuado com sucesso!", this);
+            dispose();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Informe um valor menor do que R$ " + pagamento.getValor().negate().toString().replace(".", ",") + " e maior que 0.", this);
             return;
@@ -330,6 +353,8 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void efetuarPagamento() {
         if (pagamento.getContratoEmprestimo() != null) {
             if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
+                pagamento.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
+                pagamento.getContratoEmprestimo().setNumeroParcelas(calcularNumeroParcela());
             }
             pagamento.setPago(true);
             pagamento.setContaCorrente(Main.getCondominio().getContaCorrente());
@@ -359,6 +384,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             if (!p2.equals(p)) {
                 p2.setPago(true);
                 p2.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+                if (p.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
+                    p2.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + p2.getConta().getNome());
+                }
             }
             new DAO().salvar(p2);
 
