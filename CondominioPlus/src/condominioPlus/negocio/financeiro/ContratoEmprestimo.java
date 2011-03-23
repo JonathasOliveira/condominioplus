@@ -40,13 +40,16 @@ public class ContratoEmprestimo implements Serializable {
     private Calendar dataContrato;
     @Column(name = "numero_parcela")
     private int numeroParcelas;
-    @OneToMany(mappedBy = "contratoEmprestimo", cascade=CascadeType.ALL)
+    @OneToMany(mappedBy = "contratoEmprestimo", cascade = CascadeType.ALL)
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
     @ManyToOne(cascade = CascadeType.ALL)
     private Emprestimo emprestimo;
     private BigDecimal valor;
     private String descricao;
     private FormaPagamentoEmprestimo forma;
+    @Column(precision = 20, scale = 2)
+    private BigDecimal saldo = new BigDecimal(0);
+
     public int getCodigo() {
         return codigo;
     }
@@ -118,6 +121,21 @@ public class ContratoEmprestimo implements Serializable {
         this.forma = forma;
     }
 
-    
+    public BigDecimal getSaldo() {
+        saldo = getValor();
+        if (!getPagamentos().isEmpty()) {
+            for (Pagamento p : getPagamentos()) {
+                if (p.getContaCorrente() == null && p.getContaPagar() == null) {
+                    if (p.isPago() && p.getDataPagamento() != null) {
+                        saldo = saldo.add(p.getValor());
+                    }
+                }
+            }
+        }
+        return saldo;
+    }
 
+    public void setSaldo(BigDecimal saldo) {
+        this.saldo = saldo;
+    }
 }

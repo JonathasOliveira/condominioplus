@@ -2,19 +2,15 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro;
 
 import condominioPlus.negocio.Condominio;
-import condominioPlus.util.ComparadorPagamentoCodigo;
-import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
+import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,18 +22,18 @@ import javax.persistence.OneToOne;
  *
  * @author Administrador
  */
-
 @Entity
 public class Emprestimo implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     @OneToOne
     private Condominio condominio;
     @OneToMany(mappedBy = "emprestimo", cascade = CascadeType.ALL)
     private List<ContratoEmprestimo> contratos;
-    private BigDecimal saldo;
+    @Column(precision = 20, scale = 2)
+    private BigDecimal saldo = new BigDecimal(0);
 
     public int getCodigo() {
         return codigo;
@@ -72,44 +68,10 @@ public class Emprestimo implements Serializable {
     }
 
     public void calculaSaldo(Emprestimo emprestimo) {
-
-        Calendar novaData = Calendar.getInstance();
-
-
-        novaData.add(Calendar.DAY_OF_MONTH, -1);
-
-        List<Pagamento> pagamentos = new ArrayList<Pagamento>();
-
-        for (ContratoEmprestimo contrato : emprestimo.getContratos()){
-            for (Pagamento p: contrato.getPagamentos()){
-                if(!p.isPago())
-                pagamentos.add(p);
-            }
+        saldo = new BigDecimal(0);
+        for (ContratoEmprestimo contrato : emprestimo.getContratos()) {
+            saldo = saldo.add(contrato.getSaldo());
         }
-
-        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
-
-        Collections.sort(pagamentos, comCod);
-
-        ComparatorPagamento comparator = new ComparatorPagamento();
-
-        Collections.sort(pagamentos, comparator);
-
-        for (int i = 0; i < pagamentos.size(); i++) {
-            Pagamento p1 = pagamentos.get(i);
-            if (i == 0) {
-                p1.setSaldo(p1.getValor());
-            } else if (i != 0) {
-                Pagamento pagamentoAnterior = pagamentos.get(i - 1);
-                p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
-
-                condominio.getEmprestimo().setSaldo(p1.getSaldo());
-            }
-
-        }
-
-        // falta implementar código para salvar os pagamentos
-
+        condominio.getEmprestimo().setSaldo(saldo);
     }
-
 }
