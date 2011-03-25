@@ -236,11 +236,16 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         pagamento.setForma(FormaPagamento.DINHEIRO);
                         pagamento.setDadosPagamento(dados.clone());
 
+                    if (conta.isCredito()) {
+                        new DAO().salvar(pagamento);
+                    } else {
                         verificarVinculo(pagamento, texto);
+                    }
 
                     }
 
                 } else {
+                    System.out.println("teste");
                     texto = "PAGAMENTO ";
                     pagamento = new Pagamento();
                     pagamento.setDataVencimento(DataUtil.getCalendar(txtDataPrimeiroPagamento.getValue()));
@@ -256,7 +261,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     pagamento.setDadosPagamento(dados);
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
-                    verificarVinculo(pagamento, texto);
+                    if (conta.isCredito()) {
+                        new DAO().salvar(pagamento);
+                    } else {
+                        verificarVinculo(pagamento, texto);
+                    }
+
 
                 }
 
@@ -279,7 +289,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 condominio.getContaCorrente().adicionarPagamento(p);
                 condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(p.getValor()));
 
-
                 new DAO().salvar(condominio);
                 limparCampos();
                 return true;
@@ -294,6 +303,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private void verificarVinculo(Pagamento p1, String texto) {
+        System.out.println("Eestou aqui!");
         if (conta.getContaVinculada() != null) {
 
             TransacaoBancaria transacao = new TransacaoBancaria();
