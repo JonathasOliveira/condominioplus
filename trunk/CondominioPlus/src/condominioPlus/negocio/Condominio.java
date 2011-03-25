@@ -7,6 +7,7 @@ package condominioPlus.negocio;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
+import condominioPlus.negocio.financeiro.ContaIndispensavel;
 import condominioPlus.negocio.financeiro.ContaPagar;
 import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.Poupanca;
@@ -87,6 +88,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<DadosTalaoCheque> dadosTalaoCheques = new LinkedList<DadosTalaoCheque>();
     @Column(name = "numero_minimo_taloes")
     private int numeroMinimoTaloes = 0;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<ContaIndispensavel> contasIndispensaveis;
 
     public Condominio() {
     }
@@ -338,5 +341,13 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setEmprestimo(Emprestimo emprestimo) {
         this.emprestimo = emprestimo;
+    }
+
+    public List<ContaIndispensavel> getContasIndispensaveis() {
+        return contasIndispensaveis;
+    }
+
+    public void setContasIndispensaveis(List<ContaIndispensavel> contasIndispensaveis) {
+        this.contasIndispensaveis = contasIndispensaveis;
     }
 }
