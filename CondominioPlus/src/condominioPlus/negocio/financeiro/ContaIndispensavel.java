@@ -13,6 +13,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 
 /**
@@ -20,6 +23,10 @@ import javax.persistence.Temporal;
  * @author eugenia
  */
 @Entity
+@NamedQueries(value={
+    @NamedQuery(name="ContasDispensaveisPorCondominio", query="SELECT c FROM ContaIndispensavel c WHERE c.condominio = ?1 ORDER BY c.dataVencimento")
+})
+@Table(name="conta_indispensavel")
 public class ContaIndispensavel implements Serializable {
 
     @Id
