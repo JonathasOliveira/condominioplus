@@ -149,7 +149,7 @@
                 <Property name="text" type="java.lang.String" value="Contas Dispens&#xe1;veis"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menItemContasIndispensaveis">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemContasIndispensaveis">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Contas Indispens&#xe1;veis"/>
               </Properties>

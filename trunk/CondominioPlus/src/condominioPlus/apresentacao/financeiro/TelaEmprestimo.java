@@ -489,7 +489,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtValorContrato.setEnabled(false);
     }
 
-    private void exibirPainelPagamentos(ContratoEmprestimo c) {
+    private void exibirPainelContrato(ContratoEmprestimo c) {
         if (c != null) {
             painelDadosContrato.setVisible(true);
             contrato = c;
@@ -553,7 +553,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             } else if (origem == btnConta) {
                 pegarConta();
             } else if (origem == itemMenuVisualizarContrato) {
-                exibirPainelPagamentos(modelo.getObjetoSelecionado());
+                exibirPainelContrato(modelo.getObjetoSelecionado());
             } else if (origem == btnVoltar) {
                 cancelar();
             } else if (origem == radioAVista) {
@@ -635,7 +635,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         public void mouseClicked(MouseEvent e) {
             origem = e.getSource();
             if (origem == tabela && painelDadosContrato.isVisible()) {
-                exibirPainelPagamentos(modelo.getObjetoSelecionado());
+                exibirPainelContrato(modelo.getObjetoSelecionado());
             } else if (origem == tabelaPagamentos && e.getClickCount() == 2) {
                 editarPagamentoContrato();
             }
