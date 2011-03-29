@@ -407,8 +407,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 }
             }
             condominio.getEmprestimo().getContratos().removeAll(itensRemover);
-//            new DAO().remover(itensRemover);
             new DAO().salvar(condominio);
+            painelDadosContrato.setVisible(false);
             ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
