@@ -11,7 +11,6 @@
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuEditarContaIndispensavel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Editar Conta Indispens&#xe1;vel"/>
-            <Property name="actionCommand" type="java.lang.String" value=""/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuRemoverSelecionados">
@@ -64,7 +63,7 @@
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="135" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="139" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
               <Component id="painelDadosContaIndispensavel" min="-2" pref="117" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>

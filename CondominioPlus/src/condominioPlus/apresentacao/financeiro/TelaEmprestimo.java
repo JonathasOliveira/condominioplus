@@ -344,6 +344,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
             p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
+            
 
         }
 

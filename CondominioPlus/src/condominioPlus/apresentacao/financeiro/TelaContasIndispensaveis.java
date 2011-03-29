@@ -13,7 +13,6 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaIndispensavel;
-import condominioPlus.negocio.financeiro.Poupanca;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.LimitarCaracteres;
@@ -41,10 +40,10 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private Conta conta;
     private ContaIndispensavel contaIndispensavel;
-    private TabelaModelo_2 modeloTabela;
+    private TabelaModelo_2<ContaIndispensavel> modeloTabela;
     private List<ContaIndispensavel> listaContasIndispensaveis;
 
-    /** Creates new form TelaPoupanca */
+    /** Creates new form TelaContasIndispensaveis */
     public TelaContasIndispensaveis(Condominio condominio) {
 
         this.condominio = condominio;
@@ -110,7 +109,7 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
     }
 
     private boolean verificarContasIndispensaveis() {
-        for (ContaIndispensavel c : getContasIndispensaveis()) {
+        for (ContaIndispensavel c : condominio.getContasIndispensaveis()) {
             if (c.getConta().getCodigo() == conta.getCodigo()) {
                 return true;
             }
@@ -179,8 +178,8 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
                 new DAO().remover(c);
             }
 
-            condominio.getContasIndispensaveis().removeAll(itensRemover);
-            new DAO().salvar(condominio);
+            condominio.setContasIndispensaveis(modeloTabela.getObjetos());
+
             painelDadosContaIndispensavel.setVisible(false);
             ApresentacaoUtil.exibirInformacao("Registros removidos com sucesso!", this);
         } else {
@@ -271,7 +270,7 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuRemoverSelecionados) {
                 apagarItensSelecionados();
             } else if (origem == itemMenuEditarContaIndispensavel) {
-                exibirPainelContaIndispensavel((ContaIndispensavel) modeloTabela.getObjetoSelecionado());
+                exibirPainelContaIndispensavel(modeloTabela.getObjetoSelecionado());
             } else if (origem == btnVoltar) {
                 cancelar();
             } else if (origem == btnSalvar) {
@@ -307,7 +306,7 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
         public void mouseClicked(MouseEvent e) {
             Object origem = e.getSource();
             if (origem == tabelaContasIndispensaveis && painelDadosContaIndispensavel.isVisible()) {
-                exibirPainelContaIndispensavel((ContaIndispensavel) modeloTabela.getObjetoSelecionado());
+                exibirPainelContaIndispensavel(modeloTabela.getObjetoSelecionado());
             }
         }
 
