@@ -236,11 +236,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         pagamento.setForma(FormaPagamento.DINHEIRO);
                         pagamento.setDadosPagamento(dados.clone());
 
-                    if (conta.isCredito()) {
-                        new DAO().salvar(pagamento);
-                    } else {
-                        verificarVinculo(pagamento, texto);
-                    }
+                        if (conta.isCredito()) {
+                            new DAO().salvar(pagamento);
+                        } else {
+                            verificarVinculo(pagamento, texto);
+                        }
 
                     }
 
@@ -344,7 +344,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
             p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
-            
+
 
         }
 
