@@ -10,6 +10,7 @@ import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaIndispensavel;
 import condominioPlus.negocio.financeiro.ContaPagar;
 import condominioPlus.negocio.financeiro.Emprestimo;
+import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Poupanca;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -90,6 +91,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private int numeroMinimoTaloes = 0;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<ContaIndispensavel> contasIndispensaveis;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<ExtratoBancario> extratos;
 
     public Condominio() {
     }
@@ -349,5 +352,13 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setContasIndispensaveis(List<ContaIndispensavel> contasIndispensaveis) {
         this.contasIndispensaveis = contasIndispensaveis;
+    }
+
+    public List<ExtratoBancario> getExtratos() {
+        return extratos;
+    }
+
+    public void setExtratos(List<ExtratoBancario> extratos) {
+        this.extratos = extratos;
     }
 }
