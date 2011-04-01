@@ -38,6 +38,7 @@ import condominioPlus.apresentacao.financeiro.TelaContaCorrente;
 import condominioPlus.apresentacao.financeiro.TelaContaPagar;
 import condominioPlus.apresentacao.financeiro.TelaContasIndispensaveis;
 import condominioPlus.apresentacao.financeiro.TelaEmprestimo;
+import condominioPlus.apresentacao.financeiro.TelaExtratoBancario;
 import condominioPlus.apresentacao.financeiro.TelaPoupanca;
 import condominioPlus.apresentacao.fornecedor.TelaFornecedor;
 import condominioPlus.negocio.Condominio;
@@ -358,6 +359,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                         if (validarContaCorrente()) {
                             criarFrame(new TelaContaPagar(Main.getCondominio()));
                         }
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
+                } else if (source == menuItemExtratoBancario) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaExtratoBancario(Main.getCondominio()));
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
