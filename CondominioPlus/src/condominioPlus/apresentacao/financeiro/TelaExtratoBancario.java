@@ -14,12 +14,14 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
+import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 
 /**
@@ -83,10 +85,19 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                 }
             }
         };
+
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+
+        tabelaExtratoDiario.getColumn(modeloTabelaExtratoDiario.getCampo(0)).setMaxWidth(80);
+        tabelaExtratoDiario.getColumn(modeloTabelaExtratoDiario.getCampo(2)).setMaxWidth(150);
+        tabelaExtratoDiario.getColumn(modeloTabelaExtratoDiario.getCampo(3)).setMaxWidth(40);
+        tabelaExtratoDiario.getColumn(modeloTabelaExtratoDiario.getCampo(4)).setMaxWidth(80);
+        tabelaExtratoDiario.getColumn(modeloTabelaExtratoDiario.getCampo(3)).setCellRenderer(centralizado);
     }
 
     private List<ExtratoBancario> getExtratoDiario() {
-        listaExtratoDiario = new ArrayList<ExtratoBancario>();
+        listaExtratoDiario = new DAO().listar("ExtratosPorDia", condominio, DataUtil.getCalendar(DataUtil.hoje()));
         return listaExtratoDiario;
     }
 
@@ -119,13 +130,21 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             }
         };
 
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+
         tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(0)).setMaxWidth(80);
-        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(2)).setMinWidth(100);
-        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setMaxWidth(70);
+        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(2)).setMinWidth(120);
+        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(3)).setMaxWidth(100);
+        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setMaxWidth(40);
+        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(5)).setMaxWidth(80);
+        tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setCellRenderer(centralizado);
     }
 
     private List<ExtratoBancario> getExtratoMensal() {
-        listaExtratoMensal = new ArrayList<ExtratoBancario>();
+        Calendar dataInicial = DataUtil.getCalendar(DataUtil.getPrimeiroDiaMes());
+        Calendar dataFinal = DataUtil.getCalendar(DataUtil.getUltimoDiaMes());
+        listaExtratoMensal = new DAO().listar("ExtratosPorMês", condominio, dataInicial, dataFinal);
         return listaExtratoMensal;
     }
 
@@ -152,12 +171,17 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             }
         };
 
+        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+
+        tabelaIdentificadores.getColumn(modeloTabelaIdentificadores.getCampo(1)).setCellRenderer(esquerda);
+
         tabelaIdentificadores.getColumn(modeloTabelaIdentificadores.getCampo(0)).setMinWidth(200);
         tabelaIdentificadores.getColumn(modeloTabelaIdentificadores.getCampo(2)).setMinWidth(200);
     }
 
     private List<Identificador> getIdentificadores() {
-        listaIdentificadores = new ArrayList<Identificador>();
+        listaIdentificadores = new DAO().listar(Identificador.class);
         return listaIdentificadores;
     }
 
@@ -179,6 +203,8 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         public void configurar() {
             btnLerArquivo.addActionListener(this);
         }
+
+
     }
 
     /** This method is called from within the constructor to
