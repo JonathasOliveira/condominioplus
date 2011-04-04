@@ -26,6 +26,7 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -586,6 +587,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             btnSalvar.addActionListener(this);
             tabelaPagamentos.addMouseListener(this);
             txtData.addChangeListener(this);
+            tabela.addKeyListener(this);
         }
 
         @Override
@@ -649,6 +651,13 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
             }
         }
+
+//        @Override
+//        public void keyPressed(KeyEvent e) {
+//            if ((origem == tabela && painelDadosContrato.isVisible()) && (e.getKeyCode() == e.VK_DOWN || e.getKeyCode() == e.VK_UP)) {
+//                exibirPainelContrato(modelo.getObjetoSelecionado());
+//            }
+//        }
     }
 
     /** This method is called from within the constructor to
