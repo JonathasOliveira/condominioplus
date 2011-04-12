@@ -25,7 +25,8 @@ import javax.persistence.Temporal;
 @Entity
 @NamedQueries(value={
     @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.data= ?2"),
-    @NamedQuery(name="ExtratosPorMês", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.dataPagamento")
+    @NamedQuery(name="ExtratosPorMês", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.dataPagamento"),
+    @NamedQuery(name="ExtratosPorIdentificador", query="SELECT e FROM ExtratoBancario e WHERE e.identificador = ?1")
 })
 @Table(name = "extrato_bancario")
 public class ExtratoBancario implements Serializable {
