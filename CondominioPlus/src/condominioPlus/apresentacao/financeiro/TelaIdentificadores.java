@@ -11,6 +11,7 @@
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
@@ -22,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingConstants;
+import javax.swing.event.CaretEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -53,7 +55,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
 
     public void carregarTabela() {
 
-        modeloTabela = new TabelaModelo_2<Identificador>(tabelaIdentificadores, "Palavra Chave, Cód. Conta, Conta, Cód. Histórico".split(",")) {
+        modeloTabela = new TabelaModelo_2<Identificador>(tabelaIdentificadores, "Cód. Histórico, Palavra Chave, Cód. Conta, Conta, Tipo".split(",")) {
 
             @Override
             protected List<Identificador> getCarregarObjetos() {
@@ -61,35 +63,61 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
             }
 
             @Override
+            protected List<Identificador> getFiltrar(List<Identificador> identificadores) {
+                return filtrarLista(txtBusca.getText(), identificadores);
+            }
+
+            @Override
             public Object getValor(Identificador identificador, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return identificador.getPalavraChave();
-                    case 1:
-                        return identificador.getConta().getCodigo();
-                    case 2:
-                        return identificador.getConta().getNome();
-                    case 3:
                         return identificador.getCodigoHistorico();
+                    case 1:
+                        return identificador.getPalavraChave();
+                    case 2:
+                        return identificador.getConta().getCodigo();
+                    case 3:
+                        return identificador.getConta().getNome();
+                    case 4:
+                        return identificador.getConta().isCredito() ? "C" : "D";
                     default:
                         return null;
                 }
             }
         };
 
-        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
-        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
 
-        tabelaIdentificadores.getColumn(modeloTabela.getCampo(1)).setCellRenderer(esquerda);
-
-        tabelaIdentificadores.getColumn(modeloTabela.getCampo(0)).setMinWidth(200);
-        tabelaIdentificadores.getColumn(modeloTabela.getCampo(2)).setMinWidth(200);
+        tabelaIdentificadores.getColumn(modeloTabela.getCampo(1)).setMinWidth(200);
+        tabelaIdentificadores.getColumn(modeloTabela.getCampo(3)).setMinWidth(200);
+        tabelaIdentificadores.getColumn(modeloTabela.getCampo(4)).setMaxWidth(40);
+        tabelaIdentificadores.getColumn(modeloTabela.getCampo(4)).setCellRenderer(centralizado);
 
     }
 
     private List<Identificador> getIdentificadores() {
         listaIdentificadores = new DAO().listar(Identificador.class);
         return listaIdentificadores;
+    }
+
+    private List<Identificador> filtrarLista(String sequencia, List<Identificador> identificadores) {
+        ArrayList<Identificador> listaFiltrada = new ArrayList<Identificador>();
+
+        String[] sequencias = sequencia.toUpperCase().split(" ", 0);
+
+        IDENTIFICADORES:
+        for (Identificador i : identificadores) {
+            for (String s : sequencias) {
+                if (!i.getPalavraChave().toUpperCase().contains(s)) {
+                    continue IDENTIFICADORES;
+                }
+            }
+
+            listaFiltrada.add(i);
+        }
+
+        return listaFiltrada;
     }
 
     private void desabilitarCampos() {
@@ -101,6 +129,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         List<Object> campos = new ArrayList<Object>();
         campos.add(txtConta);
         campos.add(txtHistorico);
+        campos.add(txtCodigoHistorico);
         return campos;
     }
 
@@ -167,13 +196,20 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         if (modeloTabela.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
             List<Identificador> itensRemover = modeloTabela.getObjetosSelecionados();
+            List<ExtratoBancario> extratos = new ArrayList<ExtratoBancario>();
 
             for (Identificador i : itensRemover) {
+                DAO dao = new DAO();
+                extratos = dao.listar("ExtratosPorIdentificador", i);
+                if (!extratos.isEmpty()) {
+                    ApresentacaoUtil.exibirAdvertencia("O identificador '" + i.getPalavraChave() + "' não pode ser removido", this);
+                    return;
+                }
                 modeloTabela.remover(i);
                 modeloTabela.notificar();
+                new DAO().remover(i);
             }
 
-            new DAO().remover(itensRemover);
             ApresentacaoUtil.exibirInformacao("Registros removidos com sucesso!", this);
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
@@ -211,6 +247,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
             txtConta.addFocusListener(this);
             tabelaIdentificadores.addMouseListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
+            txtBusca.addCaretListener(this);
         }
 
         @Override
@@ -255,6 +292,13 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
             }
         }
+
+        @Override
+        public void caretUpdate(CaretEvent e) {
+            if (e.getSource() == txtBusca) {
+                modeloTabela.filtrar();
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -269,16 +313,20 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
         jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        txtHistorico = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txtConta = new javax.swing.JTextField();
-        btnIncluir = new javax.swing.JButton();
-        txtPalavraChave = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaIdentificadores = new javax.swing.JTable();
-        btnConta = new javax.swing.JButton();
+        painelPesquisa = new javax.swing.JPanel();
+        txtBusca = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txtPalavraChave = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         txtCodigoHistorico = new javax.swing.JTextField();
+        btnConta = new javax.swing.JButton();
+        txtConta = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtHistorico = new javax.swing.JTextField();
+        btnIncluir = new javax.swing.JButton();
 
         itemMenuRemoverSelecionados.setText("Deletar Itens Selecionados");
         popupMenu.add(itemMenuRemoverSelecionados);
@@ -288,18 +336,6 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         setTitle("Identificadores");
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel1.setText("Palavra Chave:");
-
-        txtHistorico.setName("Histórico"); // NOI18N
-
-        jLabel2.setText("Histórico:");
-
-        txtConta.setName("Conta"); // NOI18N
-
-        btnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnIncluir.setToolTipText("Incluir Conta");
-        btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         tabelaIdentificadores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -311,6 +347,30 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tabelaIdentificadores);
 
+        painelPesquisa.setBorder(javax.swing.BorderFactory.createTitledBorder("Pesquisa"));
+
+        javax.swing.GroupLayout painelPesquisaLayout = new javax.swing.GroupLayout(painelPesquisa);
+        painelPesquisa.setLayout(painelPesquisaLayout);
+        painelPesquisaLayout.setHorizontalGroup(
+            painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelPesquisaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(txtBusca, javax.swing.GroupLayout.PREFERRED_SIZE, 307, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(307, Short.MAX_VALUE))
+        );
+        painelPesquisaLayout.setVerticalGroup(
+            painelPesquisaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelPesquisaLayout.createSequentialGroup()
+                .addComponent(txtBusca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Cadastro"));
+
+        jLabel1.setText("Palavra Chave:");
+
+        jLabel3.setText("Cód. Histórico:");
+
         btnConta.setText("Conta:");
         btnConta.setBorder(null);
         btnConta.setBorderPainted(false);
@@ -319,55 +379,93 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         btnConta.setRequestFocusEnabled(false);
         btnConta.setVerifyInputWhenFocusTarget(false);
 
+        txtConta.setName("Conta"); // NOI18N
+
+        jLabel2.setText("Descrição Conta:");
+
+        txtHistorico.setName("Histórico"); // NOI18N
+
+        btnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnIncluir.setToolTipText("Incluir Conta");
+        btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(108, 108, 108))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtPalavraChave, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnConta))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(26, 26, 26))
+                    .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(btnConta)
+                                    .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtPalavraChave, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(1, 1, 1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPalavraChave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnConta))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtHistorico, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(painelPesquisa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(11, 11, 11)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtPalavraChave, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(jLabel2)
-                                .addComponent(btnConta))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(2, 2, 2)
-                .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelPesquisa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(108, 108, 108))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -383,23 +481,26 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 454, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnIncluir;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel painelPesquisa;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaIdentificadores;
+    private javax.swing.JTextField txtBusca;
     private javax.swing.JTextField txtCodigoHistorico;
     private javax.swing.JTextField txtConta;
     private javax.swing.JTextField txtHistorico;
