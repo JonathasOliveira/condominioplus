@@ -21,6 +21,8 @@ public class Identificador implements Serializable {
     @Id
     @GeneratedValue
     private int codigo;
+    @Column(name="codigo_historico")
+    private int codigoHistorico;
     @ManyToOne
     private Conta conta;
     @Column(name = "palavra_chave")
@@ -49,4 +51,13 @@ public class Identificador implements Serializable {
     public void setPalavraChave(String palavraChave) {
         this.palavraChave = palavraChave;
     }
+
+    public int getCodigoHistorico() {
+        return codigoHistorico;
+    }
+
+    public void setCodigoHistorico(int codigoHistorico) {
+        this.codigoHistorico = codigoHistorico;
+    }
+    
 }
