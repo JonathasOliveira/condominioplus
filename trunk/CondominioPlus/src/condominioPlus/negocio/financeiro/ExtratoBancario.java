@@ -17,6 +17,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
+import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 
 /**
  *
@@ -44,6 +46,8 @@ public class ExtratoBancario implements Serializable {
     private BigDecimal valor = new BigDecimal(0);
     @ManyToOne
     private Condominio condominio;
+    private String tipo;
+    private int natureza;
 
     public int getCodigo() {
         return codigo;
@@ -69,14 +73,6 @@ public class ExtratoBancario implements Serializable {
         this.identificador = identificador;
     }
 
-    public Calendar getData() {
-        return dataPagamento;
-    }
-
-    public void setData(Calendar data) {
-        this.dataPagamento = data;
-    }
-
     public String getDoc() {
         return doc;
     }
@@ -85,11 +81,42 @@ public class ExtratoBancario implements Serializable {
         this.doc = doc;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public Moeda getValor() {
+        return new Moeda(valor);
     }
 
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
+    public void setValor(Moeda valor) {
+        this.valor = valor.bigDecimalValue();
     }
+
+    public Calendar getDataPagamento() {
+        return dataPagamento;
+    }
+
+    public void setDataPagamento(Calendar dataPagamento) {
+        this.dataPagamento = dataPagamento;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public int getNatureza() {
+        return natureza;
+    }
+
+    public void setNatureza(int natureza) {
+        this.natureza = natureza;
+    }
+
+    @Override
+    public String toString() {
+        return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + identificador.getCodigoHistorico() + " " + identificador.getPalavraChave() + " " + doc;
+    }
+
+    
 }

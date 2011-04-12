@@ -71,7 +71,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             public Object getValor(ExtratoBancario extratoBancario, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(extratoBancario.getData());
+                        return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
                         return extratoBancario.getIdentificador().getPalavraChave();
                     case 2:
@@ -113,7 +113,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             public Object getValor(ExtratoBancario extratoBancario, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(extratoBancario.getData());
+                        return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
                         return extratoBancario.getIdentificador().getPalavraChave();
                     case 2:

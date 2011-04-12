@@ -28,6 +28,8 @@ public class Identificador implements Serializable {
     @Column(name = "palavra_chave")
     private String palavraChave;
 
+    public Identificador() {
+    }
     public int getCodigo() {
         return codigo;
     }
