@@ -53,7 +53,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
 
     public void carregarTabela() {
 
-        modeloTabela = new TabelaModelo_2<Identificador>(tabelaIdentificadores, "Palavra Chave, Cód. Conta, Conta".split(",")) {
+        modeloTabela = new TabelaModelo_2<Identificador>(tabelaIdentificadores, "Palavra Chave, Cód. Conta, Conta, Cód. Histórico".split(",")) {
 
             @Override
             protected List<Identificador> getCarregarObjetos() {
@@ -69,6 +69,8 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
                         return identificador.getConta().getCodigo();
                     case 2:
                         return identificador.getConta().getNome();
+                    case 3:
+                        return identificador.getCodigoHistorico();
                     default:
                         return null;
                 }
@@ -104,7 +106,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
 
     private boolean verificarContasIndispensaveis() {
         for (Identificador i : getIdentificadores()) {
-            if (i.getPalavraChave().equalsIgnoreCase(txtPalavraChave.getText())) {
+            if (i.getCodigoHistorico() == Integer.valueOf(txtCodigoHistorico.getText())) {
                 return true;
             }
         }
@@ -115,6 +117,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         identificador = new Identificador();
         identificador.setConta(conta);
         identificador.setPalavraChave(txtPalavraChave.getText());
+        identificador.setCodigoHistorico(Integer.valueOf(txtCodigoHistorico.getText()));
         new DAO().salvar(identificador);
         limparCampos();
     }
@@ -123,6 +126,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         txtHistorico.setText("");
         txtConta.setText("");
         txtPalavraChave.setText("");
+        txtCodigoHistorico.setText("");
     }
 
     private void salvar() {
@@ -274,6 +278,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaIdentificadores = new javax.swing.JTable();
         btnConta = new javax.swing.JButton();
+        txtCodigoHistorico = new javax.swing.JTextField();
 
         itemMenuRemoverSelecionados.setText("Deletar Itens Selecionados");
         popupMenu.add(itemMenuRemoverSelecionados);
@@ -321,10 +326,12 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(txtPalavraChave, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPalavraChave, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -335,8 +342,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
                             .addComponent(txtHistorico, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -357,7 +363,9 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(2, 2, 2)
+                .addComponent(txtCodigoHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -376,7 +384,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -392,6 +400,7 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaIdentificadores;
+    private javax.swing.JTextField txtCodigoHistorico;
     private javax.swing.JTextField txtConta;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtPalavraChave;
