@@ -48,6 +48,8 @@ public class ExtratoBancario implements Serializable {
     private Condominio condominio;
     private String tipo;
     private int natureza;
+    @Column(name="identificador_historico")
+    private int identificadorRegistro;
 
     public int getCodigo() {
         return codigo;
@@ -113,9 +115,17 @@ public class ExtratoBancario implements Serializable {
         this.natureza = natureza;
     }
 
+    public int getIdentificadorRegistro() {
+        return identificadorRegistro;
+    }
+
+    public void setIdentificadorRegistro(int identificadorRegistro) {
+        this.identificadorRegistro = identificadorRegistro;
+    }
+
     @Override
     public String toString() {
-        return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + identificador.getCodigoHistorico() + " " + identificador.getPalavraChave() + " " + doc;
+        return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + identificador.getCodigoHistorico() + " " + identificador.getPalavraChave() + " " + doc + " " + identificadorRegistro + " " + natureza;
     }
 
     
