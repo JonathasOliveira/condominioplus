@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.financeiro.arquivoRetorno;
 
 import condominioPlus.negocio.financeiro.ExtratoBancario;
@@ -26,7 +25,8 @@ import org.joda.time.DateTime;
  * @author Administrador
  */
 public class EntradaExtratoDiário {
-     String linha = null;
+
+    String linha = null;
     ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
     private String codigoRetorno;
 
@@ -45,34 +45,34 @@ public class EntradaExtratoDiário {
 
     public List<ExtratoBancario> lerArquivo(File arquivo) {
 //        for (int i = 0; i < arquivos.length; i++) {
-            BufferedReader leitor = null;
-            try {
-                leitor = pegarReader(arquivo);
-                while ((linha = leitor.readLine()) != null) {
+        BufferedReader leitor = null;
+        try {
+            leitor = pegarReader(arquivo);
+            while ((linha = leitor.readLine()) != null) {
 
-                    if (linha.equalsIgnoreCase("")) {
-                        break;
-                    }
-
-                    if (isTransacao(linha) && arquivo.getName().charAt(0) == 'E') {
-//                    editarValor(linha);
-                        registros.add(obterRegistro(linha));
-                    } else if (linha.charAt(0) == '0') {
-                        codigoRetorno = linha.substring(108, 113);
-                    }
-
+                if (linha.equalsIgnoreCase("")) {
+                    break;
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
+
+                if (isTransacao(linha) && arquivo.getName().charAt(0) == 'E') {
+//                    editarValor(linha);
+                    registros.add(obterRegistro(linha));
+                } else if (linha.charAt(0) == '0') {
+                    codigoRetorno = linha.substring(108, 113);
+                }
 
             }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+
+        }
 //        }
         return registros;
     }
 
     private boolean isTransacao(String linha) {
 
-        if (linha.charAt(0) == '1' ) {
+        if (linha.charAt(0) == '1') {
 
             return true;
 
@@ -89,14 +89,15 @@ public class EntradaExtratoDiário {
         registro.setDataPagamento(DataUtil.getCalendar(data));
         Identificador ident = new Identificador();
         ident.setCodigoHistorico(Integer.valueOf(linha.substring(45, 49).trim()));
-        ident.setPalavraChave(linha.substring(49,74));
+        ident.setPalavraChave(linha.substring(49, 74));
         registro.setTipo(linha.substring(104, 105));
         registro.setIdentificador(ident);
         registro.setDoc(linha.substring(74, 80));
-//        registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
+        registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
+        if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
+            registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
+        }
         registro.setValor(new Moeda(editarValor(linha, 86, 104)));
-
-
 
         System.out.println(registro);
         return registro;
@@ -105,7 +106,7 @@ public class EntradaExtratoDiário {
     private double editarValor(String linha, int indiceInicio, int indiceTermino) {
 
         String valor = linha.substring(indiceInicio, indiceTermino);
-        double numero = (Double.parseDouble(valor))/100;
+        double numero = (Double.parseDouble(valor)) / 100;
 
         return numero;
     }
@@ -115,5 +116,4 @@ public class EntradaExtratoDiário {
         FileReader reader = new FileReader(file);
         return new BufferedReader(reader);
     }
-
 }
