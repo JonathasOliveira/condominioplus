@@ -4,18 +4,17 @@
  */
 package condominioPlus.negocio.financeiro.arquivoRetorno;
 
+import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
@@ -26,48 +25,60 @@ import org.joda.time.DateTime;
  */
 public class EntradaExtratoDiário {
 
-    String linha = null;
-    ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
+    private String linha = null;
+    private ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
     private String codigoRetorno;
+    private List<Condominio> condominios;
+    private List<Identificador> identificadores;
+
+    public EntradaExtratoDiário() {
+        carregarConexao();
+    }
+
+
 
     public String getCodigoRetorno() {
         return codigoRetorno;
 
     }
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
 //        FileDialog fileDialog = new FileDialog((Frame) null);
 //        fileDialog.setVisible(true);
-//        File diretorio = new File(fileDialog.getFile());
+//        File diretorio = new File(fileDialog.getDirectory());
 //        System.out.println("sad" + diretorio.listFiles());
-        new EntradaExtratoDiário().lerArquivo(new File("Extrato.TXT"));
-    }
+//
+//        new EntradaExtratoDiário().lerArquivo(new File("Extrato.TXT"));
+//
+//    }
+    public void lerArquivo(File arquivos[]) {
+        for (int i = 0; i < arquivos.length; i++) {
+            BufferedReader leitor = null;
+            try {
+                leitor = pegarReader(arquivos[i]);
+                while ((linha = leitor.readLine()) != null) {
 
-    public List<ExtratoBancario> lerArquivo(File arquivo) {
-//        for (int i = 0; i < arquivos.length; i++) {
-        BufferedReader leitor = null;
-        try {
-            leitor = pegarReader(arquivo);
-            while ((linha = leitor.readLine()) != null) {
+                    if (linha.equalsIgnoreCase("")) {
+                        break;
+                    }
 
-                if (linha.equalsIgnoreCase("")) {
-                    break;
-                }
-
-                if (isTransacao(linha) && arquivo.getName().charAt(0) == 'E') {
+                    if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
 //                    editarValor(linha);
-                    registros.add(obterRegistro(linha));
-                } else if (linha.charAt(0) == '0') {
-                    codigoRetorno = linha.substring(108, 113);
+                        if (obterRegistro(linha) != null) {
+                            registros.add(obterRegistro(linha));
+                        }
+
+                    } else if (linha.charAt(0) == '0') {
+                        codigoRetorno = linha.substring(108, 113);
+                    }
+
                 }
+            } catch (IOException ex) {
+                ex.printStackTrace();
 
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-
         }
-//        }
-        return registros;
+        salvar();
     }
 
     private boolean isTransacao(String linha) {
@@ -82,25 +93,72 @@ public class EntradaExtratoDiário {
         }
     }
 
+    private void salvar() {
+        new DAO().salvar(registros);
+
+    }
+
+    private Condominio localizaCondominio(String condominio) {
+
+        for (Condominio c : condominios) {
+            if (c.getContaBancaria().getContaCorrente().equals(condominio)) {
+                return c;
+            }
+        }
+
+        return null;
+
+    }
+
+    private Identificador localizaIdentificador(String ident) {
+
+        for (Identificador i : identificadores) {
+            if (i.getPalavraChave().equalsIgnoreCase(ident)) {
+                System.out.println("i " + i.getPalavraChave());
+                return i;
+            }
+        }
+
+        return null;
+
+    }
+
+    private void carregarConexao() {
+        identificadores = new DAO().listar(Identificador.class);
+        condominios = new DAO().listar(Condominio.class);
+
+    }
+
     private ExtratoBancario obterRegistro(String linha) {
         ExtratoBancario registro = new ExtratoBancario();
 
-        DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(84, 86)), Integer.parseInt(linha.substring(82, 84)), Integer.parseInt(linha.substring(80, 82)), 0, 0, 0, 0);
-        registro.setDataPagamento(DataUtil.getCalendar(data));
-        Identificador ident = new Identificador();
-        ident.setCodigoHistorico(Integer.valueOf(linha.substring(45, 49).trim()));
-        ident.setPalavraChave(linha.substring(49, 74));
-        registro.setTipo(linha.substring(104, 105));
-        registro.setIdentificador(ident);
-        registro.setDoc(linha.substring(74, 80));
-        registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
-        if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
-            registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
-        }
-        registro.setValor(new Moeda(editarValor(linha, 86, 104)));
+        if (localizaCondominio(linha.substring(21, 28)) != null) {
+            DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(84, 86)), Integer.parseInt(linha.substring(82, 84)), Integer.parseInt(linha.substring(80, 82)), 0, 0, 0, 0);
+            registro.setDataPagamento(DataUtil.getCalendar(data));
+            registro.setTipo(linha.substring(104, 105));
+            registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
+            registro.setCondominio(localizaCondominio(linha.substring(21, 28)));
+            if (registro.getIdentificadorRegistro() == 1) {
+                registro.setIdentificador(localizaIdentificador(linha.substring(49, 74).trim()));
+                System.out.println("registr identificador " +  registro.getIdentificador());
+                System.out.println("fadf " + linha.substring(49, 74).trim());
+                System.out.println("fadf " + linha.substring(45, 49).trim());
+            }
 
-        System.out.println(registro);
-        return registro;
+            registro.setDoc(linha.substring(74, 80));
+
+            if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
+                registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
+            }
+            registro.setValor(new Moeda(editarValor(linha, 86, 104)));
+
+            System.out.println(registro);
+             return registro;
+        } else {
+            return null;
+        }
+
+
     }
 
     private double editarValor(String linha, int indiceInicio, int indiceTermino) {

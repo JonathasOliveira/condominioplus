@@ -61,5 +61,29 @@ public class Identificador implements Serializable {
     public void setCodigoHistorico(int codigoHistorico) {
         this.codigoHistorico = codigoHistorico;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Identificador other = (Identificador) obj;
+        if (this.codigo != other.codigo) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 83 * hash + this.codigo;
+        return hash;
+    }
+
+    
     
 }

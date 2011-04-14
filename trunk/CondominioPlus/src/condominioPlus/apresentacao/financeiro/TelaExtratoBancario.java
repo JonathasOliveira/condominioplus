@@ -13,7 +13,11 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
+import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiário;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.SwingConstants;
@@ -73,11 +77,11 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return extratoBancario.getIdentificador().getPalavraChave();
+                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getPalavraChave() : extratoBancario.getHistorico();
                     case 2:
                         return extratoBancario.getDoc();
                     case 3:
-                        return extratoBancario.getIdentificador().getConta().isCredito() ? "C" : "D";
+                        return extratoBancario.getTipo();
                     case 4:
                         return extratoBancario.getValor();
                     default:
@@ -115,13 +119,13 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return extratoBancario.getIdentificador().getPalavraChave();
+                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getPalavraChave() : extratoBancario.getHistorico();
                     case 2:
-                        return extratoBancario.getIdentificador().getConta().getNome();
+                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getConta().getNome() : "";
                     case 3:
                         return extratoBancario.getDoc();
                     case 4:
-                        return extratoBancario.getIdentificador().getConta().isCredito() ? "C" : "D";
+                        return extratoBancario.getTipo();
                     case 5:
                         return extratoBancario.getValor();
                     default:
@@ -140,6 +144,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(5)).setMaxWidth(80);
         tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setCellRenderer(centralizado);
     }
+
 
     private List<ExtratoBancario> getExtratoMensal() {
         Calendar dataInicial = DataUtil.getCalendar(DataUtil.getPrimeiroDiaMes());
@@ -186,7 +191,10 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     }
 
     private void lerArquivoExtrato() {
-        ApresentacaoUtil.exibirInformacao("Teste", this);
+        FileDialog fileDialog = new FileDialog((Frame) null);
+        fileDialog.setVisible(true);
+        File diretorio = new File(fileDialog.getDirectory());
+        new EntradaExtratoDiário().lerArquivo(diretorio.listFiles());
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -203,8 +211,6 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         public void configurar() {
             btnLerArquivo.addActionListener(this);
         }
-
-
     }
 
     /** This method is called from within the constructor to

@@ -11,7 +11,6 @@ package condominioPlus;
 import java.util.Properties;
 import javax.swing.UIManager;
 import condominioPlus.apresentacao.TelaPrincipal;
-import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.Configuracao;
