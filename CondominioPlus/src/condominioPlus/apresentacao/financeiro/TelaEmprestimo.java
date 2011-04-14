@@ -109,15 +109,26 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             txtNumeroParcelas.setEnabled(true);
             txtValorParcelas.setEnabled(true);
         } else if (radioConformeDisponibilidade.isSelected()) {
-            txtNumeroParcelas.setText("0");
+            txtNumeroParcelas.setText("1");
             txtValorParcelas.setText(txtValor.getText());
             txtNumeroParcelas.setEnabled(false);
             txtValorParcelas.setEnabled(false);
         }
     }
 
+    private String obterFormaPagamento(ContratoEmprestimo c){
+        if(c.getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
+            return "Conforme Disponibilidade Financeira";
+        } else if (c.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA){
+            return "À vista";
+        } else if(c.getForma() == FormaPagamentoEmprestimo.PARCELADO){
+            return "Parcelado";
+        }
+        return "";
+    }
+
     private void carregarTabela() {
-        modelo = new TabelaModelo_2<ContratoEmprestimo>(tabela, "Data, Descrição, Parcelas, Valor, Saldo".split(",")) {
+        modelo = new TabelaModelo_2<ContratoEmprestimo>(tabela, "Data, Descrição, Forma Pgto., Parcelas, Valor, Saldo".split(",")) {
 
             @Override
             protected List<ContratoEmprestimo> getCarregarObjetos() {
@@ -132,10 +143,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     case 1:
                         return c.getDescricao();
                     case 2:
-                        return c.getNumeroParcelas();
+                        return obterFormaPagamento(c);
                     case 3:
-                        return c.getValor();
+                        return c.getNumeroParcelas();
                     case 4:
+                        return c.getValor();
+                    case 5:
                         return c.getSaldo();
                     default:
                         return null;
@@ -143,6 +156,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 }
             }
         };
+
+        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(80);
+        tabela.getColumn(modelo.getCampo(1)).setMinWidth(150);
+        tabela.getColumn(modelo.getCampo(2)).setMinWidth(150);
+        tabela.getColumn(modelo.getCampo(3)).setMaxWidth(60);
 
     }
 
