@@ -116,12 +116,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         }
     }
 
-    private String obterFormaPagamento(ContratoEmprestimo c){
-        if(c.getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE){
+    private String obterFormaPagamento(ContratoEmprestimo c) {
+        if (c.getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
             return "Conforme Disponibilidade Financeira";
-        } else if (c.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA){
+        } else if (c.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA) {
             return "À vista";
-        } else if(c.getForma() == FormaPagamentoEmprestimo.PARCELADO){
+        } else if (c.getForma() == FormaPagamentoEmprestimo.PARCELADO) {
             return "Parcelado";
         }
         return "";
@@ -285,8 +285,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     } else {
                         verificarVinculo(pagamento, texto);
                     }
-
-
                 }
 
                 Pagamento p = new Pagamento();
@@ -669,7 +667,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
             }
         }
-
 //        @Override
 //        public void keyPressed(KeyEvent e) {
 //            if ((origem == tabela && painelDadosContrato.isVisible()) && (e.getKeyCode() == e.VK_DOWN || e.getKeyCode() == e.VK_UP)) {
