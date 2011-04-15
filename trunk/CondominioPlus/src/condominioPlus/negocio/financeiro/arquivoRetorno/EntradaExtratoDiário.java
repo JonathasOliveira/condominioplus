@@ -139,10 +139,15 @@ public class EntradaExtratoDiário {
             registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
             registro.setCondominio(localizaCondominio(linha.substring(21, 28)));
             if (registro.getIdentificadorRegistro() == 1) {
-                registro.setIdentificador(localizaIdentificador(linha.substring(49, 74).trim()));
-                System.out.println("registr identificador " +  registro.getIdentificador());
-                System.out.println("fadf " + linha.substring(49, 74).trim());
-                System.out.println("fadf " + linha.substring(45, 49).trim());
+                registro.setHistorico(linha.substring(49, 74).trim());
+                System.out.println("registro identificador " +  linha.substring(49, 74).trim());
+     
+            }else if(registro.getIdentificadorRegistro() == 0){
+                registro.setHistorico("Saldo Inicial");
+                registro.setDoc("000000");
+            }else {
+                registro.setHistorico("Saldo Final");
+
             }
 
             registro.setDoc(linha.substring(74, 80));

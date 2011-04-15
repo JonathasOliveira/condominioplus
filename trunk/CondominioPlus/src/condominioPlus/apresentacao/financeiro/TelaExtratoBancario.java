@@ -77,7 +77,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getPalavraChave() : extratoBancario.getHistorico();
+                        return  extratoBancario.getHistorico();
                     case 2:
                         return extratoBancario.getDoc();
                     case 3:
@@ -119,9 +119,9 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getPalavraChave() : extratoBancario.getHistorico();
+                        return  extratoBancario.getHistorico();
                     case 2:
-                        return extratoBancario.getIdentificador() != null ? extratoBancario.getIdentificador().getConta().getNome() : "";
+                        return  "";
                     case 3:
                         return extratoBancario.getDoc();
                     case 4:
@@ -195,6 +195,8 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         fileDialog.setVisible(true);
         File diretorio = new File(fileDialog.getDirectory());
         new EntradaExtratoDiário().lerArquivo(diretorio.listFiles());
+        carregarTabelaExtratoMensal();
+        carregarTabelaExtratoDiario();
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
