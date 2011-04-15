@@ -27,19 +27,11 @@ public class EntradaExtratoDiário {
 
     private String linha = null;
     private ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
-    private String codigoRetorno;
     private List<Condominio> condominios;
     private List<Identificador> identificadores;
 
     public EntradaExtratoDiário() {
         carregarConexao();
-    }
-
-
-
-    public String getCodigoRetorno() {
-        return codigoRetorno;
-
     }
 
 //    public static void main(String[] args) {
@@ -56,6 +48,7 @@ public class EntradaExtratoDiário {
             BufferedReader leitor = null;
             try {
                 leitor = pegarReader(arquivos[i]);
+
                 while ((linha = leitor.readLine()) != null) {
 
                     if (linha.equalsIgnoreCase("")) {
@@ -63,13 +56,13 @@ public class EntradaExtratoDiário {
                     }
 
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
+                        ArquivoAtualizado arquivo = new ArquivoAtualizado();
+                        arquivo.setNome(arquivos[i].getName());
+                        new DAO().salvar(arquivo);
 //                    editarValor(linha);
                         if (obterRegistro(linha) != null) {
                             registros.add(obterRegistro(linha));
                         }
-
-                    } else if (linha.charAt(0) == '0') {
-                        codigoRetorno = linha.substring(108, 113);
                     }
 
                 }
@@ -77,6 +70,7 @@ public class EntradaExtratoDiário {
                 ex.printStackTrace();
 
             }
+
         }
         salvar();
     }
@@ -95,7 +89,6 @@ public class EntradaExtratoDiário {
 
     private void salvar() {
         new DAO().salvar(registros);
-
     }
 
     private Condominio localizaCondominio(String condominio) {
@@ -140,12 +133,12 @@ public class EntradaExtratoDiário {
             registro.setCondominio(localizaCondominio(linha.substring(21, 28)));
             if (registro.getIdentificadorRegistro() == 1) {
                 registro.setHistorico(linha.substring(49, 74).trim());
-                System.out.println("registro identificador " +  linha.substring(49, 74).trim());
-     
-            }else if(registro.getIdentificadorRegistro() == 0){
+                System.out.println("registro identificador " + linha.substring(49, 74).trim());
+
+            } else if (registro.getIdentificadorRegistro() == 0) {
                 registro.setHistorico("Saldo Inicial");
                 registro.setDoc("000000");
-            }else {
+            } else {
                 registro.setHistorico("Saldo Final");
 
             }
@@ -158,7 +151,7 @@ public class EntradaExtratoDiário {
             registro.setValor(new Moeda(editarValor(linha, 86, 104)));
 
             System.out.println(registro);
-             return registro;
+            return registro;
         } else {
             return null;
         }
