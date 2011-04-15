@@ -196,15 +196,8 @@ public class TelaIdentificadores extends javax.swing.JInternalFrame {
         if (modeloTabela.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
             List<Identificador> itensRemover = modeloTabela.getObjetosSelecionados();
-            List<ExtratoBancario> extratos = new ArrayList<ExtratoBancario>();
 
             for (Identificador i : itensRemover) {
-                DAO dao = new DAO();
-                extratos = dao.listar("ExtratosPorIdentificador", i);
-                if (!extratos.isEmpty()) {
-                    ApresentacaoUtil.exibirAdvertencia("O identificador '" + i.getPalavraChave() + "' não pode ser removido", this);
-                    return;
-                }
                 modeloTabela.remover(i);
                 modeloTabela.notificar();
                 new DAO().remover(i);

@@ -26,9 +26,8 @@ import logicpoint.util.Moeda;
  */
 @Entity
 @NamedQueries(value={
-    @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2"),
-    @NamedQuery(name="ExtratosPorMês", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.dataPagamento"),
-    @NamedQuery(name="ExtratosPorIdentificador", query="SELECT e FROM ExtratoBancario e WHERE e.identificador = ?1")
+    @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2 ORDER BY e.codigo"),
+    @NamedQuery(name="ExtratosPorMês", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo")
 })
 @Table(name = "extrato_bancario")
 public class ExtratoBancario implements Serializable {
@@ -40,8 +39,6 @@ public class ExtratoBancario implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataPagamento;
     private String doc;
-    @ManyToOne
-    private Identificador identificador;
     @Column(precision = 20, scale = 2)
     private BigDecimal valor = new BigDecimal(0);
     @ManyToOne
@@ -66,14 +63,6 @@ public class ExtratoBancario implements Serializable {
 
     public void setCondominio(Condominio condominio) {
         this.condominio = condominio;
-    }
-
-    public Identificador getIdentificador() {
-        return identificador;
-    }
-
-    public void setIdentificador(Identificador identificador) {
-        this.identificador = identificador;
     }
 
     public String getDoc() {
