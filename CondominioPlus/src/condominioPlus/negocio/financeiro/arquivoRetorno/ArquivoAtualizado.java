@@ -15,7 +15,7 @@ import javax.persistence.Table;
  *
  * @author eugenia
  */
-
+//
 @Entity
 @Table(name="arquivo_atualizado")
 public class ArquivoAtualizado implements Serializable{
