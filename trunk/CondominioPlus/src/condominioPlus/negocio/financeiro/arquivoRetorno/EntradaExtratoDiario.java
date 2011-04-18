@@ -29,6 +29,7 @@ public class EntradaExtratoDiario {
     private ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
     private List<Condominio> condominios;
     private List<Identificador> identificadores;
+    private List<ArquivoAtualizado> listaArquivos;
 
     public EntradaExtratoDiario() {
         carregarConexao();
@@ -44,35 +45,47 @@ public class EntradaExtratoDiario {
 //
 //    }
     public void lerArquivo(File arquivos[]) {
+        ArquivoAtualizado arquivo = null;
+        ARQUIVOS:
         for (int i = 0; i < arquivos.length; i++) {
             BufferedReader leitor = null;
             try {
                 leitor = pegarReader(arquivos[i]);
-
                 while ((linha = leitor.readLine()) != null) {
 
                     if (linha.equalsIgnoreCase("")) {
                         break;
                     }
-
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
-                        ArquivoAtualizado arquivo = new ArquivoAtualizado();
+                        arquivo = new ArquivoAtualizado();
                         arquivo.setNome(arquivos[i].getName());
-                        new DAO().salvar(arquivo);
+                        if (verificarArquivosAtualizados(arquivo)) {
+                            continue ARQUIVOS;
+                        }
 //                    editarValor(linha);
                         if (obterRegistro(linha) != null) {
                             registros.add(obterRegistro(linha));
                         }
                     }
-
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
-
             }
-
         }
-        salvar();
+        if (arquivo != null) {
+            new DAO().salvar(arquivo);
+            listaArquivos.add(arquivo);
+            salvar();
+        }
+    }
+
+    private boolean verificarArquivosAtualizados(ArquivoAtualizado arquivo) {
+        for (ArquivoAtualizado a : listaArquivos) {
+            if (a.getNome().equals(arquivo.getNome())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean isTransacao(String linha) {
@@ -117,8 +130,10 @@ public class EntradaExtratoDiario {
     }
 
     private void carregarConexao() {
+
         identificadores = new DAO().listar(Identificador.class);
         condominios = new DAO().listar(Condominio.class);
+        listaArquivos = new DAO().listar(ArquivoAtualizado.class);
 
     }
 
@@ -131,6 +146,7 @@ public class EntradaExtratoDiario {
             registro.setTipo(linha.substring(104, 105));
             registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
             registro.setCondominio(localizaCondominio(linha.substring(21, 28)));
+            registro.setDoc(linha.substring(74, 80));
             if (registro.getIdentificadorRegistro() == 1) {
                 registro.setHistorico(linha.substring(49, 74).trim());
                 System.out.println("registro identificador " + linha.substring(49, 74).trim());
@@ -142,8 +158,6 @@ public class EntradaExtratoDiario {
                 registro.setHistorico("Saldo Final");
 
             }
-
-            registro.setDoc(linha.substring(74, 80));
 
             if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
                 registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));

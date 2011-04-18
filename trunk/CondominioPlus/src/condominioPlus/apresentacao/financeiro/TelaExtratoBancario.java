@@ -13,7 +13,7 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
-import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiário;
+import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -193,7 +193,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         FileDialog fileDialog = new FileDialog((Frame) null);
         fileDialog.setVisible(true);
         File diretorio = new File(fileDialog.getDirectory());
-        new EntradaExtratoDiário().lerArquivo(diretorio.listFiles());
+        new EntradaExtratoDiario().lerArquivo(diretorio.listFiles());
         carregarTabelaExtratoMensal();
         carregarTabelaExtratoDiario();
     }
