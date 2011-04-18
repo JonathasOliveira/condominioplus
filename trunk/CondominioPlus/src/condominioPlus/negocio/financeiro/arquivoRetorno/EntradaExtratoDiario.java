@@ -45,9 +45,8 @@ public class EntradaExtratoDiario {
 //
 //    }
     public void lerArquivo(File arquivos[]) {
-        ARQUIVOS:
+            ARQUIVOS:
         for (int i = 0; i < arquivos.length; i++) {
-            ArquivoAtualizado arquivo = new ArquivoAtualizado();
             BufferedReader leitor = null;
             try {
                 leitor = pegarReader(arquivos[i]);
@@ -57,11 +56,13 @@ public class EntradaExtratoDiario {
                         break;
                     }
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
+                        ArquivoAtualizado arquivo = new ArquivoAtualizado();
                         arquivo.setNome(arquivos[i].getName());
                         if (verificarArquivosAtualizados(arquivo)) {
                             continue ARQUIVOS;
                         }
-                        //                    editarValor(linha);
+                        new DAO().salvar(arquivo);
+//                    editarValor(linha);
                         if (obterRegistro(linha) != null) {
                             registros.add(obterRegistro(linha));
                         }
@@ -70,7 +71,6 @@ public class EntradaExtratoDiario {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            new DAO().salvar(arquivo);
         }
         salvar();
     }
