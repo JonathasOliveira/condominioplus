@@ -14,10 +14,8 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
-import java.awt.FileDialog;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.swing.SwingConstants;
@@ -26,6 +24,7 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -76,7 +75,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return  extratoBancario.getHistorico();
+                        return extratoBancario.getHistorico();
                     case 2:
                         return extratoBancario.getDoc();
                     case 3:
@@ -100,7 +99,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     }
 
     private List<ExtratoBancario> getExtratoDiario() {
-        listaExtratoDiario = new DAO().listar("ExtratosPorDia", condominio, DataUtil.getCalendar(DataUtil.hoje()));
+        listaExtratoDiario = new DAO().listar("ExtratosPorDia", condominio, DataUtil.getCalendar(new DateTime(DataUtil.hoje()).minusDays(1)));
         return listaExtratoDiario;
     }
 
@@ -118,9 +117,9 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(extratoBancario.getDataPagamento());
                     case 1:
-                        return  extratoBancario.getHistorico();
+                        return extratoBancario.getHistorico();
                     case 2:
-                        return  "";
+                        return "";
                     case 3:
                         return extratoBancario.getDoc();
                     case 4:
@@ -144,12 +143,28 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setCellRenderer(centralizado);
     }
 
-
     private List<ExtratoBancario> getExtratoMensal() {
-        Calendar dataInicial = DataUtil.getCalendar(DataUtil.getPrimeiroDiaMes());
+        Calendar dataInicial = DataUtil.getCalendar(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         Calendar dataFinal = DataUtil.getCalendar(DataUtil.getUltimoDiaMes());
         listaExtratoMensal = new DAO().listar("ExtratosPorMês", condominio, dataInicial, dataFinal);
-        return listaExtratoMensal;
+        System.out.println("lista " + listaExtratoMensal);
+        return verificarSaldoInicial(listaExtratoMensal);
+    }
+
+    private List<ExtratoBancario> verificarSaldoInicial(List<ExtratoBancario> lista) {
+        List<ExtratoBancario> novaLista = new ArrayList<ExtratoBancario>();
+        novaLista.addAll(lista);
+        for (ExtratoBancario ex : lista) {
+            if (DataUtil.compararData(DataUtil.getDateTime(ex.getDataPagamento()), DataUtil.getDateTime(DataUtil.getPrimeiroDiaMes())) == -1) {
+                if (ex.getIdentificadorRegistro() != 0) {
+                    novaLista.remove(ex);
+                }
+
+            }
+
+        }
+        return novaLista;
+
     }
 
     private void carregarTabelaIdentificadores() {
@@ -190,10 +205,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     }
 
     private void lerArquivoExtrato() {
-        FileDialog fileDialog = new FileDialog((Frame) null);
-        fileDialog.setVisible(true);
-        File diretorio = new File(fileDialog.getDirectory());
-        new EntradaExtratoDiario().lerArquivo(diretorio.listFiles());
+        new EntradaExtratoDiario();
         carregarTabelaExtratoMensal();
         carregarTabelaExtratoDiario();
     }
