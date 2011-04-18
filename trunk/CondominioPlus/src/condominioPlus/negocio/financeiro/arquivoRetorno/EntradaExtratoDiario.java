@@ -4,9 +4,11 @@
  */
 package condominioPlus.negocio.financeiro.arquivoRetorno;
 
+import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
+import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,26 +30,34 @@ public class EntradaExtratoDiario {
     private String linha = null;
     private ArrayList<ExtratoBancario> registros = new ArrayList<ExtratoBancario>();
     private List<Condominio> condominios;
-    private List<Identificador> identificadores;
+    private List<ExtratoBancario> extratosSalvos;
     private List<ArquivoAtualizado> listaArquivos;
+    private List<Identificador> identificadores;
+    private ArquivoAtualizado arquivo;
 
     public EntradaExtratoDiario() {
         carregarConexao();
+        FileDialog fileDialog = new FileDialog(TelaPrincipal.getInstancia());
+        fileDialog.setVisible(true);
+        File diretorio = new File(fileDialog.getDirectory());
+        lerArquivo(diretorio.listFiles());
+        setCondominio(registros);
     }
 
-//    public static void main(String[] args) {
-//        FileDialog fileDialog = new FileDialog((Frame) null);
-//        fileDialog.setVisible(true);
-//        File diretorio = new File(fileDialog.getDirectory());
-//        System.out.println("sad" + diretorio.listFiles());
-//
-//        new EntradaExtratoDiario().lerArquivo(new File("Extrato.TXT"));
-//
-//    }
     public void lerArquivo(File arquivos[]) {
-            ARQUIVOS:
+        ARQUIVOS:
         for (int i = 0; i < arquivos.length; i++) {
             BufferedReader leitor = null;
+            if (arquivos[i].getName().charAt(0) == 'E') {
+                arquivo = new ArquivoAtualizado();
+                arquivo.setNome(arquivos[i].getName());
+                if (verificarArquivosAtualizados(arquivo)) {
+                    continue ARQUIVOS;
+                }
+                new DAO().salvar(arquivo);
+
+            }
+
             try {
                 leitor = pegarReader(arquivos[i]);
                 while ((linha = leitor.readLine()) != null) {
@@ -56,12 +66,6 @@ public class EntradaExtratoDiario {
                         break;
                     }
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
-                        ArquivoAtualizado arquivo = new ArquivoAtualizado();
-                        arquivo.setNome(arquivos[i].getName());
-                        if (verificarArquivosAtualizados(arquivo)) {
-                            continue ARQUIVOS;
-                        }
-                        new DAO().salvar(arquivo);
 //                    editarValor(linha);
                         if (obterRegistro(linha) != null) {
                             registros.add(obterRegistro(linha));
@@ -72,11 +76,13 @@ public class EntradaExtratoDiario {
                 ex.printStackTrace();
             }
         }
-        salvar();
     }
 
     private boolean verificarArquivosAtualizados(ArquivoAtualizado arquivo) {
         for (ArquivoAtualizado a : listaArquivos) {
+            if (listaArquivos.isEmpty()) {
+                return false;
+            }
             if (a.getNome().equals(arquivo.getNome())) {
                 return true;
             }
@@ -87,18 +93,38 @@ public class EntradaExtratoDiario {
     private boolean isTransacao(String linha) {
 
         if (linha.charAt(0) == '1') {
-
             return true;
-
-
         } else {
             return false;
         }
     }
 
-    private void salvar() {
-        new DAO().salvar(registros);
+    private void setCondominio(List<ExtratoBancario> extratos) {
+        for (ExtratoBancario ex : extratos) {
+            Condominio c = localizaCondominio(ex.getContaCorrente());
+            if (c != null) {
+                ex.setCondominio(c);
+                verificarPagamento(ex);
+            }
+        }
     }
+
+    private void verificarPagamento(ExtratoBancario e) {
+        if (!extratosSalvos.isEmpty()) {
+            for (ExtratoBancario ex : extratosSalvos) {
+                if (!ex.equals(e)) {
+                    new DAO().salvar(e);
+                }
+            }
+        } else {
+            new DAO().salvar(e);
+
+        }
+    }
+
+    private void lancarNoContaCorrente(){}
+
+    private void verificarCheques(){}
 
     private Condominio localizaCondominio(String condominio) {
 
@@ -112,59 +138,54 @@ public class EntradaExtratoDiario {
 
     }
 
-    private Identificador localizaIdentificador(String ident) {
-
-        for (Identificador i : identificadores) {
-            if (i.getPalavraChave().equalsIgnoreCase(ident)) {
-                System.out.println("i " + i.getPalavraChave());
-                return i;
-            }
-        }
-
-        return null;
-
-    }
-
+//    private Identificador localizaIdentificador(String ident) {
+//
+//        for (Identificador i : identificadores) {
+//            if (i.getPalavraChave().equalsIgnoreCase(ident)) {
+//                System.out.println("i " + i.getPalavraChave());
+//                return i;
+//            }
+//        }
+//
+//        return null;
+//
+//    }
     private void carregarConexao() {
 
-        identificadores = new DAO().listar(Identificador.class);
+        extratosSalvos = new DAO().listar(ExtratoBancario.class);
         condominios = new DAO().listar(Condominio.class);
         listaArquivos = new DAO().listar(ArquivoAtualizado.class);
+        identificadores = new DAO().listar(Identificador.class);
+
 
     }
 
     private ExtratoBancario obterRegistro(String linha) {
         ExtratoBancario registro = new ExtratoBancario();
 
-        if (localizaCondominio(linha.substring(21, 28)) != null) {
-            DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(84, 86)), Integer.parseInt(linha.substring(82, 84)), Integer.parseInt(linha.substring(80, 82)), 0, 0, 0, 0);
-            registro.setDataPagamento(DataUtil.getCalendar(data));
-            registro.setTipo(linha.substring(104, 105));
-            registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
-            registro.setCondominio(localizaCondominio(linha.substring(21, 28)));
-            registro.setDoc(linha.substring(74, 80));
-            if (registro.getIdentificadorRegistro() == 1) {
-                registro.setHistorico(linha.substring(49, 74).trim());
-                System.out.println("registro identificador " + linha.substring(49, 74).trim());
+        DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(84, 86)), Integer.parseInt(linha.substring(82, 84)), Integer.parseInt(linha.substring(80, 82)), 0, 0, 0, 0);
+        registro.setDataPagamento(DataUtil.getCalendar(data));
+        registro.setTipo(linha.substring(104, 105));
+        registro.setIdentificadorRegistro(Integer.valueOf(linha.substring(41, 42)));
+        registro.setContaCorrente(linha.substring(21, 28));
+        registro.setDoc(linha.substring(74, 80));
+        if (registro.getIdentificadorRegistro() == 1) {
+            registro.setHistorico(linha.substring(49, 74).trim());
+        } else if (registro.getIdentificadorRegistro() == 0) {
+            registro.setHistorico("SALDO INICIAL");
+            registro.setDoc("000000");
+        } else if (registro.getIdentificadorRegistro() == 2) {
+            registro.setHistorico("SALDO FINAL");
 
-            } else if (registro.getIdentificadorRegistro() == 0) {
-                registro.setHistorico("Saldo Inicial");
-                registro.setDoc("000000");
-            } else {
-                registro.setHistorico("Saldo Final");
-
-            }
-
-            if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
-                registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
-            }
-            registro.setValor(new Moeda(editarValor(linha, 86, 104)));
-
-            System.out.println(registro);
-            return registro;
-        } else {
-            return null;
         }
+
+        if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
+            registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
+        }
+        registro.setValor(new Moeda(editarValor(linha, 86, 104)));
+
+        System.out.println(registro);
+        return registro;
 
 
     }
