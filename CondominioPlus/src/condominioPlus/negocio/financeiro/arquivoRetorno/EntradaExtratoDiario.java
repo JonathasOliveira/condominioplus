@@ -8,6 +8,7 @@ import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
+import condominioPlus.negocio.financeiro.Pagamento;
 import java.awt.FileDialog;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,6 +34,7 @@ public class EntradaExtratoDiario {
     private List<ExtratoBancario> extratosSalvos;
     private List<ArquivoAtualizado> listaArquivos;
     private List<Identificador> identificadores;
+    private List<Pagamento> pagamentosEmAberto;
     private ArquivoAtualizado arquivo;
 
     public EntradaExtratoDiario() {
@@ -42,6 +44,7 @@ public class EntradaExtratoDiario {
         File diretorio = new File(fileDialog.getDirectory());
         lerArquivo(diretorio.listFiles());
         setCondominio(registros);
+        lancarNoContaCorrente();
     }
 
     public void lerArquivo(File arquivos[]) {
@@ -101,7 +104,7 @@ public class EntradaExtratoDiario {
 
     private void setCondominio(List<ExtratoBancario> extratos) {
         for (ExtratoBancario ex : extratos) {
-            Condominio c = localizaCondominio(ex.getContaCorrente());
+            Condominio c = localizarCondominio(ex.getContaCorrente());
             if (c != null) {
                 ex.setCondominio(c);
                 verificarPagamento(ex);
@@ -122,11 +125,46 @@ public class EntradaExtratoDiario {
         }
     }
 
-    private void lancarNoContaCorrente(){}
+    private void lancarNoContaCorrente() {
+        Identificador identificador = null;
+        DAO dao = new DAO();
+        for (ExtratoBancario e : registros) {
+            identificador = localizaIdentificador(e.getHistorico());
+            if (identificador != null && e.getIdentificadorRegistro() == 1) {
+                pagamentosEmAberto = dao.listar("PagamentosContaPagarPorPeriodo", localizarCondominio(e.getContaCorrente()).getContaPagar(), e.getDataPagamento(), e.getDataPagamento());
+                System.out.println("identificador - " + identificador.getPalavraChave());
+                Pagamento p = new Pagamento();
+                p.setConta(identificador.getConta());
+                p.setContaCorrente(localizarCondominio(e.getContaCorrente()).getContaCorrente());
+                p.setDataPagamento(e.getDataPagamento());
+                p.setPago(true);
+                p.setHistorico(p.getConta().getNome());
+                p.setValor(e.getValor().bigDecimalValue());
+                if (!pagamentosEmAberto.isEmpty()) {
+                    for (Pagamento pagamentoEmAberto : pagamentosEmAberto) {
+                        if (pagamentoEmAberto.getValor() == p.getValor() && DataUtil.compararData(DataUtil.getDateTime(pagamentoEmAberto.getDataVencimento()), DataUtil.getDateTime(p.getDataPagamento())) == 0) {
+                            pagamentoEmAberto.setPago(true);
+                            pagamentoEmAberto.setDataPagamento(p.getDataPagamento());
+                            pagamentoEmAberto.setContaCorrente(p.getContaCorrente());
+                            System.out.println("Pagamento em aberto: " + DataUtil.toString(pagamentoEmAberto.getDataPagamento()) + " " + pagamentoEmAberto.getValor().toString() + " " + pagamentoEmAberto.getConta().getNome());
+//                            dao.salvar(pagamentoEmAberto);
+                        } else {
+                            System.out.println("Novo Pagamento : " + DataUtil.toString(p.getDataPagamento()) + " " + p.getValor().toString() + " " + p.getConta().getNome());
+//                            dao.salvar(p);
+                        }
+                    }
+                } else {
+                    System.out.println("Novo pagamento: " + DataUtil.toString(p.getDataPagamento()) + " " + p.getValor().toString() + " " + p.getConta().getNome());
+//                    dao.salvar(p);
+                }
+            }
+        }
+    }
 
-    private void verificarCheques(){}
+    private void verificarCheques() {
+    }
 
-    private Condominio localizaCondominio(String condominio) {
+    private Condominio localizarCondominio(String condominio) {
 
         for (Condominio c : condominios) {
             if (c.getContaBancaria().getContaCorrente().equals(condominio)) {
@@ -138,26 +176,23 @@ public class EntradaExtratoDiario {
 
     }
 
-//    private Identificador localizaIdentificador(String ident) {
-//
-//        for (Identificador i : identificadores) {
-//            if (i.getPalavraChave().equalsIgnoreCase(ident)) {
-//                System.out.println("i " + i.getPalavraChave());
-//                return i;
-//            }
-//        }
-//
-//        return null;
-//
-//    }
-    private void carregarConexao() {
+    private Identificador localizaIdentificador(String ident) {
 
+        for (Identificador i : identificadores) {
+            if (i.getPalavraChave().equalsIgnoreCase(ident)) {
+                return i;
+            }
+        }
+
+        return null;
+
+    }
+
+    private void carregarConexao() {
         extratosSalvos = new DAO().listar(ExtratoBancario.class);
         condominios = new DAO().listar(Condominio.class);
         listaArquivos = new DAO().listar(ArquivoAtualizado.class);
         identificadores = new DAO().listar(Identificador.class);
-
-
     }
 
     private ExtratoBancario obterRegistro(String linha) {
@@ -186,12 +221,9 @@ public class EntradaExtratoDiario {
 
         System.out.println(registro);
         return registro;
-
-
     }
 
     private double editarValor(String linha, int indiceInicio, int indiceTermino) {
-
         String valor = linha.substring(indiceInicio, indiceTermino);
         double numero = (Double.parseDouble(valor)) / 100;
 
