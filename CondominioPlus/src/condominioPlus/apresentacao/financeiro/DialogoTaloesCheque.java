@@ -24,7 +24,6 @@ import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.exception.TratadorExcecao;
-
 /**
  *
  * @author Administrador
