@@ -27,7 +27,8 @@ import logicpoint.util.DataUtil;
 @NamedQueries(value={
     @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2 ORDER BY e.codigo"),
     @NamedQuery(name="ExtratosPorMes", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo"),
-    @NamedQuery(name="ExtratosPorCondominio", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 ORDER BY e.codigo")
+    @NamedQuery(name="ExtratosPorCondominio", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 ORDER BY e.codigo"),
+    @NamedQuery(name="ExtratoSaldoFinal", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 AND e.identificadorRegistro = ?2 ORDER BY e.codigo")
 })
 @Table(name = "extrato_bancario")
 public class ExtratoBancario implements Serializable {

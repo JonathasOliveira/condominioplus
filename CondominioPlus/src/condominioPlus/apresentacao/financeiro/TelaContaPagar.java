@@ -83,6 +83,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 //        new LimitarCaracteres(10).ValidaNumero(txtConta);
         txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
         painelCheques.setVisible(false);
+        painelSaldoContaCorrente.setVisible(false);
         btnGravar.setEnabled(false);
         btnImprimir.setEnabled(false);
         if (condominio != null) {
@@ -477,6 +478,17 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
         }
     }
+    
+    private void verificarSaldoContaCorrente(){
+        if (painelSaldoContaCorrente.isVisible()){
+            btnExibirSaldoCC.setToolTipText("Exibir Saldo Conta Corrente");
+            painelSaldoContaCorrente.setVisible(false);
+        } else {
+             btnExibirSaldoCC.setToolTipText("Ocultar Saldo Conta Corrente");
+             painelSaldoContaCorrente.setVisible(true);
+             lblSaldoContaCorrente.setText(condominio.getContaCorrente().getSaldo().toString().replace(".", ","));
+        }
+    }    
 
 //    private void carregarComboFiltro() {
 //        cbFiltros.setModel(new ComboModelo<String>(Util.toList(new String[]{" ", "Crédito", "Débito"}), false));
@@ -509,7 +521,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 imprimirCheques();
             } else if (origem == itemMenuEditarPagamento) {
                 editarPagamento();
-
+            } else if (origem == btnExibirSaldoCC){
+                verificarSaldoContaCorrente();
             }
         }
 
@@ -531,6 +544,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             btnNumeroDocumento.addActionListener(this);
             btnGravar.addActionListener(this);
             btnImprimir.addActionListener(this);
+            btnExibirSaldoCC.addActionListener(this);
         }
 
         @Override
@@ -589,8 +603,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         itemMenuApagarSelecionados = new javax.swing.JMenuItem();
         itemMenuPagarSelecionados = new javax.swing.JMenuItem();
         itemMenuEditarPagamento = new javax.swing.JMenuItem();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tabelaContaPagar = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
         btnIncluir = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -607,6 +619,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         btnNumeroDocumento = new javax.swing.JToggleButton();
         btnImprimir = new javax.swing.JButton();
         btnGravar = new javax.swing.JButton();
+        btnExibirSaldoCC = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         dataTermino = new net.sf.nachocalendar.components.DateField();
@@ -615,6 +628,12 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         painelCheques = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaCheque = new javax.swing.JTable();
+        painelSaldoContaCorrente = new javax.swing.JPanel();
+        lblTextoSaldo = new javax.swing.JLabel();
+        lblSaldoContaCorrente = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tabelaContaPagar = new javax.swing.JTable();
 
         itemMenuApagarSelecionados.setText("Apagar Selecionado");
         popupMenu.add(itemMenuApagarSelecionados);
@@ -630,16 +649,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         setClosable(true);
         setTitle("Contas a Pagar");
         setPreferredSize(new java.awt.Dimension(843, 626));
-
-        tabelaContaPagar.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        jScrollPane1.setViewportView(tabelaContaPagar);
 
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -684,6 +693,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         btnGravar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/buscar.gif"))); // NOI18N
         btnGravar.setToolTipText("Gravar Cheques");
 
+        btnExibirSaldoCC.setText("Saldo C/C");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -691,26 +702,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(71, 71, 71)
-                        .addComponent(btnNumeroDocumento)
-                        .addGap(33, 33, 33)
-                        .addComponent(btnConta)
-                        .addGap(33, 33, 33)
-                        .addComponent(jLabel3)
-                        .addGap(99, 99, 99)
-                        .addComponent(jLabel2))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -720,8 +711,34 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnGravar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(35, Short.MAX_VALUE))
+                        .addComponent(btnGravar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(38, 38, 38)
+                        .addComponent(btnExibirSaldoCC))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(71, 71, 71)
+                                .addComponent(btnNumeroDocumento)))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnConta)
+                            .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(6, 6, 6)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(105, 105, 105)
+                                .addComponent(jLabel2))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -731,8 +748,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     .addComponent(jLabel1)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(1, 1, 1)
-                        .addComponent(btnNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnConta)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnConta)))
                     .addComponent(jLabel3)
                     .addComponent(jLabel2))
                 .addGap(6, 6, 6)
@@ -749,13 +767,14 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                         .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnFixarHistórico, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnFixarHistórico, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
                         .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnIncluir)
-                    .addComponent(btnImprimir)
-                    .addComponent(btnGravar))
+                    .addComponent(btnIncluir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnImprimir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnGravar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnExibirSaldoCC, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -778,7 +797,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(dataTermino, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(271, Short.MAX_VALUE))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -805,30 +824,95 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         painelCheques.setLayout(painelChequesLayout);
         painelChequesLayout.setHorizontalGroup(
             painelChequesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 817, Short.MAX_VALUE)
+            .addGroup(painelChequesLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 772, Short.MAX_VALUE)
+                .addContainerGap())
         );
         painelChequesLayout.setVerticalGroup(
             painelChequesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelChequesLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        lblTextoSaldo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        lblTextoSaldo.setText("Saldo Cta. Corrente: R$");
+
+        lblSaldoContaCorrente.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        lblSaldoContaCorrente.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblSaldoContaCorrente.setText("0,00");
+
+        javax.swing.GroupLayout painelSaldoContaCorrenteLayout = new javax.swing.GroupLayout(painelSaldoContaCorrente);
+        painelSaldoContaCorrente.setLayout(painelSaldoContaCorrenteLayout);
+        painelSaldoContaCorrenteLayout.setHorizontalGroup(
+            painelSaldoContaCorrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelSaldoContaCorrenteLayout.createSequentialGroup()
+                .addContainerGap(513, Short.MAX_VALUE)
+                .addComponent(lblTextoSaldo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblSaldoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        painelSaldoContaCorrenteLayout.setVerticalGroup(
+            painelSaldoContaCorrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelSaldoContaCorrenteLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(painelSaldoContaCorrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSaldoContaCorrente)
+                    .addComponent(lblTextoSaldo))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabelaContaPagar.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(tabelaContaPagar);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 772, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(painelCheques, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(painelSaldoContaCorrente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 817, Short.MAX_VALUE)
-                            .addComponent(painelCheques, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(11, 11, 11)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -839,9 +923,11 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(painelCheques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(painelSaldoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -849,6 +935,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConta;
+    private javax.swing.JButton btnExibirSaldoCC;
     private javax.swing.JToggleButton btnFixarHistórico;
     private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnImprimir;
@@ -866,10 +953,14 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblSaldoContaCorrente;
+    private javax.swing.JLabel lblTextoSaldo;
     private javax.swing.JPanel painelCheques;
+    private javax.swing.JPanel painelSaldoContaCorrente;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaCheque;
     private javax.swing.JTable tabelaContaPagar;
