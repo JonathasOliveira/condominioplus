@@ -74,7 +74,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private void verificarConformeDisponibilidade() {
-        if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
+        if (pagamento.getContratoEmprestimo() != null && pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
             if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)) {
                 desabilitarPainelNovoPagamento();
 
