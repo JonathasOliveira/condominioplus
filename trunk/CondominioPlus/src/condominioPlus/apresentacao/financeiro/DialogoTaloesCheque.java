@@ -24,6 +24,8 @@ import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.exception.TratadorExcecao;
+import logicpoint.persistencia.DAO;
+
 /**
  *
  * @author Administrador
@@ -92,23 +94,23 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
         TelaPrincipal.getInstancia().criarJanela(new DialogoTaloesCheque(pai, dados));
         return dados;
     }
-
-    private boolean validarIntervalo(){
-
-        List<DadosTalaoCheque> lista = Main.getCondominio().getDadosTalaoCheques();
-        for (DadosTalaoCheque d : lista) {
-            if (d.verificarIntervaloChequeSemContaCorrente(txtNumeroInicial.getText()) || d.verificarIntervaloChequeSemContaCorrente(txtNumeroFinal.getText())) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
+//
+//    private boolean validarIntervalo(){
+//
+//        List<DadosTalaoCheque> lista = Main.getCondominio().getDadosTalaoCheques();
+//        for (DadosTalaoCheque d : lista) {
+//            if (d.verificarIntervaloChequeSemContaCorrente(txtNumeroInicial.getText()) || d.verificarIntervaloChequeSemContaCorrente(txtNumeroFinal.getText())) {
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//
+//    }
 
     private boolean verificarStatus() {
 
-        List<DadosTalaoCheque> lista = Main.getCondominio().getDadosTalaoCheques();
+        List<DadosTalaoCheque> lista = new DAO().listar("TaloesPorCondominio", Main.getCondominio().getCodigo());
         for (DadosTalaoCheque d : lista) {
             if (d.isEmUso() && radioEmUso.isSelected()) {
                 return true;
@@ -128,10 +130,10 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
                 return;
             }
 
-            if (validarIntervalo()){
-                ApresentacaoUtil.exibirAdvertencia("Verifique o intervalo de cheques", this);
-                return;
-            }
+//            if (validarIntervalo()){
+//                ApresentacaoUtil.exibirAdvertencia("Verifique o intervalo de cheques", this);
+//                return;
+//            }
 
             if (verificarStatus()) {
                 ApresentacaoUtil.exibirAdvertencia("Já existe um talão de cheque em uso!", this);
@@ -139,6 +141,9 @@ public class DialogoTaloesCheque extends javax.swing.JDialog {
             }
 
             preencherObjeto();
+
+            new DAO().salvar(dados);
+            
 
             TipoAcesso tipo = null;
             if (dados.getCodigo() == 0) {
