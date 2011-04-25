@@ -319,7 +319,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private void verificarVinculo(Pagamento p1, String texto) {
-        System.out.println("Eestou aqui!");
         if (conta.getContaVinculada() != null) {
 
             TransacaoBancaria transacao = new TransacaoBancaria();

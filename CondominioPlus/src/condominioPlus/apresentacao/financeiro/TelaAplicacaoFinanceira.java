@@ -15,6 +15,7 @@ import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
@@ -126,7 +127,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         return campos;
     }
 
-    private void verificarDataPagamento(Pagamento p2) {
+    private void verificarListaVaziaAplicacao(Pagamento p2) {
         if (condominio.getAplicacao().getPagamentos().isEmpty()) {
             System.out.println("lista " + condominio.getAplicacao().getPagamentos().size());
             p2.setSaldo(p2.getValor());
@@ -135,14 +136,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
         }
     }
 
-    private void verificarDataPagamentoContaCorrente(Pagamento p2) {
-        if (condominio.getContaCorrente().getPagamentos().isEmpty()) {
-            p2.setSaldo(p2.getValor());
-            condominio.getContaCorrente().setSaldo(p2.getValor());
-        }
-    }
-
-    private void verificarLista() {
+  private void verificarLista() {
         if (condominio.getAplicacao().getPagamentos().size() == 1) {
             for (Pagamento p : getPagamentos()) {
                 p.setSaldo(p.getValor());
@@ -188,56 +182,12 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
 
             pagamento.setAplicacao(condominio.getAplicacao());
             pagamento.setPago(true);
-            verificarDataPagamento(pagamento);
+            verificarListaVaziaAplicacao(pagamento);
 
             condominio.getAplicacao().adicionarPagamento(pagamento);
             condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamento.getValor()));
 
-            if (conta.getContaVinculada() != null) {
-
-                TransacaoBancaria transacao = new TransacaoBancaria();
-                if (pagamento.getTransacaoBancaria() != null) {
-                    transacao = pagamento.getTransacaoBancaria();
-                }
-
-                Pagamento pagamentoRelacionado = new Pagamento();
-                if (transacao.getPagamentos() != null) {
-                    for (Pagamento p : transacao.getPagamentos()) {
-                        if (!p.equals(pagamento)) {
-                            pagamentoRelacionado = p;
-                        }
-                    }
-                }
-
-//                new DAO().salvar(transacao);
-
-                pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
-                pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
-                pagamentoRelacionado.setConta(conta.getContaVinculada());
-                if (pagamentoRelacionado.getConta().isCredito()) {
-                    pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-                } else {
-                    pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-                }
-                pagamentoRelacionado.setSaldo(new BigDecimal(0));
-                pagamentoRelacionado.setDadosPagamento(pagamento.getDadosPagamento());
-
-
-                pagamentoRelacionado.setContaCorrente(condominio.getContaCorrente());
-                pagamentoRelacionado.setPago(true);
-
-                transacao.adicionarPagamento(pagamento);
-                transacao.adicionarPagamento(pagamentoRelacionado);
-
-                verificarDataPagamentoContaCorrente(pagamentoRelacionado);
-                condominio.getContaCorrente().adicionarPagamento(pagamentoRelacionado);
-                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamentoRelacionado.getValor()));
-
-                System.out.println("Transacao Bancária: " + transacao);
-
-                pagamento.setTransacaoBancaria(transacao);
-                pagamentoRelacionado.setTransacaoBancaria(transacao);
-            }
+           PagamentoUtil.pagamentoVinculado(pagamento);
 
             new DAO().salvar(condominio);
             limparCampos();
