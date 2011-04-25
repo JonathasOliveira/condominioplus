@@ -17,6 +17,7 @@ import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
@@ -246,109 +247,14 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         condominio.getContaCorrente().adicionarPagamento(pagamento);
         condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamento.getValor()));
 
-        verificarVinculo();
+        PagamentoUtil.verificarVinculoPagamento(pagamento);
 
         new DAO().salvar(condominio);
         limparCampos();
 
     }
 
-    private void verificarVinculo() {
-        if (conta.getContaVinculada() != null) {
-            TransacaoBancaria transacao = new TransacaoBancaria();
-            if (pagamento.getTransacaoBancaria() != null) {
-                transacao = pagamento.getTransacaoBancaria();
-            }
 
-            Pagamento pagamentoRelacionado = new Pagamento();
-            if(transacao.getPagamentos() != null){
-                for (Pagamento p : transacao.getPagamentos()) {
-                    if(!p.equals(pagamento)){
-                        pagamentoRelacionado = p;
-                    }
-                }
-            }
-
-
-
-//                new DAO().salvar(transacao);
-
-            pagamentoRelacionado.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
-            pagamentoRelacionado.setHistorico(conta.getContaVinculada().getNome());
-            pagamentoRelacionado.setConta(conta.getContaVinculada());
-            if (pagamentoRelacionado.getConta().isCredito()) {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-            } else {
-                pagamentoRelacionado.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-            }
-            pagamentoRelacionado.setSaldo(new BigDecimal(0));
-            pagamentoRelacionado.setDadosPagamento(pagamento.getDadosPagamento());
-
-            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
-
-            if (nome.equals("AF")) {
-                pagamentoRelacionado.setAplicacao(condominio.getAplicacao());
-            } else if (nome.equals("PO")) {
-                pagamentoRelacionado.setPoupanca(condominio.getPoupanca());
-            } else if (nome.equals("CO")) {
-                pagamentoRelacionado.setConsignacao(condominio.getConsignacao());
-            } else if (nome.equals("EM")) {
-            }
-
-            pagamentoRelacionado.setPago(true);
-
-
-            transacao.adicionarPagamento(pagamento);
-            transacao.adicionarPagamento(pagamentoRelacionado);
-
-            if (nome.equals("AF")) {
-
-                verificarDataPagamentoAplicacao(pagamentoRelacionado);
-                condominio.getAplicacao().adicionarPagamento(pagamentoRelacionado);
-                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamentoRelacionado.getValor()));
-
-            } else if (nome.equals("PO")) {
-
-                verificarDataPagamentoPoupanca(pagamentoRelacionado);
-                condominio.getPoupanca().adicionarPagamento(pagamentoRelacionado);
-                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().add(pagamentoRelacionado.getValor()));
-
-            } else if (nome.equals("CO")) {
-
-                verificarDataPagamentoConsignacao(pagamentoRelacionado);
-                condominio.getConsignacao().adicionarPagamento(pagamentoRelacionado);
-                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamentoRelacionado.getValor()));
-
-            } else if (nome.equals("EM")) {
-            }
-
-            System.out.println("Transacao Bancária: " + transacao);
-
-            pagamento.setTransacaoBancaria(transacao);
-            pagamentoRelacionado.setTransacaoBancaria(transacao);
-        }
-    }
-
-    private void verificarDataPagamentoAplicacao(Pagamento p2) {
-        if (condominio.getAplicacao().getPagamentos().isEmpty()) {
-            p2.setSaldo(p2.getValor());
-            condominio.getAplicacao().setSaldo(p2.getValor());
-        }
-    }
-
-    private void verificarDataPagamentoPoupanca(Pagamento p2) {
-        if (condominio.getPoupanca().getPagamentos().isEmpty()) {
-            p2.setSaldo(p2.getValor());
-            condominio.getPoupanca().setSaldo(p2.getValor());
-        }
-    }
-
-    private void verificarDataPagamentoConsignacao(Pagamento p2) {
-        if (condominio.getConsignacao().getPagamentos().isEmpty()) {
-            p2.setSaldo(p2.getValor());
-            condominio.getConsignacao().setSaldo(p2.getValor());
-        }
-    }
 
     private String fixarHistorico() {
         String texto = "";

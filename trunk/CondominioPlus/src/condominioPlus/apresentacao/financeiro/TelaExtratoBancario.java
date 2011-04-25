@@ -15,6 +15,7 @@ import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
 import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,6 +25,7 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
 /**
@@ -81,7 +83,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 3:
                         return extratoBancario.getTipo();
                     case 4:
-                        return extratoBancario.getValor();
+                        return new Moeda(extratoBancario.getValor());
                     default:
                         return null;
                 }
@@ -104,7 +106,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaExtratoMensal() {
-        modeloTabelaExtratoMensal = new TabelaModelo_2<ExtratoBancario>(tabelaExtratoMensal, "Data, Histórico, Discrimação da Conta,Doc, Tipo, Valor".split(",")) {
+        modeloTabelaExtratoMensal = new TabelaModelo_2<ExtratoBancario>(tabelaExtratoMensal, "Data, Histórico, Discriminação da Conta,Doc, Tipo, Valor".split(",")) {
 
             @Override
             protected List<ExtratoBancario> getCarregarObjetos() {
@@ -125,7 +127,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 4:
                         return extratoBancario.getTipo();
                     case 5:
-                        return extratoBancario.getValor();
+                        return new Moeda(extratoBancario.getValor());
                     default:
                         return null;
                 }
