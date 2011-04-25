@@ -18,7 +18,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import logicpoint.util.DataUtil;
-import logicpoint.util.Moeda;
 
 /**
  *
@@ -27,7 +26,7 @@ import logicpoint.util.Moeda;
 @Entity
 @NamedQueries(value={
     @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2 ORDER BY e.codigo"),
-    @NamedQuery(name="ExtratosPorMês", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo"),
+    @NamedQuery(name="ExtratosPorMes", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo"),
     @NamedQuery(name="ExtratosPorCondominio", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 ORDER BY e.codigo")
 })
 @Table(name = "extrato_bancario")
@@ -76,12 +75,12 @@ public class ExtratoBancario implements Serializable {
         this.doc = doc;
     }
 
-    public Moeda getValor() {
-        return new Moeda(valor);
+    public BigDecimal getValor() {
+        return valor;
     }
 
-    public void setValor(Moeda valor) {
-        this.valor = valor.bigDecimalValue();
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
     }
 
     public Calendar getDataPagamento() {
@@ -132,8 +131,7 @@ public class ExtratoBancario implements Serializable {
         this.contaCorrente = contaCorrente;
     }
 
-    
-
+   
     @Override
     public String toString() {
         return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + " " + doc + " " + identificadorRegistro + " " ;

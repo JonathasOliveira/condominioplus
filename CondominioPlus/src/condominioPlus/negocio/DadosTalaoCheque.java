@@ -123,7 +123,6 @@ public class DadosTalaoCheque implements Serializable {
         System.out.println(novoNumeroInicial);
         System.out.println(novoNumeroFinal);
         if (novoValor >= novoNumeroInicial && novoValor <= novoNumeroFinal) {
-            System.out.println("here maneh");
             return true;
         }
         return false;

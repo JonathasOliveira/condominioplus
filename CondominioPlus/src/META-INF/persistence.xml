@@ -37,6 +37,7 @@
     <class>condominioPlus.negocio.financeiro.ContaIndispensavel</class>
     <class>condominioPlus.negocio.financeiro.ExtratoBancario</class>
     <class>condominioPlus.negocio.financeiro.Identificador</class>
+    <class>condominioPlus.negocio.financeiro.arquivoRetorno.ArquivoAtualizado</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>

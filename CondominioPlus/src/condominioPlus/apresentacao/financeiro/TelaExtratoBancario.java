@@ -146,7 +146,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     private List<ExtratoBancario> getExtratoMensal() {
         Calendar dataInicial = DataUtil.getCalendar(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         Calendar dataFinal = DataUtil.getCalendar(DataUtil.getUltimoDiaMes());
-        listaExtratoMensal = new DAO().listar("ExtratosPorMês", condominio, dataInicial, dataFinal);
+        listaExtratoMensal = new DAO().listar("ExtratosPorMes", condominio, dataInicial, dataFinal);
         return verificarSaldoInicial(listaExtratoMensal);
     }
 
