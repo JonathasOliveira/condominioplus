@@ -34,6 +34,8 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosContaPagar", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false order by c.dataVencimento"),
     @NamedQuery(name = "PagamentosContaPagarPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaPagar = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
+    @NamedQuery(name = "PagamentosContaReceber", query = "SELECT c FROM Pagamento c WHERE c.contaReceber = ?1 and c.pago = false order by c.dataVencimento"),
+    @NamedQuery(name = "PagamentosContaReceberPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaReceber = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorFornecedor", query = "SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosPorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.dadosPagamento = ?2"),
     @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2"),
@@ -71,6 +73,8 @@ public class Pagamento implements Serializable {
     private ContaCorrente contaCorrente;
     @ManyToOne
     private ContaPagar contaPagar;
+    @ManyToOne
+    private ContaReceber contaReceber;
     @ManyToOne
     private AplicacaoFinanceira aplicacao;
     @ManyToOne
@@ -211,6 +215,14 @@ public class Pagamento implements Serializable {
 
     public void setContaPagar(ContaPagar contaPagar) {
         this.contaPagar = contaPagar;
+    }
+
+    public ContaReceber getContaReceber() {
+        return contaReceber;
+    }
+
+    public void setContaReceber(ContaReceber contaReceber) {
+        this.contaReceber = contaReceber;
     }
 
     public DadosPagamento getDadosPagamento() {

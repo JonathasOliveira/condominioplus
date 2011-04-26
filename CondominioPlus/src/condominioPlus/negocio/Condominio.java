@@ -9,6 +9,7 @@ import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaIndispensavel;
 import condominioPlus.negocio.financeiro.ContaPagar;
+import condominioPlus.negocio.financeiro.ContaReceber;
 import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Poupanca;
@@ -77,6 +78,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ContaCorrente contaCorrente = new ContaCorrente();
     @OneToOne(cascade = CascadeType.ALL)
     private ContaPagar contaPagar;
+    @OneToOne(cascade = CascadeType.ALL)
+    private ContaReceber contaReceber;
     @OneToOne(cascade = CascadeType.ALL)
     private AplicacaoFinanceira aplicacao;
     @OneToOne(cascade = CascadeType.ALL)
@@ -296,6 +299,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setContaPagar(ContaPagar contaPagar) {
         this.contaPagar = contaPagar;
+    }
+
+    public ContaReceber getContaReceber() {
+        return contaReceber;
+    }
+
+    public void setContaReceber(ContaReceber contaReceber) {
+        this.contaReceber = contaReceber;
     }
 
     public List<DadosTalaoCheque> getDadosTalaoCheques() {
