@@ -6,6 +6,9 @@ package condominioPlus.negocio.financeiro;
 
 import condominioPlus.Main;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  *
@@ -160,6 +163,15 @@ public class PagamentoUtil {
             p2.setSaldo(p2.getValor());
             Main.getCondominio().getContaCorrente().setSaldo(p2.getValor());
         }
+    }
+
+    public static String formatarMoeda(Double valor) {
+
+        NumberFormat format = NumberFormat.getInstance();
+        format.setMinimumFractionDigits(2);
+        String valorFormatado;
+
+        return valorFormatado = format.format(valor);
     }
 }
 

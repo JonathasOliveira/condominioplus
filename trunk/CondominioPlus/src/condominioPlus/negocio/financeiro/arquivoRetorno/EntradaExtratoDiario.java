@@ -153,7 +153,7 @@ public class EntradaExtratoDiario {
                 pagamento.setDataPagamento(ex.getDataPagamento());
                 pagamento.setContaCorrente(ex.getCondominio().getContaCorrente());
                 pagamento.setPago(true);
-                pagamento.setHistorico(ex.getHistorico());
+                pagamento.setHistorico(ident.getConta().getNome());
                 if (ident.getConta().isCredito()) {
                     pagamento.setValor(ex.getValor());
                 } else {
@@ -217,7 +217,7 @@ public class EntradaExtratoDiario {
                 pagamento.setDataPagamento(ex.getDataPagamento());
                 pagamento.setPoupanca(ex.getCondominio().getPoupanca());
                 pagamento.setPago(true);
-                pagamento.setHistorico(ex.getHistorico());
+                pagamento.setHistorico(ident.getConta().getNome());
                 if (ident.getConta().isCredito()) {
                     pagamento.setValor(ex.getValor());
                 } else {
@@ -235,7 +235,7 @@ public class EntradaExtratoDiario {
             pagamento.setDataPagamento(ex.getDataPagamento());
             pagamento.setContaCorrente(ex.getCondominio().getContaCorrente());
             pagamento.setPago(true);
-            pagamento.setHistorico(ex.getHistorico());
+            pagamento.setHistorico(ident.getConta().getNome());
             if (ident.getConta().isCredito()) {
                 pagamento.setValor(ex.getValor());
             } else {
