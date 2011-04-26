@@ -18,24 +18,19 @@ import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
-import condominioPlus.negocio.financeiro.TransacaoBancaria;
-import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
 import condominioPlus.util.RenderizadorCelulaCor;
-import condominioPlus.validadores.ValidadorGenerico;
+import condominioPlus.util.RenderizadorCelulaCorData;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -53,13 +48,10 @@ import logicpoint.util.Util;
 public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     private ContaCorrente contaCorrente;
-    private Pagamento pagamento;
     private Condominio condominio;
-    private Conta conta;
     private TabelaModelo_2 modeloTabela;
-    private List<Pagamento> cheques = new ArrayList<Pagamento>();
     private List<Pagamento> pagamentos;
-    private RenderizadorCelulaCor renderizadorCelulaCor = new RenderizadorCelulaCor();
+    private RenderizadorCelulaCor renderizadorCelulaCor;
 
     /** Creates new form TelaContaCorrente */
     public TelaContaCorrente(Condominio condominio) {
@@ -81,7 +73,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
-        carregarFornecedor();
+        calcularSaldo();
 
         carregarTabela();
 
@@ -151,14 +143,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 }
             }
         };
-        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
 
-//        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
-//        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-//        direita.setHorizontalAlignment(SwingConstants.RIGHT);
-//
+        renderizadorCelulaCor = new RenderizadorCelulaCor(modeloTabela);
+        RenderizadorCelulaCorData renderizadorCelula = new RenderizadorCelulaCorData(modeloTabela);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setCellRenderer(renderizadorCelula);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(renderizadorCelulaCor);
@@ -210,15 +198,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     }
 
-    private List listaCampos() {
-        List<Object> campos = new ArrayList<Object>();
-        campos.add(txtNumeroDocumento);
-        campos.add(txtConta);
-        campos.add(txtValor);
-        campos.add(txtHistorico);
-        return campos;
-    }
-
     private List<Pagamento> getPagamentos() {
         pagamentos = new DAO().listar("PagamentosContaCorrente", condominio.getContaCorrente());
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
@@ -226,58 +205,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         ComparatorPagamento comparator = new ComparatorPagamento();
         Collections.sort(pagamentos, comparator);
         return pagamentos;
-    }
-
-    private void preencherPagamento() {
-        pagamento = new Pagamento();
-        ValidadorGenerico validador = new ValidadorGenerico();
-        if (!validador.validar(listaCampos())) {
-            validador.exibirErros(this);
-            return;
-        }
-        pagamento.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
-        pagamento.setHistorico(txtHistorico.getText());
-        pagamento.setFornecedor((Fornecedor) cbFornecedores.getModel().getSelectedItem());
-        pagamento.setConta(conta);
-        if (pagamento.getConta().isCredito()) {
-            pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-        } else {
-            pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-        }
-        pagamento.setSaldo(new BigDecimal(0));
-        pagamento.setContaCorrente(condominio.getContaCorrente());
-        pagamento.setPago(true);
-        verificarDataPagamento(pagamento);
-
-        pagamento.setForma(FormaPagamento.DINHEIRO);
-        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
-        condominio.getContaCorrente().adicionarPagamento(pagamento);
-        condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(pagamento.getValor()));
-
-        PagamentoUtil.verificarVinculoPagamento(pagamento);
-
-        new DAO().salvar(condominio);
-        limparCampos();
-
-    }
-
-    private String fixarHistorico() {
-        String texto = "";
-        if (btnFixarHistórico.isSelected()) {
-            texto = txtHistorico.getText();
-            return texto;
-        } else {
-            return texto;
-        }
-
-    }
-
-    private void verificarDataPagamento(Pagamento p2) {
-        if (condominio.getContaCorrente().getPagamentos().isEmpty()) {
-            p2.setSaldo(p2.getValor());
-            condominio.getContaCorrente().setSaldo(p2.getValor());
-
-        }
     }
 
     private void verificarLista() {
@@ -290,106 +217,77 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         }
     }
 
-    private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false);
-        c.setVisible(true);
-        if (c.getConta() != null) {
-            conta = c.getConta();
-            txtConta.setText(String.valueOf(conta.getCodigo()));
-            if (!btnFixarHistórico.isSelected()) {
-                txtHistorico.setText(conta.getNome());
-            } else {
-                txtHistorico.setText(fixarHistorico());
-            }
-        }
+    private void calcularSaldo() {
+        verificarLista();
+        contaCorrente.calculaSaldo(contaCorrente);
+        carregarTabela();
     }
 
-    public void setConta(Conta conta) {
-        this.conta = conta;
-    }
-
-    private void adicionarPagamento() {
-        preencherPagamento();
-    }
-
-    private void limparCampos() {
-        txtHistorico.setText(fixarHistorico());
-        txtConta.setText("");
-        txtNumeroDocumento.setText("");
-        txtValor.setText("");
-        cbFornecedores.setSelectedIndex(-1);
-    }
-
-    private void carregarFornecedor() {
-        cbFornecedores.setModel(new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class)));
-    }
-
-    private void apagarItensSelecionados() {
-        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
-            return;
-        }
-        if (modeloTabela.getLinhaSelecionada() > -1) {
-            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
-            List<Pagamento> itensRemoverContaCorrente = modeloTabela.getObjetosSelecionados();
-            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
-
-            for (Pagamento p : itensRemoverContaCorrente) {
-                if (p.getTransacaoBancaria() != null) {
-                    TransacaoBancaria transacao = p.getTransacaoBancaria();
-                    Pagamento pagamentoRelacionado = new Pagamento();
-                    for (Pagamento p2 : transacao.getPagamentos()) {
-                        if (!p.equals(p2)) {
-                            pagamentoRelacionado = p2;
-                            pagamentoRelacionado.setDadosPagamento(null);
-
-                            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
-
-                            if (nome.equals("AF")) {
-                                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
-                            } else if (nome.equals("PO")) {
-                                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().subtract(pagamentoRelacionado.getValor()));
-                            } else if (nome.equals("CO")) {
-                                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
-                            } else if (nome.equals("EM")) {
-                            }
-                            //verificar
-
-                            itensRelacionadosRemover.add(pagamentoRelacionado);
-                        }
-                    }
-                    new DAO().remover(transacao);
-                }
-                modeloTabela.remover(p);
-                modeloTabela.notificar();
-                contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
-            }
-            if (!itensRelacionadosRemover.isEmpty()) {
-                for (Pagamento p : itensRelacionadosRemover) {
-
-                    String nome = p.getConta().getNomeVinculo();
-
-                    if (nome.equals("AF")) {
-                        condominio.getAplicacao().getPagamentos().remove(p);
-                    } else if (nome.equals("PO")) {
-                        condominio.getPoupanca().getPagamentos().remove(p);
-                    } else if (nome.equals("CO")) {
-                        condominio.getConsignacao().getPagamentos().remove(p);
-                    } else if (nome.equals("EM")) {
-                    }
-                }
-                new DAO().remover(itensRelacionadosRemover);
-                //verificar
-            }
-            new DAO().remover(itensRemoverContaCorrente);
-            condominio.getContaCorrente().getPagamentos().removeAll(itensRemoverContaCorrente);
-            new DAO().salvar(condominio);
-            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
-        } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
-        }
-
-    }
-
+//  private void apagarItensSelecionados() {
+//        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+//            return;
+//        }
+//        if (modeloTabela.getLinhaSelecionada() > -1) {
+//            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
+//            List<Pagamento> itensRemoverContaCorrente = modeloTabela.getObjetosSelecionados();
+//            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
+//
+//            for (Pagamento p : itensRemoverContaCorrente) {
+//                if (p.getTransacaoBancaria() != null) {
+//                    TransacaoBancaria transacao = p.getTransacaoBancaria();
+//                    Pagamento pagamentoRelacionado = new Pagamento();
+//                    for (Pagamento p2 : transacao.getPagamentos()) {
+//                        if (!p.equals(p2)) {
+//                            pagamentoRelacionado = p2;
+//                            pagamentoRelacionado.setDadosPagamento(null);
+//
+//                            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
+//
+//                            if (nome.equals("AF")) {
+//                                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+//                            } else if (nome.equals("PO")) {
+//                                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().subtract(pagamentoRelacionado.getValor()));
+//                            } else if (nome.equals("CO")) {
+//                                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+//                            } else if (nome.equals("EM")) {
+//                            }
+//                            //verificar
+//
+//                            itensRelacionadosRemover.add(pagamentoRelacionado);
+//                        }
+//                    }
+//                    new DAO().remover(transacao);
+//                }
+//                modeloTabela.remover(p);
+//                modeloTabela.notificar();
+//                contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
+//            }
+//            if (!itensRelacionadosRemover.isEmpty()) {
+//                for (Pagamento p : itensRelacionadosRemover) {
+//
+//                    String nome = p.getConta().getNomeVinculo();
+//
+//                    if (nome.equals("AF")) {
+//                        condominio.getAplicacao().getPagamentos().remove(p);
+//                    } else if (nome.equals("PO")) {
+//                        condominio.getPoupanca().getPagamentos().remove(p);
+//                    } else if (nome.equals("CO")) {
+//                        condominio.getConsignacao().getPagamentos().remove(p);
+//                    } else if (nome.equals("EM")) {
+//                    }
+//                }
+//                new DAO().remover(itensRelacionadosRemover);
+//                //verificar
+//            }
+//            new DAO().remover(itensRemoverContaCorrente);
+//            condominio.getContaCorrente().getPagamentos().removeAll(itensRemoverContaCorrente);
+//            new DAO().salvar(condominio);
+//            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+//        } else {
+//            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+//        }
+//
+//    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -402,22 +300,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             Object origem = e.getSource();
-            if (origem == btnDocumento) {
-                contador = 0;
-            } else if (origem == btnConta) {
-                pegarConta();
-            } else if (origem == btnIncluir) {
-                adicionarPagamento();
-                carregarTabela();
-            } else if (origem == btnCalcular) {
-                verificarLista();
-                contaCorrente.calculaSaldo(contaCorrente);
-                carregarTabela();
-            } else if (origem == btnGravar) {
-//                gravarCheques();
-            } else if (origem == itemMenuApagarSelecionados) {
-                apagarItensSelecionados();
-            } else if (origem == btnFixarHistórico) {
+            if (origem == itemMenuApagarSelecionados) {
+//                apagarItensSelecionados();
             }
         }
 
@@ -433,15 +317,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaContaCorrente.this, JTextField.class);
 
-            btnConta.addActionListener(this);
-            btnDocumento.addActionListener(this);
             cbFiltros.addItemListener(this);
-            btnCalcular.addActionListener(this);
-            btnFixarHistórico.addActionListener(this);
-            btnGravar.addActionListener(this);
-            btnImprimir.addActionListener(this);
-            btnIncluir.addActionListener(this);
-            btnPesquisar.addActionListener(this);
             tabelaContaCorrente.addMouseListener(this);
             itemMenuApagarSelecionados.addActionListener(this);
         }
@@ -464,26 +340,38 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
-        jPanel3 = new javax.swing.JPanel();
-        btnPesquisar = new javax.swing.JButton();
-        btnImprimir = new javax.swing.JButton();
-        btnGravar = new javax.swing.JButton();
-        btnIncluir = new javax.swing.JButton();
-        btnCalcular = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
-        txtNumeroDocumento = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        txtData = new net.sf.nachocalendar.components.DateField();
-        txtValor = new javax.swing.JTextField();
-        txtConta = new javax.swing.JTextField();
-        btnConta = new javax.swing.JButton();
-        btnDocumento = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        txtHistorico = new javax.swing.JTextField();
-        cbFornecedores = new javax.swing.JComboBox();
-        btnFixarHistórico = new javax.swing.JToggleButton();
         cbFiltros = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jTextField5 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        jTextField6 = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        jTextField7 = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        jTextField8 = new javax.swing.JTextField();
+        jTextField9 = new javax.swing.JTextField();
+        jTextField10 = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jTextField11 = new javax.swing.JTextField();
+        jTextField12 = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
 
         itemMenuApagarSelecionados.setText("Apagar Selecionado");
         popupMenu.add(itemMenuApagarSelecionados);
@@ -507,115 +395,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tabelaContaCorrente);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        btnPesquisar.setText("Pesquisar");
-
-        btnImprimir.setText("Imprimir");
-
-        btnGravar.setText("Gravar");
-
-        btnIncluir.setText("Incluir");
-
-        btnCalcular.setText("Recalc");
-
-        jLabel3.setText("Valor:");
-
-        txtNumeroDocumento.setName("Número Documento"); // NOI18N
-
-        jLabel1.setText("Data Lançamento:");
-
-        txtData.setFocusable(false);
-        txtData.setRequestFocusEnabled(false);
-
-        txtValor.setName("Valor"); // NOI18N
-
-        txtConta.setName("Conta"); // NOI18N
-
-        btnConta.setText("Conta:");
-        btnConta.setBorder(null);
-        btnConta.setBorderPainted(false);
-        btnConta.setContentAreaFilled(false);
-        btnConta.setFocusable(false);
-        btnConta.setRequestFocusEnabled(false);
-        btnConta.setVerifyInputWhenFocusTarget(false);
-
-        btnDocumento.setText("Nº Cheque:");
-        btnDocumento.setBorder(null);
-        btnDocumento.setBorderPainted(false);
-        btnDocumento.setContentAreaFilled(false);
-        btnDocumento.setFocusable(false);
-        btnDocumento.setRequestFocusEnabled(false);
-        btnDocumento.setVerifyInputWhenFocusTarget(false);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtData, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(29, 29, 29)))
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnDocumento))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnConta)
-                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnCalcular)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnImprimir)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnGravar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnPesquisar))
-                    .addComponent(jLabel3))
-                .addContainerGap())
-        );
-
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnGravar, btnImprimir, btnIncluir});
-
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(btnConta, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(btnDocumento))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnIncluir)
-                        .addComponent(btnCalcular)
-                        .addComponent(btnImprimir)
-                        .addComponent(btnGravar)
-                        .addComponent(btnPesquisar))
-                    .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        txtHistorico.setName("Histórico"); // NOI18N
-
-        btnFixarHistórico.setText("Fixar Histórico");
 
         jLabel6.setText("Filtrar por:");
 
@@ -624,13 +404,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnFixarHistórico)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, 251, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(40, 40, 40)
+                .addContainerGap(677, Short.MAX_VALUE)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -641,67 +415,252 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
-                    .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnFixarHistórico))
+                    .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel1.setBackground(new java.awt.Color(0, 102, 102));
+        jLabel1.setText("Resumo da Conta Corrente:");
+
+        jLabel2.setText("Saldo Anterior");
+
+        jTextField1.setText("jTextField1");
+
+        jLabel3.setText("Créditos");
+
+        jTextField2.setText("jTextField2");
+
+        jLabel4.setText("Débitos");
+
+        jTextField3.setText("jTextField3");
+
+        jLabel5.setText("Saldos de Aplicações, Empréstimos e Outros:");
+
+        jTextField4.setText("jTextField4");
+
+        jLabel7.setText("Poupança");
+
+        jLabel8.setText("Aplicações");
+
+        jTextField5.setText("jTextField5");
+
+        jLabel9.setText("Consignações");
+
+        jTextField6.setText("jTextField6");
+
+        jLabel10.setText("Empréstimos");
+
+        jTextField7.setText("jTextField7");
+
+        jLabel11.setText("Resumo Extrato Bancário");
+
+        jTextField8.setText("jTextField8");
+
+        jTextField9.setText("jTextField9");
+
+        jTextField10.setText("jTextField10");
+
+        jLabel12.setText("Saldo Anterior");
+
+        jLabel13.setText("Créditos");
+
+        jLabel14.setText("Débitos");
+
+        jLabel15.setText("Saldos Atuais");
+
+        jTextField11.setText("jTextField11");
+
+        jTextField12.setText("jTextField12");
+
+        jLabel16.setText("Caixa");
+
+        jLabel17.setText("Extrato");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4)))
+                    .addComponent(jLabel5)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextField6))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addGap(51, 51, 51)
+                        .addComponent(jLabel8)
+                        .addGap(51, 51, 51)
+                        .addComponent(jLabel9)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addComponent(jLabel10))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(149, 149, 149)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel11)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel12))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel13)
+                            .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel14)))
+                    .addComponent(jLabel15)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel16))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel17)
+                            .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(61, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel11))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel12)
+                            .addComponent(jLabel13)
+                            .addComponent(jLabel14))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel15))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel10)
+                    .addComponent(jLabel16)
+                    .addComponent(jLabel17))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(22, 22, 22))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 914, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 415, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCalcular;
-    private javax.swing.JButton btnConta;
-    private javax.swing.JButton btnDocumento;
-    private javax.swing.JToggleButton btnFixarHistórico;
-    private javax.swing.JButton btnGravar;
-    private javax.swing.JButton btnImprimir;
-    private javax.swing.JButton btnIncluir;
-    private javax.swing.JButton btnPesquisar;
     private javax.swing.JComboBox cbFiltros;
-    private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField10;
+    private javax.swing.JTextField jTextField11;
+    private javax.swing.JTextField jTextField12;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField jTextField6;
+    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField jTextField9;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaContaCorrente;
-    private javax.swing.JTextField txtConta;
-    private net.sf.nachocalendar.components.DateField txtData;
-    private javax.swing.JTextField txtHistorico;
-    private javax.swing.JTextField txtNumeroDocumento;
-    private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
 }
 

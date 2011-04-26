@@ -9,33 +9,34 @@ import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JLabel;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.TabelaModelo_2;
+import logicpoint.util.DataUtil;
 
 /**
  *
  * @author Administrador
  */
-public class RenderizadorCelulaCor extends DefaultTableCellRenderer {
+public class RenderizadorCelulaCorData extends RenderizadorCelulaCor {
 
-    private Color corNaoPagoAberta = Color.GREEN.darker();
-    private Color corNaoPagoEncerrada = Color.RED.darker();
-    protected TabelaModelo_2 modeloTabela;
+    public RenderizadorCelulaCorData(TabelaModelo_2 modeloTabela) {
+        super(modeloTabela);
+    }
 
-    public RenderizadorCelulaCor(TabelaModelo_2 modeloTabela) {
-        this.modeloTabela = modeloTabela;
+    @Override
+    public void setValue(Object valor) {
+        super.setValue(DataUtil.toString(DataUtil.getDate(valor)));
     }
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-        setHorizontalAlignment(JLabel.RIGHT);
+        setHorizontalAlignment(JLabel.CENTER);
 
         Pagamento p = (Pagamento) modeloTabela.getObjeto(row);
 
         if (p.getConta().getCodigo() == 12902) {
-            setForeground(corNaoPagoEncerrada);
+            setForeground(Color.RED.darker());
         } else {
             setForeground(table.getForeground());
             if (isSelected) {
