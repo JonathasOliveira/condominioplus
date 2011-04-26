@@ -24,11 +24,13 @@ import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
+import condominioPlus.util.RenderizadorCelulaCor;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +59,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private TabelaModelo_2 modeloTabela;
     private List<Pagamento> cheques = new ArrayList<Pagamento>();
     private List<Pagamento> pagamentos;
+    private RenderizadorCelulaCor renderizadorCelulaCor = new RenderizadorCelulaCor();
 
     /** Creates new form TelaContaCorrente */
     public TelaContaCorrente(Condominio condominio) {
@@ -88,7 +91,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             this.setTitle("Conta Corrente - " + condominio.getRazaoSocial());
         }
     }
-  
+
     private void carregarTabela() {
         modeloTabela = new TabelaModelo_2<Pagamento>(tabelaContaCorrente, "Data, Documento, Conta, Descrição, Valor, Saldo ".split(",")) {
 
@@ -123,11 +126,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     case 2:
                         return pagamento.getConta().getCodigo();
                     case 3:
-                        return pagamento.getHistorico();
+                        return pagamento.getHistorico().toUpperCase();
                     case 4:
-                        return pagamento.getValor();
+                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
                     case 5:
-                        return pagamento.getSaldo();
+                        return PagamentoUtil.formatarMoeda(pagamento.getSaldo().doubleValue());
                     default:
                         return null;
                 }
@@ -152,15 +155,19 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
         DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
 
-        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+//        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+//        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+//        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+//
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(renderizadorCelulaCor);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setCellRenderer(renderizadorCelulaCor);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(renderizadorCelulaCor);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(renderizadorCelulaCor);
 
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(direita);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setCellRenderer(direita);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(direita);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(direita);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(direita);
+
+
+
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(300);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
 
@@ -253,8 +260,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         limparCampos();
 
     }
-
-
 
     private String fixarHistorico() {
         String texto = "";
