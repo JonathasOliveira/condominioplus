@@ -765,7 +765,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemFluxoCaixa.setText("Fluxo de Caixa");
         menuFinanceiro.add(menuItemFluxoCaixa);
 
-        menuItemContaPagar.setText("Contas a Pagar");
+        menuItemContaPagar.setText("Contas a Pagar/Receber");
         menuFinanceiro.add(menuItemContaPagar);
 
         menu.add(menuFinanceiro);
