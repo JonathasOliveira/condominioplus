@@ -139,7 +139,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemContaPagar">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Contas a Pagar"/>
+                <Property name="text" type="java.lang.String" value="Contas a Pagar/Receber"/>
               </Properties>
             </MenuItem>
           </SubComponents>
