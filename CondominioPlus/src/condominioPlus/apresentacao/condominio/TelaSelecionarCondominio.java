@@ -13,6 +13,8 @@ import java.util.List;
 import javax.swing.event.CaretEvent;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.DadosTalaoCheque;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
 import javax.swing.JTable;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -28,11 +30,13 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
 
     private ControladorEventos controlador;
     private TabelaModelo_2<Condominio> modelo;
+    private JDesktopPane desktop;
 
     /** Creates new form TelaFuncionario */
-    public TelaSelecionarCondominio() {
+    public TelaSelecionarCondominio(JDesktopPane desktop) {
         initComponents();
 
+        this.desktop = desktop;
         controlador = new ControladorEventos();
 
         carregarTabela();
@@ -43,6 +47,11 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
     }
 
     private void sair() {
+        if (!modelo.getObjetoSelecionado().equals(Main.getCondominio())) {
+            for (JInternalFrame f : desktop.getAllFrames()) {
+                f.dispose();
+            }
+        }
         doDefaultCloseAction();
     }
 
