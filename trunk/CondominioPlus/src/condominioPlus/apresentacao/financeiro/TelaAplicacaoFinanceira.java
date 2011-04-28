@@ -285,7 +285,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false);
+        DialogoConta c = new DialogoConta(null, true, true, false, "AF");
         c.setVisible(true);
 
         if (c.getConta() != null) {

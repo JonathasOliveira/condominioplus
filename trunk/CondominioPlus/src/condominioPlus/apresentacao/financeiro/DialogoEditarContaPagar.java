@@ -222,7 +222,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 
 
         }
-        return String.valueOf(total.negate());
+        return String.valueOf(total);
 
 
     }
@@ -316,7 +316,11 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, false, false);
+        boolean exibirCredito = false;
+        if (pagamento.getConta().isCredito()) {
+            exibirCredito = true;
+        }
+        DialogoConta c = new DialogoConta(null, true, exibirCredito, false, "");
         c.setVisible(true);
 
 

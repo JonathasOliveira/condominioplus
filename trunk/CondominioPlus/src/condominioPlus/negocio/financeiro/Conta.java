@@ -21,7 +21,8 @@ import logicpoint.persistencia.Removivel;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "ListarContas", query = "SELECT c FROM Conta c WHERE c.credito = ?1 order by c.codigo"),
+    @NamedQuery(name = "ListarContasTipo", query = "SELECT c FROM Conta c WHERE c.credito = ?1 AND c.contaVinculada is null AND c.nomeVinculo = '' order by c.codigo"),
+    @NamedQuery(name = "ListarContasVinculo", query = "SELECT c FROM Conta c WHERE c.nomeVinculo = ?1 order by c.codigo"),
     @NamedQuery(name = "LocalizarContas", query = "SELECT c FROM Conta c WHERE c.codigo = ?1 and c.credito = ?2 order by c.codigo")
 })
 public class Conta implements Serializable, Removivel {

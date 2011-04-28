@@ -116,7 +116,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, true);
+        DialogoConta c = new DialogoConta(null, true, true, true, "T");
         c.setVisible(true);
 
         if (c.getConta() != null) {
