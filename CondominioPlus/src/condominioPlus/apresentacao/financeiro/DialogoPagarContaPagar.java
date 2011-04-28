@@ -226,6 +226,10 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         return new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
     }
 
+    private List<Pagamento> getPagamentosContasReceber() {
+        return new DAO().listar("PagamentosPorNumeroDocumentoContaReceber", Main.getCondominio().getContaReceber(), pagamento.getDadosPagamento());
+    }
+
     private List<Pagamento> getPagamentosSemOriginal() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
         System.out.println("listaaaa  " + lista);
@@ -282,10 +286,16 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private String somarCheque() {
-        for (Pagamento p : getPagamentos()) {
-            total = total.add(p.getValor());
+        if (pagamento.getContaPagar() != null) {
+            for (Pagamento p : getPagamentos()) {
+                total = total.add(p.getValor());
+            }
+        } else if (pagamento.getContaReceber() != null) {
+            for (Pagamento p : getPagamentosContasReceber()) {
+                total = total.add(p.getValor());
+            }
         }
-        return String.valueOf(total.negate());
+        return String.valueOf(total);
     }
 
     private void imprimirCheques() {
@@ -322,7 +332,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, false, false);
+        boolean exibirCredito = false;
+        if (pagamento.getConta().isCredito()) {
+            exibirCredito = true;
+        }
+        DialogoConta c = new DialogoConta(null, true, exibirCredito, false, "");
         c.setVisible(true);
 
         if (c.getConta() != null) {

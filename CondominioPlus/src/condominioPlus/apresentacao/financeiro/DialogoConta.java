@@ -32,15 +32,17 @@ public class DialogoConta extends javax.swing.JDialog {
     private Conta conta;
     private boolean credito;
     private boolean selecaoNula;
+    private String nomeVinculo;
 
     /** Creates new form DialogoConta */
-    public DialogoConta(java.awt.Frame parent, boolean modal, boolean credito, boolean selecaoNula) {
+    public DialogoConta(java.awt.Frame parent, boolean modal, boolean credito, boolean selecaoNula, String nomeVinculo) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
         this.credito = credito;
         this.selecaoNula = selecaoNula;
+        this.nomeVinculo = nomeVinculo;
         carregarTipoBusca();
         carregarTabela();
     }
@@ -55,7 +57,7 @@ public class DialogoConta extends javax.swing.JDialog {
 
             @Override
             protected List<Conta> getCarregarObjetos() {
-                return getContas(credito);
+                return getContas();
             }
 
             @Override
@@ -148,13 +150,14 @@ public class DialogoConta extends javax.swing.JDialog {
         dispose();
     }
 
-    private List<Conta> getContas(boolean credito) {
-        if (credito) {
+    private List<Conta> getContas() {
+        if (credito && nomeVinculo.equals("T")) {
             return new DAO().listar(Conta.class);
+        } else if (nomeVinculo.equals("")) {
+            return new DAO().listar("ListarContasTipo", credito);
         } else {
-            return new DAO().listar("ListarContas", credito);
+            return new DAO().listar("ListarContasVinculo", nomeVinculo);
         }
-
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

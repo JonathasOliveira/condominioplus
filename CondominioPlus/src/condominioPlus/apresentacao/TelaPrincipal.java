@@ -410,7 +410,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                 } else if (source == menuItemSobre) {
                     criarFrame(new TelaSobre());
                 } else if (source == btnSelecionarCondominio) {
-                    criarFrame(new TelaSelecionarCondominio());
+                    criarFrame(new TelaSelecionarCondominio(desktop));
                 } else if (source == menuItemContas) {
                     criarFrame(new TelaConta());
                 } else if (source == menuItemIdentificadores) {

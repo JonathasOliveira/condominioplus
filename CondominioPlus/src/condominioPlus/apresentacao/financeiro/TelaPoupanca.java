@@ -253,7 +253,7 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false);
+        DialogoConta c = new DialogoConta(null, true, true, false, "PO");
         c.setVisible(true);
 
         if (c.getConta() != null) {

@@ -189,7 +189,7 @@ public class TelaContasIndispensaveis extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false);
+        DialogoConta c = new DialogoConta(null, true, false, false, "");
         c.setVisible(true);
 
         if (c.getConta() != null) {

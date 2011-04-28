@@ -38,6 +38,7 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosContaReceberPorPeriodo", query = "SELECT p FROM Pagamento p WHERE p.contaReceber = ?1 and p.pago = false and p.dataVencimento >= ?2 and p.dataVencimento <= ?3 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorFornecedor", query = "SELECT p FROM Pagamento p WHERE p.fornecedor = ?1 and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosPorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.dadosPagamento = ?2"),
+    @NamedQuery(name = "PagamentosPorNumeroDocumentoContaReceber", query = "SELECT c FROM Pagamento c WHERE c.contaReceber = ?1 and c.pago = false and c.dadosPagamento = ?2"),
     @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2"),
     @NamedQuery(name = "PagamentosAplicacaoFinanceira", query = "SELECT c FROM Pagamento c WHERE c.aplicacao = ?1"),
     @NamedQuery(name = "PagamentosAplicacaoOrdenados", query="SELECT p FROM Pagamento p WHERE p.aplicacao = ?1 order by p.dataPagamento"),
