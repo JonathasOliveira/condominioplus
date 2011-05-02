@@ -30,6 +30,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -95,9 +97,9 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                     case 1:
                         return pagamento.getHistorico();
                     case 2:
-                        return pagamento.getValor();
+                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
                     case 3:
-                        return pagamento.getSaldo();
+                        return PagamentoUtil.formatarMoeda(pagamento.getSaldo().doubleValue());
                     case 4:
                         return pagamento.getConta().getCodigo();
                     case 5:
@@ -107,6 +109,13 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
                 }
             }
         };
+
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabelaPoupanca.getColumn(modeloTabela.getCampo(2)).setCellRenderer(direita);
+        tabelaPoupanca.getColumn(modeloTabela.getCampo(3)).setCellRenderer(direita);
 
     }
 
