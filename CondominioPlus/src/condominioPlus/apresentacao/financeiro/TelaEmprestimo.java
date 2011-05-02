@@ -158,9 +158,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
         };
 
-                DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
 
-               direita.setHorizontalAlignment(SwingConstants.RIGHT);
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
 
         tabela.getColumn(modelo.getCampo(4)).setCellRenderer(direita);
         tabela.getColumn(modelo.getCampo(5)).setCellRenderer(direita);
