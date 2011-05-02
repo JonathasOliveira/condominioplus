@@ -19,6 +19,7 @@ import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
@@ -39,6 +40,7 @@ import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
 /**
@@ -146,15 +148,22 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     case 3:
                         return c.getNumeroParcelas();
                     case 4:
-                        return c.getValor();
+                        return PagamentoUtil.formatarMoeda(c.getValor().doubleValue());
                     case 5:
-                        return c.getSaldo();
+                        return PagamentoUtil.formatarMoeda(c.getSaldo().doubleValue());
                     default:
                         return null;
 
                 }
             }
         };
+
+                DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+               direita.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabela.getColumn(modelo.getCampo(4)).setCellRenderer(direita);
+        tabela.getColumn(modelo.getCampo(5)).setCellRenderer(direita);
 
         tabela.getColumn(modelo.getCampo(0)).setMaxWidth(80);
         tabela.getColumn(modelo.getCampo(1)).setMinWidth(150);
@@ -467,7 +476,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     case 1:
                         return pagamento.getHistorico();
                     case 2:
-                        return pagamento.getValor();
+                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
                     case 3:
                         return pagamento.getConta().getCodigo();
                     case 4:
@@ -488,6 +497,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         centralizado.setHorizontalAlignment(SwingConstants.CENTER);
         direita.setHorizontalAlignment(SwingConstants.RIGHT);
 
+        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setCellRenderer(direita);
         tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
         tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
 
@@ -528,7 +538,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         txtCodigoContrato.setText(String.valueOf(c.getCodigo()));
         txtDescricao.setText(c.getDescricao());
         txtParcelasContrato.setText(String.valueOf(c.getNumeroParcelas()));
-        txtValorContrato.setText(c.getValor().toString());
+        txtValorContrato.setText(new Moeda(c.getValor()).toString());
     }
 
     private void editarPagamentoContrato() {
