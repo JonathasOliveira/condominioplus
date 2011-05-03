@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
 /**
@@ -116,28 +117,22 @@ public class EntradaExtratoDiario {
             Condominio c = localizarCondominio(ex.getContaCorrente());
             if (c != null) {
                 ex.setCondominio(c);
-                verificarPagamento(ex);
-                verificarCheques(ex);
-                verificarPoupanca(ex);
-            }
-        }
-    }
-
-    private void verificarPagamento(ExtratoBancario e) {
-        if (!extratosSalvos.isEmpty()) {
-            for (ExtratoBancario ex : extratosSalvos) {
-                if (!ex.equals(e)) {
-                    new DAO().salvar(e);
+                if (!extratosSalvos.isEmpty()) {
+                    if (!extratosSalvos.contains(ex)) {
+                        new DAO().salvar(ex);
+                        verificarPagamentoNoContasAPagar(ex);
+                        verificarCheques(ex);
+                        verificarPoupanca(ex);
+                    }
+                } else {
+                    new DAO().salvar(ex);
                     verificarPagamentoNoContasAPagar(ex);
-                    System.out.println("teste");
+                    verificarCheques(ex);
+                    verificarPoupanca(ex);
 
                 }
+                //                verificarPoupanca(ex);
             }
-        } else {
-            new DAO().salvar(e);
-            verificarPagamentoNoContasAPagar(e);
-            System.out.println("teste2");
-
         }
     }
 
@@ -167,13 +162,8 @@ public class EntradaExtratoDiario {
             } else {
 
                 for (Pagamento p : pagamentosEmAberto) {
-                    System.out.println("cointa de pagamento " + p.getConta().getCodigo());
-                    System.out.println("conta do ident " + ident.getConta().getCodigo());
-                    System.out.println("valor pagamento " + p.getValor());
-                    System.out.println("valor ex " + ex.getValor().doubleValue());
                     ex.setValor(ex.getValor().negate());
                     if (p.getConta().getCodigo() == ident.getConta().getCodigo() && p.getValor().doubleValue() == ex.getValor().doubleValue()) {
-                        System.out.println("here");
                         p.setContaCorrente(ex.getCondominio().getContaCorrente());
                         p.setPago(true);
                         p.setDataPagamento(ex.getDataPagamento());
@@ -190,21 +180,23 @@ public class EntradaExtratoDiario {
 
     private void verificarCheques(ExtratoBancario ex) {
         List<Pagamento> pagamentosEmAberto = new DAO().listar("PagamentosContaPagarPorPeriodo", ex.getCondominio().getContaPagar(), DataUtil.getCalendar(DataUtil.getPrimeiroDiaMes()), DataUtil.getCalendar(DataUtil.getUltimoDiaMes()));
-        if (ex.getIdentificadorRegistro() == 1) {
-            for (Pagamento p : pagamentosEmAberto) {
-                if (p.getForma() == FormaPagamento.CHEQUE) {
-                    ex.setValor(ex.getValor().negate());
-                    if (((DadosCheque) p.getDadosPagamento()).getNumero() == Long.valueOf(ex.getCondominio().getContaBancaria().getContaCorrente() + ex.getDoc())) {
-                        p.setContaCorrente(ex.getCondominio().getContaCorrente());
-                        p.setPago(true);
-                        p.setDataPagamento(ex.getDataPagamento());
-                        PagamentoUtil.verificarListaVaziaContaCorrente(p);
-                        new DAO().salvar(p);
+        if (pagamentosEmAberto != null) {
+            if (ex.getIdentificadorRegistro() == 1) {
+                for (Pagamento p : pagamentosEmAberto) {
+                    if (p.getForma() == FormaPagamento.CHEQUE) {
+                        ex.setValor(ex.getValor().negate());
+                        if (((DadosCheque) p.getDadosPagamento()).getNumero() == Long.valueOf(ex.getCondominio().getContaBancaria().getContaCorrente() + ex.getDoc())) {
+                            p.setContaCorrente(ex.getCondominio().getContaCorrente());
+                            p.setPago(true);
+                            p.setDataPagamento(ex.getDataPagamento());
+                            PagamentoUtil.verificarListaVaziaContaCorrente(p);
+                            new DAO().salvar(p);
+                        }
+
                     }
-
                 }
-            }
 
+            }
         }
     }
 
@@ -304,17 +296,19 @@ public class EntradaExtratoDiario {
         if (registro.getIdentificadorRegistro() == 1 && !linha.substring(182, 183).equals(" ")) {
             registro.setNatureza(Integer.valueOf(linha.substring(182, 183)));
         }
-        registro.setValor(new BigDecimal(editarValor(linha, 86, 104)));
+        registro.setValor(new BigDecimal(editarValor(linha, 86, 104).doubleValue()));
 
         System.out.println(registro);
         return registro;
     }
 
-    private double editarValor(String linha, int indiceInicio, int indiceTermino) {
+    private Moeda editarValor(String linha, int indiceInicio, int indiceTermino) {
         String valor = linha.substring(indiceInicio, indiceTermino);
+
         double numero = (Double.parseDouble(valor)) / 100;
 
-        return numero;
+        return new Moeda(numero);
+
     }
 
     private BufferedReader pegarReader(File arquivo) throws FileNotFoundException {
