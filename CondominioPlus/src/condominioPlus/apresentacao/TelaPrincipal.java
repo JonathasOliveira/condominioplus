@@ -212,7 +212,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     public static void preencherCondominio(Condominio c) {
         lblCondominio.setText(c.getRazaoSocial());
         lblCondominio.setVisible(true);
-
     }
 
     public static TelaPrincipal getInstancia() {

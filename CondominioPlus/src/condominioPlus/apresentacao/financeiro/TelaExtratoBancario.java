@@ -17,9 +17,10 @@ import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
 import java.awt.event.ActionEvent;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -209,6 +210,33 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         Calendar dataInicial = DataUtil.getCalendar(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         Calendar dataFinal = DataUtil.getCalendar(DataUtil.getUltimoDiaMes());
         listaExtratoMensal = new DAO().listar("ExtratosPorMes", condominio, dataInicial, dataFinal);
+
+        Comparator c1 = null;
+
+        c1 = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                ExtratoBancario e1 = (ExtratoBancario) o1;
+                ExtratoBancario e2 = (ExtratoBancario) o2;
+                return Integer.valueOf(e1.getIdentificadorRegistro()).compareTo(Integer.valueOf(e2.getIdentificadorRegistro()));
+            }
+        };
+
+        Collections.sort(listaExtratoMensal, c1);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                ExtratoBancario e1 = (ExtratoBancario) o1;
+                ExtratoBancario e2 = (ExtratoBancario) o2;
+                return e1.getDataPagamento().compareTo(e2.getDataPagamento());
+            }
+        };
+
+        Collections.sort(listaExtratoMensal, c);
+
         return verificarSaldoInicial(listaExtratoMensal);
     }
 
