@@ -24,11 +24,11 @@ import logicpoint.util.DataUtil;
  * @author eugenia
  */
 @Entity
-@NamedQueries(value={
-    @NamedQuery(name="ExtratosPorDia", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2 ORDER BY e.codigo"),
-    @NamedQuery(name="ExtratosPorMes", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo"),
-    @NamedQuery(name="ExtratosPorCondominio", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 ORDER BY e.codigo"),
-    @NamedQuery(name="ExtratoSaldoFinal", query="SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 AND e.identificadorRegistro = ?2 ORDER BY e.codigo")
+@NamedQueries(value = {
+    @NamedQuery(name = "ExtratosPorDia", query = "SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento= ?2 ORDER BY e.codigo"),
+    @NamedQuery(name = "ExtratosPorMes", query = "SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 and e.dataPagamento >= ?2 and e.dataPagamento <= ?3 ORDER BY e.codigo"),
+    @NamedQuery(name = "ExtratosPorCondominio", query = "SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 ORDER BY e.codigo"),
+    @NamedQuery(name = "ExtratoSaldoFinal", query = "SELECT e FROM ExtratoBancario e WHERE e.condominio = ?1 AND e.identificadorRegistro = ?2 ORDER BY e.codigo")
 })
 @Table(name = "extrato_bancario")
 public class ExtratoBancario implements Serializable {
@@ -36,7 +36,7 @@ public class ExtratoBancario implements Serializable {
     @Id
     @GeneratedValue
     private int codigo;
-    @Column(name="data_pagamento")
+    @Column(name = "data_pagamento")
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataPagamento;
     private String doc;
@@ -46,10 +46,10 @@ public class ExtratoBancario implements Serializable {
     private Condominio condominio;
     private String tipo;
     private int natureza;
-    @Column(name="identificador_historico")
+    @Column(name = "identificador_historico")
     private int identificadorRegistro;
     private String historico;
-    @Column(name="conta_corrente")
+    @Column(name = "conta_corrente")
     private String contaCorrente;
 
     public int getCodigo() {
@@ -132,12 +132,6 @@ public class ExtratoBancario implements Serializable {
         this.contaCorrente = contaCorrente;
     }
 
-   
-    @Override
-    public String toString() {
-        return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + " " + doc + " " + identificadorRegistro + " " ;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -147,22 +141,20 @@ public class ExtratoBancario implements Serializable {
             return false;
         }
         final ExtratoBancario other = (ExtratoBancario) obj;
-        if (this.dataPagamento != other.dataPagamento && (this.dataPagamento == null || !this.dataPagamento.equals(other.dataPagamento))) {
+
+        if (DataUtil.compararData(DataUtil.getDateTime(this.dataPagamento), DataUtil.getDateTime(other.dataPagamento)) != 0) {
             return false;
         }
-        if ((this.doc == null) ? (other.doc != null) : !this.doc.equals(other.doc)) {
+
+        if (this.valor.doubleValue() != other.valor.doubleValue()) {
             return false;
         }
-        if (this.condominio != other.condominio && (this.condominio == null || !this.condominio.equals(other.condominio))) {
+
+        if (!this.condominio.equals(other.condominio)){
             return false;
         }
-        if ((this.tipo == null) ? (other.tipo != null) : !this.tipo.equals(other.tipo)) {
-            return false;
-        }
-        if (this.identificadorRegistro != other.identificadorRegistro) {
-            return false;
-        }
-        if ((this.historico == null) ? (other.historico != null) : !this.historico.equals(other.historico)) {
+
+        if (!this.historico.equals(other.historico)) {
             return false;
         }
         return true;
@@ -174,6 +166,8 @@ public class ExtratoBancario implements Serializable {
         return hash;
     }
 
-    
-    
+    @Override
+    public String toString() {
+        return DataUtil.toString(dataPagamento) + " " + getValor() + " " + tipo + " " + " " + doc + " " + identificadorRegistro + " ";
+    }
 }

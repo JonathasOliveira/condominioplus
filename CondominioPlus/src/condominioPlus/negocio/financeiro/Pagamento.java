@@ -24,7 +24,7 @@ import logicpoint.persistencia.DAO;
 
 /**
  *
- * @author Administrador
+ * @author Administrado
  */
 
 @Entity

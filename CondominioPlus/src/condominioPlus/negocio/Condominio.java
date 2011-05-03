@@ -372,4 +372,31 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setExtratos(List<ExtratoBancario> extratos) {
         this.extratos = extratos;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Condominio other = (Condominio) obj;
+        if (this.codigo != other.codigo) {
+            return false;
+        }
+        if ((this.razaoSocial == null) ? (other.razaoSocial != null) : !this.razaoSocial.equals(other.razaoSocial)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 71 * hash + this.codigo;
+        return hash;
+    }
+
+    
 }
