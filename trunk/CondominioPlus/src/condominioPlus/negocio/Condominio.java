@@ -58,6 +58,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private Calendar dataCadastro = Calendar.getInstance();
     private boolean ativo;
     private boolean removido;
+    @Column(name="sindico_paga")
+    private boolean sindicoPaga;
     private String anotacoes = "";
     @Column(name = "responsavel_cheque")
     private String responsavelCheque = "";
@@ -254,6 +256,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public boolean isRemovido() {
         return removido;
+    }
+
+    public boolean isSindicoPaga() {
+        return sindicoPaga;
+    }
+
+    public void setSindicoPaga(boolean sindicoPaga) {
+        this.sindicoPaga = sindicoPaga;
     }
 
     public String getSindico() {
