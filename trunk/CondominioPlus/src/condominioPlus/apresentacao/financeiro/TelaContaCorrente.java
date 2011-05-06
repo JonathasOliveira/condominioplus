@@ -11,13 +11,14 @@
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
-import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.ComparadorPagamentoCodigo;
@@ -27,11 +28,12 @@ import condominioPlus.util.RenderizadorCelulaCorData;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -39,7 +41,9 @@ import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import logicpoint.util.Util;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -73,6 +77,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
+        painelSaldos.setVisible(false);
         calcularSaldo();
 
         carregarTabela();
@@ -223,127 +228,285 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         carregarTabela();
     }
 
-//  private void apagarItensSelecionados() {
-//        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
-//            return;
-//        }
-//        if (modeloTabela.getLinhaSelecionada() > -1) {
-//            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
-//            List<Pagamento> itensRemoverContaCorrente = modeloTabela.getObjetosSelecionados();
-//            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
-//
-//            for (Pagamento p : itensRemoverContaCorrente) {
-//                if (p.getTransacaoBancaria() != null) {
-//                    TransacaoBancaria transacao = p.getTransacaoBancaria();
-//                    Pagamento pagamentoRelacionado = new Pagamento();
-//                    for (Pagamento p2 : transacao.getPagamentos()) {
-//                        if (!p.equals(p2)) {
-//                            pagamentoRelacionado = p2;
-//                            pagamentoRelacionado.setDadosPagamento(null);
-//
-//                            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
-//
-//                            if (nome.equals("AF")) {
-//                                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
-//                            } else if (nome.equals("PO")) {
-//                                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().subtract(pagamentoRelacionado.getValor()));
-//                            } else if (nome.equals("CO")) {
-//                                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
-//                            } else if (nome.equals("EM")) {
-//                            }
-//                            //verificar
-//
-//                            itensRelacionadosRemover.add(pagamentoRelacionado);
-//                        }
-//                    }
-//                    new DAO().remover(transacao);
-//                }
-//                modeloTabela.remover(p);
-//                modeloTabela.notificar();
-//                contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
-//            }
-//            if (!itensRelacionadosRemover.isEmpty()) {
-//                for (Pagamento p : itensRelacionadosRemover) {
-//
-//                    String nome = p.getConta().getNomeVinculo();
-//
-//                    if (nome.equals("AF")) {
-//                        condominio.getAplicacao().getPagamentos().remove(p);
-//                    } else if (nome.equals("PO")) {
-//                        condominio.getPoupanca().getPagamentos().remove(p);
-//                    } else if (nome.equals("CO")) {
-//                        condominio.getConsignacao().getPagamentos().remove(p);
-//                    } else if (nome.equals("EM")) {
-//                    }
-//                }
-//                new DAO().remover(itensRelacionadosRemover);
-//                //verificar
-//            }
-//            new DAO().remover(itensRemoverContaCorrente);
-//            condominio.getContaCorrente().getPagamentos().removeAll(itensRemoverContaCorrente);
-//            new DAO().salvar(condominio);
-//            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
-//        } else {
-//            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
-//        }
-//
-//    }
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
-     */
-    private class ControladorEventos extends ControladorEventosGenerico {
-
-        int contador;
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            Object origem = e.getSource();
-            if (origem == itemMenuApagarSelecionados) {
-//                apagarItensSelecionados();
-            }
+    private void preencherTelaComSaldos() {
+        if (btnVisualizarSaldos.isSelected()) {
+            painelSaldos.setVisible(true);
+            txtSaldoAnteriorContaCorrente.setText(String.valueOf(pegarSaldoAnterior().toString()));
+            txtCreditosContaCorrente.setText(pegarCreditoDoMes().toString());
+            txtDebitosContaCorrente.setText(pegarDebitoDoMes().toString());
+            txtSaldoPoupanca.setText(new Moeda(condominio.getPoupanca().getSaldo()).toString());
+            txtSaldoEmprestimo.setText(new Moeda(condominio.getEmprestimo().getSaldo()).toString());
+            txtSaldoConsignacao.setText(new Moeda(condominio.getConsignacao().getSaldo()).toString());
+            txtSaldoAplicacao.setText(new Moeda(condominio.getAplicacao().getSaldo()).toString());
+            txtSaldoContaCorrente.setText(new Moeda(condominio.getContaCorrente().getSaldo()).toString());
+            txtSaldoExtrato.setText(pegarSaldoFinalExtrato().toString());
+            txtSaldoAnteriorExtratoBancario.setText(getExtratoMensal().toString());
+            txtCreditosExtratoBancario.setText(pegarCreditoExtratoDoMes().toString());
+            txtDebitosExtratoBancario.setText(pegarDebitoExtratoDoMes().toString());
+        } else {
+            painelSaldos.setVisible(false);
         }
 
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-            if (cbFiltros.getSelectedIndex() != -1) {
-                modeloTabela.filtrar();
-            }
+    }
+
+    private Moeda pegarSaldoAnterior() {
+        List<Pagamento> pagamentosUltimoDia = new DAO().listar("PagamentosDoDia", condominio.getContaCorrente(), DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusMonths(1)), DataUtil.getCalendar(new DateTime(DataUtil.getUltimoDiaMes()).minusMonths(1)));
+        Moeda saldo = new Moeda();
+        if (!pagamentosUltimoDia.isEmpty()) {
+            ComparadorPagamentoCodigo c = new ComparadorPagamentoCodigo();
+
+            Collections.sort(pagamentosUltimoDia, c);
+
+            ComparatorPagamento c2 = new ComparatorPagamento();
+
+            Collections.sort(pagamentosUltimoDia, c2);
+
+
+            saldo = new Moeda(pagamentosUltimoDia.get(pagamentosUltimoDia.size() - 1).getSaldo());
         }
 
-        @Override
-        public void configurar() {
 
-            ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaContaCorrente.this, JTextField.class);
+        return saldo;
 
-            cbFiltros.addItemListener(this);
-            tabelaContaCorrente.addMouseListener(this);
-            itemMenuApagarSelecionados.addActionListener(this);
+
+    }
+
+    private Moeda pegarCreditoDoMes() {
+        List<Pagamento> pagamentosUltimoDia = new DAO().listar("PagamentosDoMes", condominio.getContaCorrente(), DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes())), DataUtil.getCalendar(new DateTime(DataUtil.getUltimoDiaMes())));
+        Moeda total = new Moeda(BigDecimal.ZERO);
+
+        for (Pagamento p : pagamentosUltimoDia) {
+            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
+            if (p.getConta().isCredito()) {
+                total.soma(p.getValor());
+            }
+        }
+        return new Moeda(total);
+
+
+    }
+
+    private Moeda pegarDebitoDoMes() {
+        List<Pagamento> pagamentosUltimoDia = new DAO().listar("PagamentosDoMes", condominio.getContaCorrente(), DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes())), DataUtil.getCalendar(new DateTime(DataUtil.getUltimoDiaMes())));
+        Moeda total = new Moeda(BigDecimal.ZERO);
+
+        for (Pagamento p : pagamentosUltimoDia) {
+            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
+            if (!p.getConta().isCredito()) {
+                total.soma(p.getValor());
+            }
+        }
+        return new Moeda(total);
+    }
+
+    private Moeda pegarSaldoFinalExtrato() {
+        List<ExtratoBancario> listaExtratos = new DAO().listar("ExtratoSaldoFinal", condominio, 2);
+        Moeda saldoFinal = new Moeda(obterSaldoFinal(listaExtratos));
+        return saldoFinal;
+    }
+
+    private Moeda obterSaldoFinal(List<ExtratoBancario> lista) {
+        Moeda valor = new Moeda(BigDecimal.ZERO);
+
+        if (!lista.isEmpty()) {
+            valor.soma(lista.get(lista.size() - 1).getValor());
         }
 
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+        return valor;
+    }
+
+    private Calendar pegarUltimoDiaUtilDoMes(Calendar dia) {
+
+        switch (dia.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.SUNDAY:
+                return DataUtil.getCalendar(new DateTime(dia).minusDays(2));
+            case Calendar.SATURDAY:
+                return DataUtil.getCalendar(new DateTime(dia).minusDays(1));
+            default:
+                return dia;
+        }
+
+    }
+
+    private Moeda getExtratoMensal() {
+        Calendar dataInicial = pegarUltimoDiaUtilDoMes(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
+        List<ExtratoBancario> listaExtratoMensal = new DAO().listar("ExtratosPorDia", condominio, dataInicial);
+
+        Moeda saldo = new Moeda(listaExtratoMensal.get(listaExtratoMensal.size() - 1).getValor());
+        return saldo;
+    }
+
+    private Moeda pegarCreditoExtratoDoMes() {
+        List<ExtratoBancario> extratosUltimoDia = new DAO().listar("ExtratosPorMes", condominio, DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes())), DataUtil.getCalendar(new DateTime(DataUtil.getUltimoDiaMes())));
+        Moeda total = new Moeda(BigDecimal.ZERO);
+
+        for (ExtratoBancario e : extratosUltimoDia) {
+            if (e.getTipo().equalsIgnoreCase("C")) {
+                total.soma(e.getValor());
             }
+        }
+        return new Moeda(total);
+
+
+    }
+
+    private Moeda pegarDebitoExtratoDoMes() {
+        List<ExtratoBancario> extratosUltimoDia = new DAO().listar("ExtratosPorMes", condominio, DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes())), DataUtil.getCalendar(new DateTime(DataUtil.getUltimoDiaMes())));
+        Moeda total = new Moeda(BigDecimal.ZERO);
+
+        for (ExtratoBancario e : extratosUltimoDia) {
+            if (e.getTipo().equalsIgnoreCase("D")) {
+                total.soma(e.getValor());
+            }
+        }
+        return new Moeda(total);
+
+
+    }
+
+    private void apagarItensSelecionados() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+            return;
+        }
+        if (modeloTabela.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modeloTabela.getLinhasSelecionadas());
+            List<Pagamento> itensRemoverContaCorrente = modeloTabela.getObjetosSelecionados();
+            List<Pagamento> itensRelacionadosRemover = new ArrayList<Pagamento>();
+
+            for (Pagamento p : itensRemoverContaCorrente) {
+                if (p.getTransacaoBancaria() != null) {
+                    TransacaoBancaria transacao = p.getTransacaoBancaria();
+                    Pagamento pagamentoRelacionado = new Pagamento();
+                    for (Pagamento p2 : transacao.getPagamentos()) {
+                        if (!p.equals(p2)) {
+                            pagamentoRelacionado = p2;
+                            pagamentoRelacionado.setDadosPagamento(null);
+
+                            String nome = pagamentoRelacionado.getConta().getNomeVinculo();
+
+                            if (nome.equals("AF")) {
+                                condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("PO")) {
+                                condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("CO")) {
+                                condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().subtract(pagamentoRelacionado.getValor()));
+                            } else if (nome.equals("EM")) {
+                            }
+                            //verificar
+
+                            itensRelacionadosRemover.add(pagamentoRelacionado);
+                        }
+                    }
+                    new DAO().remover(transacao);
+                }
+                modeloTabela.remover(p);
+                modeloTabela.notificar();
+                contaCorrente.setSaldo(contaCorrente.getSaldo().subtract(p.getValor()));
+            }
+            if (!itensRelacionadosRemover.isEmpty()) {
+                for (Pagamento p : itensRelacionadosRemover) {
+
+                    String nome = p.getConta().getNomeVinculo();
+
+                    if (nome.equals("AF")) {
+                        condominio.getAplicacao().getPagamentos().remove(p);
+                    } else if (nome.equals("PO")) {
+                        condominio.getPoupanca().getPagamentos().remove(p);
+                    } else if (nome.equals("CO")) {
+                        condominio.getConsignacao().getPagamentos().remove(p);
+                    } else if (nome.equals("EM")) {
+                    }
+                }
+                new DAO().remover(itensRelacionadosRemover);
+                //verificar
+            }
+            new DAO().remover(itensRemoverContaCorrente);
+            condominio.getContaCorrente().getPagamentos().removeAll(itensRemoverContaCorrente);
+            new DAO().salvar(condominio);
+            calcularSaldo();
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+
+    }
+
+    private void editarPagamento() {
+        if (!modeloTabela.getObjetosSelecionados().isEmpty()) {
+            DialogoEditarPagamentoContaCorrente tela = new DialogoEditarPagamentoContaCorrente((Pagamento) modeloTabela.getObjetoSelecionado());
+            tela.setLocationRelativeTo(this);
+            tela.setVisible(true);
+            modeloTabela.carregarObjetos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
         }
     }
 
-    @SuppressWarnings("unchecked")
+
+/** This method is called from within the constructor to
+ * initialize the form.
+ * WARNING: Do NOT modify this code. The content of this method is
+ * always regenerated by the Form Editor.
+ */
+private class ControladorEventos extends ControladorEventosGenerico {
+
+    int contador;
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object origem = e.getSource();
+        if (origem == itemMenuApagarSelecionados) {
+            apagarItensSelecionados();
+
+        } else if (origem == btnVisualizarSaldos) {
+            preencherTelaComSaldos();
+        }else if (origem == itemMenuEditarPagamento){
+            editarPagamento();
+        }
+    }
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+        if (cbFiltros.getSelectedIndex() != -1) {
+            modeloTabela.filtrar();
+        }
+    }
+
+    @Override
+    public void configurar() {
+
+        ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaContaCorrente.this, JTextField.class);
+
+        cbFiltros.addItemListener(this);
+        tabelaContaCorrente.addMouseListener(this);
+        itemMenuApagarSelecionados.addActionListener(this);
+        btnVisualizarSaldos.addActionListener(this);
+        itemMenuEditarPagamento.addActionListener(this);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+            popupMenu.show(e.getComponent(), e.getX(), e.getY());
+        }
+    }
+}
+
+@SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuApagarSelecionados = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        itemMenuEditarPagamento = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         cbFiltros = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        btnVisualizarSaldos = new javax.swing.JToggleButton();
+        painelSaldos = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtSaldoAnteriorContaCorrente = new javax.swing.JTextField();
@@ -376,8 +539,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuApagarSelecionados.setText("Apagar Selecionado");
         popupMenu.add(itemMenuApagarSelecionados);
 
-        jMenuItem2.setText("jMenuItem2");
-        popupMenu.add(jMenuItem2);
+        itemMenuEditarPagamento.setText("Editar Pagamento Selecionado");
+        popupMenu.add(itemMenuEditarPagamento);
 
         jMenuItem3.setText("jMenuItem3");
         popupMenu.add(jMenuItem3);
@@ -399,12 +562,17 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         jLabel6.setText("Filtrar por:");
 
+        btnVisualizarSaldos.setText("Visualizar Saldos");
+        btnVisualizarSaldos.setToolTipText("Visualizar Saldos");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap(611, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(btnVisualizarSaldos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 538, Short.MAX_VALUE)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -416,209 +584,237 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
-                    .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnVisualizarSaldos))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        painelSaldos.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel1.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Resumo da Conta Corrente:");
         jLabel1.setAlignmentX(1.0F);
         jLabel1.setOpaque(true);
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel2.setText("Saldo Anterior");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtSaldoAnteriorContaCorrente.setEditable(false);
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel3.setText("Créditos");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtCreditosContaCorrente.setEditable(false);
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel4.setText("Débitos");
 
+        txtDebitosContaCorrente.setEditable(false);
+
         jLabel5.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("Saldos de Aplicações, Empréstimos e Outros:");
         jLabel5.setOpaque(true);
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtSaldoPoupanca.setEditable(false);
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel7.setText("Poupança");
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel8.setText("Aplicações");
 
+        txtSaldoAplicacao.setEditable(false);
         txtSaldoAplicacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtSaldoAplicacaoActionPerformed(evt);
             }
         });
 
-        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel9.setText("Consignações");
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtSaldoConsignacao.setEditable(false);
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel10.setText("Empréstimos");
 
+        txtSaldoEmprestimo.setEditable(false);
+
         jLabel11.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setText("Resumo Extrato Bancário");
         jLabel11.setOpaque(true);
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtSaldoAnteriorExtratoBancario.setEditable(false);
+
+        txtCreditosExtratoBancario.setEditable(false);
+
+        txtDebitosExtratoBancario.setEditable(false);
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel12.setText("Saldo Anterior");
 
-        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel13.setText("Créditos");
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel14.setText("Débitos");
 
         jLabel15.setBackground(new java.awt.Color(0, 102, 102));
-        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 12));
         jLabel15.setForeground(new java.awt.Color(255, 255, 255));
         jLabel15.setText("Saldos Atuais");
         jLabel15.setOpaque(true);
 
-        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        txtSaldoContaCorrente.setEditable(false);
+
+        txtSaldoExtrato.setEditable(false);
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel16.setText("Caixa");
 
-        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel17.setText("Extrato");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelSaldosLayout = new javax.swing.GroupLayout(painelSaldos);
+        painelSaldos.setLayout(painelSaldosLayout);
+        painelSaldosLayout.setHorizontalGroup(
+            painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelSaldosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2)
                                     .addComponent(txtSaldoAnteriorContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtCreditosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel3))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel4)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtSaldoPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSaldoAplicacao, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                                        .addComponent(txtSaldoPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtSaldoAplicacao, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addGap(51, 51, 51)
+                                        .addComponent(jLabel8)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtSaldoConsignacao))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addGap(51, 51, 51)
-                                .addComponent(jLabel8)
-                                .addGap(51, 51, 51)
-                                .addComponent(jLabel9)))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                                        .addComponent(jLabel9)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                                    .addComponent(txtSaldoConsignacao))))
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
                                 .addGap(8, 8, 8)
                                 .addComponent(jLabel10))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtSaldoEmprestimo, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE))))
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(113, 113, 113)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(158, 158, 158)
+                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel11)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSaldoAnteriorExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel12))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel13)
                             .addComponent(txtCreditosExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDebitosExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel14)))
                     .addComponent(jLabel15)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
                                 .addComponent(jLabel16)
                                 .addGap(89, 89, 89))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
                                 .addComponent(txtSaldoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)))
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel17)
                             .addComponent(txtSaldoExtrato, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                .addGap(19, 19, 19))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        painelSaldosLayout.setVerticalGroup(
+            painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelSaldosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtSaldoAnteriorContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtCreditosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel9)
-                            .addComponent(jLabel10))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtSaldoPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSaldoAplicacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSaldoConsignacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSaldoEmprestimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(22, 22, 22))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelSaldosLayout.createSequentialGroup()
                         .addComponent(jLabel11)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel12)
                             .addComponent(jLabel13)
                             .addComponent(jLabel14))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtSaldoAnteriorExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtCreditosExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDebitosExtratoBancario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel15)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel17)
                             .addComponent(jLabel16))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtSaldoExtrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtSaldoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(painelSaldosLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtSaldoAnteriorContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(painelSaldosLayout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(txtCreditosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel10)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtSaldoPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSaldoAplicacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSaldoConsignacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtSaldoEmprestimo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(22, 22, 22))))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -630,7 +826,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(painelSaldos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 896, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -639,9 +835,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -651,10 +847,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private void txtSaldoAplicacaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSaldoAplicacaoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtSaldoAplicacaoActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btnVisualizarSaldos;
     private javax.swing.JComboBox cbFiltros;
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
+    private javax.swing.JMenuItem itemMenuEditarPagamento;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -672,11 +869,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel painelSaldos;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaContaCorrente;
     private javax.swing.JTextField txtCreditosContaCorrente;
@@ -692,5 +888,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtSaldoExtrato;
     private javax.swing.JTextField txtSaldoPoupanca;
     // End of variables declaration//GEN-END:variables
+
 }
 

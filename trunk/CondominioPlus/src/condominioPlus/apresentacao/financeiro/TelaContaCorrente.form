@@ -13,9 +13,9 @@
             <Property name="text" type="java.lang.String" value="Apagar Selecionado"/>
           </Properties>
         </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuEditarPagamento">
           <Properties>
-            <Property name="text" type="java.lang.String" value="jMenuItem2"/>
+            <Property name="text" type="java.lang.String" value="Editar Pagamento Selecionado"/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItem3">
@@ -53,7 +53,7 @@
               <Group type="103" groupAlignment="1" max="-2" attributes="0">
                   <Component id="jPanel4" alignment="0" max="32767" attributes="1"/>
                   <Component id="jScrollPane1" alignment="0" max="32767" attributes="1"/>
-                  <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
+                  <Component id="painelSaldos" alignment="0" pref="896" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -62,13 +62,13 @@
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="280" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" pref="280" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-              <Component id="jPanel1" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="painelSaldos" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -103,7 +103,9 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="611" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="btnVisualizarSaldos" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="538" max="32767" attributes="0"/>
                   <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="cbFiltros" min="-2" pref="168" max="-2" attributes="0"/>
@@ -118,6 +120,7 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="cbFiltros" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnVisualizarSaldos" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -137,9 +140,15 @@
             <Property name="text" type="java.lang.String" value="Filtrar por:"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JToggleButton" name="btnVisualizarSaldos">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Visualizar Saldos"/>
+            <Property name="toolTipText" type="java.lang.String" value="Visualizar Saldos"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
-    <Container class="javax.swing.JPanel" name="jPanel1">
+    <Container class="javax.swing.JPanel" name="painelSaldos">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
@@ -173,19 +182,27 @@
                                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Group type="102" alignment="0" attributes="1">
-                                  <Component id="txtSaldoPoupanca" min="-2" pref="91" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtSaldoAplicacao" min="-2" pref="90" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="txtSaldoConsignacao" max="32767" attributes="0"/>
-                              </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="txtSaldoPoupanca" min="-2" pref="91" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="txtSaldoAplicacao" min="-2" pref="90" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
+                                          <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                      </Group>
+                                      <Component id="txtSaldoConsignacao" alignment="0" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -201,7 +218,7 @@
                       </Group>
                       <Component id="jLabel5" alignment="0" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace min="-2" pref="113" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="158" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
@@ -221,7 +238,7 @@
                           </Group>
                       </Group>
                       <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
                               <Group type="102" alignment="1" attributes="0">
                                   <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
@@ -238,54 +255,15 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtSaldoAnteriorContaCorrente" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="txtCreditosContaCorrente" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="txtDebitosContaCorrente" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtSaldoPoupanca" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSaldoAplicacao" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSaldoConsignacao" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtSaldoEmprestimo" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
-                      </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -313,6 +291,45 @@
                               <Component id="txtSaldoContaCorrente" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtSaldoAnteriorContaCorrente" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="txtCreditosContaCorrente" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtDebitosContaCorrente" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtSaldoPoupanca" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtSaldoAplicacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtSaldoConsignacao" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtSaldoEmprestimo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -345,6 +362,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoAnteriorContaCorrente">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
@@ -355,6 +375,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtCreditosContaCorrente">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
@@ -365,6 +388,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtDebitosContaCorrente">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
           <Properties>
@@ -382,6 +408,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoPoupanca">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
           <Properties>
@@ -400,6 +429,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoAplicacao">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtSaldoAplicacaoActionPerformed"/>
           </Events>
@@ -413,6 +445,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoConsignacao">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel10">
           <Properties>
@@ -423,6 +458,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoEmprestimo">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel11">
           <Properties>
@@ -440,10 +478,19 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoAnteriorExtratoBancario">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtCreditosExtratoBancario">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtDebitosExtratoBancario">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel12">
           <Properties>
@@ -485,8 +532,14 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoContaCorrente">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtSaldoExtrato">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel16">
           <Properties>

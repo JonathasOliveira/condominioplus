@@ -81,6 +81,7 @@ public class EntradaExtratoDiario {
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'E') {
 //                    editarValor(linha);
                         if (obterRegistro(linha) != null) {
+                            System.out.println("arquivo " + arquivos[i].getName());
                             registros.add(obterRegistro(linha));
                         }
                     }
@@ -119,13 +120,15 @@ public class EntradaExtratoDiario {
                 ex.setCondominio(c);
                 if (!extratosSalvos.isEmpty()) {
                     if (!extratosSalvos.contains(ex)) {
-                        new DAO().salvar(ex);
+                        extratosSalvos.add(ex);
+                        criarNovoPagamento(ex);
                         verificarPagamentoNoContasAPagar(ex);
                         verificarCheques(ex);
                         verificarPoupanca(ex);
                     }
                 } else {
-                    new DAO().salvar(ex);
+                    extratosSalvos.add(ex);
+                    criarNovoPagamento(ex);
                     verificarPagamentoNoContasAPagar(ex);
                     verificarCheques(ex);
                     verificarPoupanca(ex);
@@ -134,14 +137,31 @@ public class EntradaExtratoDiario {
                 //                verificarPoupanca(ex);
             }
         }
+
+        new DAO().salvar(extratosSalvos);
     }
 
     private void verificarPagamentoNoContasAPagar(ExtratoBancario ex) {
         Identificador ident = localizaIdentificador(ex.getHistorico());
         if (ident != null && ex.getIdentificadorRegistro() == 1) {
             List<Pagamento> pagamentosEmAberto = new DAO().listar("PagamentosContaPagarPorPeriodo", ex.getCondominio().getContaPagar(), DataUtil.getCalendar(DataUtil.getPrimeiroDiaMes()), DataUtil.getCalendar(DataUtil.getUltimoDiaMes()));
-            System.out.println("pagamentos em aberto " + pagamentosEmAberto.size());
-            //if para inserir despesas
+            for (Pagamento p : pagamentosEmAberto) {
+                ex.setValor(ex.getValor().negate());
+                if (p.getConta().getCodigo() == ident.getConta().getCodigo() && p.getValor().doubleValue() == ex.getValor().doubleValue()) {
+                    p.setContaCorrente(ex.getCondominio().getContaCorrente());
+                    p.setPago(true);
+                    p.setDataPagamento(ex.getDataPagamento());
+                    PagamentoUtil.verificarListaVaziaContaCorrente(p);
+                    new DAO().salvar(p);
+                }
+
+            }
+        }
+    }
+
+    private void criarNovoPagamento(ExtratoBancario ex) {
+        Identificador ident = localizaIdentificador(ex.getHistorico());
+        if (ident != null && ex.getIdentificadorRegistro() == 1) {
             if (ident.getConta().getCodigo() == 12902) {
                 Pagamento pagamento = new Pagamento();
                 pagamento.setConta(ident.getConta());
@@ -158,22 +178,28 @@ public class EntradaExtratoDiario {
                 pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
                 PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
                 new DAO().salvar(pagamento);
-
             } else {
+                for (Identificador identificador : identificadores) {
+                    if (identificador.getPalavraChave().equals(ex.getHistorico())) {
+                        Pagamento pagamento = new Pagamento();
+                        pagamento.setConta(identificador.getConta());
+                        pagamento.setDataPagamento(ex.getDataPagamento());
+                        pagamento.setContaCorrente(ex.getCondominio().getContaCorrente());
+                        pagamento.setPago(true);
+                        pagamento.setHistorico(identificador.getConta().getNome());
+                        if (ident.getConta().isCredito()) {
+                            pagamento.setValor(ex.getValor());
+                        } else {
+                            pagamento.setValor(ex.getValor().negate());
+                        }
 
-                for (Pagamento p : pagamentosEmAberto) {
-                    ex.setValor(ex.getValor().negate());
-                    if (p.getConta().getCodigo() == ident.getConta().getCodigo() && p.getValor().doubleValue() == ex.getValor().doubleValue()) {
-                        p.setContaCorrente(ex.getCondominio().getContaCorrente());
-                        p.setPago(true);
-                        p.setDataPagamento(ex.getDataPagamento());
-                        PagamentoUtil.verificarListaVaziaContaCorrente(p);
-                        new DAO().salvar(p);
+                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                        PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
+                        new DAO().salvar(pagamento);
+
                     }
-
-
-
                 }
+
             }
         }
     }
@@ -221,7 +247,7 @@ public class EntradaExtratoDiario {
                 PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
                 new DAO().salvar(Main.getCondominio());
             }
-        } else if (ident.getConta().getCodigo() == 13072) {
+        } else if (ident != null && ident.getConta().getCodigo() == 13072) {
             Pagamento pagamento = new Pagamento();
             pagamento.setConta(ident.getConta());
             pagamento.setDataPagamento(ex.getDataPagamento());
