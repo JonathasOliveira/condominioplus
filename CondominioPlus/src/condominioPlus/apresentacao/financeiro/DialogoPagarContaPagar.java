@@ -377,11 +377,18 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             pagarPagamentoRelacionado(pagamento);
             new DAO().salvar(pagamento);
         } else {
-            List<Pagamento> novaLista = getPagamentos();
+            List<Pagamento> novaLista;
+            if (pagamento.getContaReceber() != null) {
+                novaLista = getPagamentosContasReceber();
+
+            } else {
+                novaLista = getPagamentos();
+            }
+
             for (Pagamento p : novaLista) {
                 p.setPago(true);
                 p.setContaCorrente(Main.getCondominio().getContaCorrente());
-                p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
+                p.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
                 p.getContaCorrente().setSaldo(p.getContaCorrente().getSaldo().add(p.getValor()));
                 verificarVinculo(p);
             }

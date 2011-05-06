@@ -150,11 +150,15 @@ public class ExtratoBancario implements Serializable {
             return false;
         }
 
-        if (!this.condominio.equals(other.condominio)){
+        if (!this.condominio.equals(other.condominio)) {
             return false;
         }
 
         if (!this.historico.equals(other.historico)) {
+            return false;
+        }
+
+        if (!this.doc.equals(other.doc)) {
             return false;
         }
         return true;

@@ -163,6 +163,33 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
 
     private List<ExtratoBancario> getExtratoDiario() {
         listaExtratoDiario = new DAO().listar("ExtratosPorDia", condominio, DataUtil.getCalendar(new DateTime(DataUtil.hoje()).minusDays(1)));
+
+        Comparator c1 = null;
+
+        c1 = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                ExtratoBancario e1 = (ExtratoBancario) o1;
+                ExtratoBancario e2 = (ExtratoBancario) o2;
+                return Integer.valueOf(e1.getIdentificadorRegistro()).compareTo(Integer.valueOf(e2.getIdentificadorRegistro()));
+            }
+        };
+
+        Collections.sort(listaExtratoDiario, c1);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                ExtratoBancario e1 = (ExtratoBancario) o1;
+                ExtratoBancario e2 = (ExtratoBancario) o2;
+                return e1.getDataPagamento().compareTo(e2.getDataPagamento());
+            }
+        };
+
+        Collections.sort(listaExtratoDiario, c);
+
         return listaExtratoDiario;
     }
 
@@ -206,8 +233,21 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         tabelaExtratoMensal.getColumn(modeloTabelaExtratoMensal.getCampo(4)).setCellRenderer(centralizado);
     }
 
+    private Calendar pegarUltimoDiaUtilDoMes(Calendar dia) {
+
+        switch (dia.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.SUNDAY:
+                return DataUtil.getCalendar(new DateTime(dia).minusDays(2));
+            case Calendar.SATURDAY:
+                return DataUtil.getCalendar(new DateTime(dia).minusDays(1));
+            default:
+                return dia;
+        }
+
+    }
+
     private List<ExtratoBancario> getExtratoMensal() {
-        Calendar dataInicial = DataUtil.getCalendar(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
+        Calendar dataInicial = pegarUltimoDiaUtilDoMes(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         Calendar dataFinal = DataUtil.getCalendar(DataUtil.getUltimoDiaMes());
         listaExtratoMensal = new DAO().listar("ExtratosPorMes", condominio, dataInicial, dataFinal);
 
