@@ -331,6 +331,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     criarFrame(new TelaAdvogado());
                 } else if (source == menuItemFornecedores) {
                     criarFrame(new TelaFornecedor());
+                } else if (source == menuItemCobrancaBase) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaCobrancaBase(Main.getCondominio()));
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
                 } else if (source == menuItemPagos) {
 //                    criarFrame(new TelaVeiculo());
                 } else if (source == menuItemControleAcesso) {
@@ -459,6 +465,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemContas.addActionListener(this);
             menuItemIdentificadores.addActionListener(this);
             menuItemFornecedores.addActionListener(this);
+            menuItemCobrancaBase.addActionListener(this);
             menuItemContaPagar.addActionListener(this);
             menuItemPoupanca.addActionListener(this);
             menuItemAplicacao.addActionListener(this);
