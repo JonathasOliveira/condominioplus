@@ -98,23 +98,21 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     }
 
     private List<CobrancaBase> getCobrancas() {
-        listaCobrancas = new DAO().listar("CobrancaBasePorCondominio", condominio);
+        listaCobrancas = condominio.getCobrancasBase();
 
         return listaCobrancas;
     }
 
-    private void preencherPainelDados() {
-        if (cobranca == null) {
-            cobranca = new CobrancaBase();
-            conta = null;
-        } else {
-            conta = cobranca.getConta();
+    private void preencherPainelDados(CobrancaBase c) {
+        if (c.getConta() != null) {
+            cobranca = c;
+            conta = c.getConta();
         }
-        if (conta != null) {
-            txtConta.setText(String.valueOf(cobranca.getConta().getCodigo()));
-            txtHistorico.setText(cobranca.getConta().getNome());
-            txtValor.setText(cobranca.getValor().toString().replace(".", ","));
-            checkDividirFracaoIdeal.setSelected(cobranca.isDividirFracaoIdeal());
+        if (conta != null && c.getCodigo() != 0) {
+            txtConta.setText(String.valueOf(c.getConta().getCodigo()));
+            txtHistorico.setText(c.getConta().getNome());
+            txtValor.setText(c.getValor().toString().replace(".", ","));
+            checkDividirFracaoIdeal.setSelected(c.isDividirFracaoIdeal());
         } else {
             limparCampos();
         }
@@ -130,11 +128,31 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         cobranca.setDividirFracaoIdeal(checkDividirFracaoIdeal.isSelected());
         cobranca.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
-        condominio.getCobrancasBase().add(cobranca);
+        if (verificarListaCobranca()) {
+            ApresentacaoUtil.exibirAdvertencia("Já existe uma cobrança com essas características.", this);
+            limparCampos();
+            return;
+        } else {
+            if(cobranca.getCodigo() == 0){
+                condominio.getCobrancasBase().add(cobranca);
+            }
+            new DAO().salvar(condominio);
+            limparCampos();
+        }
+    }
 
-        new DAO().salvar(condominio);
-        limparCampos();
-
+    private boolean verificarListaCobranca() {
+        System.out.println("lista cobranca " + condominio.getCobrancasBase());
+        for (CobrancaBase cobrancaBase : condominio.getCobrancasBase()) {
+            System.out.println("cobranca " + cobranca);
+            if (cobranca != null && cobranca.getCodigo() != cobrancaBase.getCodigo()) {
+                System.out.println("hereeeeeee");
+                if (cobrancaBase.getConta().getCodigo() == cobranca.getConta().getCodigo()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void salvar() {
@@ -158,6 +176,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
             String descricao = "Cobrança base adicionada " + cobranca.getConta().getNome() + " .";
             FuncionarioUtil.registrar(tipo, descricao);
+            cobranca = null;
 
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
@@ -179,8 +198,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             }
             condominio.getCobrancasBase().removeAll(itensRemover);
             new DAO().salvar(condominio);
-            cobranca = null;
             limparCampos();
+            cobranca = null;
 
             System.out.println("Cobranças " + condominio.getCobrancasBase().size());
 
@@ -252,11 +271,9 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         public void actionPerformed(ActionEvent e) {
             origem = e.getSource();
             if (origem == itemMenuAdicionar) {
-                cobranca = null;
-                preencherPainelDados();
+                preencherPainelDados(new CobrancaBase());
             } else if (origem == itemMenuEditar) {
-                cobranca = modeloTabela.getObjetoSelecionado();
-                preencherPainelDados();
+                preencherPainelDados(modeloTabela.getObjetoSelecionado());
             } else if (origem == btnCancelar) {
                 limparCampos();
                 cobranca = null;
