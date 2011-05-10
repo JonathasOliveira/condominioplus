@@ -15,6 +15,7 @@ import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 3:
                         return extratoBancario.getTipo();
                     case 4:
-                        return new Moeda(extratoBancario.getValor());
+                        return PagamentoUtil.formatarMoeda(extratoBancario.getValor().doubleValue());
                     default:
                         return null;
                 }
@@ -215,7 +216,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                     case 4:
                         return extratoBancario.getTipo();
                     case 5:
-                        return new Moeda(extratoBancario.getValor());
+                        return PagamentoUtil.formatarMoeda(extratoBancario.getValor().doubleValue());
                     default:
                         return null;
                 }

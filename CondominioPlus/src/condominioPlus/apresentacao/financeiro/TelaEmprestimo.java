@@ -78,11 +78,14 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         desabilitarBotoesUmaParcela();
 
+        System.out.println("contratos em condominio 1 " + condominio.getEmprestimo().getContratos().size());
+
         painelDadosContrato.setVisible(false);
 
         new ControladorEventos();
 
         preencherTela();
+        calcularSaldo();
 
         carregarTabela();
 
@@ -94,7 +97,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     private void preencherTela() {
         txtDataPrimeiroPagamento.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
         if (emprestimo.getSaldo() != null) {
-            lblSaldoEmprestimo.setText(emprestimo.getSaldo().toString().replace(".", ","));
+            calcularSaldo();
         }
     }
 
@@ -173,8 +176,8 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private List<ContratoEmprestimo> getContratos() {
-        contratos = new DAO().listar("ContratosPorData", emprestimo);
-        return contratos;
+//        contratos = new DAO().listar("ContratosPorData", emprestimo);
+        return emprestimo.getContratos();
 
     }
 
@@ -218,6 +221,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             contrato.setDataContrato(DataUtil.getCalendar(txtData.getValue()));
             contrato.setDescricao(txtHistorico.getText());
             contrato.setEmprestimo(emprestimo);
+
             if (radioAVista.isSelected()) {
                 contrato.setForma(FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA);
             } else if (radioConformeDisponibilidade.isSelected()) {
@@ -258,13 +262,13 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         }
 
                         pagamento.setContratoEmprestimo(contrato);
-                        pagamento.setHistorico(texto + " " + pagamento.getConta().getNome());
+                        pagamento.setHistorico(texto + " " + contrato.getDescricao());
                         System.out.println("pagamento historico " + pagamento.getHistorico());
                         pagamento.setForma(FormaPagamento.DINHEIRO);
                         pagamento.setDadosPagamento(dados.clone());
 
                         if (conta.isCredito()) {
-                            new DAO().salvar(pagamento);
+                            contrato.adicionarPagamento(pagamento);
                         } else {
                             verificarVinculo(pagamento, texto);
                         }
@@ -284,12 +288,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     }
 
                     pagamento.setContratoEmprestimo(contrato);
-                    pagamento.setHistorico(texto + " " + pagamento.getConta().getNome());
+                    pagamento.setHistorico(texto + " " + contrato.getDescricao());
                     pagamento.setDadosPagamento(dados);
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
                     if (conta.isCredito()) {
-                        new DAO().salvar(pagamento);
+                        contrato.adicionarPagamento(pagamento);
                     } else {
                         verificarVinculo(pagamento, texto);
                     }
@@ -297,7 +301,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
                 Pagamento p = new Pagamento();
                 p.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
-                p.setHistorico(conta.getContaVinculada().getNome());
+                p.setHistorico(conta.getContaVinculada().getNome() + " " + contrato.getDescricao());
                 p.setConta(conta.getContaVinculada());
                 p.setContratoEmprestimo(contrato);
                 if (p.getConta().isCredito()) {
@@ -312,10 +316,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 p.setPago(true);
 
                 condominio.getContaCorrente().adicionarPagamento(p);
-                condominio.getContaCorrente().setSaldo(condominio.getContaCorrente().getSaldo().add(p.getValor()));
+                emprestimo.getContratos().add(contrato);
+                
 
-                new DAO().salvar(condominio);
                 limparCampos();
+                calcularSaldo();
                 return true;
 
             }
@@ -346,7 +351,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
             pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
             pagamentoRelacionado.setConta(conta);
-            pagamentoRelacionado.setHistorico(texto + " " + conta.getContaVinculada().getNome());
+            pagamentoRelacionado.setHistorico(texto + " " + contrato.getDescricao());
             pagamentoRelacionado.setContratoEmprestimo(contrato);
 
             pagamentoRelacionado.setValor(p1.getValor().negate());
@@ -393,9 +398,12 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 tipo = tipo.EDICAO;
             }
 
+            new DAO().salvar(contrato);
+            new DAO().salvar(condominio);
 
             String descricao = "Contrato de Empréstimo adicionado! " + contrato.getDescricao() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
+            calcularSaldo();
 
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
@@ -407,7 +415,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             return;
         }
         if (modelo.getLinhaSelecionada() > -1) {
-            System.out.println("removendo... " + modelo.getLinhasSelecionadas());
+            System.out.println("removendo... " + modelo.getObjetosSelecionados());
             List<ContratoEmprestimo> itensRemover = modelo.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
                 for (ContratoEmprestimo c : itensRemover) {
@@ -426,12 +434,17 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                             }
                             new DAO().remover(transacao);
                         }
+
                     }
+                    emprestimo.getContratos().remove(c);
                     new DAO().remover(c);
                 }
             }
-            condominio.getEmprestimo().getContratos().removeAll(itensRemover);
-            new DAO().salvar(condominio);
+
+            new DAO().salvar(emprestimo);
+            calcularSaldo();
+
+            System.out.println("contratos em condominio " + condominio.getEmprestimo().getContratos().size());
             painelDadosContrato.setVisible(false);
             ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
         } else {
@@ -533,6 +546,13 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
         carregarTabela();
     }
 
+    private void calcularSaldo() {
+
+        lblSaldoEmprestimo.setText(emprestimo.calculaSaldo(emprestimo).toString());
+        emprestimo.setSaldo(emprestimo.calculaSaldo(emprestimo).bigDecimalValue());
+        new DAO().salvar(emprestimo);
+    }
+
     public void preencherPainelContrato(ContratoEmprestimo c) {
         txtDataContrato.setValue(DataUtil.toString(c.getDataContrato()));
         txtCodigoContrato.setText(String.valueOf(c.getCodigo()));
@@ -571,9 +591,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 salvar();
                 carregarTabela();
             } else if (origem == btnCalcular) {
-                emprestimo.calculaSaldo(emprestimo);
-                new DAO().salvar(emprestimo);
-                lblSaldoEmprestimo.setText(emprestimo.getSaldo().toString().replace(".", ","));
+                calcularSaldo();
             } else if (origem == itemMenuRemoverSelecionados) {
                 remover();
             } else if (origem == btnConta) {

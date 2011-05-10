@@ -97,6 +97,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 
     private void habilitarPainelNovoPagamento() {
         txtNumeroDocumentoNovoPagamento.setEnabled(true);
+        txtNumeroDocumentoNovoPagamento.setText(Pagamento.gerarNumeroDocumento());
         txtValorNovoPagamento.setEnabled(true);
         cbFornecedoresNovoPagamento.setEnabled(true);
         btnAdicionarNovoPagamento.setEnabled(true);
@@ -391,11 +392,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 p.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
                 p.getContaCorrente().setSaldo(p.getContaCorrente().getSaldo().add(p.getValor()));
                 verificarVinculo(p);
+                new DAO().salvar(p);
             }
 
-            new DAO().salvar(novaLista);
         }
-        new DAO().salvar(condominio);
+        //new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Pagamentos efetuados com sucesso!", this);
         dispose();
     }
