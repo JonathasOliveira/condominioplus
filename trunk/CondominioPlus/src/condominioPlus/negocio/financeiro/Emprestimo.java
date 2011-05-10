@@ -7,7 +7,6 @@ package condominioPlus.negocio.financeiro;
 import condominioPlus.negocio.Condominio;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import logicpoint.util.Moeda;
 
 /**
  *
@@ -67,11 +67,11 @@ public class Emprestimo implements Serializable {
         this.saldo = saldo;
     }
 
-    public void calculaSaldo(Emprestimo emprestimo) {
-        saldo = new BigDecimal(0);
+    public Moeda calculaSaldo(Emprestimo emprestimo) {
+        Moeda valor = new Moeda();
         for (ContratoEmprestimo contrato : emprestimo.getContratos()) {
-            saldo = saldo.add(contrato.getSaldo());
+            valor = valor.soma(contrato.getSaldo());
         }
-        condominio.getEmprestimo().setSaldo(saldo);
+        return valor;
     }
 }
