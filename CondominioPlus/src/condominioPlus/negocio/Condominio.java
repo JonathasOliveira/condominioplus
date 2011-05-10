@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio;
 
+import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
@@ -58,7 +59,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private Calendar dataCadastro = Calendar.getInstance();
     private boolean ativo;
     private boolean removido;
-    @Column(name="sindico_paga")
+    @Column(name = "sindico_paga")
     private boolean sindicoPaga;
     private String anotacoes = "";
     @Column(name = "responsavel_cheque")
@@ -98,6 +99,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<ContaIndispensavel> contasIndispensaveis;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<ExtratoBancario> extratos;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<CobrancaBase> cobrancasBase;
 
     public Condominio() {
     }
@@ -383,6 +386,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.extratos = extratos;
     }
 
+    public List<CobrancaBase> getCobrancasBase() {
+        return cobrancasBase;
+    }
+
+    public void setCobrancasBase(List<CobrancaBase> cobrancasBase) {
+        this.cobrancasBase = cobrancasBase;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -407,6 +418,4 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         hash = 71 * hash + this.codigo;
         return hash;
     }
-
-    
 }
