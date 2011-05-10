@@ -53,8 +53,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
         new ControladorEventos();
 
-        limparCampos();
         carregarTabela();
+        preencherPainelDados(new CobrancaBase());
 
         if (condominio != null) {
             this.setTitle("Cobrança Base - " + condominio.getRazaoSocial());
@@ -104,8 +104,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     }
 
     private void preencherPainelDados(CobrancaBase c) {
+        cobranca = c;
         if (c.getConta() != null) {
-            cobranca = c;
             conta = c.getConta();
         }
         if (conta != null && c.getCodigo() != 0) {
@@ -133,7 +133,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             limparCampos();
             return;
         } else {
-            if(cobranca.getCodigo() == 0){
+            if (cobranca.getCodigo() == 0) {
                 condominio.getCobrancasBase().add(cobranca);
             }
             new DAO().salvar(condominio);
