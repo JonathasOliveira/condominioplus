@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao;
 
+import condominioPlus.apresentacao.cobranca.TelaCobrancaBase;
 import condominioPlus.Main;
 import condominioPlus.apresentacao.advogado.TelaAdvogado;
 import java.awt.KeyboardFocusManager;
