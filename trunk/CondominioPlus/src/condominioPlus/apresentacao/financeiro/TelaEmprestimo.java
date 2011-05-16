@@ -78,8 +78,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         desabilitarBotoesUmaParcela();
 
-        System.out.println("contratos em condominio 1 " + condominio.getEmprestimo().getContratos().size());
-
         painelDadosContrato.setVisible(false);
 
         new ControladorEventos();
@@ -441,7 +439,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             new DAO().salvar(condominio);
             calcularSaldo();
 
-            System.out.println("contratos em condominio " + condominio.getEmprestimo().getContratos().size());
             painelDadosContrato.setVisible(false);
             ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
         } else {
@@ -704,6 +701,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
             }
         }
+
         @Override
         public void keyReleased(KeyEvent e) {
             origem = e.getSource();
