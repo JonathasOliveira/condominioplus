@@ -13,6 +13,7 @@ package condominioPlus.apresentacao;
 import condominioPlus.apresentacao.cobranca.TelaCobrancaBase;
 import condominioPlus.Main;
 import condominioPlus.apresentacao.advogado.TelaAdvogado;
+import condominioPlus.apresentacao.cobranca.TelaLancamentos;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -332,6 +333,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     criarFrame(new TelaAdvogado());
                 } else if (source == menuItemFornecedores) {
                     criarFrame(new TelaFornecedor());
+                } else if (source == menuItemLancamentos) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaLancamentos(Main.getCondominio()));
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
                 } else if (source == menuItemCobrancaBase) {
                     if (Main.getCondominio() != null) {
                         criarFrame(new TelaCobrancaBase(Main.getCondominio()));
