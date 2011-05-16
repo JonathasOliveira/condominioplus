@@ -25,7 +25,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
-import org.joda.time.DateTime;
 
 /**
  *

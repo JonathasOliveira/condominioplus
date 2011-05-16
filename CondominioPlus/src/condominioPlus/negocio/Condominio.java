@@ -6,6 +6,7 @@ package condominioPlus.negocio;
 
 import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
+import condominioPlus.negocio.financeiro.Conciliacao;
 import condominioPlus.negocio.financeiro.Consignacao;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.ContaIndispensavel;
@@ -101,6 +102,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<ExtratoBancario> extratos;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<CobrancaBase> cobrancasBase;
+    private Conciliacao conciliacao;
 
     public Condominio() {
     }
@@ -418,4 +420,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         hash = 71 * hash + this.codigo;
         return hash;
     }
+
+    public Conciliacao getConciliacao() {
+        return conciliacao;
+    }
+
+    public void setConciliacao(Conciliacao conciliacao) {
+        this.conciliacao = conciliacao;
+    }
+
+    
 }

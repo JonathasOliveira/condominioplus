@@ -16,7 +16,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import logicpoint.util.Moeda;
 
 /**
  *
@@ -65,13 +64,5 @@ public class Emprestimo implements Serializable {
 
     public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
-    }
-
-    public Moeda calculaSaldo(Emprestimo emprestimo) {
-        Moeda valor = new Moeda();
-        for (ContratoEmprestimo contrato : emprestimo.getContratos()) {
-            valor = valor.soma(contrato.getSaldo());
-        }
-        return valor;
     }
 }

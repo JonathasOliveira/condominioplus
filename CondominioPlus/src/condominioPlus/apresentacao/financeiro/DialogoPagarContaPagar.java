@@ -127,7 +127,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
             p.getContratoEmprestimo().setNumeroParcelas(calcularNumeroParcela() + 1);
             verificarVinculo(p);
-            new DAO().salvar(pagamento.getContratoEmprestimo());
+            new DAO().salvar(p);
             ApresentacaoUtil.exibirInformacao("Pagamento efetuado com sucesso!", this);
             dispose();
         } else {
@@ -141,6 +141,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         int resultado = 0;
         for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
             if (p.getContaCorrente() == null && p.getContaPagar() == null) {
+                System.out.println("teste");
                 resultado = resultado + 1;
                 System.out.println("here");
                 System.out.println("resultadooo " + resultado);

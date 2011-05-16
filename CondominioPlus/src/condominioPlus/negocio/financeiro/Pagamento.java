@@ -26,10 +26,10 @@ import logicpoint.persistencia.DAO;
  *
  * @author Administrado
  */
-
 @Entity
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.dataPagamento"),
+    @NamedQuery(name = "PagamentosConciliacao", query = "SELECT c FROM Pagamento c WHERE c.conciliacao = ?1 and c.pago = false order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosDoDia", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosDoMes", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.pago =  true order by c.dataPagamento"),
@@ -43,14 +43,13 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosPorNumeroDocumentoContaReceber", query = "SELECT c FROM Pagamento c WHERE c.contaReceber = ?1 and c.pago = false and c.dadosPagamento = ?2"),
     @NamedQuery(name = "PagamentosPorForma", query = "SELECT c FROM Pagamento c WHERE c.contaPagar = ?1 and c.pago = false and c.forma = ?2"),
     @NamedQuery(name = "PagamentosAplicacaoFinanceira", query = "SELECT c FROM Pagamento c WHERE c.aplicacao = ?1"),
-    @NamedQuery(name = "PagamentosAplicacaoOrdenados", query="SELECT p FROM Pagamento p WHERE p.aplicacao = ?1 order by p.dataPagamento"),
+    @NamedQuery(name = "PagamentosAplicacaoOrdenados", query = "SELECT p FROM Pagamento p WHERE p.aplicacao = ?1 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosPoupanca", query = "SELECT c FROM Pagamento c WHERE c.poupanca = ?1"),
-    @NamedQuery(name = "PagamentosPoupancaOrdenados", query="SELECT p FROM Pagamento p WHERE p.poupanca = ?1 order by p.dataPagamento"),
+    @NamedQuery(name = "PagamentosPoupancaOrdenados", query = "SELECT p FROM Pagamento p WHERE p.poupanca = ?1 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosConsignacao", query = "SELECT c FROM Pagamento c WHERE c.consignacao = ?1"),
-    @NamedQuery(name = "PagamentosConsignacaoOrdenados", query="SELECT p FROM Pagamento p WHERE p.consignacao = ?1 order by p.dataPagamento"),
-    @NamedQuery(name = "PagamentosPorContratoEmprestimo", query="SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 order by p.dataVencimento"),
-    @NamedQuery(name = "PagamentosPorContratoEmprestimoCodigo", query="SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 and p.contaCorrente is null and p.contaPagar is null order by p.codigo")
-
+    @NamedQuery(name = "PagamentosConsignacaoOrdenados", query = "SELECT p FROM Pagamento p WHERE p.consignacao = ?1 order by p.dataPagamento"),
+    @NamedQuery(name = "PagamentosPorContratoEmprestimo", query = "SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 order by p.dataVencimento"),
+    @NamedQuery(name = "PagamentosPorContratoEmprestimoCodigo", query = "SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 and p.contaCorrente is null and p.contaPagar is null order by p.codigo")
 })
 public class Pagamento implements Serializable {
 
@@ -83,14 +82,16 @@ public class Pagamento implements Serializable {
     @ManyToOne
     private Poupanca poupanca;
     @ManyToOne
+    private Conciliacao conciliacao;
+    @ManyToOne
     private Consignacao consignacao;
     private FormaPagamento forma = FormaPagamento.DINHEIRO;
     @OneToOne(cascade = CascadeType.ALL)
     private DadosPagamento dadosPagamento;
     private boolean pago = false;
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private TransacaoBancaria transacaoBancaria;
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private ContratoEmprestimo contratoEmprestimo;
 
     public Calendar getDataVencimento() {
@@ -292,6 +293,15 @@ public class Pagamento implements Serializable {
     public void setContratoEmprestimo(ContratoEmprestimo contratoEmprestimo) {
         this.contratoEmprestimo = contratoEmprestimo;
     }
-    
+
+    public Conciliacao getConciliacao() {
+        return conciliacao;
+    }
+
+    public void setConciliacao(Conciliacao conciliacao) {
+        this.conciliacao = conciliacao;
+    }
+
+
 }
 
