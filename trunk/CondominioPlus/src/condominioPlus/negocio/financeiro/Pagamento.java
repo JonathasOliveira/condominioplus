@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio.financeiro;
 
+import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -93,6 +94,8 @@ public class Pagamento implements Serializable {
     private TransacaoBancaria transacaoBancaria;
     @ManyToOne(cascade = CascadeType.ALL)
     private ContratoEmprestimo contratoEmprestimo;
+    @ManyToOne
+    private Cobranca cobranca;
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -302,6 +305,13 @@ public class Pagamento implements Serializable {
         this.conciliacao = conciliacao;
     }
 
+    public Cobranca getCobranca() {
+        return cobranca;
+    }
+
+    public void setCobranca(Cobranca cobranca) {
+        this.cobranca = cobranca;
+    }
 
 }
 

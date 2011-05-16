@@ -2,10 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio;
 
+import condominioPlus.negocio.cobranca.Cobranca;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -27,40 +29,43 @@ import javax.persistence.OneToOne;
     @NamedQuery(name = "ConselheirosPorUnidade", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 AND u.condomino.conselheiro = true order by u.codigo"),
     @NamedQuery(name = "CondominosPorUnidade", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 order by u.condomino.nome"),
     @NamedQuery(name = "CondominosPorUnidadeSemSindico", query = "SELECT u FROM Unidade u WHERE u.condominio.codigo = ?1 AND u.condomino.conselheiro = false and u.sindico = false order by u.condomino.nome")
-    })
+})
 public class Unidade implements Serializable {
+
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int codigo;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Condomino condomino = new Condomino();
     @ManyToOne
     private Condominio condominio;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Inquilino inquilino;
-    @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)
+    @OneToOne(mappedBy = "unidade", cascade = CascadeType.ALL)
     private ProcessoJudicial processoJudicial;
-    @OneToOne(mappedBy = "unidade", cascade=CascadeType.ALL)
+    @OneToOne(mappedBy = "unidade", cascade = CascadeType.ALL)
     private NotificacaoJudicial notificacaoJudicial;
     private String unidade;
     private String descricao;
     private String iptu;
-    @Column(name="fracao_ideal")
+    @Column(name = "fracao_ideal")
     private String fracaoIdeal;
     private String bloco;
     private String coeficiente;
-    @Column(name="valor_principal")
+    @Column(name = "valor_principal")
     private String valorPrincipal;
     private boolean sindico;
     private boolean ativo;
-    @Column(name="bloquear_impressao_certificado")
+    @Column(name = "bloquear_impressao_certificado")
     private boolean bloquearImpressaoCertificado;
-    @Column(name="bloquear_impressao_cobranca")
+    @Column(name = "bloquear_impressao_cobranca")
     private boolean bloquearImpressaoCobranca;
-    @Column(name="bloquear_impressao_carta_cobranca")
+    @Column(name = "bloquear_impressao_carta_cobranca")
     private boolean bloquearImpressaoCartaCobranca;
-    @Column(name="tem_inquilino")
+    @Column(name = "tem_inquilino")
     private boolean hasInquilino;
+    @OneToMany(mappedBy = "unidade", cascade = CascadeType.ALL)
+    private List<Cobranca> cobrancas;
 
     public Unidade() {
     }
@@ -80,7 +85,7 @@ public class Unidade implements Serializable {
     public Inquilino getInquilino() {
         return inquilino;
     }
-    
+
     public void setInquilino(Inquilino inquilino) {
         this.inquilino = inquilino;
     }
@@ -197,7 +202,6 @@ public class Unidade implements Serializable {
         this.processoJudicial = processoJudicial;
     }
 
-
     public boolean isSindico() {
         return sindico;
     }
@@ -220,6 +224,14 @@ public class Unidade implements Serializable {
 
     public void setValorPrincipal(String valorPrincipal) {
         this.valorPrincipal = valorPrincipal;
+    }
+
+    public List<Cobranca> getCobrancas() {
+        return cobrancas;
+    }
+
+    public void setCobrancas(List<Cobranca> cobrancas) {
+        this.cobrancas = cobrancas;
     }
 
     @Override
