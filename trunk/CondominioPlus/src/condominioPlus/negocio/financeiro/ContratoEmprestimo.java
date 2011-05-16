@@ -42,7 +42,7 @@ public class ContratoEmprestimo implements Serializable {
     private int numeroParcelas;
     @OneToMany(mappedBy = "contratoEmprestimo", cascade = CascadeType.ALL)
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Emprestimo emprestimo;
     private BigDecimal valor;
     private String descricao;
@@ -135,6 +135,7 @@ public class ContratoEmprestimo implements Serializable {
         return saldo;
     }
 
+   
     public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }

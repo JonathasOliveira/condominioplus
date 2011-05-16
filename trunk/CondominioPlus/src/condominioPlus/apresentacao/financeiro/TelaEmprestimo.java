@@ -14,7 +14,6 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.DadosDOC;
-import condominioPlus.negocio.financeiro.DadosPagamento;
 import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
@@ -27,6 +26,7 @@ import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -84,10 +84,9 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
         new ControladorEventos();
 
-        preencherTela();
-        calcularSaldo();
 
         carregarTabela();
+        preencherTela();
 
         if (condominio != null) {
             this.setTitle("Empréstimos - " + condominio.getRazaoSocial());
@@ -176,9 +175,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
     }
 
     private List<ContratoEmprestimo> getContratos() {
-//        contratos = new DAO().listar("ContratosPorData", emprestimo);
-        return emprestimo.getContratos();
-
+        return contratos = new DAO().listar("ContratosPorData", emprestimo);
     }
 
     private List listaCampos() {
@@ -241,8 +238,6 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             }
 
 
-            DadosPagamento dados = new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()));
-
             if (contrato.getNumeroParcelas() > 0) {
                 String texto = "";
                 if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
@@ -265,12 +260,16 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         pagamento.setHistorico(texto + " " + contrato.getDescricao());
                         System.out.println("pagamento historico " + pagamento.getHistorico());
                         pagamento.setForma(FormaPagamento.DINHEIRO);
-                        pagamento.setDadosPagamento(dados.clone());
+                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
 
                         if (conta.isCredito()) {
-                            contrato.adicionarPagamento(pagamento);
+                            new DAO().salvar(pagamento);
                         } else {
-                            verificarVinculo(pagamento, texto);
+                            if (i == 0) {
+                                verificarVinculo(pagamento, texto);
+                            } else {
+                                verificarVinculo(pagamento, texto);
+                            }
                         }
 
                     }
@@ -289,11 +288,11 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
                     pagamento.setContratoEmprestimo(contrato);
                     pagamento.setHistorico(texto + " " + contrato.getDescricao());
-                    pagamento.setDadosPagamento(dados);
+                    pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
                     if (conta.isCredito()) {
-                        contrato.adicionarPagamento(pagamento);
+                        new DAO().salvar(pagamento);
                     } else {
                         verificarVinculo(pagamento, texto);
                     }
@@ -310,14 +309,14 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
                 }
                 p.setSaldo(new BigDecimal(0));
-                p.setDadosPagamento(dados);
+                p.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()) + 1));
 
                 p.setContaCorrente(condominio.getContaCorrente());
                 p.setPago(true);
 
                 condominio.getContaCorrente().adicionarPagamento(p);
-                emprestimo.getContratos().add(contrato);
-                
+                new DAO().salvar(contrato);
+
 
                 limparCampos();
                 calcularSaldo();
@@ -398,12 +397,10 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 tipo = tipo.EDICAO;
             }
 
-            new DAO().salvar(contrato);
             new DAO().salvar(condominio);
 
             String descricao = "Contrato de Empréstimo adicionado! " + contrato.getDescricao() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
-            calcularSaldo();
 
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
@@ -433,15 +430,15 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                                 }
                             }
                             new DAO().remover(transacao);
+
                         }
 
                     }
-                    emprestimo.getContratos().remove(c);
                     new DAO().remover(c);
                 }
             }
-
-            new DAO().salvar(emprestimo);
+            new DAO().remover(itensRemover);
+            new DAO().salvar(condominio);
             calcularSaldo();
 
             System.out.println("contratos em condominio " + condominio.getEmprestimo().getContratos().size());
@@ -548,9 +545,22 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
     private void calcularSaldo() {
 
-        lblSaldoEmprestimo.setText(emprestimo.calculaSaldo(emprestimo).toString());
-        emprestimo.setSaldo(emprestimo.calculaSaldo(emprestimo).bigDecimalValue());
+        lblSaldoEmprestimo.setText(PagamentoUtil.formatarMoeda(calculaSaldo().doubleValue()));
+    }
+
+    public BigDecimal calculaSaldo() {
+        BigDecimal valor = new BigDecimal(0);
+        List<ContratoEmprestimo> lista = new DAO().listar("ContratosPorData", emprestimo);
+        for (ContratoEmprestimo c : lista) {
+            valor = valor.add(c.getSaldo());
+
+
+
+//            valor = valor.soma(c.getSaldo());
+        }
+        emprestimo.setSaldo(valor);
         new DAO().salvar(emprestimo);
+        return valor;
     }
 
     public void preencherPainelContrato(ContratoEmprestimo c) {
@@ -590,6 +600,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
             if (origem == btnIncluir) {
                 salvar();
                 carregarTabela();
+                calcularSaldo();
             } else if (origem == btnCalcular) {
                 calcularSaldo();
             } else if (origem == itemMenuRemoverSelecionados) {
@@ -693,12 +704,13 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                 txtDataPrimeiroPagamento.setValue(DataUtil.toString(DataUtil.getDateTime(txtData.getValue()).plusMonths(1)));
             }
         }
-//        @Override
-//        public void keyPressed(KeyEvent e) {
-//            if ((origem == tabela && painelDadosContrato.isVisible()) && (e.getKeyCode() == e.VK_DOWN || e.getKeyCode() == e.VK_UP)) {
-//                exibirPainelContrato(modelo.getObjetoSelecionado());
-//            }
-//        }
+        @Override
+        public void keyReleased(KeyEvent e) {
+            origem = e.getSource();
+            if ((origem == tabela && painelDadosContrato.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
+                exibirPainelContrato(modelo.getObjetoSelecionado());
+            }
+        }
     }
 
     /** This method is called from within the constructor to
