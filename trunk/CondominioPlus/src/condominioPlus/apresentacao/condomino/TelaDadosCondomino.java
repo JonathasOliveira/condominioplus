@@ -386,7 +386,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtCepInquilino.setText((unidade.getInquilino().getEndereco().getCep()));
         }
 
-        txtFracaoIdeal.setText(unidade.getFracaoIdeal());
+        txtFracaoIdeal.setText(String.valueOf(unidade.getFracaoIdeal()));
         txtIptu.setText(unidade.getIptu());
         txtBloco.setText(unidade.getBloco());
         txtCoeficiente.setText(unidade.getCoeficiente());
@@ -490,7 +490,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtCepInquilino.setText((unidade.getInquilino().getEndereco().getCep()));
         }
 
-        unidade.setFracaoIdeal(txtFracaoIdeal.getText());
+        unidade.setFracaoIdeal(Double.parseDouble(txtFracaoIdeal.getText()));
         unidade.setIptu(txtIptu.getText());
         unidade.setBloco(txtBloco.getText());
         unidade.setCoeficiente(txtCoeficiente.getText());
@@ -995,7 +995,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tblEndereco);
 
-        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
