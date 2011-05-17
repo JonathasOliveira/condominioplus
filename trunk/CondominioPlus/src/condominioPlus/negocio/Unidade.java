@@ -49,7 +49,7 @@ public class Unidade implements Serializable {
     private String descricao;
     private String iptu;
     @Column(name = "fracao_ideal")
-    private String fracaoIdeal;
+    private double  fracaoIdeal;
     private String bloco;
     private String coeficiente;
     @Column(name = "valor_principal")
@@ -170,11 +170,11 @@ public class Unidade implements Serializable {
         this.descricao = descricao;
     }
 
-    public String getFracaoIdeal() {
+    public double getFracaoIdeal() {
         return fracaoIdeal;
     }
 
-    public void setFracaoIdeal(String fracaoIdeal) {
+    public void setFracaoIdeal(double fracaoIdeal) {
         this.fracaoIdeal = fracaoIdeal;
     }
 
