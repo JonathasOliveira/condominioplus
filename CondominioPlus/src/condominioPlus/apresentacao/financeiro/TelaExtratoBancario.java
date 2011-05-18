@@ -11,13 +11,22 @@
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.financeiro.Conciliacao;
+import condominioPlus.negocio.financeiro.DadosCheque;
+import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Identificador;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaExtratoDiario;
+import condominioPlus.negocio.funcionario.FuncionarioUtil;
+import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.util.RenderizadorCelulaCor;
+import condominioPlus.util.RenderizadorCelulaCorData;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -25,8 +34,10 @@ import java.util.Comparator;
 import java.util.List;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
+import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
+import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
@@ -42,9 +53,11 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     private TabelaModelo_2<ExtratoBancario> modeloTabelaExtratoDiario;
     private TabelaModelo_2<ExtratoBancario> modeloTabelaExtratoMensal;
     private TabelaModelo_2<Identificador> modeloTabelaIdentificadores;
+    private TabelaModelo_2<Pagamento> modeloTabelaConciliacao;
     private List<ExtratoBancario> listaExtratoDiario;
     private List<ExtratoBancario> listaExtratoMensal;
     private List<Identificador> listaIdentificadores;
+    private RenderizadorCelulaCor renderizadorCelulaCor;
 
     /** Creates new form TelaExtratoBancario */
     public TelaExtratoBancario(Condominio condominio) {
@@ -57,6 +70,11 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         carregarTabelas();
         exibirSaldos();
 
+        if (condominio.getConciliacao() == null) {
+            condominio.setConciliacao(new Conciliacao());
+            new DAO().salvar(condominio);
+        }
+
         if (condominio != null) {
             this.setTitle("Extrato Bancário - " + condominio.getRazaoSocial());
         }
@@ -66,6 +84,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         carregarTabelaExtratoDiario();
         carregarTabelaExtratoMensal();
         carregarTabelaIdentificadores();
+        carregarTabelaConciliacao();
     }
 
     private void exibirSaldos() {
@@ -329,6 +348,134 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         tabelaIdentificadores.getColumn(modeloTabelaIdentificadores.getCampo(2)).setMinWidth(200);
     }
 
+    private void carregarTabelaConciliacao() {
+        modeloTabelaConciliacao = new TabelaModelo_2<Pagamento>(tabelaConciliacao, "Data, Documento, Conta, Descrição, Valor".split(",")) {
+
+            @Override
+            protected List<Pagamento> getCarregarObjetos() {
+                return getPagamentos();
+            }
+
+            @Override
+            public Object getValor(Pagamento pagamento, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return DataUtil.getDateTime(pagamento.getDataPagamento());
+                    case 1:
+                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
+                    case 2:
+                        return pagamento.getConta().getCodigo();
+                    case 3:
+                        return pagamento.getHistorico().toUpperCase();
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
+                    default:
+                        return null;
+                }
+            }
+
+            @Override
+            public boolean getRemover(Pagamento pagamento) {
+                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Pagamento - " + pagamento.getHistorico() + " ?", TelaExtratoBancario.this)) {
+                    return false;
+                }
+
+                try {
+                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Pagamento - " + pagamento.getHistorico());
+                    return true;
+                } catch (Throwable t) {
+                    new TratadorExcecao(t, TelaExtratoBancario.this);
+                    return false;
+                }
+            }
+        };
+
+        renderizadorCelulaCor = new RenderizadorCelulaCor(modeloTabelaConciliacao);
+        RenderizadorCelulaCorData renderizadorCelula = new RenderizadorCelulaCorData(modeloTabelaConciliacao);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(0)).setCellRenderer(renderizadorCelula);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(1)).setCellRenderer(renderizadorCelulaCor);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(2)).setCellRenderer(renderizadorCelulaCor);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(3)).setCellRenderer(renderizadorCelulaCor);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
+
+
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(3)).setMinWidth(300);
+        tabelaConciliacao.getColumn(modeloTabelaConciliacao.getCampo(4)).setMinWidth(100);
+
+    }
+
+    private List<Pagamento> getPagamentos() {
+        List<Pagamento> conciliacoes = new DAO().listar("PagamentosConciliacao", condominio.getConciliacao());
+        return conciliacoes;
+    }
+
+    private void apagarItensSelecionados() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover os pagamentos?", this)) {
+            return;
+        }
+        if (modeloTabelaConciliacao.getLinhaSelecionada() > -1) {
+            List<Pagamento> itensRemoverConciliacao = modeloTabelaConciliacao.getObjetosSelecionados();
+            for (Pagamento p3 : itensRemoverConciliacao) {
+                modeloTabelaConciliacao.remover(p3);
+            }
+
+            new DAO().remover(itensRemoverConciliacao);
+            new DAO().salvar(condominio);
+            ApresentacaoUtil.exibirInformacao("Pagamentos removidos com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void editarPagamento() {
+        if (!modeloTabelaConciliacao.getObjetosSelecionados().isEmpty()) {
+            DialogoEditarPagamentoContaCorrente tela = new DialogoEditarPagamentoContaCorrente((Pagamento) modeloTabelaConciliacao.getObjetoSelecionado());
+            tela.setLocationRelativeTo(this);
+            tela.setVisible(true);
+            modeloTabelaConciliacao.carregarObjetos();
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+        }
+    }
+
+    private void efetivarPagamentos() {
+        if (!getPagamentos().isEmpty()) {
+            for (Pagamento p2 : getPagamentos()) {
+                if (p2.getConta().getCodigo() == 6452) {
+                    p2.setPago(true);
+                    p2.setPoupanca(condominio.getPoupanca());
+                    new DAO().salvar(p2);
+                } else {
+                    p2.setPago(true);
+                    p2.setContaCorrente(condominio.getContaCorrente());
+                    new DAO().salvar(p2);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Pagamentos Compensados com Sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirInformacao("Não existem Pagamentos a serem processados!", this);
+        }
+    }
+
+    private void efetivarPagamentosSelecionados() {
+        if (!modeloTabelaConciliacao.getObjetosSelecionados().isEmpty()) {
+            for (Pagamento p2 : modeloTabelaConciliacao.getObjetosSelecionados()) {
+                if (p2.getConta().getCodigo() == 6452) {
+                    p2.setPago(true);
+                    p2.setPoupanca(condominio.getPoupanca());
+                    new DAO().salvar(p2);
+                } else {
+                    p2.setPago(true);
+                    p2.setContaCorrente(condominio.getContaCorrente());
+                    new DAO().salvar(p2);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Pagamentos Compensados com Sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirInformacao("Não existem Pagamentos a serem processados!", this);
+        }
+    }
+
     private List<Identificador> getIdentificadores() {
         listaIdentificadores = new DAO().listar(Identificador.class);
         return listaIdentificadores;
@@ -344,16 +491,38 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+
+        @Override
         public void actionPerformed(ActionEvent e) {
             Object origem = e.getSource();
             if (origem == btnLerArquivo) {
                 lerArquivoExtrato();
+            } else if (origem == itemMenuApagar) {
+                apagarItensSelecionados();
+            } else if (origem == itemMenuEditar) {
+                editarPagamento();
+            } else if (origem == itemMenuCompensar) {
+                efetivarPagamentosSelecionados();
+                carregarTabelaConciliacao();
+            } else if (origem == btnCompensarTodos) {
+                efetivarPagamentos();
+                carregarTabelaConciliacao();
             }
         }
 
         @Override
         public void configurar() {
             btnLerArquivo.addActionListener(this);
+            tabelaConciliacao.addMouseListener(this);
+            itemMenuApagar.addActionListener(this);
+            itemMenuEditar.addActionListener(this);
+            itemMenuCompensar.addActionListener(this);
+            btnCompensarTodos.addActionListener(this);
         }
     }
 
@@ -366,6 +535,10 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuApagar = new javax.swing.JMenuItem();
+        itemMenuEditar = new javax.swing.JMenuItem();
+        itemMenuCompensar = new javax.swing.JMenuItem();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         painelExtratoDiario = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -400,6 +573,20 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         painelIdentificadores = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         tabelaIdentificadores = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tabelaConciliacao = new javax.swing.JTable();
+        jPanel3 = new javax.swing.JPanel();
+        btnCompensarTodos = new javax.swing.JButton();
+
+        itemMenuApagar.setText("Apagar Pagamentos Selecionados");
+        popupMenu.add(itemMenuApagar);
+
+        itemMenuEditar.setText("Editar Pagamentos Selecionados");
+        popupMenu.add(itemMenuEditar);
+
+        itemMenuCompensar.setText("Compensar Pagamentos Selecionados");
+        popupMenu.add(itemMenuCompensar);
 
         setClosable(true);
         setTitle("Extrato Bancário");
@@ -669,6 +856,61 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Identificadores", painelIdentificadores);
 
+        tabelaConciliacao.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(tabelaConciliacao);
+
+        btnCompensarTodos.setText("Compensar Todos");
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(btnCompensarTodos)
+                .addContainerGap(544, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnCompensarTodos)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Conciliação Bancária", jPanel2);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -682,7 +924,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -692,7 +934,11 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCompensarTodos;
     private javax.swing.JButton btnLerArquivo;
+    private javax.swing.JMenuItem itemMenuApagar;
+    private javax.swing.JMenuItem itemMenuCompensar;
+    private javax.swing.JMenuItem itemMenuEditar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -706,13 +952,18 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelExtratoDiario;
     private javax.swing.JPanel painelExtratoMensal;
     private javax.swing.JPanel painelIdentificadores;
+    private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JTable tabelaConciliacao;
     private javax.swing.JTable tabelaExtratoDiario;
     private javax.swing.JTable tabelaExtratoMensal;
     private javax.swing.JTable tabelaIdentificadores;
