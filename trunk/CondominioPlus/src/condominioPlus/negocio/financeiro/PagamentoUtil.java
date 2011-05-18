@@ -164,7 +164,7 @@ public class PagamentoUtil {
             Main.getCondominio().getContaCorrente().setSaldo(p2.getValor());
         }
     }
-
+    
     public static String formatarMoeda(Double valor) {
 
         NumberFormat format = NumberFormat.getInstance();
