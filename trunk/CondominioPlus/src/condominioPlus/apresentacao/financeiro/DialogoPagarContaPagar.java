@@ -141,13 +141,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         int resultado = 0;
         for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
             if (p.getContaCorrente() == null && p.getContaPagar() == null) {
-                System.out.println("teste");
                 resultado = resultado + 1;
-                System.out.println("here");
-                System.out.println("resultadooo " + resultado);
             }
         }
-        System.out.println("resultado fora do for " + resultado);
         return resultado;
     }
 
