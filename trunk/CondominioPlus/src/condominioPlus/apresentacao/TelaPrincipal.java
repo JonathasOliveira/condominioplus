@@ -14,6 +14,7 @@ import condominioPlus.apresentacao.cobranca.TelaCobrancaBase;
 import condominioPlus.Main;
 import condominioPlus.apresentacao.advogado.TelaAdvogado;
 import condominioPlus.apresentacao.cobranca.TelaLancamentos;
+import condominioPlus.apresentacao.cobranca.agua.TelaAgua;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -345,8 +346,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
-                } else if (source == menuItemPagos) {
-//                    criarFrame(new TelaVeiculo());
+                } else if (source == menuItemAgua) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaAgua());
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
                 } else if (source == menuItemControleAcesso) {
                     criarFrame(new TelaControleAcesso());
                 } else if (source == menuItemRelatorioCliente) {
@@ -469,6 +474,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemBanco.addActionListener(this);
             menuItemConfiguracao.addActionListener(this);
             menuItemIntegracao.addActionListener(this);
+            menuItemAgua.addActionListener(this);
             menuItemSobre.addActionListener(this);
             menuItemContas.addActionListener(this);
             menuItemIdentificadores.addActionListener(this);
