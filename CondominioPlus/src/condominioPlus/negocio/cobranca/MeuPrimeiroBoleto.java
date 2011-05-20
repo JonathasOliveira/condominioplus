@@ -125,7 +125,7 @@ public class MeuPrimeiroBoleto {
         // Instanciando um objeto "BoletoViewer", classe responsável pela
         // geração do boleto bancário.
         BoletoViewer boletoViewer = new BoletoViewer(boleto);
-        boletoViewer.setTemplate("BoletoTemplateSemSacadorAvalista.pdf");
+//        boletoViewer.setTemplate("BoletoTemplateSemSacadorAvalista.pdf");
 
         // Gerando o arquivo. No caso o arquivo mencionado será salvo na mesma
         // pasta do projeto. Outros exemplos:
