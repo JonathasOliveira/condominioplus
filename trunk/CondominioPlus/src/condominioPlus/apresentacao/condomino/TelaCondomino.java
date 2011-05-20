@@ -18,7 +18,6 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.util.Relatorios;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
-import logicpoint.apresentacao.NotificavelClasse;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
@@ -27,7 +26,7 @@ import logicpoint.persistencia.DAO;
  *
  * @author Thiago
  */
-public class TelaCondomino extends javax.swing.JInternalFrame implements NotificavelClasse<Unidade> {
+public class TelaCondomino extends javax.swing.JInternalFrame {
 
     private ControladorEventos controlador;
     private TabelaModelo_2<Unidade> modelo;
