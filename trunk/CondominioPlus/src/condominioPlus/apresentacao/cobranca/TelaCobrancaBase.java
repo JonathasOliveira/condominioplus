@@ -12,6 +12,8 @@ package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.apresentacao.financeiro.DialogoConta;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.Configuracao;
+import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
@@ -44,6 +46,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private CobrancaBase cobranca;
     private List<CobrancaBase> listaCobrancas;
     private Conta conta;
+    private Configuracao configuracao = NegocioUtil.getConfiguracao();
 
     /** Creates new form TelaCobrancaBase */
     public TelaCobrancaBase(Condominio condominio) {
@@ -55,6 +58,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
         carregarTabela();
         preencherPainelDados(new CobrancaBase());
+        preencherPainelJuros();
 
         if (condominio != null) {
             this.setTitle("Cobrança Base - " + condominio.getRazaoSocial());
@@ -251,6 +255,19 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         return c;
     }
 
+    private void preencherPainelJuros() {
+        txtJuros.setText(String.valueOf(configuracao.getPercentualJuros()));
+        txtMulta.setText(String.valueOf(configuracao.getPercentualMulta()));
+    }
+
+    private
+            void salvarPercentualJuros() {
+        configuracao.setPercentualJuros(new BigDecimal(txtJuros.getText().replace(",", ".")));
+        configuracao.setPercentualMulta(new BigDecimal(txtMulta.getText().replace(",", ".")));
+        new DAO().salvar(configuracao);
+        ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso", this);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -265,6 +282,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             btnCancelar.addActionListener(this);
             txtConta.addFocusListener(this);
             btnSalvar.addActionListener(this);
+            btnSalvarJuros.addActionListener(this);
         }
 
         @Override
@@ -284,6 +302,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
                 carregarTabela();
             } else if (origem == itemMenuRemover) {
                 remover();
+            } else if (origem == btnSalvarJuros) {
+                salvarPercentualJuros();
             }
         }
 
@@ -330,6 +350,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         itemMenuAdicionar = new javax.swing.JMenuItem();
         itemMenuEditar = new javax.swing.JMenuItem();
         itemMenuRemover = new javax.swing.JMenuItem();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel2 = new javax.swing.JPanel();
         painelTabela = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaCobranca = new javax.swing.JTable();
@@ -344,6 +366,13 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         btnCancelar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         checkDividirFracaoIdeal = new javax.swing.JCheckBox();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txtJuros = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtMulta = new javax.swing.JTextField();
+        btnSalvarJuros = new javax.swing.JButton();
 
         itemMenuAdicionar.setText("Adicionar Cobrança");
         popupMenu.add(itemMenuAdicionar);
@@ -355,7 +384,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         popupMenu.add(itemMenuRemover);
 
         setClosable(true);
-        setToolTipText("Cobrança Base");
+        setTitle("Cobrança Base");
+        setToolTipText("");
 
         painelTabela.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -384,8 +414,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         painelTabelaLayout.setVerticalGroup(
             painelTabelaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelTabelaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                .addContainerGap(18, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -479,24 +509,110 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelTabela, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(painelDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelTabela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(painelDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Cobranças Base", jPanel2);
+
+        jLabel1.setText("% Juros");
+
+        txtJuros.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        jLabel4.setText("% Multa");
+
+        txtMulta.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        btnSalvarJuros.setText("Salvar");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtJuros))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtMulta, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(btnSalvarJuros)
+                .addGap(20, 20, 20))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap(28, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(txtJuros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(txtMulta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(27, 27, 27))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(btnSalvarJuros)
+                        .addGap(42, 42, 42))))
+        );
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(154, 154, 154)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(172, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(118, 118, 118)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(129, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Juros/Multa", jPanel3);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(painelTabela, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(painelDados, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 574, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(painelTabela, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(painelDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -506,20 +622,29 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnSalvar;
+    private javax.swing.JButton btnSalvarJuros;
     private javax.swing.JCheckBox checkDividirFracaoIdeal;
     private javax.swing.JMenuItem itemMenuAdicionar;
     private javax.swing.JMenuItem itemMenuEditar;
     private javax.swing.JMenuItem itemMenuRemover;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelDados;
     private javax.swing.JPanel painelTabela;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaCobranca;
     private javax.swing.JTextField txtConta;
     private javax.swing.JTextField txtHistorico;
+    private javax.swing.JTextField txtJuros;
+    private javax.swing.JTextField txtMulta;
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
 }
