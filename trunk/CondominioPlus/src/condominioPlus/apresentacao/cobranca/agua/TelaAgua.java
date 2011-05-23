@@ -10,13 +10,21 @@
  */
 package condominioPlus.apresentacao.cobranca.agua;
 
+import condominioPlus.apresentacao.TelaPrincipal;
+import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.cobranca.agua.FormaCalculoMetroCubico;
 import condominioPlus.negocio.cobranca.agua.FormaRateioAreaComum;
+import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.cobranca.agua.TarifaProlagos;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
-import condominioPlus.util.RenderizadorCelulaCor;
 import condominioPlus.util.RenderizadorCelulaDireita;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import logicpoint.apresentacao.ApresentacaoUtil;
+import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
@@ -29,14 +37,23 @@ import logicpoint.util.Util;
 public class TelaAgua extends javax.swing.JInternalFrame {
 
     private TabelaModelo_2<TarifaProlagos> modelo;
+    private ControladorEventos controlador;
+    private ParametrosCalculoAgua parametros;
 
     /** Creates new form TelaAgua */
-    public TelaAgua() {
-        System.out.println("here");
+    public TelaAgua(Condominio condominio) {
         initComponents();
         carregarComboFormaPrecoMetroCubico();
         carregarComboFormaRateioAreaComum();
         carregarTabela();
+        if (condominio.getParametros() != null) {
+            this.parametros = condominio.getParametros();
+        }else{
+            parametros = new ParametrosCalculoAgua();
+            condominio.setParametros(parametros);
+            new DAO().salvar(condominio);
+        }
+        controlador = new ControladorEventos();
     }
 
     private void carregarComboFormaPrecoMetroCubico() {
@@ -49,22 +66,6 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     private void carregarTabela() {
         modelo = new TabelaModelo_2<TarifaProlagos>(tabela, "Consumo Inicial, Consumo Final, Valor".split(",")) {
-
-            @Override
-            public void editar(TarifaProlagos objeto) {
-                super.editar(objeto);
-            }
-
-            @Override
-            protected TarifaProlagos getAdicionar() {
-                return super.getAdicionar();
-            }
-
-            @Override
-            protected boolean getRemover(TarifaProlagos objeto) {
-                return super.getRemover(objeto);
-            }
-
 
             @Override
             protected List<TarifaProlagos> getCarregarObjetos() {
@@ -97,6 +98,76 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         return tarifas;
     }
 
+    private void adicionar() {
+        DialogoTarifaProlagos.getTarifa(new TarifaProlagos(), TelaPrincipal.getInstancia(), true);
+        carregarTabela();
+    }
+
+    private void editar() {
+        if (modelo.getLinhaSelecionada() != -1) {
+            DialogoTarifaProlagos.getTarifa(modelo.getObjetoSelecionado(), TelaPrincipal.getInstancia(), true);
+            carregarTabela();
+        } else {
+            ApresentacaoUtil.exibirInformacao("Você deve selecionar uma tarifa para editar!", this);
+
+        }
+    }
+
+    private void remover() {
+        if (modelo.getLinhaSelecionada() > -1) {
+            List<TarifaProlagos> tarifas = modelo.getObjetosSelecionados();
+
+            new DAO().remover(tarifas);
+            ApresentacaoUtil.exibirInformacao("Tarifa(s) removidas com sucesso!", this);
+            carregarTabela();
+
+        } else {
+            ApresentacaoUtil.exibirInformacao("Você deve selecionar uma tarifa para remover!", this);
+        }
+
+    }
+
+    private void preencherObjeto() {
+        parametros.setFormaAreaComum((FormaRateioAreaComum) cbFormaRateioAreaComum.getSelectedItem());
+        parametros.setFormaMetroCubico((FormaCalculoMetroCubico) cbFormaCalculoMetroCubico.getSelectedItem());
+        parametros.setQuantidadeMetrosCubicosNaCota((Integer) spinnerQuantidadeIncluirCota.getValue());
+        parametros.setCobrarPipa(checkNaoCobrarPipa.isSelected());
+        parametros.setHidrometroAreaComum(checkHidrometroAreaComum.isSelected());
+        parametros.setValorFixoAreaComum(new BigDecimal(txtValorFixoAreaComum.getText()));
+        parametros.setValorMetroCubicoSindico(new BigDecimal(txtValorSindico.getText()));
+    }
+
+    private class ControladorEventos extends ControladorEventosGenerico {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Object origem = e.getSource();
+
+            if (origem == itemMenuAdicionar) {
+                adicionar();
+            } else if (origem == itemMenuEditar) {
+                editar();
+            } else if (origem == itemMenuRemover) {
+                remover();
+            }
+        }
+
+        @Override
+        public void configurar() {
+            itemMenuAdicionar.addActionListener(this);
+            itemMenuEditar.addActionListener(this);
+            itemMenuRemover.addActionListener(this);
+            tabela.addMouseListener(this);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger()) {
+                popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -106,6 +177,10 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuAdicionar = new javax.swing.JMenuItem();
+        itemMenuEditar = new javax.swing.JMenuItem();
+        itemMenuRemover = new javax.swing.JMenuItem();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -118,18 +193,27 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         cbFormaCalculoMetroCubico = new javax.swing.JComboBox();
         jLabel3 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
+        spinnerQuantidadeIncluirCota = new javax.swing.JSpinner();
         jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        txtValorSindico = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
+        txtValorFixoAreaComum = new javax.swing.JTextField();
+        checkHidrometroAreaComum = new javax.swing.JCheckBox();
+        checkNaoCobrarPipa = new javax.swing.JCheckBox();
         jLabel6 = new javax.swing.JLabel();
         cbFormaRateioAreaComum = new javax.swing.JComboBox();
         jPanel6 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
+
+        itemMenuAdicionar.setText("Adicionar Tarifa");
+        popupMenu.add(itemMenuAdicionar);
+
+        itemMenuEditar.setText("Editar Tarifa");
+        popupMenu.add(itemMenuEditar);
+
+        itemMenuRemover.setText("Remover Tarifa");
+        popupMenu.add(itemMenuRemover);
 
         setClosable(true);
         setTitle("Cálculo de Água");
@@ -194,25 +278,17 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         jLabel2.setText("Forma de Cálculo do Preço:");
 
-        cbFormaCalculoMetroCubico.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
         jLabel3.setText("Qtd para Incluir na Taxa Condominial:");
 
         jLabel4.setText("Valor Informado Pelo Síndico:");
 
-        jTextField1.setText("jTextField1");
-
         jLabel5.setText("Valor Fixo Cobrado Área Comum:");
 
-        jTextField2.setText("jTextField2");
+        checkHidrometroAreaComum.setText("Condomínio com Hidrômetro na Área Comum");
 
-        jCheckBox1.setText("Condomínio com Hidrômetro na Área Comum");
-
-        jCheckBox2.setText("Não Cobrar Despesas com Pipa");
+        checkNaoCobrarPipa.setText("Não Cobrar Despesas com Pipa");
 
         jLabel6.setText("Forma de Rateio da Área Comum:");
-
-        cbFormaRateioAreaComum.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -223,22 +299,22 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel6)
                     .addComponent(cbFormaRateioAreaComum, 0, 237, Short.MAX_VALUE)
-                    .addComponent(jCheckBox2)
+                    .addComponent(checkNaoCobrarPipa)
                     .addComponent(jLabel2)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE))
+                        .addComponent(spinnerQuantidadeIncluirCota, javax.swing.GroupLayout.DEFAULT_SIZE, 52, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE))
+                        .addComponent(txtValorSindico, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
+                        .addComponent(txtValorFixoAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
                     .addComponent(cbFormaCalculoMetroCubico, 0, 237, Short.MAX_VALUE)
-                    .addComponent(jCheckBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(checkHidrometroAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -250,19 +326,19 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 .addGap(27, 27, 27)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(spinnerQuantidadeIncluirCota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(26, 26, 26)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtValorSindico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtValorFixoAreaComum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jCheckBox1)
+                .addComponent(checkHidrometroAreaComum)
                 .addGap(18, 18, 18)
-                .addComponent(jCheckBox2)
+                .addComponent(checkNaoCobrarPipa)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -366,8 +442,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnVoltar;
     private javax.swing.JComboBox cbFormaCalculoMetroCubico;
     private javax.swing.JComboBox cbFormaRateioAreaComum;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JCheckBox checkHidrometroAreaComum;
+    private javax.swing.JCheckBox checkNaoCobrarPipa;
+    private javax.swing.JMenuItem itemMenuAdicionar;
+    private javax.swing.JMenuItem itemMenuEditar;
+    private javax.swing.JMenuItem itemMenuRemover;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -381,10 +460,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JSpinner spinnerQuantidadeIncluirCota;
     private javax.swing.JTable tabela;
+    private javax.swing.JTextField txtValorFixoAreaComum;
+    private javax.swing.JTextField txtValorSindico;
     // End of variables declaration//GEN-END:variables
 }

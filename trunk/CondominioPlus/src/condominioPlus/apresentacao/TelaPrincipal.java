@@ -348,7 +348,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     }
                 } else if (source == menuItemAgua) {
                     if (Main.getCondominio() != null) {
-                        criarFrame(new TelaAgua());
+                        criarFrame(new TelaAgua(Main.getCondominio()));
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
