@@ -11,6 +11,7 @@ package condominioPlus.negocio;
 
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import logicpoint.recursos.Local;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,7 +55,12 @@ public class Configuracao implements Serializable {
     private String telefoneEmpresa = "";
     @Column(name = "endereco_empresa")
     private String enderecoEmpresa = "";
-
+    @Column(name="percentual_juros")
+    private BigDecimal percentualJuros;
+    @Column(name="percentual_multa")
+    private BigDecimal percentualMulta;
+    @Column(name="incremento_nosso_numero")
+    private int incrementoNumeroDocumento = 10000;
 
     public boolean isExpirado() {
         return expirado;
@@ -144,4 +150,29 @@ public class Configuracao implements Serializable {
     public void setEnderecoEmpresa(String enderecoEmpresa) {
         this.enderecoEmpresa = enderecoEmpresa;
     }
+
+    public BigDecimal getPercentualJuros() {
+        return percentualJuros;
+    }
+
+    public void setPercentualJuros(BigDecimal percentualJuros) {
+        this.percentualJuros = percentualJuros;
+    }
+
+    public BigDecimal getPercentualMulta() {
+        return percentualMulta;
+    }
+
+    public void setPercentualMulta(BigDecimal percentualMulta) {
+        this.percentualMulta = percentualMulta;
+    }
+
+    public int getIncrementoNumeroDocumento() {
+        return incrementoNumeroDocumento;
+    }
+
+    public void setIncrementoNumeroDocumento(int incrementoNumeroDocumento) {
+        this.incrementoNumeroDocumento = incrementoNumeroDocumento;
+    }
+    
 }
