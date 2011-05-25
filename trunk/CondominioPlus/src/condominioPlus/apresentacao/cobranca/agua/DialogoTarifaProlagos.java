@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.cobranca.agua;
 
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.cobranca.agua.TarifaProlagos;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.util.List;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.persistencia.DAO;
+import logicpoint.util.Moeda;
 
 /**
  *
@@ -51,17 +53,17 @@ public class DialogoTarifaProlagos extends javax.swing.JDialog {
 
     private void preencherObjeto() {
 
-        tarifa.setConsumoInicial(Double.valueOf(txtConsumoInicial.getText().replace(",", ".")));
-        tarifa.setConsumoFinal(Double.valueOf(txtConsumoFinal.getText().replace(",", ".")));
-        tarifa.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+        tarifa.setConsumoInicial(new Moeda(txtConsumoInicial.getText()).bigDecimalValue());
+        tarifa.setConsumoFinal(new Moeda (txtConsumoFinal.getText()).bigDecimalValue());
+        tarifa.setValor(new Moeda(txtValor.getText()).bigDecimalValue());
 
     }
 
     private void preencherTela() {
 
-        txtConsumoInicial.setText(String.valueOf(tarifa.getConsumoInicial()));
-        txtConsumoFinal.setText(String.valueOf(tarifa.getConsumoFinal()));
-        txtValor.setText(tarifa.getValor().toString());
+        txtConsumoInicial.setText(tarifa.getConsumoInicial().toString());
+        txtConsumoFinal.setText(tarifa.getConsumoFinal().toString());
+        txtValor.setText(new Moeda(tarifa.getValor()).toString());
     }
 
     private void fechar() {

@@ -5,6 +5,7 @@
 package condominioPlus.negocio;
 
 import condominioPlus.negocio.cobranca.CobrancaBase;
+import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conciliacao;
@@ -440,6 +441,5 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setParametros(ParametrosCalculoAgua parametros) {
         this.parametros = parametros;
     }
-
     
 }

@@ -20,14 +20,13 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.RenderizadorCelulaDireita;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
+import logicpoint.util.Moeda;
 import logicpoint.util.Util;
 
 /**
@@ -39,6 +38,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private TabelaModelo_2<TarifaProlagos> modelo;
     private ControladorEventos controlador;
     private ParametrosCalculoAgua parametros;
+    private Condominio condominio;
 
     /** Creates new form TelaAgua */
     public TelaAgua(Condominio condominio) {
@@ -46,22 +46,25 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         carregarComboFormaPrecoMetroCubico();
         carregarComboFormaRateioAreaComum();
         carregarTabela();
+        this.condominio = condominio;
         if (condominio.getParametros() != null) {
             this.parametros = condominio.getParametros();
-        }else{
+        } else {
             parametros = new ParametrosCalculoAgua();
             condominio.setParametros(parametros);
             new DAO().salvar(condominio);
         }
         controlador = new ControladorEventos();
+
+        preencherTela();
     }
 
     private void carregarComboFormaPrecoMetroCubico() {
-        cbFormaCalculoMetroCubico.setModel(new ComboModelo<String>(Util.toList(new String[]{"", FormaCalculoMetroCubico.DIVIDIR_METROS_CUBICOS.toString(), FormaCalculoMetroCubico.SINDICO_PRECO.toString(), FormaCalculoMetroCubico.TABELA_PROLAGOS.toString()})));
+        cbFormaCalculoMetroCubico.setModel(new ComboModelo<String>(Util.toList(new String[]{FormaCalculoMetroCubico.SEM_VALOR.toString(), FormaCalculoMetroCubico.DIVIDIR_METROS_CUBICOS.toString(), FormaCalculoMetroCubico.SINDICO_PRECO.toString(), FormaCalculoMetroCubico.TABELA_PROLAGOS.toString()})));
     }
 
     private void carregarComboFormaRateioAreaComum() {
-        cbFormaRateioAreaComum.setModel(new ComboModelo<String>(Util.toList(new String[]{"", FormaRateioAreaComum.IGUAL_TODOS.toString(), FormaRateioAreaComum.NAO_COBRAR.toString(), FormaRateioAreaComum.PROPORCIONAL_CONSUMO.toString(), FormaRateioAreaComum.PROPORCIONAL_FRACAO.toString()})));
+        cbFormaRateioAreaComum.setModel(new ComboModelo<String>(Util.toList(new String[]{FormaRateioAreaComum.SEM_VALOR.toString(), FormaRateioAreaComum.IGUAL_TODOS.toString(), FormaRateioAreaComum.NAO_COBRAR.toString(), FormaRateioAreaComum.PROPORCIONAL_CONSUMO.toString(), FormaRateioAreaComum.PROPORCIONAL_FRACAO.toString()})));
     }
 
     private void carregarTabela() {
@@ -127,14 +130,81 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
+    private FormaRateioAreaComum selecionarRateioAreaComum() {
+        if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.SEM_VALOR.toString())) {
+            return FormaRateioAreaComum.SEM_VALOR;
+        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.IGUAL_TODOS.toString())) {
+            return FormaRateioAreaComum.IGUAL_TODOS;
+        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.NAO_COBRAR.toString())) {
+            return FormaRateioAreaComum.NAO_COBRAR;
+        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.PROPORCIONAL_CONSUMO.toString())) {
+            return FormaRateioAreaComum.PROPORCIONAL_CONSUMO;
+        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.PROPORCIONAL_FRACAO.toString())) {
+            return FormaRateioAreaComum.PROPORCIONAL_FRACAO;
+        }
+
+        return FormaRateioAreaComum.SEM_VALOR;
+    }
+
+    private FormaCalculoMetroCubico selecionarCalculoMetroCubico() {
+        if (cbFormaCalculoMetroCubico.getSelectedItem().equals(FormaCalculoMetroCubico.SEM_VALOR.toString())) {
+            return FormaCalculoMetroCubico.SEM_VALOR;
+        } else if (cbFormaCalculoMetroCubico.getSelectedItem().equals(FormaCalculoMetroCubico.DIVIDIR_METROS_CUBICOS.toString())) {
+            return FormaCalculoMetroCubico.DIVIDIR_METROS_CUBICOS;
+        } else if (cbFormaCalculoMetroCubico.getSelectedItem().equals(FormaCalculoMetroCubico.SINDICO_PRECO.toString())) {
+            return FormaCalculoMetroCubico.SINDICO_PRECO;
+        } else if (cbFormaCalculoMetroCubico.getSelectedItem().equals(FormaCalculoMetroCubico.TABELA_PROLAGOS.toString())) {
+            return FormaCalculoMetroCubico.TABELA_PROLAGOS;
+        }
+
+        return FormaCalculoMetroCubico.SEM_VALOR;
+    }
+
     private void preencherObjeto() {
-        parametros.setFormaAreaComum((FormaRateioAreaComum) cbFormaRateioAreaComum.getSelectedItem());
-        parametros.setFormaMetroCubico((FormaCalculoMetroCubico) cbFormaCalculoMetroCubico.getSelectedItem());
+
+        parametros.setFormaAreaComum(selecionarRateioAreaComum());
+        parametros.setFormaMetroCubico(selecionarCalculoMetroCubico());
         parametros.setQuantidadeMetrosCubicosNaCota((Integer) spinnerQuantidadeIncluirCota.getValue());
         parametros.setCobrarPipa(checkNaoCobrarPipa.isSelected());
         parametros.setHidrometroAreaComum(checkHidrometroAreaComum.isSelected());
-        parametros.setValorFixoAreaComum(new BigDecimal(txtValorFixoAreaComum.getText()));
-        parametros.setValorMetroCubicoSindico(new BigDecimal(txtValorSindico.getText()));
+        parametros.setValorFixoAreaComum(new Moeda(txtValorFixoAreaComum.getText()).bigDecimalValue());
+        parametros.setValorMetroCubicoSindico(new Moeda(txtValorSindico.getText()).bigDecimalValue());
+    }
+
+    private void preencherTela() {
+
+        if (parametros.getFormaAreaComum() != null) {
+            cbFormaRateioAreaComum.setSelectedItem(parametros.getFormaAreaComum().toString());
+        }
+        if (parametros.getFormaMetroCubico() != null) {
+            cbFormaCalculoMetroCubico.setSelectedItem(parametros.getFormaMetroCubico().toString());
+        }
+        spinnerQuantidadeIncluirCota.setValue(parametros.getQuantidadeMetrosCubicosNaCota());
+        checkHidrometroAreaComum.setSelected(parametros.isHidrometroAreaComum());
+        checkNaoCobrarPipa.setSelected(parametros.isCobrarPipa());
+        txtValorFixoAreaComum.setText(new Moeda(parametros.getValorFixoAreaComum()).toString());
+        txtValorSindico.setText(new Moeda(parametros.getValorMetroCubicoSindico()).toString());
+    }
+
+    private void fechar() {
+        doDefaultCloseAction();
+    }
+
+    private void salvar() {
+
+        preencherObjeto();
+        try {
+            new DAO().salvar(condominio.getParametros());
+
+            ApresentacaoUtil.exibirInformacao("Parâmetros salvos com Sucesso!", this);
+            fechar();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ApresentacaoUtil.exibirInformacao("Ocorreu um erro ao tentar salvar os parâmetros", this);
+        }
+
+
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -143,12 +213,16 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         public void actionPerformed(ActionEvent e) {
             Object origem = e.getSource();
 
-            if (origem == itemMenuAdicionar) {
+            if (origem == itemMenuAdicionar || origem == btnAdicionar) {
                 adicionar();
-            } else if (origem == itemMenuEditar) {
+            } else if (origem == itemMenuEditar || origem == btnEditar) {
                 editar();
-            } else if (origem == itemMenuRemover) {
+            } else if (origem == itemMenuRemover || origem == btnRemover) {
                 remover();
+            } else if (origem == btnVoltar) {
+                fechar();
+            } else if (origem == btnSalvar) {
+                salvar();
             }
         }
 
@@ -158,6 +232,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             itemMenuEditar.addActionListener(this);
             itemMenuRemover.addActionListener(this);
             tabela.addMouseListener(this);
+            btnVoltar.addActionListener(this);
+            btnSalvar.addActionListener(this);
+            btnAdicionar.addActionListener(this);
+            btnEditar.addActionListener(this);
+            btnRemover.addActionListener(this);
         }
 
         @Override
@@ -183,12 +262,30 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         itemMenuRemover = new javax.swing.JMenuItem();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        btnIncluir = new javax.swing.JButton();
+        btnIncluirPipa = new javax.swing.JButton();
+        btnSalvarAgua = new javax.swing.JButton();
+        btnCalcular = new javax.swing.JButton();
+        btnImprimir = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        abaPipa = new javax.swing.JTabbedPane();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        jPanel9 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTable3 = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        btnAdicionar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
+        btnRemover = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         cbFormaCalculoMetroCubico = new javax.swing.JComboBox();
@@ -218,15 +315,150 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         setClosable(true);
         setTitle("Cálculo de Água");
 
+        btnIncluir.setText("Incluir");
+
+        btnIncluirPipa.setText("Incluir PIPA");
+
+        btnSalvarAgua.setText("Salvar");
+
+        btnCalcular.setText("Calcular");
+
+        btnImprimir.setText("Imprimir");
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(86, 86, 86)
+                .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnIncluirPipa)
+                .addGap(18, 18, 18)
+                .addComponent(btnSalvarAgua)
+                .addGap(18, 18, 18)
+                .addComponent(btnCalcular)
+                .addGap(27, 27, 27)
+                .addComponent(btnImprimir)
+                .addContainerGap(86, Short.MAX_VALUE))
+        );
+
+        jPanel7Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnIncluirPipa, btnSalvarAgua});
+
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnIncluirPipa)
+                    .addComponent(btnSalvarAgua)
+                    .addComponent(btnCalcular)
+                    .addComponent(btnImprimir))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel7Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnIncluirPipa, btnSalvarAgua});
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTable1);
+
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTable2);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 698, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        abaPipa.addTab("Rateio", jPanel8);
+
+        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane4.setViewportView(jTable3);
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 698, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        abaPipa.addTab("Fornecimento de PIPA", jPanel9);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 756, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(abaPipa, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 723, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 723, Short.MAX_VALUE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 462, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(abaPipa, javax.swing.GroupLayout.PREFERRED_SIZE, 327, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Cálculos Mensais de Àgua", jPanel1);
@@ -250,28 +482,47 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         jLabel1.setText("Tabela Tarifário Prolagos");
 
+        btnAdicionar.setText("Adicionar");
+
+        btnEditar.setText("Editar");
+
+        btnRemover.setText("Remover");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1)))
+                    .addComponent(jLabel1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(btnAdicionar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                .addComponent(btnEditar)
+                .addGap(66, 66, 66)
+                .addComponent(btnRemover)
+                .addGap(36, 36, 36))
         );
+
+        jPanel4Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnAdicionar, btnEditar, btnRemover});
+
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(11, 11, 11)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 316, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRemover)
+                    .addComponent(btnEditar)
+                    .addComponent(btnAdicionar))
+                .addGap(22, 22, 22))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Metro Cúbico"));
@@ -297,8 +548,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel6)
-                    .addComponent(cbFormaRateioAreaComum, 0, 237, Short.MAX_VALUE)
+                    .addComponent(checkHidrometroAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(checkNaoCobrarPipa)
                     .addComponent(jLabel2)
                     .addGroup(jPanel5Layout.createSequentialGroup()
@@ -309,12 +559,13 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtValorSindico, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE))
+                    .addComponent(cbFormaCalculoMetroCubico, 0, 237, Short.MAX_VALUE)
+                    .addComponent(jLabel6)
+                    .addComponent(cbFormaRateioAreaComum, 0, 237, Short.MAX_VALUE)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtValorFixoAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
-                    .addComponent(cbFormaCalculoMetroCubico, 0, 237, Short.MAX_VALUE)
-                    .addComponent(checkHidrometroAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(txtValorFixoAreaComum, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -327,23 +578,23 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(spinnerQuantidadeIncluirCota, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
+                .addGap(44, 44, 44)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txtValorSindico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(26, 26, 26)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel5)
                     .addComponent(txtValorFixoAreaComum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 28, Short.MAX_VALUE)
                 .addComponent(checkHidrometroAreaComum)
-                .addGap(18, 18, 18)
+                .addGap(29, 29, 29)
                 .addComponent(checkNaoCobrarPipa)
-                .addGap(18, 18, 18)
+                .addGap(34, 34, 34)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbFormaRateioAreaComum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGap(36, 36, 36))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -361,13 +612,10 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(13, 13, 13))))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(21, 21, 21))
         );
 
         btnSalvar.setText("Salvar");
@@ -379,21 +627,26 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
-                .addGap(235, 235, 235)
-                .addComponent(btnSalvar)
+                .addGap(223, 223, 223)
+                .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(132, 132, 132)
                 .addComponent(btnVoltar, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(238, Short.MAX_VALUE))
+                .addContainerGap(214, Short.MAX_VALUE))
         );
+
+        jPanel6Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnSalvar, btnVoltar});
+
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnSalvar)
-                    .addComponent(btnVoltar))
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnVoltar, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnSalvar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
+
+        jPanel6Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnSalvar, btnVoltar});
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -401,18 +654,18 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 468, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -424,21 +677,30 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 761, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 748, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 604, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTabbedPane abaPipa;
+    private javax.swing.JButton btnAdicionar;
+    private javax.swing.JButton btnCalcular;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnImprimir;
+    private javax.swing.JButton btnIncluir;
+    private javax.swing.JButton btnIncluirPipa;
+    private javax.swing.JButton btnRemover;
     private javax.swing.JButton btnSalvar;
+    private javax.swing.JButton btnSalvarAgua;
     private javax.swing.JButton btnVoltar;
     private javax.swing.JComboBox cbFormaCalculoMetroCubico;
     private javax.swing.JComboBox cbFormaRateioAreaComum;
@@ -459,8 +721,17 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jTable2;
+    private javax.swing.JTable jTable3;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JSpinner spinnerQuantidadeIncluirCota;
     private javax.swing.JTable tabela;
