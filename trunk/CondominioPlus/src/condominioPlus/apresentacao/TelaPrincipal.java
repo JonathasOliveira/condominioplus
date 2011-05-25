@@ -172,8 +172,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemCondominios.setEnabled(Main.permite(CaracteristicaAcesso.VENDA));
         menuItemCondominos.setEnabled(Main.permite(CaracteristicaAcesso.VENDA_HISTORICO));
         menuItemLancamentos.setEnabled(Main.permite(CaracteristicaAcesso.ENTREGA_PREVISTA));
-        menuItemInadimplencia.setEnabled(Main.permite(CaracteristicaAcesso.ENTREGA_REALIZADA));
-        menuItemPagos.setEnabled(Main.permite(CaracteristicaAcesso.VEICULO_CADASTRO));
         menuItemFuncionario.setEnabled(Main.permite(CaracteristicaAcesso.FUNCIONARIO_CADASTRO));
         menuItemCategoriaFuncionario.setEnabled(Main.permite(CaracteristicaAcesso.FUNCIONARIO_CATEGORIA_CADASTRO));
         menuItemControleAcesso.setEnabled(Main.permite(CaracteristicaAcesso.CONTROLE_DE_ACESSO));
@@ -459,8 +457,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemAdvogados.addActionListener(this);
             menuItemCondominos.addActionListener(this);
             menuItemLancamentos.addActionListener(this);
-            menuItemInadimplencia.addActionListener(this);
-            menuItemPagos.addActionListener(this);
             menuItemControleAcesso.addActionListener(this);
             menuItemRelatorioCliente.addActionListener(this);
             menuItemRelatorioFornecedor.addActionListener(this);
@@ -530,9 +526,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemFornecedores = new javax.swing.JMenuItem();
         menuCobrancas = new javax.swing.JMenu();
         menuItemLancamentos = new javax.swing.JMenuItem();
-        menuItemInadimplencia = new javax.swing.JMenuItem();
         jSeparator6 = new javax.swing.JSeparator();
-        menuItemPagos = new javax.swing.JMenuItem();
         menuItemAgua = new javax.swing.JMenuItem();
         menuItemCobrancaBase = new javax.swing.JMenuItem();
         menuItemCalculoMaiorCota = new javax.swing.JMenuItem();
@@ -741,15 +735,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 
         menuCobrancas.setText("Cobranças");
 
-        menuItemLancamentos.setText("Lançamentos");
+        menuItemLancamentos.setText("Lançamentos/Inadimplência/Pagos");
         menuCobrancas.add(menuItemLancamentos);
-
-        menuItemInadimplencia.setText("Inadimplência");
-        menuCobrancas.add(menuItemInadimplencia);
         menuCobrancas.add(jSeparator6);
-
-        menuItemPagos.setText("Pagos");
-        menuCobrancas.add(menuItemPagos);
 
         menuItemAgua.setText("Água");
         menuCobrancas.add(menuItemAgua);
@@ -927,11 +915,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemFornecedores;
     private javax.swing.JMenuItem menuItemFuncionario;
     private javax.swing.JMenuItem menuItemIdentificadores;
-    private javax.swing.JMenuItem menuItemInadimplencia;
     private javax.swing.JMenuItem menuItemIntegracao;
     private javax.swing.JMenuItem menuItemLancamentos;
     private javax.swing.JMenuItem menuItemOrcamento;
-    private javax.swing.JMenuItem menuItemPagos;
     private javax.swing.JMenuItem menuItemPoupanca;
     private javax.swing.JMenuItem menuItemRelatorioCliente;
     private javax.swing.JMenuItem menuItemRelatorioEstorno;
