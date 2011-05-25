@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.cobranca.agua;
 
 import java.io.Serializable;
@@ -21,34 +20,35 @@ import javax.persistence.Table;
  * @author Administrador
  */
 @Entity
-@Table(name="tarifa_prolagos")
-@NamedQueries(value={@NamedQuery(name="TarifaPorId", query="SELECT t FROM TarifaProlagos t order by t.codigo")})
+@Table(name = "tarifa_prolagos")
+@NamedQueries(value = {
+    @NamedQuery(name = "TarifaPorId", query = "SELECT t FROM TarifaProlagos t order by t.codigo")})
 public class TarifaProlagos implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
+    @Column(precision = 20, scale= 2)
+    private BigDecimal consumoInicial;
     @Column(precision = 20, scale = 2)
-    private double consumoInicial;
-    @Column(precision = 20, scale = 2)
-    private double consumoFinal;
+    private BigDecimal consumoFinal;
     @Column(precision = 20, scale = 2)
     private BigDecimal valor = new BigDecimal(0);
 
-    public double getConsumoFinal() {
-        return consumoFinal;
-    }
-
-    public void setConsumoFinal(double consumoFinal) {
-        this.consumoFinal = consumoFinal;
-    }
-
-    public double getConsumoInicial() {
+    public BigDecimal getConsumoInicial() {
         return consumoInicial;
     }
 
-    public void setConsumoInicial(double consumoInicial) {
+    public void setConsumoInicial(BigDecimal consumoInicial) {
         this.consumoInicial = consumoInicial;
+    }
+
+    public BigDecimal getConsumoFinal() {
+        return consumoFinal;
+    }
+
+    public void setConsumoFinal(BigDecimal consumoFinal) {
+        this.consumoFinal = consumoFinal;
     }
 
     public BigDecimal getValor() {
@@ -66,5 +66,4 @@ public class TarifaProlagos implements Serializable {
     public void setCodigo(int codigo) {
         this.codigo = codigo;
     }
-
 }

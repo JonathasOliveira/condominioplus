@@ -5,7 +5,6 @@
 
 package condominioPlus.negocio.cobranca.agua;
 
-import condominioPlus.negocio.Condominio;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import javax.persistence.Column;
@@ -28,12 +27,15 @@ public class ParametrosCalculoAgua implements Serializable {
     private int codigo;
     private FormaCalculoMetroCubico formaMetroCubico;
     private FormaRateioAreaComum formaAreaComum;
+    @Column(name="quantidade_metros_cubicos_cota")
     private int quantidadeMetrosCubicosNaCota;
-    @Column(precision = 20, scale = 2)
+    @Column(precision = 20, scale = 2, name="valor_metro_cubico_sindico")
     private BigDecimal valorMetroCubicoSindico = new BigDecimal(0);
-    @Column(precision = 20, scale = 2)
+    @Column(precision = 20, scale = 2, name="valor_fixo_area_comum")
     private BigDecimal valorFixoAreaComum = new BigDecimal(0);
+    @Column(name="hidrometro_area_comum")
     private boolean hidrometroAreaComum;
+    @Column(name="cobrar_pipa")
     private boolean cobrarPipa;
 
     public boolean isCobrarPipa() {
