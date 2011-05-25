@@ -23,7 +23,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -623,15 +622,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         public void configurar() {
             btnGerarCobranca.addActionListener(this);
             btnImprimirBoleto.addActionListener(this);
+            btnLimpar.addActionListener(this);
+            btnImprimirBoletoInadimplente.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
-            tabelaCobrancas.addMouseListener(this);
             itemMenuCalcularJurosMulta.addActionListener(this);
             itemMenuMudarAltura.addActionListener(this);
             jTabbedPane1.addChangeListener(this);
-            btnLimpar.addActionListener(this);
             tabelaCondominos.addMouseListener(this);
             tabelaInadimplentes.addMouseListener(this);
-            btnImprimirBoletoInadimplente.addActionListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
         }
