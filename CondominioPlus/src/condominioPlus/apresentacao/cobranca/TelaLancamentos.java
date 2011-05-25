@@ -322,7 +322,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaPagos() {
-        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Vencimento, Pagamento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Vencimento, Pagamento, Documento, Valor Original, Juros, Multa, Total".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -350,8 +350,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
                     case 8:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
-                    case 9:
-                        return cobranca.getLinhaDigitavel();
                     default:
                         return null;
                 }
@@ -359,9 +357,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         };
 
         DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
         direito.setHorizontalAlignment(SwingConstants.RIGHT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
 
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setCellRenderer(direito);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(4)).setCellRenderer(direito);
@@ -369,13 +365,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(6)).setCellRenderer(direito);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(7)).setCellRenderer(direito);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(8)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(9)).setCellRenderer(centralizado);
 
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setMaxWidth(50);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(3)).setMinWidth(85);
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(3)).setMinWidth(80);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(1)).setMaxWidth(80);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setMinWidth(80);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(9)).setMinWidth(265);
 
         tabelaPagos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
