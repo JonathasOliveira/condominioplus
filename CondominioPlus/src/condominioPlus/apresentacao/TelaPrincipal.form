@@ -50,20 +50,10 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemLancamentos">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Lan&#xe7;amentos"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemInadimplencia">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia"/>
+                <Property name="text" type="java.lang.String" value="Lan&#xe7;amentos/Inadimpl&#xea;ncia/Pagos"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator6">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemPagos">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Pagos"/>
-              </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemAgua">
               <Properties>
