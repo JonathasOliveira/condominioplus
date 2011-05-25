@@ -90,7 +90,7 @@ public class EntradaArquivoRetorno implements Serializable {
 
         DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(299, 301)), Integer.parseInt(linha.substring(297, 299)), Integer.parseInt(linha.substring(295, 297)), 0, 0, 0, 0);
         registro.setData(data);
-        registro.setCodigo(linha.substring(46, 60));
+        registro.setCodigo(linha.substring(46, 59));
         registro.setNumeroPrestacao(Integer.parseInt(linha.substring(67, 69)));
         registro.setValor(new Moeda(editarValor(linha, 253, 266)));
         registro.setValorTitulo(new Moeda(editarValor(linha, 152, 165)));
