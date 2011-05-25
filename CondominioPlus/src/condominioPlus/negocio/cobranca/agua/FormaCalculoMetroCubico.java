@@ -17,6 +17,7 @@ public enum FormaCalculoMetroCubico {
 
     DIVIDIR_METROS_CUBICOS("Dividir por Metros Cúbicos"),
     SINDICO_PRECO("Síndico estabelece Preço"),
+    SEM_VALOR(""),
     TABELA_PROLAGOS("Tabela da Prolagos");
     private String descricao = "";
 

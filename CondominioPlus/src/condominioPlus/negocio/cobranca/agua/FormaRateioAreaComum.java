@@ -16,6 +16,7 @@ package condominioPlus.negocio.cobranca.agua;
 public enum FormaRateioAreaComum {
 
     NAO_COBRAR("Não Cobrar"),
+    SEM_VALOR(""),
     PROPORCIONAL_CONSUMO("Proporcional ao Consumo"),
     PROPORCIONAL_FRACAO("Proporcional a Fração Ideal"),
     IGUAL_TODOS("Igual para Todos");
