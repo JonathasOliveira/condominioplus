@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -28,6 +29,8 @@ public class Pipa implements Serializable {
     private int quantidadeLitrosPorMil;
     @Column(name="total_pago", precision=20, scale=2)
     private BigDecimal totalPago;
+    @ManyToOne
+    private ContaAgua conta;
 
     public int getCodigo() {
         return codigo;
@@ -60,6 +63,16 @@ public class Pipa implements Serializable {
     public void setTotalPago(BigDecimal totalPago) {
         this.totalPago = totalPago;
     }
+
+    public ContaAgua getConta() {
+        return conta;
+    }
+
+    public void setConta(ContaAgua conta) {
+        this.conta = conta;
+    }
+
+    
 
     
 
