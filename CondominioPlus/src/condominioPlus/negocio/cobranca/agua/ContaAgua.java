@@ -33,9 +33,11 @@ public class ContaAgua implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int codigo;
-    @OneToMany(cascade=CascadeType.ALL)
+    @ManyToOne
+    private CobrancaAgua cobrancaAgua;
+    @OneToMany(mappedBy="conta", cascade = CascadeType.ALL)
     private List<Rateio> rateios;
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<Pipa> pipas;
     @Column(name="data_inicial")
     @Temporal(javax.persistence.TemporalType.DATE)
@@ -194,6 +196,16 @@ public class ContaAgua implements Serializable {
     public void setValorProlagos(BigDecimal valorProlagos) {
         this.valorProlagos = valorProlagos;
     }
+
+    public CobrancaAgua getCobrancaAgua() {
+        return cobrancaAgua;
+    }
+
+    public void setCobrancaAgua(CobrancaAgua cobrancaAgua) {
+        this.cobrancaAgua = cobrancaAgua;
+    }
+
+    
 
    
     

@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.cobranca.agua;
 
 import condominioPlus.negocio.Unidade;
@@ -24,34 +23,44 @@ import javax.persistence.ManyToOne;
 public class Rateio implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Unidade unidade;
-    @Column(name="leitura_anterior", precision=20, scale=3)
+    @Column(name = "leitura_anterior", precision = 20, scale = 3)
     private BigDecimal leituraAnterior;
-    @Column(name="leitura_atual", precision=20, scale=3)
+    @Column(name = "leitura_atual", precision = 20, scale = 3)
     private BigDecimal leituraAtual;
-    @Column(name="consumo_metro_cubico", precision=20, scale=3)
+    @Column(name = "consumo_metro_cubico", precision = 20, scale = 3)
     private BigDecimal consumoMetroCubico;
-    @Column(name="consumo_em_dinheiro", precision=20, scale=2)
+    @Column(name = "consumo_em_dinheiro", precision = 20, scale = 2)
     private BigDecimal consumoEmDinheiro;
-    @Column(name="valor_metro_cubico", precision=20, scale=2)
+    @Column(name = "valor_metro_cubico", precision = 20, scale = 2)
     private BigDecimal valorDoMetroCubico;
-    @Column(name="percentual_gasto", precision=20, scale=2)
+    @Column(name = "percentual_gasto", precision = 20, scale = 2)
     private BigDecimal percentualGasto;
-    @Column(name="valor_rateio_pipa", precision=20, scale=2)
+    @Column(name = "valor_rateio_pipa", precision = 20, scale = 2)
     private BigDecimal valorRateioPipa;
-    @Column(name="valor_total_consumido", precision=20, scale=3)
+    @Column(name = "valor_total_consumido", precision = 20, scale = 3)
     private BigDecimal valorTotalConsumido;
-    @Column(name="percentual_rateio_area_comum", precision=20, scale=2)
+    @Column(name = "percentual_rateio_area_comum", precision = 20, scale = 2)
     private BigDecimal percentualRateioAreaComum;
-    @Column(name="consumo_metro_cubico_area_comum", precision=20, scale=3)
+    @Column(name = "consumo_metro_cubico_area_comum", precision = 20, scale = 3)
     private BigDecimal consumoMetroCubicoAreaComum;
-    @Column(name="consumo_dinheiro_area_comum", precision=20, scale=2)
+    @Column(name = "consumo_dinheiro_area_comum", precision = 20, scale = 2)
     private BigDecimal consumoEmDinheiroAreaComum;
-    @Column(name="valor_total_cobrar", precision=20, scale=2)
+    @Column(name = "valor_total_cobrar", precision = 20, scale = 2)
     private BigDecimal valorTotalCobrar;
+    @ManyToOne
+    private ContaAgua conta;
+
+    public ContaAgua getConta() {
+        return conta;
+    }
+
+    public void setConta(ContaAgua conta) {
+        this.conta = conta;
+    }
 
     public int getCodigo() {
         return codigo;
@@ -164,6 +173,4 @@ public class Rateio implements Serializable {
     public void setValorTotalConsumido(BigDecimal valorTotalConsumido) {
         this.valorTotalConsumido = valorTotalConsumido;
     }
-
-
 }
