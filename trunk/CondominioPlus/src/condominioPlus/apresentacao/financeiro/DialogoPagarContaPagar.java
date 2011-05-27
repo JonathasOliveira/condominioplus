@@ -346,7 +346,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private Conta pesquisarContaPorCodigo(int codigo) {
         Conta c = null;
         try {
-            c = (Conta) new DAO().localizar("LocalizarContas", codigo, false);
+            c = (Conta) new DAO().localizar("LocalizarContas", codigo);
         } catch (Exception e) {
             e.printStackTrace();
         }
