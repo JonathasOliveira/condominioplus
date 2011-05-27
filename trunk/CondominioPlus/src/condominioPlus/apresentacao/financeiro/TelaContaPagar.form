@@ -35,17 +35,21 @@
       <SubComponents>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuApagarSelecionadosReceber">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Apagar Selecionado"/>
+            <Property name="text" type="java.lang.String" value="Apagar Selecionados"/>
           </Properties>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+        </Component>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuPagarSelecionadosReceber">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Pagar Selecionados"/>
+            <Property name="text" type="java.lang.String" value="Receber Selecionados"/>
           </Properties>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+        </Component>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuEditarPagamentoReceber">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Editar Pagamento"/>
+            <Property name="text" type="java.lang.String" value="Editar Selecionados"/>
           </Properties>
         </MenuItem>
       </SubComponents>
@@ -80,7 +84,7 @@
               <EmptySpace min="11" pref="11" max="11" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="painelSaldoContaCorrente" alignment="1" max="32767" attributes="1"/>
-                  <Component id="painelContasPagarReceber" alignment="1" pref="841" max="32767" attributes="1"/>
+                  <Component id="painelContasPagarReceber" alignment="1" pref="851" max="32767" attributes="1"/>
                   <Component id="jPanel3" alignment="1" max="32767" attributes="3"/>
                   <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
               </Group>
@@ -96,7 +100,7 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="painelContasPagarReceber" pref="345" max="32767" attributes="0"/>
+              <Component id="painelContasPagarReceber" pref="347" max="32767" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="painelSaldoContaCorrente" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -161,7 +165,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="txtValor" min="-2" pref="127" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="cbFornecedores" pref="370" max="32767" attributes="0"/>
+                                  <Component id="cbFornecedores" pref="380" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -343,7 +347,7 @@
                   <Component id="btnSemana" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="btnMes" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="138" max="32767" attributes="0"/>
+                  <EmptySpace pref="142" max="32767" attributes="0"/>
                   <Component id="checkBoxMostrarDateField" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
@@ -443,7 +447,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="562" max="32767" attributes="0"/>
+                  <EmptySpace pref="572" max="32767" attributes="0"/>
                   <Component id="lblTextoSaldo" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="lblSaldoContaCorrente" min="-2" pref="113" max="-2" attributes="0"/>
@@ -530,7 +534,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="796" max="32767" attributes="3"/>
+                          <Component id="jScrollPane1" pref="806" max="32767" attributes="3"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -539,7 +543,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane1" pref="123" max="32767" attributes="0"/>
+                          <Component id="jScrollPane1" pref="125" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -571,7 +575,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" pref="796" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="806" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -580,7 +584,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane2" pref="122" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="125" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -619,7 +623,7 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="836" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="846" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
@@ -631,7 +635,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="317" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="322" max="32767" attributes="0"/>
                   <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
@@ -650,7 +654,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" pref="796" max="32767" attributes="3"/>
+                          <Component id="jScrollPane3" pref="806" max="32767" attributes="3"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -659,7 +663,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane3" pref="273" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" pref="278" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>

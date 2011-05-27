@@ -10,12 +10,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -31,9 +33,9 @@ public class ContaAgua implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int codigo;
-    @ManyToOne
-    private CobrancaAgua cobranca;
+    @OneToMany(cascade=CascadeType.ALL)
     private List<Rateio> rateios;
+    @OneToMany(cascade=CascadeType.ALL)
     private List<Pipa> pipas;
     @Column(name="data_inicial")
     @Temporal(javax.persistence.TemporalType.DATE)
