@@ -29,7 +29,7 @@ public class CobrancaAgua implements Serializable {
     private int codigo;
     @OneToOne
     private Condominio condominio;
-    @OneToMany(mappedBy = "cobranca")
+    @OneToMany
     private List<ContaAgua> contas;
 
     public List<ContaAgua> getContas() {
