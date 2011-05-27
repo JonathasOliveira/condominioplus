@@ -10,7 +10,9 @@ package condominioPlus.negocio.financeiro.arquivoRetorno;
  * @author Administrador
  */
 
+import condominioPlus.negocio.cobranca.Cobranca;
 import java.io.Serializable;
+import javax.persistence.OneToOne;
 import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
@@ -20,19 +22,20 @@ import org.joda.time.DateTime;
  */
 public class RegistroTransacao implements Serializable {
 
-  private Moeda valor;
+  private Moeda valorPago;
   private Moeda valorTitulo;
   private DateTime data;
-  private int numeroPrestacao;
-  private String codigo;
+  private String documento;
   private Moeda juros;
+  @OneToOne
+  private Cobranca cobranca;
 
-    public String getCodigo() {
-        return codigo;
+    public String getDocumento() {
+        return documento;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
     public DateTime getData() {
@@ -43,20 +46,12 @@ public class RegistroTransacao implements Serializable {
         this.data = data;
     }
 
-    public int getNumeroPrestacao() {
-        return numeroPrestacao;
+    public Moeda getValorPago() {
+        return valorPago;
     }
 
-    public void setNumeroPrestacao(int numeroPrestacao) {
-        this.numeroPrestacao = numeroPrestacao;
-    }
-
-    public Moeda getValor() {
-        return valor;
-    }
-
-    public void setValor(Moeda valor) {
-        this.valor = valor;
+    public void setValorPago(Moeda valorPago) {
+        this.valorPago = valorPago;
     }
 
     public Moeda getValorTitulo() {
@@ -75,10 +70,18 @@ public class RegistroTransacao implements Serializable {
         this.juros = juros;
     }
 
+    public Cobranca getCobranca() {
+        return cobranca;
+    }
+
+    public void setCobranca(Cobranca cobranca) {
+        this.cobranca = cobranca;
+    }
+    
     @Override
     public String toString(){
 
-    return valor +" - " + valorTitulo +" - " + data +" - " + juros +" - " + codigo;
+    return valorTitulo + " - " + valorPago + " - " + data + " - " + juros + " - " + documento + " - Cobrança";
 
     }
 }

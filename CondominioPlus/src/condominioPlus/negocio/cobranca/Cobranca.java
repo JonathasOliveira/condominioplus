@@ -29,7 +29,9 @@ import javax.persistence.Temporal;
 @Entity
 @NamedQueries ( value= {
     @NamedQuery (name="CobrancasPagasPorPeriodo", query="SELECT c FROM Cobranca c WHERE c.unidade.condominio = ?1 AND c.dataPagamento >= ?2 AND c.dataPagamento <= ?3 ORDER BY c.dataPagamento, c.unidade.unidade"),
-    @NamedQuery (name="CobrancasPagasPorPeriodoUnidade", query="SELECT c FROM Cobranca c WHERE c.unidade = ?1 AND c.dataPagamento >= ?2 AND c.dataPagamento <=?3 ORDER BY c.dataPagamento, c.unidade.unidade")
+    @NamedQuery (name="CobrancasPagasPorPeriodoUnidade", query="SELECT c FROM Cobranca c WHERE c.unidade = ?1 AND c.dataPagamento >= ?2 AND c.dataPagamento <=?3 ORDER BY c.dataPagamento, c.unidade.unidade"),
+    @NamedQuery (name="CobrancasEmAberto", query="SELECT c FROM Cobranca c WHERE c.dataPagamento is null ORDER BY c.dataVencimento"),
+    @NamedQuery (name="CobrancaPorNumeroDocumento", query="SELECT c FROM Cobranca c WHERE c.numeroDocumento LIKE ?1")
 })
 public class Cobranca implements Serializable {
 
