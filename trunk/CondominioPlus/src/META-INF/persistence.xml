@@ -38,6 +38,15 @@
     <class>condominioPlus.negocio.financeiro.ExtratoBancario</class>
     <class>condominioPlus.negocio.financeiro.Identificador</class>
     <class>condominioPlus.negocio.financeiro.arquivoRetorno.ArquivoAtualizado</class>
+    <class>condominioPlus.negocio.financeiro.ContaReceber</class>
+    <class>condominioPlus.negocio.cobranca.CobrancaBase</class>
+    <class>condominioPlus.negocio.financeiro.Conciliacao</class>
+    <class>condominioPlus.negocio.cobranca.Cobranca</class>
+    <class>condominioPlus.negocio.cobranca.agua.TarifaProlagos</class>
+    <class>condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua</class>
+    <class>condominioPlus.negocio.cobranca.agua.ContaAgua</class>
+    <class>condominioPlus.negocio.cobranca.agua.Rateio</class>
+    <class>condominioPlus.negocio.cobranca.agua.Pipa</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>

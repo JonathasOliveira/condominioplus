@@ -43,6 +43,7 @@ import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import logicpoint.util.Util;
+import net.sf.nachocalendar.table.JTableCustomizer;
 import org.joda.time.DateTime;
 
 /**
@@ -159,8 +160,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(renderizadorCelulaCor);
 
+         JTableCustomizer.setEditorForRow(tabelaContaCorrente, 0, null);
 
-
+         modeloTabela.setEditaveis(0);
 
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(300);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);

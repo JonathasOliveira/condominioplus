@@ -17,6 +17,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -28,13 +30,13 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name="conta_agua")
+@NamedQueries(value = {
+    @NamedQuery(name = "ContasPorCondominio", query = "SELECT c FROM ContaAgua c where c.condominio = ?1 order by c.dataInicial")})
 public class ContaAgua implements Serializable {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int codigo;
-    @ManyToOne
-    private CobrancaAgua cobrancaAgua;
     @OneToMany(mappedBy="conta", cascade = CascadeType.ALL)
     private List<Rateio> rateios;
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
@@ -68,6 +70,8 @@ public class ContaAgua implements Serializable {
     private BigDecimal precoAreaComum;
     @Column(name="total_despesas")
     private BigDecimal totalDespesas;
+    @ManyToOne
+    private Condominio condominio;
 
     public int getCodigo() {
         return codigo;
@@ -197,17 +201,13 @@ public class ContaAgua implements Serializable {
         this.valorProlagos = valorProlagos;
     }
 
-    public CobrancaAgua getCobrancaAgua() {
-        return cobrancaAgua;
+    public Condominio getCondominio() {
+        return condominio;
     }
 
-    public void setCobrancaAgua(CobrancaAgua cobrancaAgua) {
-        this.cobrancaAgua = cobrancaAgua;
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
     }
 
-    
-
-   
-    
 
 }
