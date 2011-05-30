@@ -104,6 +104,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<ExtratoBancario> extratos;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<CobrancaBase> cobrancasBase;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<ContaAgua> contasDeAgua;
     @OneToOne
     private Conciliacao conciliacao;
     @OneToOne
@@ -441,5 +443,17 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setParametros(ParametrosCalculoAgua parametros) {
         this.parametros = parametros;
     }
+
+    public List<ContaAgua> getContasDeAgua() {
+        return contasDeAgua;
+    }
+
+    public void setContasDeAgua(List<ContaAgua> contasDeAgua) {
+        this.contasDeAgua = contasDeAgua;
+    }
+
+
+
+    
     
 }

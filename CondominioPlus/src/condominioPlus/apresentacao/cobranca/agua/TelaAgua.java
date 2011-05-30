@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.cobranca.agua;
 
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.FormaCalculoMetroCubico;
 import condominioPlus.negocio.cobranca.agua.FormaRateioAreaComum;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
@@ -20,9 +21,13 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.RenderizadorCelulaDireita;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.RenderizadorCelulaADireita;
+import logicpoint.apresentacao.RenderizadorCelulaCentralizada;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
@@ -36,6 +41,7 @@ import logicpoint.util.Util;
 public class TelaAgua extends javax.swing.JInternalFrame {
 
     private TabelaModelo_2<TarifaProlagos> modelo;
+    private TabelaModelo_2<ContaAgua> modeloContaAgua;
     private ControladorEventos controlador;
     private ParametrosCalculoAgua parametros;
     private Condominio condominio;
@@ -45,7 +51,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         initComponents();
         carregarComboFormaPrecoMetroCubico();
         carregarComboFormaRateioAreaComum();
-        carregarTabela();
+
         this.condominio = condominio;
         if (condominio.getParametros() != null) {
             this.parametros = condominio.getParametros();
@@ -54,6 +60,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             condominio.setParametros(parametros);
             new DAO().salvar(condominio);
         }
+
+        carregarTabela();
+        carregarTabelaContaAgua();
         controlador = new ControladorEventos();
 
         preencherTela();
@@ -96,9 +105,74 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
+    private void carregarTabelaContaAgua() {
+        modeloContaAgua = new TabelaModelo_2<ContaAgua>(tabelaContaAgua, "Data Inicial, Data Final, Valor Prolagos(R$), Consumo Prolagos(M3), Valor Pipa (R$), Consumo Pipa(M3), Preço(M3), Data Vencimento da Conta, Consumo Unidades(M3), Consumo Total Unidades(R$), Total de Despesas".split(",")) {
+
+            @Override
+            protected List<ContaAgua> getCarregarObjetos() {
+                return getContasAgua();
+            }
+
+            @Override
+            public Object getValor(ContaAgua conta, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return conta.getDataInicial();
+                    case 1:
+                        return conta.getDataFinal();
+                    case 2:
+                        return conta.getValorProlagos();
+                    case 3:
+                        return conta.getConsumoProlagos();
+                    case 4:
+                        return conta.getValorPipa();
+                    case 5:
+                        return conta.getConsumoPipa();
+                    case 6:
+                        return conta.getPrecoMetroCubico();
+                    case 7:
+                        return conta.getDataVencimentoConta();
+                    case 8:
+                        return conta.getConsumoUnidadesMetroCubico();
+                    case 9:
+                        return conta.getPrecoTotalUnidades();
+                    case 10:
+                        return conta.getTotalDespesas();
+                    default:
+                        return null;
+
+                }
+            }
+        };
+
+        RenderizadorCelulaADireita direito = new RenderizadorCelulaADireita();
+        RenderizadorCelulaCentralizada centralizado = new RenderizadorCelulaCentralizada();
+
+        tabelaContaAgua.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        for (int i = 0; i <= 7; i++) {
+            tabelaContaAgua.getColumn(modeloContaAgua.getCampo(i)).setCellRenderer(direito);
+
+        }
+        tabelaContaAgua.getColumn(modeloContaAgua.getCampo(8)).setCellRenderer(centralizado);
+
+        for (int i = 0; i <= 10; i++) {
+            tabelaContaAgua.getColumn(modeloContaAgua.getCampo(i)).setMinWidth(80);
+
+        }
+
+
+
+    }
+
     private List<TarifaProlagos> getTarifaProlagos() {
         List<TarifaProlagos> tarifas = new DAO().listar("TarifaPorId");
         return tarifas;
+    }
+
+    private List<ContaAgua> getContasAgua() {
+        List<ContaAgua> contas = new DAO().listar("ContasPorCondominio", condominio);
+        return contas;
     }
 
     private void adicionar() {
@@ -205,6 +279,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         }
 
 
+
+
+
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -269,14 +346,14 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         btnCalcular = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tabelaContaAgua = new javax.swing.JTable();
         abaPipa = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
+        tabelaRateio = new javax.swing.JTable();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        tabelaPipa = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -360,7 +437,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         jPanel7Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnIncluirPipa, btnSalvarAgua});
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaContaAgua.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -371,9 +448,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane2.setViewportView(jTable1);
+        jScrollPane2.setViewportView(tabelaContaAgua);
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaRateio.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -384,7 +461,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane3.setViewportView(jTable2);
+        jScrollPane3.setViewportView(tabelaRateio);
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
@@ -405,7 +482,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         abaPipa.addTab("Rateio", jPanel8);
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaPipa.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -416,7 +493,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane4.setViewportView(jTable3);
+        jScrollPane4.setViewportView(tabelaPipa);
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
@@ -729,12 +806,12 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTable jTable2;
-    private javax.swing.JTable jTable3;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JSpinner spinnerQuantidadeIncluirCota;
     private javax.swing.JTable tabela;
+    private javax.swing.JTable tabelaContaAgua;
+    private javax.swing.JTable tabelaPipa;
+    private javax.swing.JTable tabelaRateio;
     private javax.swing.JTextField txtValorFixoAreaComum;
     private javax.swing.JTextField txtValorSindico;
     // End of variables declaration//GEN-END:variables
