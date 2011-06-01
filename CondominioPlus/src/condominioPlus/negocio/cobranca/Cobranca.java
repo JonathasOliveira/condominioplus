@@ -31,6 +31,7 @@ import javax.persistence.Temporal;
     @NamedQuery (name="CobrancasPagasPorPeriodo", query="SELECT c FROM Cobranca c WHERE c.unidade.condominio = ?1 AND c.dataPagamento >= ?2 AND c.dataPagamento <= ?3 ORDER BY c.dataPagamento, c.unidade.unidade"),
     @NamedQuery (name="CobrancasPagasPorPeriodoUnidade", query="SELECT c FROM Cobranca c WHERE c.unidade = ?1 AND c.dataPagamento >= ?2 AND c.dataPagamento <=?3 ORDER BY c.dataPagamento, c.unidade.unidade"),
     @NamedQuery (name="CobrancasEmAberto", query="SELECT c FROM Cobranca c WHERE c.dataPagamento is null ORDER BY c.dataVencimento"),
+    @NamedQuery (name="CobrancasEmAbertoPorUnidade", query="SELECT c FROM Cobranca c WHERE c.dataPagamento is null AND c.unidade = ?1 ORDER BY c.dataVencimento"),
     @NamedQuery (name="CobrancaPorNumeroDocumento", query="SELECT c FROM Cobranca c WHERE c.numeroDocumento LIKE ?1")
 })
 public class Cobranca implements Serializable {
@@ -49,11 +50,14 @@ public class Cobranca implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "vencimento_prorrogado")
     private Calendar vencimentoProrrogado;
+    @Column(name="numero_documento")
     private String numeroDocumento;
     @Column(name="valor_original", precision = 20, scale = 2)
     private BigDecimal valorOriginal;
     @Column(name="valor_total", precision = 20, scale = 2)
     private BigDecimal valorTotal;
+    @Column(name="valor_pago", precision = 20, scale = 2)
+    private BigDecimal valorPago;
     @Column(precision = 20, scale = 2)
     private BigDecimal juros = new BigDecimal(0);
     @Column(precision = 20, scale = 2)
@@ -126,6 +130,14 @@ public class Cobranca implements Serializable {
 
     public void setValorTotal(BigDecimal valorTotal) {
         this.valorTotal = valorTotal;
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago = valorPago;
     }
 
     public BigDecimal getJuros() {

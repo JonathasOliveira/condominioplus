@@ -190,15 +190,21 @@ public class BoletoBancario {
         contaBancaria.setAgencia(new Agencia(3918, "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
-        titulo.setNossoNumero(cobranca.getNumeroDocumento());
-        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+//        if (cobranca.getNumeroDocumento().length() == 13) {
+            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
+//        } else if (cobranca.getNumeroDocumento().length() == 12) {
+//            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
+//            titulo.setNossoNumero(cobranca.getNumeroDocumento());
+//            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+//        }
         titulo.setValor(cobranca.getValorTotal());
         titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
         if (cobranca.getVencimentoProrrogado() != null) {
             titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getVencimentoProrrogado()));
         } else {
-             titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
+            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
         }
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
         titulo.setAceite(EnumAceite.N);
