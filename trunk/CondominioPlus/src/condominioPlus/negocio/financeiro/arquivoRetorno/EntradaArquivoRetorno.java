@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import logicpoint.persistencia.DAO;
-import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
@@ -130,10 +129,10 @@ public class EntradaArquivoRetorno implements Serializable {
         registro.setValorPago(new Moeda(editarValor(linha, 253, 266)));
         registro.setJuros(new Moeda(editarValor(linha, 266, 279)));
 
-        List<Cobranca> lista = new DAO().listar(Cobranca.class, "CobrancaPorNumeroDocumento", registro.getDocumento());
+        Cobranca co = new DAO().localizar(Cobranca.class, "CobrancaPorNumeroDocumento", registro.getDocumento());
 
-        if (!lista.isEmpty()) {
-            registro.setCobranca(lista.get(0));
+        if (co != null) {
+            registro.setCobranca(co);
         }
 
         return registro;

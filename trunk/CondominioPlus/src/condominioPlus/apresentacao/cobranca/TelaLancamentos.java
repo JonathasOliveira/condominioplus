@@ -16,6 +16,9 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
+import condominioPlus.negocio.financeiro.DadosBoleto;
+import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
@@ -24,14 +27,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
-import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.RenderizadorCelulaADireita;
+import logicpoint.apresentacao.RenderizadorCelulaCentralizada;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
@@ -70,7 +74,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private TabelaModelo_2<Cobranca> modeloTabelaPagos;
     private List<Cobranca> listaPagos;
     private TabelaModelo_2<RegistroTransacao> modeloTabelaArquivos;
-    List<RegistroTransacao> listaRegistros;
+    List<RegistroTransacao> listaRegistros = new ArrayList<RegistroTransacao>();
 
     /** Creates new form TelaLancamentos */
     public TelaLancamentos(Condominio condominio) {
@@ -118,11 +122,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
-
         tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(0)).setMaxWidth(50);
-        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(0)).setCellRenderer(direito);
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
 
     }
 
@@ -157,18 +158,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-
         tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(0)).setMaxWidth(50);
         tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(1)).setMinWidth(180);
         tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(2)).setMaxWidth(70);
         tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(3)).setMaxWidth(50);
 
-        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(2)).setCellRenderer(direito);
-        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(3)).setCellRenderer(centralizado);
+        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(3)).setCellRenderer(new RenderizadorCelulaCentralizada());
     }
 
     private List<CobrancaBase> getCobrancasBase() {
@@ -191,7 +187,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 0:
                         return cobranca.getUnidade().getUnidade();
                     case 1:
-                        return cobranca.getUnidade().getCondominio().getCodigo();
+                        return cobranca.getUnidade().getCondominio().getRazaoSocial();
                     case 2:
                         return DataUtil.getDateTime(cobranca.getDataVencimento());
                     case 3:
@@ -212,21 +208,16 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(0)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(3)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(4)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(5)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(6)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(7)).setCellRenderer(direito);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(8)).setCellRenderer(centralizado);
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(8)).setCellRenderer(new RenderizadorCelulaCentralizada());
 
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(0)).setMaxWidth(50);
-        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(1)).setMaxWidth(80);
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(1)).setMinWidth(250);
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(4)).setMinWidth(80);
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(8)).setMinWidth(265);
 
@@ -260,7 +251,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 0:
                         return cobranca.getUnidade().getUnidade();
                     case 1:
-                        return cobranca.getUnidade().getCondominio().getCodigo();
+                        return cobranca.getUnidade().getCondominio().getRazaoSocial();
                     case 2:
                         return DataUtil.getDateTime(cobranca.getDataVencimento());
                     case 3:
@@ -283,22 +274,17 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(4)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(6)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(7)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(8)).setCellRenderer(direito);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(centralizado);
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(new RenderizadorCelulaCentralizada());
 
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setMaxWidth(50);
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(1)).setMinWidth(250);
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(3)).setMinWidth(85);
-        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(1)).setMaxWidth(80);
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setMinWidth(80);
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setMinWidth(265);
 
@@ -325,7 +311,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaPagos() {
-        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Vencimento, Pagamento, Documento, Valor Original, Juros, Multa, Total".split(",")) {
+        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Documento, Vencimento, Pagamento, Valor Original, Juros, Multa, Total, Valor Pago".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -338,13 +324,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 0:
                         return cobranca.getUnidade().getUnidade();
                     case 1:
-                        return cobranca.getUnidade().getCondominio().getCodigo();
+                        return cobranca.getUnidade().getCondominio().getRazaoSocial();
                     case 2:
-                        return cobranca.getVencimentoProrrogado() != null ? DataUtil.getDateTime(cobranca.getVencimentoProrrogado()) : DataUtil.getDateTime(cobranca.getDataVencimento());
-                    case 3:
-                        return DataUtil.getDateTime(cobranca.getDataPagamento());
-                    case 4:
                         return cobranca.getNumeroDocumento();
+                    case 3:
+                        return cobranca.getVencimentoProrrogado() != null ? DataUtil.getDateTime(cobranca.getVencimentoProrrogado()) : DataUtil.getDateTime(cobranca.getDataVencimento());
+                    case 4:
+                        return DataUtil.getDateTime(cobranca.getDataPagamento());
                     case 5:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
                     case 6:
@@ -353,26 +339,27 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
                     case 8:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+                    case 9:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorPago().doubleValue());
                     default:
                         return null;
                 }
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(4)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(6)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(7)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(8)).setCellRenderer(direito);
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(9)).setCellRenderer(new RenderizadorCelulaADireita());
 
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setMaxWidth(50);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(3)).setMinWidth(80);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(1)).setMaxWidth(80);
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(1)).setMinWidth(250);
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(4)).setMinWidth(80);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setMinWidth(80);
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(9)).setMinWidth(80);
 
         tabelaPagos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
@@ -390,9 +377,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         return listaPagos;
     }
 
-    private void carregarTabelaArquivos(List<RegistroTransacao> registros) {
-        listaRegistros = registros;
-        modeloTabelaArquivos = new TabelaModelo_2<RegistroTransacao>(tabelaArquivoRetorno, "Unidade, Condominio, Vencimento, Pagamento, Documento, Valor Original, Juros, Multa, Total".split(",")) {
+    private void carregarTabelaArquivos() {
+        modeloTabelaArquivos = new TabelaModelo_2<RegistroTransacao>(tabelaArquivoRetorno, "Unidade, Condominio, Nº Documento, Pagamento, Valor Original, Valor Pago".split(",")) {
 
             @Override
             protected List<RegistroTransacao> getCarregarObjetos() {
@@ -403,77 +389,74 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             public Object getValor(RegistroTransacao registro, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return registro.getCobranca().getUnidade().getUnidade();
+                        return registro.getCobranca() != null ? registro.getCobranca().getUnidade().getUnidade() : "";
                     case 1:
-                        return registro.getCobranca().getUnidade().getCondominio().getCodigo();
+                        return registro.getCobranca() != null ? registro.getCobranca().getUnidade().getCondominio().getRazaoSocial() : "";
                     case 2:
-                        return registro.getCobranca().getVencimentoProrrogado() != null ? DataUtil.getDateTime(registro.getCobranca().getVencimentoProrrogado()) : DataUtil.getDateTime(registro.getCobranca().getDataVencimento());
+                        return registro.getDocumento();
                     case 3:
-                        return DataUtil.getDateTime(registro.getCobranca().getDataPagamento());
+                        return registro.getData() != null ? DataUtil.getDateTime(registro.getData()) : "";
                     case 4:
-                        return registro.getCobranca().getNumeroDocumento();
+                        return PagamentoUtil.formatarMoeda(registro.getValorTitulo().doubleValue());
                     case 5:
-                        return PagamentoUtil.formatarMoeda(registro.getCobranca().getValorOriginal().doubleValue());
-                    case 6:
-                        return PagamentoUtil.formatarMoeda(registro.getCobranca().getJuros().doubleValue());
-                    case 7:
-                        return PagamentoUtil.formatarMoeda(registro.getCobranca().getMulta().doubleValue());
-                    case 8:
-                        return PagamentoUtil.formatarMoeda(registro.getCobranca().getValorTotal().doubleValue());
+                        return PagamentoUtil.formatarMoeda(registro.getValorPago().doubleValue());
                     default:
                         return null;
                 }
             }
         };
 
-        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
-        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
 
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(4)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(6)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(7)).setCellRenderer(direito);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(8)).setCellRenderer(direito);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(0)).setMaxWidth(50);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(1)).setMinWidth(250);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(2)).setMinWidth(100);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(3)).setMinWidth(80);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(4)).setMinWidth(80);
+        tabelaArquivoRetorno.getColumn(modeloTabelaArquivos.getCampo(5)).setMinWidth(80);
 
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setMaxWidth(50);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(3)).setMinWidth(80);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(1)).setMaxWidth(80);
-        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(5)).setMinWidth(80);
-
-        tabelaPagos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tabelaArquivoRetorno.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     }
 
     private void gerarCobrancas(List<Unidade> lista) {
-        if (lista.size() > 1 && !txtNumeroDocumento.getText().equals("")) {
-            ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", this);
-            return;
-        }
-        if (!txtNumeroDocumento.getText().equals("") && txtNumeroDocumento.getText().length() != 12) {
-            ApresentacaoUtil.exibirAdvertencia("O número documento informado está incorreto.", this);
-            return;
-        }
+        if (verificarData(DataUtil.getDateTime(txtDataVencimento.getValue()))) {
+            if (lista.size() > 1 && !txtNumeroDocumento.getText().equals("")) {
+                ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", this);
+                return;
+            }
+            if (!txtNumeroDocumento.getText().equals("") && txtNumeroDocumento.getText().length() != 12) {
+                ApresentacaoUtil.exibirAdvertencia("O número documento informado está incorreto.", this);
+                return;
+            }
 
-        UNIDADES:
-        for (Unidade u : lista) {
-            Cobranca cobranca = new Cobranca();
-            cobranca.setUnidade(u);
-            cobranca.setValorTotal(new BigDecimal(0));
-            cobranca.setValorOriginal(new BigDecimal(0));
-            cobranca.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
-            if (txtNumeroDocumento.getText().equals("")) {
-                cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimento.getValue())));
-            } else {
-                cobranca.setNumeroDocumento(txtNumeroDocumento.getText());
+            UNIDADES:
+            for (Unidade u : lista) {
+                Cobranca cobranca = new Cobranca();
+                cobranca.setUnidade(u);
+                cobranca.setValorTotal(new BigDecimal(0));
+                cobranca.setValorOriginal(new BigDecimal(0));
+                cobranca.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                if (txtNumeroDocumento.getText().equals("")) {
+                    cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimento.getValue())));
+                } else {
+                    cobranca.setNumeroDocumento(txtNumeroDocumento.getText());
+                }
+                if (u.isSindico() && !condominio.isSindicoPaga()) {
+                    continue UNIDADES;
+                }
+                calcularCobrancas(u, cobranca);
+                u.getCobrancas().add(cobranca);
+                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
+                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+                new DAO().salvar(u);
             }
-            if (u.isSindico() && !condominio.isSindicoPaga()) {
-                continue UNIDADES;
-            }
-            calcularCobrancas(u, cobranca);
-            u.getCobrancas().add(cobranca);
-            cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
-            new DAO().salvar(u);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione uma data a partir de hoje.", this);
+            return;
         }
     }
 
@@ -483,6 +466,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
             pagamento.setCobranca(cobranca);
             pagamento.setConta(co.getConta());
+            pagamento.setHistorico(pagamento.getConta().getNome());
             if (co.isDividirFracaoIdeal()) {
                 pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)));
             } else {
@@ -509,6 +493,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         }
         return resultado;
+    }
+
+    private boolean verificarData(DateTime data) {
+        if (DataUtil.compararData(DataUtil.hoje(), data) == 1) {
+            return false;
+        }
+        return true;
     }
 
     private void remover() {
@@ -675,10 +666,70 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void lerArquivoRetorno() {
         EntradaArquivoRetorno entrada = new EntradaArquivoRetorno();
+        System.out.println("saída " + entrada.getRegistros().size());
         for (RegistroTransacao r : entrada.getRegistros()) {
-            System.out.println(r);
+            listaRegistros.add(r);
         }
-        carregarTabelaArquivos(entrada.getRegistros());
+        carregarTabelaArquivos();
+    }
+
+    private void baixarCobrancas() {
+        for (RegistroTransacao r : listaRegistros) {
+            if (r.getCobranca() != null) {
+
+                Cobranca c = r.getCobranca();
+
+                if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
+                    Pagamento pAuxiliar = getPagamentoMaiorValor(c);
+                    Moeda valorPago = new Moeda(r.getValorPago());
+                    pAuxiliar.setValor(pAuxiliar.getValor().add(valorPago.subtrai(r.getValorTitulo()).bigDecimalValue()));
+                }
+
+                for (Pagamento p : c.getPagamentos()) {
+                    p.setDataPagamento(DataUtil.getCalendar(r.getData()));
+                    p.setPago(true);
+                    p.setForma(FormaPagamento.BOLETO);
+                    p.setDadosPagamento(new DadosBoleto(r.getDocumento()));
+                    p.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+                }
+
+                c.setValorPago(r.getValorPago().bigDecimalValue());
+                c.setDataPagamento(DataUtil.getCalendar(r.getData()));
+
+                new DAO().salvar(c);
+                atualizarCondominio(c);
+
+            }
+        }
+        listaRegistros.clear();
+        carregarTabelaArquivos();
+    }
+
+    private Pagamento getPagamentoMaiorValor(Cobranca c) {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setValor(new BigDecimal(0));
+        for (Pagamento p : c.getPagamentos()) {
+            if (p.getValor().doubleValue() > pagamento.getValor().doubleValue()) {
+                pagamento = p;
+            }
+        }
+        return pagamento;
+    }
+
+    private void atualizarCondominio(Cobranca c) {
+        if (c.getUnidade().getCondominio().getCodigo() == condominio.getCodigo()) {
+            for (Unidade u : condominio.getUnidades()) {
+                if (c.getUnidade().getCodigo() == u.getCodigo()) {
+                    List<Cobranca> cobrancas = new DAO().listar("CobrancasEmAbertoPorUnidade", u);
+                    for (Cobranca co : cobrancas) {
+                        if (co.getCodigo() == c.getCodigo()) {
+                            co = c;
+                        }
+                    }
+                    u.setCobrancas(cobrancas);
+                }
+            }
+        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -695,11 +746,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuCalcularJurosMulta.addActionListener(this);
             itemMenuMudarAltura.addActionListener(this);
             jTabbedPane1.addChangeListener(this);
+            tabelaCobrancas.addMouseListener(this);
             tabelaCondominos.addMouseListener(this);
             tabelaInadimplentes.addMouseListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
             btnLerArquivoRetorno.addActionListener(this);
+            btnConfirmar.addActionListener(this);
         }
 
         @Override
@@ -747,6 +800,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             } else if (origem == btnLerArquivoRetorno) {
                 lerArquivoRetorno();
+            } else if (origem == btnConfirmar) {
+                baixarCobrancas();
             }
         }
 
@@ -779,6 +834,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
                     limparSelecoesTabelas();
+                } else if (jTabbedPane1.getSelectedIndex() == 3) {
                 }
             } else if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
                 ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
@@ -1014,7 +1070,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Lançamentos", painelLancamentos);
 
-        tabelaInadimplentes.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaInadimplentes.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaInadimplentes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1156,13 +1212,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         tabelaArquivoRetorno.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {},
+                {},
+                {},
+                {}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
         jScrollPane6.setViewportView(tabelaArquivoRetorno);
@@ -1220,7 +1276,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(13, Short.MAX_VALUE)
+                .addContainerGap(17, Short.MAX_VALUE)
                 .addComponent(btnLimpar)
                 .addGap(18, 18, 18)
                 .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1228,7 +1284,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         pack();
