@@ -129,7 +129,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
         cobranca.setConta(conta);
         cobranca.setCondominio(condominio);
-        cobranca.setDividirFracaoIdeal(checkDividirFracaoIdeal.isSelected());
+        cobranca.setDividirFracaoIdeal(checkDividirFracaoIdeal.isSelected());   
         cobranca.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
         if (verificarListaCobranca()) {
