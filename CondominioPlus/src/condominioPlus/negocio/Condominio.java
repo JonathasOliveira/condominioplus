@@ -5,6 +5,7 @@
 package condominioPlus.negocio;
 
 import condominioPlus.negocio.cobranca.CobrancaBase;
+import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
@@ -110,6 +111,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private Conciliacao conciliacao;
     @OneToOne
     private ParametrosCalculoAgua parametros;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<MensagemBoleto> mensagens = new ArrayList<MensagemBoleto>();
 
     public Condominio() {
     }
@@ -452,8 +455,12 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.contasDeAgua = contasDeAgua;
     }
 
+    public List<MensagemBoleto> getMensagens() {
+        return mensagens;
+    }
 
-
-    
+    public void setMensagens(List<MensagemBoleto> mensagens) {
+        this.mensagens = mensagens;
+    }
     
 }

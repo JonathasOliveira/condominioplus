@@ -16,8 +16,8 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
+import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.financeiro.DadosBoleto;
-import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
@@ -27,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JTable;
@@ -87,8 +86,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         carregarTabelaCondominos();
         carregarTabelaCobrancaBase();
         carregarTabelaCobranca();
-
         carregarDateField();
+        verificarMensagens();
 
         if (condominio != null) {
             this.setTitle("Cobranças - " + condominio.getRazaoSocial());
@@ -608,9 +607,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             contaBancaria.setAgencia(new Agencia(3918, "0"));
 
             Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
-            titulo.setNossoNumero(cobranca.getNumeroDocumento());
-            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
             titulo.setValor(cobranca.getValorTotal());
             titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
             if (cobranca.getVencimentoProrrogado() != null) {
@@ -635,14 +634,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     + "qualquer Banco até o Vencimento.");
 //                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
 //                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
-            boleto.setInstrucao1("PARA PAGAMENTO 1 até 23/05/2011 não cobrar nada!");
-//                boleto.setInstrucao2("PARA PAGAMENTO 2 até Amanhã Não cobre!");
-//                boleto.setInstrucao3("PARA PAGAMENTO 3 até Depois de amanhã, OK, não cobre.");
-//                boleto.setInstrucao4("PARA PAGAMENTO 4 até 04/xx/xxxx de 4 dias atrás COBRAR O VALOR DE: R$ 01,00");
-//                boleto.setInstrucao5("PARA PAGAMENTO 5 até 05/xx/xxxx COBRAR O VALOR DE: R$ 02,00");
-//                boleto.setInstrucao6("PARA PAGAMENTO 6 até 06/xx/xxxx COBRAR O VALOR DE: R$ 03,00");
-//                boleto.setInstrucao7("PARA PAGAMENTO 7 até xx/xx/xxxx COBRAR O VALOR QUE VOCÊ QUISER!");
-//                boleto.setInstrucao8("APÓS o Vencimento, Pagável Somente na Rede X.");
+            boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
+            boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
+            boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
+            boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
+            boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
+            boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
+            boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
+            boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
 
             System.out.println("campo livre " + boleto.getCampoLivre().write());
             System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
@@ -732,6 +731,43 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
+    private void verificarMensagens() {
+        List<MensagemBoleto> mensagens = condominio.getMensagens();
+        System.out.println("tamanho lista mensagem antes do while: " + mensagens.size());
+        while (mensagens.size() < 8) {
+            MensagemBoleto mensagem = new MensagemBoleto();
+            mensagem.setCondominio(condominio);
+            mensagens.add(mensagem);
+        }
+        condominio.setMensagens(mensagens);
+        System.out.println("numero lista mensagens: " + condominio.getMensagens().size());
+        new DAO().salvar(condominio);
+    }
+
+    private void preencherPainelMensagens() {
+        txtMensagem1.setText(condominio.getMensagens().get(0).getMensagem());
+        txtMensagem2.setText(condominio.getMensagens().get(1).getMensagem());
+        txtMensagem3.setText(condominio.getMensagens().get(2).getMensagem());
+        txtMensagem4.setText(condominio.getMensagens().get(3).getMensagem());
+        txtMensagem5.setText(condominio.getMensagens().get(4).getMensagem());
+        txtMensagem6.setText(condominio.getMensagens().get(5).getMensagem());
+        txtMensagem7.setText(condominio.getMensagens().get(6).getMensagem());
+        txtMensagem8.setText(condominio.getMensagens().get(7).getMensagem());
+    }
+
+    private void salvarMensagens() {
+        condominio.getMensagens().get(0).setMensagem(txtMensagem1.getText());
+        condominio.getMensagens().get(1).setMensagem(txtMensagem2.getText());
+        condominio.getMensagens().get(2).setMensagem(txtMensagem3.getText());
+        condominio.getMensagens().get(3).setMensagem(txtMensagem4.getText());
+        condominio.getMensagens().get(4).setMensagem(txtMensagem5.getText());
+        condominio.getMensagens().get(5).setMensagem(txtMensagem6.getText());
+        condominio.getMensagens().get(6).setMensagem(txtMensagem7.getText());
+        condominio.getMensagens().get(7).setMensagem(txtMensagem8.getText());
+        new DAO().salvar(condominio);
+        ApresentacaoUtil.exibirInformacao("Mensagens salvas com sucesso!", this);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -753,6 +789,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             txtDataFinal.addChangeListener(this);
             btnLerArquivoRetorno.addActionListener(this);
             btnConfirmar.addActionListener(this);
+            btnSalvarMensagem.addActionListener(this);
         }
 
         @Override
@@ -802,6 +839,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 lerArquivoRetorno();
             } else if (origem == btnConfirmar) {
                 baixarCobrancas();
+            } else if (origem == btnSalvarMensagem) {
+                salvarMensagens();
             }
         }
 
@@ -834,7 +873,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
                     limparSelecoesTabelas();
-                } else if (jTabbedPane1.getSelectedIndex() == 3) {
+                } else if (jTabbedPane1.getSelectedIndex() == 4) {
+                    preencherPainelMensagens();
                 }
             } else if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
                 ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
@@ -895,6 +935,26 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaArquivoRetorno = new javax.swing.JTable();
         btnLerArquivoRetorno = new javax.swing.JButton();
         btnConfirmar = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        painelMensagem = new javax.swing.JPanel();
+        txtMensagem1 = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        btnSalvarMensagem = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
+        txtMensagem2 = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        txtMensagem3 = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        txtMensagem4 = new javax.swing.JTextField();
+        jLabel10 = new javax.swing.JLabel();
+        txtMensagem5 = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txtMensagem6 = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        txtMensagem7 = new javax.swing.JTextField();
+        jLabel13 = new javax.swing.JLabel();
+        txtMensagem8 = new javax.swing.JTextField();
         btnLimpar = new javax.swing.JButton();
 
         itemMenuMudarAltura.setText("Mudar altura");
@@ -1002,13 +1062,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             painelCobrancaBaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCobrancaBaseLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
                 .addContainerGap())
         );
         painelCobrancaBaseLayout.setVerticalGroup(
             painelCobrancaBaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCobrancaBaseLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1034,13 +1094,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
                 .addContainerGap())
         );
         painelBoletosLayout.setVerticalGroup(
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1097,12 +1157,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtVencimentoProrrogado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(360, Short.MAX_VALUE))
+                .addContainerGap(356, Short.MAX_VALUE))
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel2Layout.createSequentialGroup()
                     .addGap(222, 222, 222)
                     .addComponent(btnImprimirBoletoInadimplente)
-                    .addContainerGap(226, Short.MAX_VALUE)))
+                    .addContainerGap(222, Short.MAX_VALUE)))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1126,7 +1186,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelInadimplentesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelInadimplentesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1136,13 +1196,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 377, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Inadimplência", painelInadimplentes);
 
-        tabelaPagos.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaPagos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaPagos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1173,7 +1233,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(155, Short.MAX_VALUE))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1194,7 +1254,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPagosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelPagosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -1204,8 +1264,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 381, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Pagos", painelPagos);
@@ -1234,7 +1294,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 551, Short.MAX_VALUE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnLerArquivoRetorno)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1249,11 +1309,149 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addComponent(btnLerArquivoRetorno)
                     .addComponent(btnConfirmar))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Arquivo Retorno", jPanel3);
+
+        painelMensagem.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        txtMensagem1.setName("Valor"); // NOI18N
+
+        jLabel6.setText("Instrução 1");
+
+        btnSalvarMensagem.setText("Salvar");
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+                .addContainerGap(239, Short.MAX_VALUE)
+                .addComponent(btnSalvarMensagem)
+                .addGap(224, 224, 224))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSalvarMensagem)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jLabel7.setText("Instrução 2");
+
+        txtMensagem2.setName("Valor"); // NOI18N
+
+        jLabel8.setText("Instrução 3");
+
+        txtMensagem3.setName("Valor"); // NOI18N
+
+        jLabel9.setText("Instrução 4");
+
+        txtMensagem4.setName("Valor"); // NOI18N
+
+        jLabel10.setText("Instrução 5");
+
+        txtMensagem5.setName("Valor"); // NOI18N
+
+        jLabel11.setText("Instrução 6");
+
+        txtMensagem6.setName("Valor"); // NOI18N
+
+        jLabel12.setText("Instrução 7");
+
+        txtMensagem7.setName("Valor"); // NOI18N
+
+        jLabel13.setText("Instrução 8");
+
+        txtMensagem8.setName("Valor"); // NOI18N
+
+        javax.swing.GroupLayout painelMensagemLayout = new javax.swing.GroupLayout(painelMensagem);
+        painelMensagem.setLayout(painelMensagemLayout);
+        painelMensagemLayout.setHorizontalGroup(
+            painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelMensagemLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtMensagem1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMensagem8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING))
+                .addContainerGap())
+        );
+        painelMensagemLayout.setVerticalGroup(
+            painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelMensagemLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel12)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtMensagem8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelMensagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(painelMensagem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Mensagens", jPanel4);
 
         btnLimpar.setText("Limpar Seleção");
 
@@ -1270,21 +1468,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addGap(25, 25, 25)
                         .addComponent(btnLimpar)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
-                .addComponent(btnLimpar)
-                .addGap(18, 18, 18)
-                .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 475, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnLimpar)
+                        .addGap(18, 18, 18)
+                        .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 494, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pack();
@@ -1296,17 +1493,28 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnImprimirBoletoInadimplente;
     private javax.swing.JButton btnLerArquivoRetorno;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.JButton btnSalvarMensagem;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
     private javax.swing.JMenuItem itemMenuMudarAltura;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1320,6 +1528,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel painelCondominos;
     private javax.swing.JPanel painelInadimplentes;
     private javax.swing.JPanel painelLancamentos;
+    private javax.swing.JPanel painelMensagem;
     private javax.swing.JPanel painelPagos;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
@@ -1332,6 +1541,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private net.sf.nachocalendar.components.DateField txtDataVencimento;
+    private javax.swing.JTextField txtMensagem1;
+    private javax.swing.JTextField txtMensagem2;
+    private javax.swing.JTextField txtMensagem3;
+    private javax.swing.JTextField txtMensagem4;
+    private javax.swing.JTextField txtMensagem5;
+    private javax.swing.JTextField txtMensagem6;
+    private javax.swing.JTextField txtMensagem7;
+    private javax.swing.JTextField txtMensagem8;
     private javax.swing.JTextField txtNumeroDocumento;
     private net.sf.nachocalendar.components.DateField txtVencimentoProrrogado;
     // End of variables declaration//GEN-END:variables
