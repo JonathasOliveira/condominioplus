@@ -17,6 +17,7 @@ import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
+import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
@@ -682,6 +683,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     Pagamento pAuxiliar = getPagamentoMaiorValor(c);
                     Moeda valorPago = new Moeda(r.getValorPago());
                     pAuxiliar.setValor(pAuxiliar.getValor().add(valorPago.subtrai(r.getValorTitulo()).bigDecimalValue()));
+                } else {
+                    Moeda soma = new Moeda(c.getValorPago());
+                    soma.subtrai(r.getValorTitulo());
+                    c.setMulta(c.getMulta().add(soma.bigDecimalValue()));
+                    Moeda valor = new Moeda(c.getJuros());
+                    valor.soma(c.getMulta());
+                    Pagamento pagamento = new Pagamento();
+                    pagamento.setConta(new DAO().localizar(Conta.class, 37226));
+                    pagamento.setHistorico(pagamento.getConta().getNome());
+                    pagamento.setValor(valor.bigDecimalValue());
+                    pagamento.setCobranca(c);
+                    c.getPagamentos().add(pagamento);
                 }
 
                 for (Pagamento p : c.getPagamentos()) {
