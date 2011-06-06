@@ -29,6 +29,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
@@ -311,7 +313,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaPagos() {
-        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Documento, Vencimento, Pagamento, Valor Original, Juros, Multa, Total, Valor Pago".split(",")) {
+        modeloTabelaPagos = new TabelaModelo_2<Cobranca>(tabelaPagos, "Unidade, Condominio, Documento, Vencimento, Pagamento, Valor Original, Juros, Multa, Total, Desconto, Valor Pago, Diferença".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -340,7 +342,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 8:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
                     case 9:
+                        return PagamentoUtil.formatarMoeda(cobranca.getDesconto().doubleValue());
+                    case 10:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorPago().doubleValue());
+                    case 11:
+                        return PagamentoUtil.formatarMoeda(cobranca.getDiferencaPagamento().doubleValue());
                     default:
                         return null;
                 }
@@ -354,6 +360,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(9)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(10)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaPagos.getColumn(modeloTabelaPagos.getCampo(11)).setCellRenderer(new RenderizadorCelulaADireita());
 
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(0)).setMaxWidth(50);
         tabelaPagos.getColumn(modeloTabelaPagos.getCampo(1)).setMinWidth(250);
@@ -675,14 +683,22 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void baixarCobrancas() {
         for (RegistroTransacao r : listaRegistros) {
+            Moeda desconto = new Moeda();
             if (r.getCobranca() != null) {
 
                 Cobranca c = r.getCobranca();
 
                 if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
                     Pagamento pAuxiliar = getPagamentoMaiorValor(c);
-                    Moeda valorPago = new Moeda(r.getValorPago());
-                    pAuxiliar.setValor(pAuxiliar.getValor().add(valorPago.subtrai(r.getValorTitulo()).bigDecimalValue()));
+                    if (r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue() > 0) {
+                        desconto = new Moeda(r.getCobranca().getUnidade().getCondominio().getDesconto());
+                        c.setDesconto(desconto.bigDecimalValue());
+                    }
+                    c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(r.getValorPago().bigDecimalValue()));
+                    c.setDiferencaPagamento(c.getDiferencaPagamento().add(r.getValorTitulo().bigDecimalValue()));
+                    c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(desconto.bigDecimalValue()));
+                    pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()));
+                    pAuxiliar.getValor().subtract(c.getDiferencaPagamento());
                 } else {
                     Moeda soma = new Moeda(c.getValorPago());
                     soma.subtrai(r.getValorTitulo());
@@ -746,18 +762,34 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void verificarMensagens() {
         List<MensagemBoleto> mensagens = condominio.getMensagens();
-        System.out.println("tamanho lista mensagem antes do while: " + mensagens.size());
+//        System.out.println("tamanho lista mensagem antes do while: " + mensagens.size());
         while (mensagens.size() < 8) {
             MensagemBoleto mensagem = new MensagemBoleto();
             mensagem.setCondominio(condominio);
             mensagens.add(mensagem);
         }
         condominio.setMensagens(mensagens);
-        System.out.println("numero lista mensagens: " + condominio.getMensagens().size());
+//        System.out.println("numero lista mensagens: " + condominio.getMensagens().size());
         new DAO().salvar(condominio);
     }
 
+    private void ordenarMensagens(){
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                MensagemBoleto m1 = (MensagemBoleto) o1;
+                MensagemBoleto m2 = (MensagemBoleto) o2;
+                return Integer.valueOf(m1.getCodigo()).compareTo(Integer.valueOf(m2.getCodigo()));
+            }
+        };
+
+        Collections.sort(condominio.getMensagens(), c);
+    }
+
     private void preencherPainelMensagens() {
+        ordenarMensagens();
         txtMensagem1.setText(condominio.getMensagens().get(0).getMensagem());
         txtMensagem2.setText(condominio.getMensagens().get(1).getMensagem());
         txtMensagem3.setText(condominio.getMensagens().get(2).getMensagem());
@@ -769,6 +801,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void salvarMensagens() {
+        ordenarMensagens();
         condominio.getMensagens().get(0).setMensagem(txtMensagem1.getText());
         condominio.getMensagens().get(1).setMensagem(txtMensagem2.getText());
         condominio.getMensagens().get(2).setMensagem(txtMensagem3.getText());
