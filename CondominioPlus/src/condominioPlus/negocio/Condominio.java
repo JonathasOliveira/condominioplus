@@ -19,6 +19,7 @@ import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Poupanca;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -113,6 +114,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ParametrosCalculoAgua parametros;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<MensagemBoleto> mensagens = new ArrayList<MensagemBoleto>();
+    @Column(precision = 20, scale = 2)
+    private BigDecimal desconto = new BigDecimal(0);
 
     public Condominio() {
     }
@@ -461,6 +464,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setMensagens(List<MensagemBoleto> mensagens) {
         this.mensagens = mensagens;
+    }
+
+    public BigDecimal getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(BigDecimal desconto) {
+        this.desconto = desconto;
     }
     
 }
