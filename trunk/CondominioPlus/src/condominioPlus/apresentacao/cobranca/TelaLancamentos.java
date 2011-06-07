@@ -346,7 +346,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 10:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorPago().doubleValue());
                     case 11:
-                        return PagamentoUtil.formatarMoeda(cobranca.getDiferencaPagamento().doubleValue());
+                        return PagamentoUtil.formatarMoeda(cobranca.getDiferencaPagamento().negate().doubleValue());
                     default:
                         return null;
                 }
@@ -556,8 +556,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         cobranca.setMulta(multa.bigDecimalValue());
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())));
         cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
-        new DAO().salvar(cobranca);
-        carregarTabelaInadimplentes();
+        if (jTabbedPane1.getSelectedIndex() == 1) {
+            System.out.println("Dentro do if em calcularJurosMulta.");
+            new DAO().salvar(cobranca);
+            carregarTabelaInadimplentes();
+        }
     }
 
     private void imprimirBoleto(List<Cobranca> listaCobrancas) {
@@ -674,7 +677,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void lerArquivoRetorno() {
         EntradaArquivoRetorno entrada = new EntradaArquivoRetorno();
-        System.out.println("saída " + entrada.getRegistros().size());
         for (RegistroTransacao r : entrada.getRegistros()) {
             listaRegistros.add(r);
         }
@@ -687,6 +689,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             if (r.getCobranca() != null) {
 
                 Cobranca c = r.getCobranca();
+                c.setDataPagamento(DataUtil.getCalendar(r.getData()));
 
                 if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
                     Pagamento pAuxiliar = getPagamentoMaiorValor(c);
@@ -700,11 +703,48 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()));
                     pAuxiliar.getValor().subtract(c.getDiferencaPagamento());
                 } else {
-                    Moeda soma = new Moeda(c.getValorPago());
-                    soma.subtrai(r.getValorTitulo());
-                    c.setMulta(c.getMulta().add(soma.bigDecimalValue()));
-                    Moeda valor = new Moeda(c.getJuros());
-                    valor.soma(c.getMulta());
+
+                    Moeda diferencaValorPagoValorTitulo = new Moeda();
+                    diferencaValorPagoValorTitulo.soma(r.getValorPago()).subtrai(r.getValorTitulo());
+
+                    //Verifica se o cálculo de juros e multa realizado pelo banco esta correto
+                    if (DataUtil.compararData(DataUtil.getDateTime(c.getDataPagamento()), DataUtil.getDateTime(c.getDataVencimento())) == 1) {
+                        Cobranca cAuxiliar = new Cobranca();
+                        cAuxiliar = new DAO().localizar(Cobranca.class, c.getCodigo());
+                        calcularJurosMulta(cAuxiliar, r.getData());
+                        Moeda valorSomaCalculoJurosMulta = new Moeda();
+                        valorSomaCalculoJurosMulta.soma(cAuxiliar.getJuros()).soma(cAuxiliar.getMulta());
+                        Moeda valorSomaJurosMultaInicial = new Moeda();
+                        valorSomaJurosMultaInicial.soma(c.getJuros()).soma(c.getMulta());
+                        Moeda resultado = new Moeda();
+                        resultado.soma(valorSomaCalculoJurosMulta).subtrai(valorSomaJurosMultaInicial);
+                        Moeda valorMinimo = new Moeda(diferencaValorPagoValorTitulo);
+                        Moeda valorMaximo = new Moeda(diferencaValorPagoValorTitulo);
+                        valorMinimo.subtrai(0.05);
+                        valorMaximo.soma(0.05);
+
+                        if (resultado.doubleValue() >= valorMinimo.doubleValue() && resultado.doubleValue() <= valorMaximo.doubleValue()) {
+                            c.setMulta(c.getMulta().add(diferencaValorPagoValorTitulo.bigDecimalValue()));
+                        } else {
+                            Moeda diferenca = new Moeda(valorSomaCalculoJurosMulta);
+                            diferenca.subtrai(diferencaValorPagoValorTitulo);
+                            if (resultado.doubleValue() > valorMinimo.doubleValue()) {
+                                c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()).subtract(diferenca.bigDecimalValue()));
+                            } else {
+                                c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()));
+                            }
+                            c.setDiferencaPagamento(diferenca.bigDecimalValue());
+                        }
+
+                    } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {
+                        //Verifica se houve pagamento superior ao valor da fatura
+                        c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(diferencaValorPagoValorTitulo.bigDecimalValue()));
+                    }
+                }
+
+                Moeda valor = new Moeda(c.getJuros());
+                valor.soma(c.getMulta());
+                if (valor.doubleValue() > 0) {
                     Pagamento pagamento = new Pagamento();
                     pagamento.setConta(new DAO().localizar(Conta.class, 37226));
                     pagamento.setHistorico(pagamento.getConta().getNome());
@@ -722,11 +762,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
 
                 c.setValorPago(r.getValorPago().bigDecimalValue());
-                c.setDataPagamento(DataUtil.getCalendar(r.getData()));
 
                 new DAO().salvar(c);
                 atualizarCondominio(c);
-
             }
         }
         listaRegistros.clear();
@@ -773,7 +811,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new DAO().salvar(condominio);
     }
 
-    private void ordenarMensagens(){
+    private void ordenarMensagens() {
         Comparator c = null;
 
         c = new Comparator() {
