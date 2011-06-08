@@ -700,8 +700,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(r.getValorPago().bigDecimalValue()));
                     c.setDiferencaPagamento(c.getDiferencaPagamento().add(r.getValorTitulo().bigDecimalValue()));
                     c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(desconto.bigDecimalValue()));
-                    pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()));
-                    pAuxiliar.getValor().subtract(c.getDiferencaPagamento());
+                    pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()).subtract(c.getDiferencaPagamento()));                    
                 } else {
 
                     Moeda diferencaValorPagoValorTitulo = new Moeda();
@@ -733,7 +732,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                             } else {
                                 c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()));
                             }
-                            c.setDiferencaPagamento(diferenca.bigDecimalValue());
+                            if (c.getUnidade().getCondominio().isCalcularMultaProximoMes() || diferenca.doubleValue() < 0) {
+                                c.setDiferencaPagamento(diferenca.bigDecimalValue());
+                            }
                         }
 
                     } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {

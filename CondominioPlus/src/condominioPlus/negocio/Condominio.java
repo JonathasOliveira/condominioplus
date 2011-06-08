@@ -116,6 +116,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<MensagemBoleto> mensagens = new ArrayList<MensagemBoleto>();
     @Column(precision = 20, scale = 2)
     private BigDecimal desconto = new BigDecimal(0);
+    @Column(name="calcular_multa_proximo_mes")
+    private boolean calcularMultaProximoMes;
 
     public Condominio() {
     }
@@ -472,6 +474,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setDesconto(BigDecimal desconto) {
         this.desconto = desconto;
+    }
+
+    public boolean isCalcularMultaProximoMes() {
+        return calcularMultaProximoMes;
+    }
+
+    public void setCalcularMultaProximoMes(boolean calcularMultaProximoMes) {
+        this.calcularMultaProximoMes = calcularMultaProximoMes;
     }
     
 }
