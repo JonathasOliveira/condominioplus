@@ -15,6 +15,11 @@
         </MenuItem>
         <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
         </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuBaixaManual">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Efetuar Baixa Item Selecionado"/>
+          </Properties>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuRemoverSelecionados">
           <Properties>
             <Property name="text" type="java.lang.String" value="Remover Selecionado(s)"/>
@@ -31,6 +36,24 @@
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuCalcularJurosMulta">
           <Properties>
             <Property name="text" type="java.lang.String" value="Calcular Juros/Multa"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuBaixaManualInadimplente">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Efetuar Baixa Item Selecionado"/>
+          </Properties>
+        </MenuItem>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPopupMenu" name="popupMenuPagos">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
+      <SubComponents>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuLancarNoCaixa">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Lan&#xe7;ar Cobran&#xe7;a no Caixa"/>
           </Properties>
         </MenuItem>
       </SubComponents>

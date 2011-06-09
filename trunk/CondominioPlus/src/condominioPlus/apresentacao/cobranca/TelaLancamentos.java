@@ -474,7 +474,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
             pagamento.setCobranca(cobranca);
             pagamento.setConta(co.getConta());
-            pagamento.setHistorico(pagamento.getConta().getNome());
+            pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
             if (co.isDividirFracaoIdeal()) {
                 pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)));
             } else {
@@ -683,93 +683,109 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         carregarTabelaArquivos();
     }
 
-    private void baixarCobrancas() {
+    private void baixarVariasCobrancas() {
         for (RegistroTransacao r : listaRegistros) {
-            Moeda desconto = new Moeda();
-            if (r.getCobranca() != null) {
-
-                Cobranca c = r.getCobranca();
-                c.setDataPagamento(DataUtil.getCalendar(r.getData()));
-
-                if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
-                    Pagamento pAuxiliar = getPagamentoMaiorValor(c);
-                    if (r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue() > 0) {
-                        desconto = new Moeda(r.getCobranca().getUnidade().getCondominio().getDesconto());
-                        c.setDesconto(desconto.bigDecimalValue());
-                    }
-                    c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(r.getValorPago().bigDecimalValue()));
-                    c.setDiferencaPagamento(c.getDiferencaPagamento().add(r.getValorTitulo().bigDecimalValue()));
-                    c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(desconto.bigDecimalValue()));
-                    pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()).subtract(c.getDiferencaPagamento()));                    
-                } else {
-
-                    Moeda diferencaValorPagoValorTitulo = new Moeda();
-                    diferencaValorPagoValorTitulo.soma(r.getValorPago()).subtrai(r.getValorTitulo());
-
-                    //Verifica se o cálculo de juros e multa realizado pelo banco esta correto
-                    if (DataUtil.compararData(DataUtil.getDateTime(c.getDataPagamento()), DataUtil.getDateTime(c.getDataVencimento())) == 1) {
-                        Cobranca cAuxiliar = new Cobranca();
-                        cAuxiliar = new DAO().localizar(Cobranca.class, c.getCodigo());
-                        calcularJurosMulta(cAuxiliar, r.getData());
-                        Moeda valorSomaCalculoJurosMulta = new Moeda();
-                        valorSomaCalculoJurosMulta.soma(cAuxiliar.getJuros()).soma(cAuxiliar.getMulta());
-                        Moeda valorSomaJurosMultaInicial = new Moeda();
-                        valorSomaJurosMultaInicial.soma(c.getJuros()).soma(c.getMulta());
-                        Moeda resultado = new Moeda();
-                        resultado.soma(valorSomaCalculoJurosMulta).subtrai(valorSomaJurosMultaInicial);
-                        Moeda valorMinimo = new Moeda(diferencaValorPagoValorTitulo);
-                        Moeda valorMaximo = new Moeda(diferencaValorPagoValorTitulo);
-                        valorMinimo.subtrai(0.05);
-                        valorMaximo.soma(0.05);
-
-                        if (resultado.doubleValue() >= valorMinimo.doubleValue() && resultado.doubleValue() <= valorMaximo.doubleValue()) {
-                            c.setMulta(c.getMulta().add(diferencaValorPagoValorTitulo.bigDecimalValue()));
-                        } else {
-                            Moeda diferenca = new Moeda(valorSomaCalculoJurosMulta);
-                            diferenca.subtrai(diferencaValorPagoValorTitulo);
-                            if (resultado.doubleValue() > valorMinimo.doubleValue()) {
-                                c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()).subtract(diferenca.bigDecimalValue()));
-                            } else {
-                                c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()));
-                            }
-                            if (c.getUnidade().getCondominio().isCalcularMultaProximoMes() || diferenca.doubleValue() < 0) {
-                                c.setDiferencaPagamento(diferenca.bigDecimalValue());
-                            }
-                        }
-
-                    } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {
-                        //Verifica se houve pagamento superior ao valor da fatura
-                        c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(diferencaValorPagoValorTitulo.bigDecimalValue()));
-                    }
-                }
-
-                Moeda valor = new Moeda(c.getJuros());
-                valor.soma(c.getMulta());
-                if (valor.doubleValue() > 0) {
-                    Pagamento pagamento = new Pagamento();
-                    pagamento.setConta(new DAO().localizar(Conta.class, 37226));
-                    pagamento.setHistorico(pagamento.getConta().getNome());
-                    pagamento.setValor(valor.bigDecimalValue());
-                    pagamento.setCobranca(c);
-                    c.getPagamentos().add(pagamento);
-                }
-
-                for (Pagamento p : c.getPagamentos()) {
-                    p.setDataPagamento(DataUtil.getCalendar(r.getData()));
-                    p.setPago(true);
-                    p.setForma(FormaPagamento.BOLETO);
-                    p.setDadosPagamento(new DadosBoleto(r.getDocumento()));
-                    p.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
-                }
-
-                c.setValorPago(r.getValorPago().bigDecimalValue());
-
-                new DAO().salvar(c);
-                atualizarCondominio(c);
-            }
+            baixarCobranca(r, true);
         }
         listaRegistros.clear();
         carregarTabelaArquivos();
+    }
+
+    private void baixarCobranca(RegistroTransacao r, boolean setContaCorrente) {
+        Moeda desconto = new Moeda();
+        if (r.getCobranca() != null) {
+
+            Cobranca c = r.getCobranca();
+            c.setDataPagamento(DataUtil.getCalendar(r.getData()));
+
+            if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
+                Pagamento pAuxiliar = getPagamentoMaiorValor(c);
+                if (r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue() > 0) {
+                    desconto = new Moeda(r.getCobranca().getUnidade().getCondominio().getDesconto());
+                    c.setDesconto(desconto.bigDecimalValue());
+                }
+                c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(r.getValorPago().bigDecimalValue()));
+                c.setDiferencaPagamento(c.getDiferencaPagamento().add(r.getValorTitulo().bigDecimalValue()));
+                c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(desconto.bigDecimalValue()));
+                pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()).subtract(c.getDiferencaPagamento()));
+            } else {
+
+                Moeda diferencaValorPagoValorTitulo = new Moeda();
+                diferencaValorPagoValorTitulo.soma(r.getValorPago()).subtrai(r.getValorTitulo());
+
+                //Verifica se o cálculo de juros e multa realizado pelo banco esta correto
+                if (DataUtil.compararData(DataUtil.getDateTime(c.getDataPagamento()), DataUtil.getDateTime(c.getDataVencimento())) == 1) {
+                    Cobranca cAuxiliar = new Cobranca();
+                    cAuxiliar = new DAO().localizar(Cobranca.class, c.getCodigo());
+                    calcularJurosMulta(cAuxiliar, r.getData());
+                    Moeda valorSomaCalculoJurosMulta = new Moeda();
+                    valorSomaCalculoJurosMulta.soma(cAuxiliar.getJuros()).soma(cAuxiliar.getMulta());
+                    Moeda valorSomaJurosMultaInicial = new Moeda();
+                    valorSomaJurosMultaInicial.soma(c.getJuros()).soma(c.getMulta());
+                    Moeda resultado = new Moeda();
+                    resultado.soma(valorSomaCalculoJurosMulta).subtrai(valorSomaJurosMultaInicial);
+                    Moeda valorMinimo = new Moeda(diferencaValorPagoValorTitulo);
+                    Moeda valorMaximo = new Moeda(diferencaValorPagoValorTitulo);
+                    valorMinimo.subtrai(0.05);
+                    valorMaximo.soma(0.05);
+
+                    if (resultado.doubleValue() >= valorMinimo.doubleValue() && resultado.doubleValue() <= valorMaximo.doubleValue()) {
+                        c.setMulta(c.getMulta().add(diferencaValorPagoValorTitulo.bigDecimalValue()));
+                    } else {
+                        Moeda diferenca = new Moeda(valorSomaCalculoJurosMulta);
+                        diferenca.subtrai(diferencaValorPagoValorTitulo);
+                        if (resultado.doubleValue() > valorMinimo.doubleValue()) {
+                            c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()).subtract(diferenca.bigDecimalValue()));
+                        } else {
+                            c.setMulta(c.getMulta().add(valorSomaCalculoJurosMulta.bigDecimalValue()));
+                        }
+                        if (c.getUnidade().getCondominio().isCalcularMultaProximoMes() || diferenca.doubleValue() < 0) {
+                            c.setDiferencaPagamento(diferenca.bigDecimalValue());
+                        }
+                    }
+
+                } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {
+                    //Verifica se houve pagamento superior ao valor da fatura
+                    c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(diferencaValorPagoValorTitulo.bigDecimalValue()));
+                }
+            }
+
+            Moeda valor = new Moeda(c.getJuros());
+            valor.soma(c.getMulta());
+            if (valor.doubleValue() > 0) {
+                Pagamento pagamento = new Pagamento();
+                pagamento.setConta(new DAO().localizar(Conta.class, 37226));
+                pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
+                pagamento.setValor(valor.bigDecimalValue());
+                pagamento.setCobranca(c);
+                c.getPagamentos().add(pagamento);
+            }
+
+            if (c.getDiferencaPagamento().doubleValue() < 0) {
+                Pagamento pagamento = new Pagamento();
+                pagamento.setConta(new DAO().localizar(Conta.class, 39602));
+                pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
+                pagamento.setValor(c.getDiferencaPagamento().negate());
+                pagamento.setCobranca(c);
+                c.getPagamentos().add(pagamento);
+            }
+
+            for (Pagamento p : c.getPagamentos()) {
+                Pagamento pagamentoAuxiliar = p;
+                pagamentoAuxiliar.setDataPagamento(DataUtil.getCalendar(r.getData()));
+                pagamentoAuxiliar.setPago(true);
+                pagamentoAuxiliar.setForma(FormaPagamento.BOLETO);
+                pagamentoAuxiliar.setDadosPagamento(new DadosBoleto(r.getDocumento()));
+                if (setContaCorrente) {
+                    pagamentoAuxiliar.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+                }
+            }
+
+            c.setValorPago(r.getValorPago().bigDecimalValue());
+
+            new DAO().salvar(c);
+            atualizarCondominio(c);
+        }
     }
 
     private Pagamento getPagamentoMaiorValor(Cobranca c) {
@@ -797,6 +813,34 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             }
         }
+    }
+
+    public void efetuarBaixaManual() {
+        DialogoBaixaManual dialogo = new DialogoBaixaManual(null, true);
+        dialogo.setVisible(true);
+
+        if (!ApresentacaoUtil.perguntar("Confirmar os dados inseridos?", this)) {
+            return;
+        }
+
+        System.out.println("data pagamento: " + DataUtil.toString(dialogo.getDataPagamento()));
+        System.out.println("valor: " + PagamentoUtil.formatarMoeda(dialogo.getValorPago().doubleValue()));
+
+        RegistroTransacao registro = new RegistroTransacao();
+        registro.setCobranca(modeloTabelaBoleto.getObjetoSelecionado());
+        registro.setData(dialogo.getDataPagamento());
+        registro.setValorPago(new Moeda(dialogo.getValorPago()));
+        registro.setValorTitulo(new Moeda(registro.getCobranca().getValorTotal()));
+        registro.setDocumento(registro.getCobranca().getNumeroDocumento());
+
+        boolean setContaCorrente = false;
+
+        if (ApresentacaoUtil.perguntar("Lançar pagamento(s) no caixa?", this)) {
+            setContaCorrente = true;
+        }
+
+        baixarCobranca(registro, setContaCorrente);
+        carregarTabelaCobranca();
     }
 
     private void verificarMensagens() {
@@ -853,6 +897,17 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         ApresentacaoUtil.exibirInformacao("Mensagens salvas com sucesso!", this);
     }
 
+    private void lancarNoCaixa(List<Cobranca> lista) {
+        for (Cobranca c : lista) {
+            for (Pagamento pagamento : c.getPagamentos()) {
+                pagamento.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+            }
+            new DAO().salvar(c);
+            atualizarCondominio(c);
+        }
+        ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -863,6 +918,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             btnImprimirBoleto.addActionListener(this);
             btnLimpar.addActionListener(this);
             btnImprimirBoletoInadimplente.addActionListener(this);
+            itemMenuBaixaManual.addActionListener(this);
+            itemMenuBaixaManualInadimplente.addActionListener(this);
+            itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
             itemMenuCalcularJurosMulta.addActionListener(this);
             itemMenuMudarAltura.addActionListener(this);
@@ -870,6 +928,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             tabelaCobrancas.addMouseListener(this);
             tabelaCondominos.addMouseListener(this);
             tabelaInadimplentes.addMouseListener(this);
+            tabelaPagos.addMouseListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
             btnLerArquivoRetorno.addActionListener(this);
@@ -923,9 +982,21 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == btnLerArquivoRetorno) {
                 lerArquivoRetorno();
             } else if (origem == btnConfirmar) {
-                baixarCobrancas();
+                baixarVariasCobrancas();
             } else if (origem == btnSalvarMensagem) {
                 salvarMensagens();
+            } else if (origem == itemMenuBaixaManual || origem == itemMenuBaixaManualInadimplente) {
+                if (modeloTabelaBoleto.getObjetosSelecionados().size() == 1) {
+                    efetuarBaixaManual();
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Selecione a cobrança que deseja baixar.", TelaLancamentos.this);
+                }
+            } else if (origem == itemMenuLancarNoCaixa) {
+                if (modeloTabelaPagos.getObjetosSelecionados().size() > 0) {
+                    lancarNoCaixa(modeloTabelaPagos.getObjetosFiltrados());
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Selecione a(s) cobrança(s) que deseja lançar no caixa.", TelaLancamentos.this);
+                }
             }
         }
 
@@ -935,6 +1006,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
             } else if (e.isPopupTrigger() && e.getSource() == tabelaInadimplentes) {
                 popupMenuInadimplentes.show(e.getComponent(), e.getX(), e.getY());
+            } else if (e.isPopupTrigger() && e.getSource() == tabelaPagos) {
+                popupMenuPagos.show(e.getComponent(), e.getX(), e.getY());
             } else if (e.getSource() == tabelaCondominos) {
                 if (jTabbedPane1.getSelectedIndex() == 1) {
                     carregarTabelaInadimplentes();
@@ -980,9 +1053,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuMudarAltura = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        itemMenuBaixaManual = new javax.swing.JMenuItem();
         itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
         popupMenuInadimplentes = new javax.swing.JPopupMenu();
         itemMenuCalcularJurosMulta = new javax.swing.JMenuItem();
+        itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
+        popupMenuPagos = new javax.swing.JPopupMenu();
+        itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
@@ -1046,11 +1123,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         popupMenu.add(itemMenuMudarAltura);
         popupMenu.add(jSeparator1);
 
+        itemMenuBaixaManual.setText("Efetuar Baixa Item Selecionado");
+        popupMenu.add(itemMenuBaixaManual);
+
         itemMenuRemoverSelecionados.setText("Remover Selecionado(s)");
         popupMenu.add(itemMenuRemoverSelecionados);
 
         itemMenuCalcularJurosMulta.setText("Calcular Juros/Multa");
         popupMenuInadimplentes.add(itemMenuCalcularJurosMulta);
+
+        itemMenuBaixaManualInadimplente.setText("Efetuar Baixa Item Selecionado");
+        popupMenuInadimplentes.add(itemMenuBaixaManualInadimplente);
+
+        itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
+        popupMenuPagos.add(itemMenuLancarNoCaixa);
 
         setClosable(true);
         setTitle("Cobranças");
@@ -1287,7 +1373,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Inadimplência", painelInadimplentes);
 
-        tabelaPagos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaPagos.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaPagos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1579,7 +1665,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnLerArquivoRetorno;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvarMensagem;
+    private javax.swing.JMenuItem itemMenuBaixaManual;
+    private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
+    private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuMudarAltura;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
@@ -1617,6 +1706,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel painelPagos;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
+    private javax.swing.JPopupMenu popupMenuPagos;
     private javax.swing.JTable tabelaArquivoRetorno;
     private javax.swing.JTable tabelaCobrancas;
     private javax.swing.JTable tabelaCobrancasBase;
