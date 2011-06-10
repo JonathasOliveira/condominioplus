@@ -69,6 +69,8 @@ public class Cobranca implements Serializable {
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
     @Column(name = "linha_digitavel")
     private String linhaDigitavel;
+    @Column(name="lancado_caixa")
+    private boolean lancadoCaixa;
 
     public int getCodigo() {
         return codigo;
@@ -188,5 +190,13 @@ public class Cobranca implements Serializable {
 
     public void setLinhaDigitavel(String linhaDigitavel) {
         this.linhaDigitavel = linhaDigitavel;
+    }
+
+    public boolean isLancadoCaixa() {
+        return lancadoCaixa;
+    }
+
+    public void setLancadoCaixa(boolean lancadoCaixa) {
+        this.lancadoCaixa = lancadoCaixa;
     }
 }

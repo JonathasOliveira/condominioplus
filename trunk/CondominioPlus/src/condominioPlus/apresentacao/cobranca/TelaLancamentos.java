@@ -484,6 +484,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
             cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
         }
+        verificarResiduoAnterior(cobranca);
     }
 
     private double calcularPorFracaoIdeal(Unidade u, CobrancaBase cobrancaBase) {
@@ -508,6 +509,37 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             return false;
         }
         return true;
+    }
+
+    private void verificarResiduoAnterior(Cobranca c) {
+        List<Cobranca> lista = getPagosPorUnidade(c.getUnidade());
+        if (!lista.isEmpty()) {
+            Cobranca ultimaCobrancaPaga = lista.get(lista.size() - 1);
+            if (ultimaCobrancaPaga.getDiferencaPagamento().doubleValue() != 0) {
+                Pagamento pagamento = new Pagamento();
+                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                pagamento.setCobranca(c);
+                if (ultimaCobrancaPaga.getDiferencaPagamento().doubleValue() < 0) {
+                    pagamento.setConta(new DAO().localizar(Conta.class, 40502));
+                } else if (ultimaCobrancaPaga.getDiferencaPagamento().doubleValue() > 0) {
+                    pagamento.setConta(new DAO().localizar(Conta.class, 40503));
+                }
+                pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
+                pagamento.setValor(ultimaCobrancaPaga.getDiferencaPagamento());
+                c.getPagamentos().add(pagamento);
+                c.setValorTotal(c.getValorTotal().add(pagamento.getValor()));
+                c.setValorOriginal(c.getValorOriginal().add(pagamento.getValor()));
+            }
+        }
+    }
+
+    private List<Cobranca> getPagosPorUnidade(Unidade u) {
+        DateTime dataInicial = DataUtil.getPrimeiroDiaMes().minusMonths(4);
+        DateTime dataFinal = DataUtil.getUltimoDiaMes();
+        System.out.println("Data Inicial: " + DataUtil.toString(dataInicial));
+        System.out.println("Data Final: " + DataUtil.toString(dataFinal));
+        List<Cobranca> lista = new DAO().listar("CobrancasPagasPorPeriodoUnidade", u, DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
+        return lista;
     }
 
     private void remover() {
@@ -699,8 +731,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             c.setDataPagamento(DataUtil.getCalendar(r.getData()));
 
             if (r.getValorPago().doubleValue() < r.getValorTitulo().doubleValue()) {
+                Moeda calculoDiferencaValorPagoValorTitulo = new Moeda();
+                calculoDiferencaValorPagoValorTitulo.soma(r.getValorTitulo()).subtrai(r.getValorPago());
                 Pagamento pAuxiliar = getPagamentoMaiorValor(c);
-                if (r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue() > 0) {
+                if (r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue() > 0 && calculoDiferencaValorPagoValorTitulo.doubleValue() == r.getCobranca().getUnidade().getCondominio().getDesconto().doubleValue()) {
                     desconto = new Moeda(r.getCobranca().getUnidade().getCondominio().getDesconto());
                     c.setDesconto(desconto.bigDecimalValue());
                 }
@@ -778,13 +812,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 pagamentoAuxiliar.setDadosPagamento(new DadosBoleto(r.getDocumento()));
                 if (setContaCorrente) {
                     pagamentoAuxiliar.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+                    c.setLancadoCaixa(true);
                 }
             }
 
             c.setValorPago(r.getValorPago().bigDecimalValue());
 
-            new DAO().salvar(c);
-            atualizarCondominio(c);
+//            new DAO().salvar(c);
+//            atualizarCondominio(c);
         }
     }
 
@@ -833,10 +868,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         registro.setValorTitulo(new Moeda(registro.getCobranca().getValorTotal()));
         registro.setDocumento(registro.getCobranca().getNumeroDocumento());
 
-        boolean setContaCorrente = false;
+        boolean setContaCorrente = true;
 
-        if (ApresentacaoUtil.perguntar("Lançar pagamento(s) no caixa?", this)) {
-            setContaCorrente = true;
+        if (!ApresentacaoUtil.perguntar("Lançar pagamento(s) no caixa?", this)) {
+            setContaCorrente = false;
         }
 
         baixarCobranca(registro, setContaCorrente);
@@ -899,11 +934,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void lancarNoCaixa(List<Cobranca> lista) {
         for (Cobranca c : lista) {
-            for (Pagamento pagamento : c.getPagamentos()) {
-                pagamento.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+            if (!c.isLancadoCaixa()) {
+                for (Pagamento pagamento : c.getPagamentos()) {
+                    pagamento.setContaCorrente(c.getUnidade().getCondominio().getContaCorrente());
+                    c.setLancadoCaixa(true);
+                }
+                new DAO().salvar(c);
+                atualizarCondominio(c);
             }
-            new DAO().salvar(c);
-            atualizarCondominio(c);
         }
         ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
     }
