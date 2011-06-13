@@ -818,8 +818,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             c.setValorPago(r.getValorPago().bigDecimalValue());
 
-//            new DAO().salvar(c);
-//            atualizarCondominio(c);
+            new DAO().salvar(c);
+            atualizarCondominio(c);
         }
     }
 
