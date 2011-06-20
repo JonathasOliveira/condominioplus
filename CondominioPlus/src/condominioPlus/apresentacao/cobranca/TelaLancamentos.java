@@ -13,6 +13,7 @@ package condominioPlus.apresentacao.cobranca;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.AcordoCobranca;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
@@ -20,6 +21,7 @@ import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.FormaPagamento;
+import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
@@ -77,6 +79,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private List<Cobranca> listaPagos;
     private TabelaModelo_2<RegistroTransacao> modeloTabelaArquivos;
     List<RegistroTransacao> listaRegistros = new ArrayList<RegistroTransacao>();
+    private TabelaModelo_2<AcordoCobranca> modeloTabelaAcordo;
+    private List<AcordoCobranca> listaAcordos;
+    private TabelaModelo_2<Cobranca> modeloTabelaCobrancasOriginais;
+    private TabelaModelo_2<Cobranca> modeloCobrancasGeradas;
 
     /** Creates new form TelaLancamentos */
     public TelaLancamentos(Condominio condominio) {
@@ -91,6 +97,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         carregarTabelaCobranca();
         carregarDateField();
         verificarMensagens();
+
+        painelDetalheAcordo.setVisible(false);
 
         if (condominio != null) {
             this.setTitle("Cobranças - " + condominio.getRazaoSocial());
@@ -299,11 +307,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         for (Unidade u : condominio.getUnidades()) {
             for (Cobranca c : u.getCobrancas()) {
                 if (modeloTabelaCondominos.getObjetoSelecionado() == null) {
-                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1) {
+                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1 && c.isExibir()) {
                         listaInadimplentes.add(c);
                     }
                 } else {
-                    if (c.getUnidade().getCodigo() == modeloTabelaCondominos.getObjetoSelecionado().getCodigo() && c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1) {
+                    if (c.getUnidade().getCodigo() == modeloTabelaCondominos.getObjetoSelecionado().getCodigo() && c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1 && c.isExibir()) {
                         listaInadimplentes.add(c);
                     }
                 }
@@ -819,7 +827,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             c.setValorPago(r.getValorPago().bigDecimalValue());
 
             new DAO().salvar(c);
-            atualizarCondominio(c);
+            atualizarCobrancasCondominio(c);
         }
     }
 
@@ -834,7 +842,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         return pagamento;
     }
 
-    private void atualizarCondominio(Cobranca c) {
+    private void atualizarCobrancasCondominio(Cobranca c) {
         if (c.getUnidade().getCondominio().getCodigo() == condominio.getCodigo()) {
             for (Unidade u : condominio.getUnidades()) {
                 if (c.getUnidade().getCodigo() == u.getCodigo()) {
@@ -940,10 +948,334 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     c.setLancadoCaixa(true);
                 }
                 new DAO().salvar(c);
-                atualizarCondominio(c);
+                atualizarCobrancasCondominio(c);
             }
         }
         ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
+    }
+
+    private void efetuarAcordo(List<Cobranca> lista) {
+        Moeda valorTotalCobrancas = new Moeda();
+        AcordoCobranca acordo = new AcordoCobranca();
+
+        DialogoDadosAcordo dialogo = new DialogoDadosAcordo(null, true);
+        dialogo.setVisible(true);
+
+        if (dialogo.getForma() != null && dialogo.getNumeroParcelas() >= 1) {
+
+            for (Cobranca co : lista) {
+                valorTotalCobrancas = valorTotalCobrancas.soma(co.getValorTotal());
+                co.setExibir(false);
+                co.setHistorico(acordo.getHistorico());
+                acordo.getHistorico().getCobrancasOriginais().add(co);
+            }
+
+            acordo.setValor(valorTotalCobrancas.bigDecimalValue());
+
+            System.out.println("Total Cobranças: " + PagamentoUtil.formatarMoeda(valorTotalCobrancas.doubleValue()));
+
+            System.out.println("Forma Pagamento: " + dialogo.getForma().name());
+            System.out.println("Número Parcelas: " + dialogo.getNumeroParcelas());
+            System.out.println("Data primeiro pagamento: " + DataUtil.toString(dialogo.getDataPrimeiroPagamento()));
+            acordo.setDataPrimeiroPagamento(DataUtil.getCalendar(dialogo.getDataPrimeiroPagamento()));
+            acordo.setForma(dialogo.getForma());
+            acordo.setNumeroParcelas(dialogo.getNumeroParcelas());
+            acordo.setCobrancasGeradas(new ArrayList<Cobranca>());
+            gerarCobrancasAcordo(acordo);
+            System.out.println(acordo.getUnidade().getCondominio().getRazaoSocial() + " - Unidade " + acordo.getUnidade().getUnidade());
+            new DAO().salvar(acordo);
+            carregarTabelaInadimplentes();
+            atualizarAcordosCondominio(acordo);
+        }
+
+        System.out.println("lista originais: " + acordo.getHistorico().getCobrancasOriginais().size());
+        System.out.println("lista gerada: " + acordo.getCobrancasGeradas().size());
+
+        new DAO().salvar(lista);
+    }
+
+    private void gerarCobrancasAcordo(AcordoCobranca ac) {
+        Unidade u = modeloTabelaCondominos.getObjetoSelecionado();
+        for (int i = 0; i < ac.getNumeroParcelas(); i++) {
+            Cobranca cobranca = new Cobranca();
+            cobranca.setUnidade(u);
+            cobranca.setValorTotal(new BigDecimal(0));
+            cobranca.setValorOriginal(new BigDecimal(0));
+            cobranca.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(ac.getDataPrimeiroPagamento()).plusMonths(i)));
+            cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimento.getValue())));
+            gerarPagamentosCobrancasAcordo(ac, cobranca, i);
+            u.getCobrancas().add(cobranca);
+            cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
+            cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+            ac.getCobrancasGeradas().add(cobranca);
+            cobranca.setAcordo(ac);
+        }
+        ac.setUnidade(u);
+    }
+
+    private void gerarPagamentosCobrancasAcordo(AcordoCobranca ac, Cobranca cobranca, int i) {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(ac.getDataPrimeiroPagamento()).plusMonths(i)));
+        pagamento.setCobranca(cobranca);
+        pagamento.setConta(new DAO().localizar(Conta.class, 41102));
+        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+        pagamento.setValor(ac.getValor());
+        pagamento.setValor(new Moeda(pagamento.getValor().doubleValue() / (ac.getNumeroParcelas())).bigDecimalValue());
+        cobranca.getPagamentos().add(pagamento);
+        cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
+        cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+        System.out.println("Pagamento " + (i + 1) + " - valor: " + PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+    }
+
+    private void carregarTabelaAcordo() {
+        modeloTabelaAcordo = new TabelaModelo_2<AcordoCobranca>(tabelaAcordo, "Unidade, Forma Pgto., Parcelas, Valor".split(",")) {
+
+            @Override
+            protected List<AcordoCobranca> getCarregarObjetos() {
+                return getAcordos();
+            }
+
+            @Override
+            public Object getValor(AcordoCobranca acordo, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return acordo.getUnidade().getUnidade();
+                    case 1:
+                        return acordo.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA ? "À vista" : "Parcelado";
+                    case 2:
+                        return acordo.getNumeroParcelas();
+                    case 3:
+                        return PagamentoUtil.formatarMoeda(acordo.getValor().doubleValue());
+//                    case 4:
+//                        return cobranca.getNumeroDocumento();
+//                    case 5:
+//                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
+//                    case 6:
+//                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
+//                    case 7:
+//                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
+//                    case 8:
+//                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+//                    case 9:
+//                        return cobranca.getLinhaDigitavel();
+                    default:
+                        return null;
+                }
+            }
+        };
+
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaAcordo.getColumn(modeloTabelaAcordo.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(new RenderizadorCelulaCentralizada());
+//
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setMaxWidth(50);
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(1)).setMinWidth(250);
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(3)).setMinWidth(85);
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setMinWidth(80);
+//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setMinWidth(265);
+
+//        tabelaInadimplentes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+    }
+
+    private void atualizarAcordosCondominio(AcordoCobranca a) {
+        if (a.getUnidade().getCondominio().getCodigo() == condominio.getCodigo()) {
+            for (Unidade u : condominio.getUnidades()) {
+                if (a.getUnidade().getCodigo() == u.getCodigo()) {
+                    List<AcordoCobranca> acordos = new DAO().listar("AcordosPorUnidade", u);
+                    for (AcordoCobranca ac : acordos) {
+                        if (ac.getCodigo() == a.getCodigo()) {
+                            ac = a;
+                        }
+                    }
+                    u.setAcordos(acordos);
+                }
+            }
+        }
+    }
+
+    private List<AcordoCobranca> getAcordos() {
+        listaAcordos = new ArrayList<AcordoCobranca>();
+        for (Unidade u : condominio.getUnidades()) {
+            for (AcordoCobranca ac : u.getAcordos()) {
+                if (modeloTabelaCondominos.getObjetoSelecionado() == null) {
+                    listaAcordos.add(ac);
+                } else {
+                    if (ac.getUnidade().getCodigo() == modeloTabelaCondominos.getObjetoSelecionado().getCodigo()) {
+                        listaAcordos.add(ac);
+                    }
+                }
+            }
+        }
+        return listaAcordos;
+    }
+
+    private void exibirPainelDetalheAcordo() {
+        painelDetalheAcordo.setVisible(true);
+        carregarTabelaCobrancasOriginais();
+        carregarTabelaCobrancasgeradas();
+    }
+
+    private void esconderPainelDetalheAcordo() {
+        painelDetalheAcordo.setVisible(false);
+    }
+
+    private void carregarTabelaCobrancasOriginais() {
+        modeloTabelaCobrancasOriginais = new TabelaModelo_2<Cobranca>(tabelaCobrancasOriginais, "Unidade, Condominio, Vencimento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+
+            @Override
+            protected List<Cobranca> getCarregarObjetos() {
+                return getCobrancasOriginais();
+            }
+
+            @Override
+            public Object getValor(Cobranca cobranca, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return cobranca.getUnidade().getUnidade();
+                    case 1:
+                        return cobranca.getUnidade().getCondominio().getRazaoSocial();
+                    case 2:
+                        return DataUtil.getDateTime(cobranca.getDataVencimento());
+                    case 3:
+                        return cobranca.getNumeroDocumento();
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
+                    case 5:
+                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
+                    case 6:
+                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
+                    case 7:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+                    case 8:
+                        return cobranca.getLinhaDigitavel();
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(8)).setCellRenderer(new RenderizadorCelulaCentralizada());
+
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(0)).setMaxWidth(50);
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(1)).setMinWidth(250);
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(4)).setMinWidth(80);
+        tabelaCobrancasOriginais.getColumn(modeloTabelaCobrancasOriginais.getCampo(8)).setMinWidth(265);
+
+        tabelaCobrancasOriginais.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+    }
+
+    private List<Cobranca> getCobrancasOriginais() {
+        List<Cobranca> listaCobrancasOriginais = modeloTabelaAcordo.getObjetoSelecionado().getHistorico().getCobrancasOriginais();
+        return listaCobrancasOriginais;
+    }
+
+    private void carregarTabelaCobrancasgeradas() {
+        modeloCobrancasGeradas = new TabelaModelo_2<Cobranca>(tabelaCobrancasGeradas, "Unidade, Condominio, Vencimento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+
+            @Override
+            protected List<Cobranca> getCarregarObjetos() {
+                return getCobrancasGeradas(modeloTabelaAcordo.getObjetoSelecionado());
+            }
+
+            @Override
+            public Object getValor(Cobranca cobranca, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return cobranca.getUnidade().getUnidade();
+                    case 1:
+                        return cobranca.getUnidade().getCondominio().getRazaoSocial();
+                    case 2:
+                        return DataUtil.getDateTime(cobranca.getDataVencimento());
+                    case 3:
+                        return cobranca.getNumeroDocumento();
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
+                    case 5:
+                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
+                    case 6:
+                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
+                    case 7:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+                    case 8:
+                        return cobranca.getLinhaDigitavel();
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(8)).setCellRenderer(new RenderizadorCelulaCentralizada());
+
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(0)).setMaxWidth(50);
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(1)).setMinWidth(250);
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(4)).setMinWidth(80);
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(8)).setMinWidth(265);
+
+        tabelaCobrancasGeradas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+    }
+
+    private void removerAcordo() {
+        if (!ApresentacaoUtil.perguntar("Desejar remover o(s) acordo(s)?", this)) {
+            return;
+        }
+        if (modeloTabelaAcordo.getLinhaSelecionada() > -1) {
+            System.out.println("removendo... " + modeloTabelaAcordo.getLinhasSelecionadas());
+            List<AcordoCobranca> itensRemover = modeloTabelaAcordo.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (AcordoCobranca ac : itensRemover) {
+                    modeloTabelaAcordo.remover(ac);
+                    for (Unidade u : condominio.getUnidades()) {
+                        if (ac.getUnidade().getCodigo() == u.getCodigo()) {
+                            u.getAcordos().remove(ac);
+                        }
+                    }
+                    for (Cobranca co : ac.getHistorico().getCobrancasOriginais()) {
+                        if (co.getAcordo() != null) {
+                            co.setAcordo(null);
+                        }
+                        if (co.getHistorico() != null) {
+                            co.setHistorico(null);
+                        }
+                        co.setExibir(true);
+                        new DAO().salvar(co);
+                        atualizarCobrancasCondominio(co);
+                    }
+                    new DAO().remover(ac);
+                    for (Cobranca c : ac.getCobrancasGeradas()){
+                        atualizarCobrancasCondominio(c);
+                    }
+                }
+            }
+            esconderPainelDetalheAcordo();
+            ApresentacaoUtil.exibirInformacao("Acordo(s) removido(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+
+    }
+
+    private List<Cobranca> getCobrancasGeradas(AcordoCobranca acordo) {
+        List<Cobranca> lista = acordo.getCobrancasGeradas();
+        return lista;
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -972,6 +1304,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             btnLerArquivoRetorno.addActionListener(this);
             btnConfirmar.addActionListener(this);
             btnSalvarMensagem.addActionListener(this);
+            btnEfetuarAcordo.addActionListener(this);
+            btnEsconderPainel.addActionListener(this);
+            tabelaAcordo.addMouseListener(this);
+            itemMenuExibirDetalheAcordo.addActionListener(this);
+            itemMenuRemoverAcordo.addActionListener(this);
         }
 
         @Override
@@ -1035,6 +1372,22 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Selecione a(s) cobrança(s) que deseja lançar no caixa.", TelaLancamentos.this);
                 }
+            } else if (origem == btnEfetuarAcordo) {
+                if (modeloTabelaCondominos.getObjetosSelecionados().size() == 1) {
+                    if (modeloTabelaInadimplentes.getObjetosSelecionados().size() >= 2) {
+                        efetuarAcordo(modeloTabelaInadimplentes.getObjetosSelecionados());
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Selecione 2 cobranças, no mínimo.", TelaLancamentos.this);
+                    }
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", TelaLancamentos.this);
+                }
+            } else if (origem == itemMenuExibirDetalheAcordo) {
+                exibirPainelDetalheAcordo();
+            } else if (origem == btnEsconderPainel) {
+                esconderPainelDetalheAcordo();
+            } else if (origem == itemMenuRemoverAcordo) {
+                removerAcordo();
             }
         }
 
@@ -1052,6 +1405,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
                 }
+            } else if (e.isPopupTrigger() && e.getSource() == tabelaAcordo) {
+                popupMenuAcordo.show(e.getComponent(), e.getX(), e.getY());
             }
         }
 
@@ -1071,6 +1426,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     limparSelecoesTabelas();
                 } else if (jTabbedPane1.getSelectedIndex() == 4) {
                     preencherPainelMensagens();
+                } else if (jTabbedPane1.getSelectedIndex() == 5) {
+                    carregarTabelaAcordo();
                 }
             } else if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
                 ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
@@ -1098,6 +1455,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
+        popupMenuAcordo = new javax.swing.JPopupMenu();
+        itemMenuExibirDetalheAcordo = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        itemMenuRemoverAcordo = new javax.swing.JMenuItem();
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
@@ -1122,6 +1483,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         txtVencimentoProrrogado = new net.sf.nachocalendar.components.DateField();
         btnImprimirBoletoInadimplente = new javax.swing.JButton();
+        btnEfetuarAcordo = new javax.swing.JButton();
         painelPagos = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         tabelaPagos = new javax.swing.JTable();
@@ -1155,6 +1517,17 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         txtMensagem7 = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         txtMensagem8 = new javax.swing.JTextField();
+        jPanel7 = new javax.swing.JPanel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        tabelaAcordo = new javax.swing.JTable();
+        painelDetalheAcordo = new javax.swing.JPanel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tabelaCobrancasOriginais = new javax.swing.JTable();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        tabelaCobrancasGeradas = new javax.swing.JTable();
+        btnEsconderPainel = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
 
         itemMenuMudarAltura.setText("Mudar altura");
@@ -1175,6 +1548,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
         popupMenuPagos.add(itemMenuLancarNoCaixa);
+
+        itemMenuExibirDetalheAcordo.setText("Exibir Detalhes");
+        popupMenuAcordo.add(itemMenuExibirDetalheAcordo);
+        popupMenuAcordo.add(jSeparator2);
+
+        itemMenuRemoverAcordo.setText("Remover Selecionado(s)");
+        itemMenuRemoverAcordo.setActionCommand("Remover Selecionado(s)");
+        popupMenuAcordo.add(itemMenuRemoverAcordo);
 
         setClosable(true);
         setTitle("Cobranças");
@@ -1357,6 +1738,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         btnImprimirBoletoInadimplente.setText("Imprimir Boleto");
 
+        btnEfetuarAcordo.setText("Fazer Acordo");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -1366,26 +1749,23 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtVencimentoProrrogado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(356, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(222, 222, 222)
-                    .addComponent(btnImprimirBoletoInadimplente)
-                    .addContainerGap(222, Short.MAX_VALUE)))
+                .addGap(33, 33, 33)
+                .addComponent(btnImprimirBoletoInadimplente)
+                .addGap(18, 18, 18)
+                .addComponent(btnEfetuarAcordo)
+                .addContainerGap(105, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtVencimentoProrrogado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addContainerGap(13, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(8, 8, 8)
-                    .addComponent(btnImprimirBoletoInadimplente)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel4)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnImprimirBoletoInadimplente)
+                        .addComponent(btnEfetuarAcordo))
+                    .addComponent(txtVencimentoProrrogado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(8, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout painelInadimplentesLayout = new javax.swing.GroupLayout(painelInadimplentes);
@@ -1395,17 +1775,17 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelInadimplentesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelInadimplentesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
                 .addContainerGap())
         );
         painelInadimplentesLayout.setVerticalGroup(
             painelInadimplentesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelInadimplentesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1662,6 +2042,114 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Mensagens", jPanel4);
 
+        tabelaAcordo.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaAcordo.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane7.setViewportView(tabelaAcordo);
+
+        painelDetalheAcordo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        tabelaCobrancasOriginais.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane8.setViewportView(tabelaCobrancasOriginais);
+
+        jLabel5.setText("Cobranças Originais");
+
+        jLabel14.setText("Cobranças Geradas");
+
+        tabelaCobrancasGeradas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane9.setViewportView(tabelaCobrancasGeradas);
+
+        btnEsconderPainel.setText("Fechar");
+
+        javax.swing.GroupLayout painelDetalheAcordoLayout = new javax.swing.GroupLayout(painelDetalheAcordo);
+        painelDetalheAcordo.setLayout(painelDetalheAcordoLayout);
+        painelDetalheAcordoLayout.setHorizontalGroup(
+            painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
+                .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(jLabel14)))
+                    .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
+                        .addGap(242, 242, 242)
+                        .addComponent(btnEsconderPainel))
+                    .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(jLabel5))))
+                .addContainerGap())
+        );
+        painelDetalheAcordoLayout.setVerticalGroup(
+            painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
+                .addGap(11, 11, 11)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnEsconderPainel)
+                .addContainerGap())
+        );
+
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        jPanel7.setLayout(jPanel7Layout);
+        jPanel7Layout.setHorizontalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(painelDetalheAcordo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 547, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+        jPanel7Layout.setVerticalGroup(
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(painelDetalheAcordo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Acordo", jPanel7);
+
         btnLimpar.setText("Limpar Seleção");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -1697,6 +2185,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConfirmar;
+    private javax.swing.JButton btnEfetuarAcordo;
+    private javax.swing.JButton btnEsconderPainel;
     private javax.swing.JButton btnGerarCobranca;
     private javax.swing.JButton btnImprimirBoleto;
     private javax.swing.JButton btnImprimirBoletoInadimplente;
@@ -1706,17 +2196,21 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuBaixaManual;
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
+    private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuMudarAltura;
+    private javax.swing.JMenuItem itemMenuRemoverAcordo;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -1727,27 +2221,37 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelBoletos;
     private javax.swing.JPanel painelCobrancaBase;
     private javax.swing.JPanel painelCondominos;
+    private javax.swing.JPanel painelDetalheAcordo;
     private javax.swing.JPanel painelInadimplentes;
     private javax.swing.JPanel painelLancamentos;
     private javax.swing.JPanel painelMensagem;
     private javax.swing.JPanel painelPagos;
     private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JPopupMenu popupMenuAcordo;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
     private javax.swing.JPopupMenu popupMenuPagos;
+    private javax.swing.JTable tabelaAcordo;
     private javax.swing.JTable tabelaArquivoRetorno;
     private javax.swing.JTable tabelaCobrancas;
     private javax.swing.JTable tabelaCobrancasBase;
+    private javax.swing.JTable tabelaCobrancasGeradas;
+    private javax.swing.JTable tabelaCobrancasOriginais;
     private javax.swing.JTable tabelaCondominos;
     private javax.swing.JTable tabelaInadimplentes;
     private javax.swing.JTable tabelaPagos;

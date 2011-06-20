@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio;
 
+import condominioPlus.negocio.cobranca.AcordoCobranca;
 import condominioPlus.negocio.cobranca.Cobranca;
 import java.io.Serializable;
 import java.util.List;
@@ -66,6 +67,8 @@ public class Unidade implements Serializable {
     private boolean hasInquilino;
     @OneToMany(mappedBy = "unidade", cascade = CascadeType.ALL)
     private List<Cobranca> cobrancas;
+    @OneToMany(mappedBy = "unidade", cascade = CascadeType.ALL)
+    private List<AcordoCobranca> acordos;
 
     public Unidade() {
     }
@@ -232,6 +235,14 @@ public class Unidade implements Serializable {
 
     public void setCobrancas(List<Cobranca> cobrancas) {
         this.cobrancas = cobrancas;
+    }
+
+    public List<AcordoCobranca> getAcordos() {
+        return acordos;
+    }
+
+    public void setAcordos(List<AcordoCobranca> acordos) {
+        this.acordos = acordos;
     }
 
     @Override

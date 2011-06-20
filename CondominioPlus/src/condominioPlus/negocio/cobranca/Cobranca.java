@@ -71,6 +71,11 @@ public class Cobranca implements Serializable {
     private String linhaDigitavel;
     @Column(name="lancado_caixa")
     private boolean lancadoCaixa;
+    @ManyToOne
+    private AcordoCobranca acordo;
+    @ManyToOne
+    private HistoricoAcordo historico;
+    private boolean exibir = true;
 
     public int getCodigo() {
         return codigo;
@@ -199,4 +204,29 @@ public class Cobranca implements Serializable {
     public void setLancadoCaixa(boolean lancadoCaixa) {
         this.lancadoCaixa = lancadoCaixa;
     }
+
+    public AcordoCobranca getAcordo() {
+        return acordo;
+    }
+
+    public void setAcordo(AcordoCobranca acordo) {
+        this.acordo = acordo;
+    }
+
+    public HistoricoAcordo getHistorico() {
+        return historico;
+    }
+
+    public void setHistorico(HistoricoAcordo historico) {
+        this.historico = historico;
+    }
+
+    public boolean isExibir() {
+        return exibir;
+    }
+
+    public void setExibir(boolean exibir) {
+        this.exibir = exibir;
+    }
+    
 }
