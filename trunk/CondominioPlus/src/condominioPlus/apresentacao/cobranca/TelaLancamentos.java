@@ -244,6 +244,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             }
         }
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(listaCobrancas, c);
+
         return listaCobrancas;
     }
 
@@ -1178,6 +1192,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private List<Cobranca> getCobrancasOriginais() {
         List<Cobranca> listaCobrancasOriginais = modeloTabelaAcordo.getObjetoSelecionado().getHistorico().getCobrancasOriginais();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(listaCobrancasOriginais, c);
+
         return listaCobrancasOriginais;
     }
 
@@ -1260,7 +1288,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         atualizarCobrancasCondominio(co);
                     }
                     new DAO().remover(ac);
-                    for (Cobranca c : ac.getCobrancasGeradas()){
+                    for (Cobranca c : ac.getCobrancasGeradas()) {
                         atualizarCobrancasCondominio(c);
                     }
                 }
@@ -1275,6 +1303,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private List<Cobranca> getCobrancasGeradas(AcordoCobranca acordo) {
         List<Cobranca> lista = acordo.getCobrancasGeradas();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(lista, c);
+
         return lista;
     }
 
@@ -1554,7 +1596,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         popupMenuAcordo.add(jSeparator2);
 
         itemMenuRemoverAcordo.setText("Remover Selecionado(s)");
-        itemMenuRemoverAcordo.setActionCommand("Remover Selecionado(s)");
         popupMenuAcordo.add(itemMenuRemoverAcordo);
 
         setClosable(true);
@@ -1632,7 +1673,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCobrancaBase.setBorder(javax.swing.BorderFactory.createTitledBorder("Cobranças Base"));
 
-        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1664,7 +1705,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelBoletos.setBorder(javax.swing.BorderFactory.createTitledBorder("Boletos Gerados"));
 
-        tabelaCobrancas.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCobrancas.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCobrancas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2042,7 +2083,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Mensagens", jPanel4);
 
-        tabelaAcordo.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaAcordo.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaAcordo.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2058,6 +2099,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelDetalheAcordo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        tabelaCobrancasOriginais.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCobrancasOriginais.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2075,6 +2117,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel14.setText("Cobranças Geradas");
 
+        tabelaCobrancasGeradas.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCobrancasGeradas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
