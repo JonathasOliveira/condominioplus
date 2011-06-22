@@ -27,8 +27,8 @@ public class ParametrosCalculoAgua implements Serializable {
     private int codigo;
     private FormaCalculoMetroCubico formaMetroCubico;
     private FormaRateioAreaComum formaAreaComum;
-    @Column(name="quantidade_metros_cubicos_cota")
-    private int quantidadeMetrosCubicosNaCota;
+    @Column(precision = 20, scale = 2, name="quantidade_metros_cubicos_cota")
+    private BigDecimal quantidadeMetrosCubicosNaCota = new BigDecimal(0);
     @Column(precision = 20, scale = 2, name="valor_metro_cubico_sindico")
     private BigDecimal valorMetroCubicoSindico = new BigDecimal(0);
     @Column(precision = 20, scale = 2, name="valor_fixo_area_comum")
@@ -78,11 +78,11 @@ public class ParametrosCalculoAgua implements Serializable {
         this.hidrometroAreaComum = hidrometroAreaComum;
     }
 
-    public int getQuantidadeMetrosCubicosNaCota() {
+    public BigDecimal getQuantidadeMetrosCubicosNaCota() {
         return quantidadeMetrosCubicosNaCota;
     }
 
-    public void setQuantidadeMetrosCubicosNaCota(int quantidadeMetrosCubicosNaCota) {
+    public void setQuantidadeMetrosCubicosNaCota(BigDecimal quantidadeMetrosCubicosNaCota) {
         this.quantidadeMetrosCubicosNaCota = quantidadeMetrosCubicosNaCota;
     }
 

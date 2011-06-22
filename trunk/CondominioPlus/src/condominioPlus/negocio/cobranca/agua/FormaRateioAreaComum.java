@@ -19,7 +19,8 @@ public enum FormaRateioAreaComum {
     SEM_VALOR(""),
     PROPORCIONAL_CONSUMO("Proporcional ao Consumo"),
     PROPORCIONAL_FRACAO("Proporcional a Fração Ideal"),
-    IGUAL_TODOS("Igual para Todos");
+    IGUAL_TODOS("Igual para Todos"),
+    VALOR_FIXO("Valor Fixo");
     private String descricao = "";
 
     FormaRateioAreaComum(String descricao) {

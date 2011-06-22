@@ -8,6 +8,8 @@ package condominioPlus.negocio.cobranca.agua;
 import condominioPlus.negocio.Condominio;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -38,7 +40,7 @@ public class ContaAgua implements Serializable {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int codigo;
     @OneToMany(mappedBy="conta", cascade = CascadeType.ALL)
-    private List<Rateio> rateios;
+    private List<Rateio> rateios = new ArrayList<Rateio>();
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<Pipa> pipas;
     @Column(name="data_inicial")
@@ -48,28 +50,28 @@ public class ContaAgua implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataFinal;
     @Column(name="valor_prolagos")
-    private BigDecimal valorProlagos;
+    private BigDecimal valorProlagos = new BigDecimal(0);
     @Column(name="consumo_prolagos")
-    private BigDecimal consumoProlagos;
+    private BigDecimal consumoProlagos = new BigDecimal(0);
     @Column(name="valor_pipa")
-    private BigDecimal valorPipa;
+    private BigDecimal valorPipa = new BigDecimal(0);
     @Column(name="consumo_pipa")
     private BigDecimal consumoPipa;
     @Column(name="preco_metro_cubico")
-    private BigDecimal precoMetroCubico;
+    private BigDecimal precoMetroCubico = new BigDecimal(0);
     @Column(name="data_vencimento_conta")
     @Temporal(TemporalType.DATE)
     private Calendar dataVencimentoConta;
     @Column(name="consumo_unidades_metro_cubico")
     private BigDecimal consumoUnidadesMetroCubico;
     @Column(name="preco_total_unidades")
-    private BigDecimal precoTotalUnidades;
+    private BigDecimal precoTotalUnidades = new BigDecimal(0);
     @Column(name="consumo_area_comum")
     private BigDecimal consumoAreaComum;
     @Column(name="preco_area_comum")
-    private BigDecimal precoAreaComum;
+    private BigDecimal precoAreaComum = new BigDecimal(0);
     @Column(name="total_despesas")
-    private BigDecimal totalDespesas;
+    private BigDecimal totalDespesas = new BigDecimal(0);
     @ManyToOne
     private Condominio condominio;
 

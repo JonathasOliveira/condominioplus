@@ -33,16 +33,16 @@ public class Rateio implements Serializable {
     private BigDecimal leituraAtual;
     @Column(name = "consumo_metro_cubico", precision = 20, scale = 3)
     private BigDecimal consumoMetroCubico;
-    @Column(name = "consumo_em_dinheiro", precision = 20, scale = 2)
-    private BigDecimal consumoEmDinheiro;
+    @Column(name = "consumo_metro_cubico_cobrar", precision = 20, scale = 3)
+    private BigDecimal consumoMetroCubicoACobrar;
     @Column(name = "valor_metro_cubico", precision = 20, scale = 2)
-    private BigDecimal valorDoMetroCubico;
+    private BigDecimal valorDoMetroCubico = new BigDecimal(0);
     @Column(name = "percentual_gasto", precision = 20, scale = 2)
     private BigDecimal percentualGasto;
     @Column(name = "valor_rateio_pipa", precision = 20, scale = 2)
-    private BigDecimal valorRateioPipa;
+    private BigDecimal valorRateioPipa = new BigDecimal(0);
     @Column(name = "valor_total_consumido", precision = 20, scale = 3)
-    private BigDecimal valorTotalConsumido;
+    private BigDecimal valorTotalConsumido = new BigDecimal(0);
     @Column(name = "percentual_rateio_area_comum", precision = 20, scale = 2)
     private BigDecimal percentualRateioAreaComum;
     @Column(name = "consumo_metro_cubico_area_comum", precision = 20, scale = 3)
@@ -50,9 +50,16 @@ public class Rateio implements Serializable {
     @Column(name = "consumo_dinheiro_area_comum", precision = 20, scale = 2)
     private BigDecimal consumoEmDinheiroAreaComum;
     @Column(name = "valor_total_cobrar", precision = 20, scale = 2)
-    private BigDecimal valorTotalCobrar;
+    private BigDecimal valorTotalCobrar = new BigDecimal(0);
     @ManyToOne
     private ContaAgua conta;
+
+    public Rateio() {
+    }
+
+    public Rateio(Unidade unidade) {
+        this.unidade = unidade;
+    }
 
     public ContaAgua getConta() {
         return conta;
@@ -70,12 +77,12 @@ public class Rateio implements Serializable {
         this.codigo = codigo;
     }
 
-    public BigDecimal getConsumoEmDinheiro() {
-        return consumoEmDinheiro;
+    public BigDecimal getConsumoMetroCubicoACobrar() {
+        return consumoMetroCubicoACobrar;
     }
 
-    public void setConsumoEmDinheiro(BigDecimal consumoEmDinheiro) {
-        this.consumoEmDinheiro = consumoEmDinheiro;
+    public void setConsumoMetroCubicoACobrar(BigDecimal consumoMetroCubicoACobrar) {
+        this.consumoMetroCubicoACobrar = consumoMetroCubicoACobrar;
     }
 
     public BigDecimal getConsumoEmDinheiroAreaComum() {
