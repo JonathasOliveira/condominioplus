@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ContaCorrente;
+import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
@@ -119,7 +120,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     case 0:
                         return DataUtil.getDateTime(pagamento.getDataPagamento());
                     case 1:
-                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
+                        return getFormaPagamento(pagamento);
                     case 2:
                         return pagamento.getConta().getCodigo();
                     case 3:
@@ -147,7 +148,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     return false;
                 }
             }
-         
         };
 
         renderizadorCelulaCor = new RenderizadorCelulaCor(modeloTabela);
@@ -163,6 +163,16 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(300);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
 
+    }
+
+    private String getFormaPagamento(Pagamento p) {
+        if (p.getForma() == FormaPagamento.BOLETO) {
+            return ((DadosBoleto) p.getDadosPagamento()).getNumeroBoleto();
+        } else if (p.getForma() == FormaPagamento.CHEQUE) {
+            return String.valueOf(((DadosCheque) p.getDadosPagamento()).getNumero());
+        } else {
+            return String.valueOf(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento());
+        }
     }
 
     private void carregarComboFiltro() {
