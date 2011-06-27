@@ -872,7 +872,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
-    public void efetuarBaixaManual() {
+    public void efetuarBaixaManual(Cobranca c) {
         DialogoBaixaManual dialogo = new DialogoBaixaManual(null, true);
         dialogo.setVisible(true);
 
@@ -884,10 +884,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         System.out.println("valor: " + PagamentoUtil.formatarMoeda(dialogo.getValorPago().doubleValue()));
 
         RegistroTransacao registro = new RegistroTransacao();
-        registro.setCobranca(modeloTabelaBoleto.getObjetoSelecionado());
+        registro.setCobranca(c);
         registro.setData(dialogo.getDataPagamento());
         registro.setValorPago(new Moeda(dialogo.getValorPago()));
-        registro.setValorTitulo(new Moeda(registro.getCobranca().getValorTotal()));
+        registro.setValorTitulo(new Moeda(c.getValorTotal()));
         registro.setDocumento(registro.getCobranca().getNumeroDocumento());
 
         boolean setContaCorrente = true;
@@ -1060,39 +1060,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return acordo.getNumeroParcelas();
                     case 3:
                         return PagamentoUtil.formatarMoeda(acordo.getValor().doubleValue());
-//                    case 4:
-//                        return cobranca.getNumeroDocumento();
-//                    case 5:
-//                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
-//                    case 6:
-//                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
-//                    case 7:
-//                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
-//                    case 8:
-//                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
-//                    case 9:
-//                        return cobranca.getLinhaDigitavel();
                     default:
                         return null;
                 }
             }
         };
 
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaAcordo.getColumn(modeloTabelaAcordo.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(new RenderizadorCelulaCentralizada());
-//
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setMaxWidth(50);
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(1)).setMinWidth(250);
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(3)).setMinWidth(85);
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setMinWidth(80);
-//        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setMinWidth(265);
-
-//        tabelaInadimplentes.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     }
 
@@ -1260,6 +1234,25 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaCobrancasGeradas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     }
+    
+    private List<Cobranca> getCobrancasGeradas(AcordoCobranca acordo) {
+        List<Cobranca> lista = acordo.getCobrancasGeradas();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(lista, c);
+
+        return lista;
+    }
 
     private void removerAcordo() {
         if (!ApresentacaoUtil.perguntar("Desejar remover o(s) acordo(s)?", this)) {
@@ -1269,7 +1262,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             System.out.println("removendo... " + modeloTabelaAcordo.getLinhasSelecionadas());
             List<AcordoCobranca> itensRemover = modeloTabelaAcordo.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
+                ACORDO:
                 for (AcordoCobranca ac : itensRemover) {
+                    for (Cobranca cg : ac.getCobrancasGeradas()){
+                        if (cg.getDataPagamento() != null){
+                            ApresentacaoUtil.exibirAdvertencia("Não foi possível deletar esse acordo, pois já existem pagamentos para o mesmo.", this);
+                            continue ACORDO;
+                        }
+                    }
                     modeloTabelaAcordo.remover(ac);
                     for (Unidade u : condominio.getUnidades()) {
                         if (ac.getUnidade().getCodigo() == u.getCodigo()) {
@@ -1277,9 +1277,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         }
                     }
                     for (Cobranca co : ac.getHistorico().getCobrancasOriginais()) {
-                        if (co.getAcordo() != null) {
-                            co.setAcordo(null);
-                        }
                         if (co.getHistorico() != null) {
                             co.setHistorico(null);
                         }
@@ -1299,25 +1296,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
 
-    }
-
-    private List<Cobranca> getCobrancasGeradas(AcordoCobranca acordo) {
-        List<Cobranca> lista = acordo.getCobrancasGeradas();
-
-        Comparator c = null;
-
-        c = new Comparator() {
-
-            public int compare(Object o1, Object o2) {
-                Cobranca e1 = (Cobranca) o1;
-                Cobranca e2 = (Cobranca) o2;
-                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
-            }
-        };
-
-        Collections.sort(lista, c);
-
-        return lista;
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -1402,9 +1380,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 baixarVariasCobrancas();
             } else if (origem == btnSalvarMensagem) {
                 salvarMensagens();
-            } else if (origem == itemMenuBaixaManual || origem == itemMenuBaixaManualInadimplente) {
+            } else if (origem == itemMenuBaixaManual) {
                 if (modeloTabelaBoleto.getObjetosSelecionados().size() == 1) {
-                    efetuarBaixaManual();
+                    efetuarBaixaManual(modeloTabelaBoleto.getObjetoSelecionado());
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Selecione a cobrança que deseja baixar.", TelaLancamentos.this);
+                }
+            } else if (origem == itemMenuBaixaManualInadimplente) {
+                if (modeloTabelaInadimplentes.getObjetosSelecionados().size() == 1) {
+                    efetuarBaixaManual(modeloTabelaInadimplentes.getObjetoSelecionado());
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Selecione a cobrança que deseja baixar.", TelaLancamentos.this);
                 }
@@ -1470,6 +1454,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     preencherPainelMensagens();
                 } else if (jTabbedPane1.getSelectedIndex() == 5) {
                     carregarTabelaAcordo();
+                    painelDetalheAcordo.setVisible(false);
                 }
             } else if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
                 ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
