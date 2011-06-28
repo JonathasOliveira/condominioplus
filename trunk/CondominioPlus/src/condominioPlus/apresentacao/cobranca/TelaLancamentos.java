@@ -227,6 +227,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(8)).setCellRenderer(new RenderizadorCelulaCentralizada());
+        tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(9)).setCellRenderer(new RenderizadorCelulaADireita());
 
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(0)).setMaxWidth(50);
         tabelaCobrancas.getColumn(modeloTabelaBoleto.getCampo(1)).setMinWidth(250);
@@ -309,6 +310,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(new RenderizadorCelulaCentralizada());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(9)).setCellRenderer(new RenderizadorCelulaADireita());
 
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setMaxWidth(50);
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(1)).setMinWidth(250);
