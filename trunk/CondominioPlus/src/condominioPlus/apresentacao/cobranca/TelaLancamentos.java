@@ -184,7 +184,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaCobranca() {
-        modeloTabelaBoleto = new TabelaModelo_2<Cobranca>(tabelaCobrancas, "Unidade, Condominio, Vencimento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+        modeloTabelaBoleto = new TabelaModelo_2<Cobranca>(tabelaCobrancas, "Unidade, Condominio, Vencimento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável, Acordo ".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -212,6 +212,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
                     case 8:
                         return cobranca.getLinhaDigitavel();
+                    case 9:
+                        return cobranca.getAcordo() != null ? cobranca.getAcordo().getCodigo() : "";
                     default:
                         return null;
                 }
@@ -262,7 +264,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaInadimplentes() {
-        modeloTabelaInadimplentes = new TabelaModelo_2<Cobranca>(tabelaInadimplentes, "Unidade, Condominio, Vencimento, V. Prorrogado, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+        modeloTabelaInadimplentes = new TabelaModelo_2<Cobranca>(tabelaInadimplentes, "Unidade, Condominio, Vencimento, V. Prorrogado, Documento, Valor Original, Juros, Multa, Total, Linha Digitável, Acordo ".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -292,6 +294,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
                     case 9:
                         return cobranca.getLinhaDigitavel();
+                    case 10:
+                        return cobranca.getAcordo() != null ? cobranca.getAcordo().getCodigo() : "";
                     default:
                         return null;
                 }
@@ -1105,7 +1109,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private void exibirPainelDetalheAcordo() {
         painelDetalheAcordo.setVisible(true);
         carregarTabelaCobrancasOriginais();
-        carregarTabelaCobrancasgeradas();
+        carregarTabelaCobrancasGeradas();
     }
 
     private void esconderPainelDetalheAcordo() {
@@ -1183,8 +1187,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         return listaCobrancasOriginais;
     }
 
-    private void carregarTabelaCobrancasgeradas() {
-        modeloCobrancasGeradas = new TabelaModelo_2<Cobranca>(tabelaCobrancasGeradas, "Unidade, Condominio, Vencimento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
+    private void carregarTabelaCobrancasGeradas() {
+        modeloCobrancasGeradas = new TabelaModelo_2<Cobranca>(tabelaCobrancasGeradas, "Unidade, Condominio, Vencimento, Pagamento, Documento, Valor Original, Juros, Multa, Total, Linha Digitável ".split(",")) {
 
             @Override
             protected List<Cobranca> getCarregarObjetos() {
@@ -1201,16 +1205,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 2:
                         return DataUtil.getDateTime(cobranca.getDataVencimento());
                     case 3:
-                        return cobranca.getNumeroDocumento();
+                        return DataUtil.getDateTime(cobranca.getDataPagamento());
                     case 4:
-                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
+                        return cobranca.getNumeroDocumento();
                     case 5:
-                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorOriginal().doubleValue());
                     case 6:
-                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
+                        return PagamentoUtil.formatarMoeda(cobranca.getJuros().doubleValue());
                     case 7:
-                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+                        return PagamentoUtil.formatarMoeda(cobranca.getMulta().doubleValue());
                     case 8:
+                        return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
+                    case 9:
                         return cobranca.getLinhaDigitavel();
                     default:
                         return null;
@@ -1219,22 +1225,22 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         };
 
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
-        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(7)).setCellRenderer(new RenderizadorCelulaADireita());
-        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(8)).setCellRenderer(new RenderizadorCelulaCentralizada());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(8)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(9)).setCellRenderer(new RenderizadorCelulaCentralizada());
 
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(0)).setMaxWidth(50);
         tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(1)).setMinWidth(250);
-        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(4)).setMinWidth(80);
-        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(8)).setMinWidth(265);
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(5)).setMinWidth(80);
+        tabelaCobrancasGeradas.getColumn(modeloCobrancasGeradas.getCampo(9)).setMinWidth(265);
 
         tabelaCobrancasGeradas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
     }
-    
+
     private List<Cobranca> getCobrancasGeradas(AcordoCobranca acordo) {
         List<Cobranca> lista = acordo.getCobrancasGeradas();
 
@@ -1264,8 +1270,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             if (!itensRemover.isEmpty()) {
                 ACORDO:
                 for (AcordoCobranca ac : itensRemover) {
-                    for (Cobranca cg : ac.getCobrancasGeradas()){
-                        if (cg.getDataPagamento() != null){
+                    for (Cobranca cg : ac.getCobrancasGeradas()) {
+                        if (cg.getDataPagamento() != null) {
                             ApresentacaoUtil.exibirAdvertencia("Não foi possível deletar esse acordo, pois já existem pagamentos para o mesmo.", this);
                             continue ACORDO;
                         }
