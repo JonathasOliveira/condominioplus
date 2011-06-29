@@ -1048,7 +1048,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaAcordo() {
-        modeloTabelaAcordo = new TabelaModelo_2<AcordoCobranca>(tabelaAcordo, "Unidade, Forma Pgto., Parcelas, Valor".split(",")) {
+        modeloTabelaAcordo = new TabelaModelo_2<AcordoCobranca>(tabelaAcordo, "Código, Unidade, Forma Pgto., Parcelas, Valor".split(",")) {
 
             @Override
             protected List<AcordoCobranca> getCarregarObjetos() {
@@ -1059,12 +1059,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             public Object getValor(AcordoCobranca acordo, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return acordo.getUnidade().getUnidade();
+                        return acordo.getCodigo();
                     case 1:
-                        return acordo.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA ? "À vista" : "Parcelado";
+                        return acordo.getUnidade().getUnidade();
                     case 2:
-                        return acordo.getNumeroParcelas();
+                        return acordo.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA ? "À vista" : "Parcelado";
                     case 3:
+                        return acordo.getNumeroParcelas();
+                    case 4:
                         return PagamentoUtil.formatarMoeda(acordo.getValor().doubleValue());
                     default:
                         return null;
@@ -1072,7 +1074,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        tabelaAcordo.getColumn(modeloTabelaAcordo.getCampo(3)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaAcordo.getColumn(modeloTabelaAcordo.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
 
     }
 
@@ -1268,13 +1270,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
         if (modeloTabelaAcordo.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modeloTabelaAcordo.getLinhasSelecionadas());
+            boolean removido = false;
             List<AcordoCobranca> itensRemover = modeloTabelaAcordo.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
                 ACORDO:
                 for (AcordoCobranca ac : itensRemover) {
                     for (Cobranca cg : ac.getCobrancasGeradas()) {
                         if (cg.getDataPagamento() != null) {
-                            ApresentacaoUtil.exibirAdvertencia("Não foi possível deletar esse acordo, pois já existem pagamentos para o mesmo.", this);
+                            ApresentacaoUtil.exibirAdvertencia("Não foi possível deletar o acordo " + ac.getCodigo() + ", pois já existem pagamentos efetuados.", this);
                             continue ACORDO;
                         }
                     }
@@ -1296,10 +1299,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     for (Cobranca c : ac.getCobrancasGeradas()) {
                         atualizarCobrancasCondominio(c);
                     }
+                    removido = true;
                 }
             }
-            esconderPainelDetalheAcordo();
-            ApresentacaoUtil.exibirInformacao("Acordo(s) removido(s) com sucesso!", this);
+            if (removido) {
+                esconderPainelDetalheAcordo();
+                ApresentacaoUtil.exibirInformacao("Acordo(s) removido(s) com sucesso!", this);
+            }
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
