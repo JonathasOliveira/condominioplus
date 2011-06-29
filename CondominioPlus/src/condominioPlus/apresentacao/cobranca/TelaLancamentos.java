@@ -1277,7 +1277,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 for (AcordoCobranca ac : itensRemover) {
                     for (Cobranca cg : ac.getCobrancasGeradas()) {
                         if (cg.getDataPagamento() != null) {
-                            ApresentacaoUtil.exibirAdvertencia("Não foi possível deletar o acordo " + ac.getCodigo() + ", pois já existem pagamentos efetuados.", this);
+                            ApresentacaoUtil.exibirAdvertencia("Não foi possível remover o acordo " + ac.getCodigo() + ", pois já existem pagamentos efetuados.", this);
                             continue ACORDO;
                         }
                     }
