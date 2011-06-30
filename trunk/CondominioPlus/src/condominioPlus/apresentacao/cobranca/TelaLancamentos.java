@@ -1414,10 +1414,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             } else if (origem == btnEfetuarAcordo) {
                 if (modeloTabelaCondominos.getObjetosSelecionados().size() == 1) {
-                    if (modeloTabelaInadimplentes.getObjetosSelecionados().size() >= 2) {
+                    if (modeloTabelaInadimplentes.getObjetosSelecionados().size() >= condominio.getNumeroMinimoParcelasAcordo()) {
                         efetuarAcordo(modeloTabelaInadimplentes.getObjetosSelecionados());
                     } else {
-                        ApresentacaoUtil.exibirAdvertencia("Selecione 2 cobranças, no mínimo.", TelaLancamentos.this);
+                        ApresentacaoUtil.exibirAdvertencia("Selecione " + condominio.getNumeroMinimoParcelasAcordo() + " cobranças, no mínimo.", TelaLancamentos.this);
                     }
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", TelaLancamentos.this);

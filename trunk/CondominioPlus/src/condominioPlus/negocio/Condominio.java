@@ -118,6 +118,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private BigDecimal desconto = new BigDecimal(0);
     @Column(name="calcular_multa_proximo_mes")
     private boolean calcularMultaProximoMes;
+    @Column(name="parcelas_acordo")
+    private int numeroMinimoParcelasAcordo;
 
     public Condominio() {
     }
@@ -482,6 +484,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setCalcularMultaProximoMes(boolean calcularMultaProximoMes) {
         this.calcularMultaProximoMes = calcularMultaProximoMes;
+    }
+
+    public int getNumeroMinimoParcelasAcordo() {
+        return numeroMinimoParcelasAcordo;
+    }
+
+    public void setNumeroMinimoParcelasAcordo(int numeroMinimoParcelasAcordo) {
+        this.numeroMinimoParcelasAcordo = numeroMinimoParcelasAcordo;
     }
     
 }
