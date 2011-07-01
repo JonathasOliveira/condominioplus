@@ -28,27 +28,27 @@ public class Rateio implements Serializable {
     @ManyToOne(cascade = CascadeType.ALL)
     private Unidade unidade;
     @Column(name = "leitura_anterior", precision = 20, scale = 3)
-    private BigDecimal leituraAnterior;
+    private BigDecimal leituraAnterior = new BigDecimal(0);
     @Column(name = "leitura_atual", precision = 20, scale = 3)
-    private BigDecimal leituraAtual;
+    private BigDecimal leituraAtual = new BigDecimal(0);
     @Column(name = "consumo_metro_cubico", precision = 20, scale = 3)
-    private BigDecimal consumoMetroCubico;
+    private BigDecimal consumoMetroCubico = new BigDecimal(0);
     @Column(name = "consumo_metro_cubico_cobrar", precision = 20, scale = 3)
-    private BigDecimal consumoMetroCubicoACobrar;
+    private BigDecimal consumoMetroCubicoACobrar = new BigDecimal(0);
     @Column(name = "valor_metro_cubico", precision = 20, scale = 2)
     private BigDecimal valorDoMetroCubico = new BigDecimal(0);
     @Column(name = "percentual_gasto", precision = 20, scale = 2)
-    private BigDecimal percentualGasto;
+    private BigDecimal percentualGasto = new BigDecimal(0);
     @Column(name = "valor_rateio_pipa", precision = 20, scale = 2)
     private BigDecimal valorRateioPipa = new BigDecimal(0);
     @Column(name = "valor_total_consumido", precision = 20, scale = 3)
     private BigDecimal valorTotalConsumido = new BigDecimal(0);
     @Column(name = "percentual_rateio_area_comum", precision = 20, scale = 2)
-    private BigDecimal percentualRateioAreaComum;
+    private BigDecimal percentualRateioAreaComum = new BigDecimal(0);
     @Column(name = "consumo_metro_cubico_area_comum", precision = 20, scale = 3)
-    private BigDecimal consumoMetroCubicoAreaComum;
+    private BigDecimal consumoMetroCubicoAreaComum = new BigDecimal(0);
     @Column(name = "consumo_dinheiro_area_comum", precision = 20, scale = 2)
-    private BigDecimal consumoEmDinheiroAreaComum;
+    private BigDecimal consumoEmDinheiroAreaComum = new BigDecimal(0);
     @Column(name = "valor_total_cobrar", precision = 20, scale = 2)
     private BigDecimal valorTotalCobrar = new BigDecimal(0);
     @ManyToOne

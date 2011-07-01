@@ -362,11 +362,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 if (rateio.getConsumoMetroCubicoACobrar().doubleValue() >= t.getConsumoInicial().doubleValue() && rateio.getConsumoMetroCubicoACobrar().doubleValue() <= t.getConsumoFinal().doubleValue()) {
                     System.out.println("rateio.getConsumoMetroCubicoACobrar " + rateio.getConsumoMetroCubicoACobrar().doubleValue());
                     System.out.println("t.getConsumoInicial " + t.getConsumoInicial().doubleValue());
-                    System.out.println("t.getConsumoFinal" + t.getConsumoFinal().doubleValue());
+                    System.out.println("t.getConsumoFinal " + t.getConsumoFinal().doubleValue());
 
                     rateio.setValorDoMetroCubico(t.getValor());
                     conta.setPrecoMetroCubico(t.getValor());
-                }else{
+                } else {
                     System.out.println("ferrou tudo meu irmao!");
                 }
             }
@@ -374,10 +374,25 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
-     private void verificarParametrosAreaComum(Rateio rateio) {
-        FormaCalculoMetroCubico parametro = condominio.getParametros().getFormaMetroCubico();
+    private void verificarParametrosAreaComum(Rateio rateio) {
+        FormaRateioAreaComum parametro = condominio.getParametros().getFormaAreaComum();
+
+        if (parametro == FormaRateioAreaComum.IGUAL_TODOS) {
+        } else if (parametro == FormaRateioAreaComum.NAO_COBRAR) {
+        } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_CONSUMO) {
+        } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_FRACAO) {
+        } else if (parametro == FormaRateioAreaComum.VALOR_FIXO) {
+        }
 
 
+    }
+
+    private void calcularPercentual(Rateio rateio){
+        if(modeloContaAgua.getObjetoSelecionado().getConsumoProlagos().intValue() > 0 ){
+            rateio.setPercentualGasto(rateio.getConsumoMetroCubico().multiply(new BigDecimal(100)).divide(modeloContaAgua.getObjetoSelecionado().getConsumoProlagos()));
+            System.out.println("vai la ver " + rateio.getPercentualGasto());
+        }
+        
     }
 
     private void calcular() {
@@ -407,6 +422,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 }
 
                 verificarParametrosMetroCubico(rateio);
+                calcularPercentual(rateio);
                 System.out.println("valor atualizado " + rateio.getConsumoMetroCubico());
             }
 
@@ -511,7 +527,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             return FormaRateioAreaComum.PROPORCIONAL_CONSUMO;
         } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.PROPORCIONAL_FRACAO.toString())) {
             return FormaRateioAreaComum.PROPORCIONAL_FRACAO;
-        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.VALOR_FIXO.toString())){
+        } else if (cbFormaRateioAreaComum.getSelectedItem().equals(FormaRateioAreaComum.VALOR_FIXO.toString())) {
             return FormaRateioAreaComum.VALOR_FIXO;
         }
 
