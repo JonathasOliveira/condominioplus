@@ -56,18 +56,18 @@ public class ContaAgua implements Serializable {
     @Column(name="valor_pipa")
     private BigDecimal valorPipa = new BigDecimal(0);
     @Column(name="consumo_pipa")
-    private BigDecimal consumoPipa;
+    private BigDecimal consumoPipa = new BigDecimal(0);
     @Column(name="preco_metro_cubico")
     private BigDecimal precoMetroCubico = new BigDecimal(0);
     @Column(name="data_vencimento_conta")
     @Temporal(TemporalType.DATE)
     private Calendar dataVencimentoConta;
     @Column(name="consumo_unidades_metro_cubico")
-    private BigDecimal consumoUnidadesMetroCubico;
+    private BigDecimal consumoUnidadesMetroCubico = new BigDecimal(0);
     @Column(name="preco_total_unidades")
     private BigDecimal precoTotalUnidades = new BigDecimal(0);
     @Column(name="consumo_area_comum")
-    private BigDecimal consumoAreaComum;
+    private BigDecimal consumoAreaComum = new BigDecimal(0);
     @Column(name="preco_area_comum")
     private BigDecimal precoAreaComum = new BigDecimal(0);
     @Column(name="total_despesas")
