@@ -285,15 +285,15 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 6:
                         return new Moeda(rateio.getValorDoMetroCubico());
                     case 7:
-                        return rateio.getPercentualGasto();
+                        return FormatadorNumeros.casasDecimais(2, rateio.getPercentualGasto());
                     case 8:
                         return rateio.getValorRateioPipa();
                     case 9:
                         return new Moeda(rateio.getValorTotalConsumido());
                     case 10:
-                        return rateio.getPercentualRateioAreaComum();
+                        return FormatadorNumeros.casasDecimais(2, rateio.getPercentualRateioAreaComum());
                     case 11:
-                        return rateio.getConsumoMetroCubicoAreaComum();
+                        return FormatadorNumeros.casasDecimais(3, rateio.getConsumoMetroCubicoAreaComum());
                     case 12:
                         return rateio.getConsumoEmDinheiroAreaComum();
                     case 13:
@@ -378,10 +378,16 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         FormaRateioAreaComum parametro = condominio.getParametros().getFormaAreaComum();
 
         if (parametro == FormaRateioAreaComum.IGUAL_TODOS) {
-        } else if (parametro == FormaRateioAreaComum.NAO_COBRAR) {
+            if (conta.getConsumoAreaComum().intValue() > 0) {
+                double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
+                rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
+            }
         } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_CONSUMO) {
         } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_FRACAO) {
         } else if (parametro == FormaRateioAreaComum.VALOR_FIXO) {
+            if (condominio.getParametros().getValorFixoAreaComum().intValue() > 0) {
+                rateio.setConsumoEmDinheiroAreaComum(condominio.getParametros().getValorFixoAreaComum());
+            }
         }
 
 
@@ -389,20 +395,34 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     private void calcularPercentual(Rateio rateio) {
         if (modeloContaAgua.getObjetoSelecionado().getConsumoProlagos().intValue() > 0) {
-            rateio.setPercentualGasto(rateio.getConsumoMetroCubico().multiply(new BigDecimal(100)).divide(modeloContaAgua.getObjetoSelecionado().getConsumoProlagos()));
+            BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubico().doubleValue() * 100)/ conta.getConsumoProlagos().doubleValue()));
+            rateio.setPercentualGasto(valor);
         }
     }
 
     private void calcularTotalConsumoUnidades() {
         List<Rateio> rateios = modeloContaAgua.getObjetoSelecionado().getRateios();
-        Moeda total =  new Moeda(BigDecimal.ZERO);
+        Moeda total = new Moeda(BigDecimal.ZERO);
+        BigDecimal totalDinheiro = new BigDecimal(0);
         for (Rateio rateio : rateios) {
-            System.out.println("rateio get consumo metro cubico "+ rateio.getConsumoMetroCubicoACobrar());
+            System.out.println("rateio get consumo metro cubico " + rateio.getConsumoMetroCubicoACobrar());
             total.soma(rateio.getConsumoMetroCubicoACobrar());
+            totalDinheiro = rateio.getValorDoMetroCubico();
+            totalDinheiro.multiply(rateio.getConsumoMetroCubicoACobrar());
         }
 
         System.out.println("total " + total);
         conta.setConsumoUnidadesMetroCubico(total.bigDecimalValue());
+        conta.setPrecoTotalUnidades(totalDinheiro);
+    }
+
+    private void calcularTotalAreaComum() {
+        BigDecimal total = conta.getConsumoProlagos().subtract(conta.getConsumoUnidadesMetroCubico());
+        if (total.intValue() > 0) {
+            conta.setConsumoAreaComum(total);
+        } else {
+            conta.setConsumoAreaComum(new BigDecimal(BigInteger.ZERO));
+        }
     }
 
     private void calcularTotalConsumoUnidade(Rateio rateio) {
@@ -414,6 +434,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private void calcular() {
         List<Rateio> rateios = modeloContaAgua.getObjetoSelecionado().getRateios();
         if (!rateios.isEmpty()) {
+
             for (Rateio rateio : rateios) {
                 if (rateio.getLeituraAtual() != null && rateio.getLeituraAnterior() != null) {
                     BigDecimal valorConsumo = rateio.getLeituraAtual().subtract(rateio.getLeituraAnterior());
@@ -444,6 +465,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             }
 
             calcularTotalConsumoUnidades();
+            calcularTotalAreaComum();
+
+            for (Rateio rateio : rateios) {
+                verificarParametrosAreaComum(rateio);
+            }
 
         }
     }
