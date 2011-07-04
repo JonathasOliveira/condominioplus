@@ -882,28 +882,32 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         DialogoBaixaManual dialogo = new DialogoBaixaManual(null, true);
         dialogo.setVisible(true);
 
-        if (!ApresentacaoUtil.perguntar("Confirmar os dados inseridos?", this)) {
-            return;
+        if (dialogo.isProximaPergunta()) {
+            if (!ApresentacaoUtil.perguntar("Confirmar os dados inseridos?", this)) {
+                return;
+            }
         }
 
-        System.out.println("data pagamento: " + DataUtil.toString(dialogo.getDataPagamento()));
-        System.out.println("valor: " + PagamentoUtil.formatarMoeda(dialogo.getValorPago().doubleValue()));
+        if (dialogo.getValorPago() != null) {
+            System.out.println("data pagamento: " + DataUtil.toString(dialogo.getDataPagamento()));
+            System.out.println("valor: " + PagamentoUtil.formatarMoeda(dialogo.getValorPago().doubleValue()));
 
-        RegistroTransacao registro = new RegistroTransacao();
-        registro.setCobranca(c);
-        registro.setData(dialogo.getDataPagamento());
-        registro.setValorPago(new Moeda(dialogo.getValorPago()));
-        registro.setValorTitulo(new Moeda(c.getValorTotal()));
-        registro.setDocumento(registro.getCobranca().getNumeroDocumento());
+            RegistroTransacao registro = new RegistroTransacao();
+            registro.setCobranca(c);
+            registro.setData(dialogo.getDataPagamento());
+            registro.setValorPago(new Moeda(dialogo.getValorPago()));
+            registro.setValorTitulo(new Moeda(c.getValorTotal()));
+            registro.setDocumento(registro.getCobranca().getNumeroDocumento());
 
-        boolean setContaCorrente = true;
+            boolean setContaCorrente = true;
 
-        if (!ApresentacaoUtil.perguntar("Lançar pagamento(s) no caixa?", this)) {
-            setContaCorrente = false;
+            if (!ApresentacaoUtil.perguntar("Lançar pagamento(s) no caixa?", this)) {
+                setContaCorrente = false;
+            }
+
+            baixarCobranca(registro, setContaCorrente);
+            carregarTabelaCobranca();
         }
-
-        baixarCobranca(registro, setContaCorrente);
-        carregarTabelaCobranca();
     }
 
     private void verificarMensagens() {
@@ -1277,7 +1281,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 for (AcordoCobranca ac : itensRemover) {
                     for (Cobranca cg : ac.getCobrancasGeradas()) {
                         if (cg.getDataPagamento() != null) {
-                            ApresentacaoUtil.exibirAdvertencia("Não foi possível remover o acordo " + ac.getCodigo() + ", pois já existem pagamentos efetuados.", this);
+                            ApresentacaoUtil.exibirAdvertencia("Não foi possível remover o acordo " + ac.getCodigo() + ", pois já existem pagamentos efetuados para o mesmo.", this);
                             continue ACORDO;
                         }
                     }
