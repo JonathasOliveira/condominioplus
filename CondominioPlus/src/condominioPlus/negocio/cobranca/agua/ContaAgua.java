@@ -70,8 +70,8 @@ public class ContaAgua implements Serializable {
     private BigDecimal consumoAreaComum = new BigDecimal(0);
     @Column(name="preco_area_comum")
     private BigDecimal precoAreaComum = new BigDecimal(0);
-    @Column(name="total_despesas")
-    private BigDecimal totalDespesas = new BigDecimal(0);
+    @Column(name="total_despesa_pipa")
+    private BigDecimal totalDespesasPipa = new BigDecimal(0);
     @ManyToOne
     private Condominio condominio;
 
@@ -179,12 +179,12 @@ public class ContaAgua implements Serializable {
         this.rateios = rateios;
     }
 
-    public BigDecimal getTotalDespesas() {
-        return totalDespesas;
+    public BigDecimal getTotalDespesasPipa() {
+        return totalDespesasPipa;
     }
 
-    public void setTotalDespesas(BigDecimal totalDespesas) {
-        this.totalDespesas = totalDespesas;
+    public void setTotalDespesas(BigDecimal totalDespesasPipa) {
+        this.totalDespesasPipa = totalDespesasPipa;
     }
 
     public BigDecimal getValorPipa() {
