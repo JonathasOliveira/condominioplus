@@ -122,7 +122,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaContaAgua() {
-        modeloContaAgua = new TabelaModelo_2<ContaAgua>(tabelaContaAgua, "Data Inicial, Data Final, Valor Prolagos(R$), Consumo Prolagos(M3), Valor Pipa (R$), Consumo Pipa(M3), Preço(M3), Data Vencimento da Conta, Consumo Unidades(M3), Consumo Total Unidades(R$), Consumo Area Comum(M3), Consumo Area Comum(R$), Total de Despesas".split(",")) {
+        modeloContaAgua = new TabelaModelo_2<ContaAgua>(tabelaContaAgua, "Data Inicial, Data Final, Valor Prolagos(R$), Consumo Prolagos(M3), Valor Pipa (R$), Consumo Pipa(M3), Preço(M3), Data Vencimento da Conta, Consumo Unidades(M3), Consumo Total Unidades(R$), Consumo Area Comum(M3), Consumo Area Comum(R$), Total Despesas com Pipa".split(",")) {
 
             @Override
             protected List<ContaAgua> getCarregarObjetos() {
@@ -185,7 +185,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                         return conta.getPrecoAreaComum();
 
                     case 12:
-                        return conta.getTotalDespesas();
+                        return conta.getTotalDespesasPipa();
                     default:
                         return null;
 
@@ -289,7 +289,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 8:
                         return rateio.getValorRateioPipa();
                     case 9:
-                        return rateio.getValorTotalConsumido();
+                        return new Moeda(rateio.getValorTotalConsumido());
                     case 10:
                         return rateio.getPercentualRateioAreaComum();
                     case 11:
@@ -387,12 +387,28 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
-    private void calcularPercentual(Rateio rateio){
-        if(modeloContaAgua.getObjetoSelecionado().getConsumoProlagos().intValue() > 0 ){
+    private void calcularPercentual(Rateio rateio) {
+        if (modeloContaAgua.getObjetoSelecionado().getConsumoProlagos().intValue() > 0) {
             rateio.setPercentualGasto(rateio.getConsumoMetroCubico().multiply(new BigDecimal(100)).divide(modeloContaAgua.getObjetoSelecionado().getConsumoProlagos()));
-            System.out.println("vai la ver " + rateio.getPercentualGasto());
         }
-        
+    }
+
+    private void calcularTotalConsumoUnidades() {
+        List<Rateio> rateios = modeloContaAgua.getObjetoSelecionado().getRateios();
+        Moeda total =  new Moeda(BigDecimal.ZERO);
+        for (Rateio rateio : rateios) {
+            System.out.println("rateio get consumo metro cubico "+ rateio.getConsumoMetroCubicoACobrar());
+            total.soma(rateio.getConsumoMetroCubicoACobrar());
+        }
+
+        System.out.println("total " + total);
+        conta.setConsumoUnidadesMetroCubico(total.bigDecimalValue());
+    }
+
+    private void calcularTotalConsumoUnidade(Rateio rateio) {
+        Moeda total = new Moeda(rateio.getConsumoMetroCubicoACobrar());
+        total.multiplica(rateio.getValorDoMetroCubico());
+        rateio.setValorTotalConsumido(total.bigDecimalValue());
     }
 
     private void calcular() {
@@ -423,8 +439,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
                 verificarParametrosMetroCubico(rateio);
                 calcularPercentual(rateio);
+                calcularTotalConsumoUnidade(rateio);
                 System.out.println("valor atualizado " + rateio.getConsumoMetroCubico());
             }
+
+            calcularTotalConsumoUnidades();
 
         }
     }
