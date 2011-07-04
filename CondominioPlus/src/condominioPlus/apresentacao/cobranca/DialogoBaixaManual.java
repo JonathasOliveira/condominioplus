@@ -24,6 +24,7 @@ public class DialogoBaixaManual extends javax.swing.JDialog {
 
     private DateTime dataPagamento;
     private BigDecimal valorPago;
+    private boolean proximaPergunta = false;
 
     /** Creates new form DialogoBaixaManual */
     public DialogoBaixaManual(java.awt.Frame parent, boolean modal) {
@@ -41,7 +42,12 @@ public class DialogoBaixaManual extends javax.swing.JDialog {
         return valorPago;
     }
 
+    public boolean isProximaPergunta() {
+        return proximaPergunta;
+    }
+
     private void salvarDados() {
+        proximaPergunta = true;
         dataPagamento = DataUtil.getDateTime(txtDataPagamento.getValue());
         valorPago = new BigDecimal(txtValorPago.getText().replace(",", "."));
         sair();
