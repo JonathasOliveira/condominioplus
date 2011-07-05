@@ -27,6 +27,7 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
@@ -1347,6 +1348,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             tabelaAcordo.addMouseListener(this);
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuRemoverAcordo.addActionListener(this);
+            tabelaAcordo.addKeyListener(this);
         }
 
         @Override
@@ -1427,7 +1429,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", TelaLancamentos.this);
                 }
             } else if (origem == itemMenuExibirDetalheAcordo) {
-                exibirPainelDetalheAcordo();
+                if (modeloTabelaAcordo.getObjetosSelecionados().size() == 1) {
+                    exibirPainelDetalheAcordo();
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia(("Selecione um acordo, para visualizar os detalhes."), TelaLancamentos.this);
+                }
             } else if (origem == btnEsconderPainel) {
                 esconderPainelDetalheAcordo();
             } else if (origem == itemMenuRemoverAcordo) {
@@ -1477,6 +1483,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
                 ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
                 carregarTabelaPagos();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            origem = e.getSource();
+            if ((origem == tabelaAcordo && painelDetalheAcordo.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
+                exibirPainelDetalheAcordo();
             }
         }
     }
