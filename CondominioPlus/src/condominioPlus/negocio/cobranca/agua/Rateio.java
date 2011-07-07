@@ -41,6 +41,8 @@ public class Rateio implements Serializable {
     private BigDecimal percentualGasto = new BigDecimal(0);
     @Column(name = "valor_rateio_pipa", precision = 20, scale = 2)
     private BigDecimal valorRateioPipa = new BigDecimal(0);
+    @Column(name="preco_metro_cubico_area_comum" , precision = 20, scale = 2)
+    private BigDecimal precoMetroCubicoAreaComum = new BigDecimal(0);
     @Column(name = "valor_total_consumido", precision = 20, scale = 3)
     private BigDecimal valorTotalConsumido = new BigDecimal(0);
     @Column(name = "percentual_rateio_area_comum", precision = 20, scale = 2)
@@ -180,4 +182,14 @@ public class Rateio implements Serializable {
     public void setValorTotalConsumido(BigDecimal valorTotalConsumido) {
         this.valorTotalConsumido = valorTotalConsumido;
     }
+
+    public BigDecimal getPrecoMetroCubicoAreaComum() {
+        return precoMetroCubicoAreaComum;
+    }
+
+    public void setPrecoMetroCubicoAreaComum(BigDecimal precoMetroCubicoAreaComum) {
+        this.precoMetroCubicoAreaComum = precoMetroCubicoAreaComum;
+    }
+
+    
 }
