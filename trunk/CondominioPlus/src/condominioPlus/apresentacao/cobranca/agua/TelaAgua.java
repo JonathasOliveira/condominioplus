@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
@@ -182,7 +183,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 10:
                         return conta.getConsumoAreaComum();
                     case 11:
-                        return conta.getPrecoAreaComum();
+                        return new Moeda(conta.getPrecoAreaComum());
 
                     case 12:
                         return conta.getTotalDespesasPipa();
@@ -374,18 +375,80 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         if (parametro == FormaRateioAreaComum.IGUAL_TODOS) {
             if (conta.getConsumoAreaComum().intValue() > 0) {
+                BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
+                Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
                 double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
-                rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
-                rateio.setConsumoEmDinheiroAreaComum(new Moeda(total * rateio.getValorDoMetroCubico().doubleValue()).bigDecimalValue());
+                if (total < 0) {
+                    rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
+                } else {
+                    rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
+                }
+
+                Moeda consumoEmDinheiro = new Moeda(total).multiplica(valorMetroCubico);
+                if ( consumoEmDinheiro. doubleValue() < 0) {
+                    rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
+                } else {
+                    rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
+                }
+
+               BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                if ( consumoAreaComum.doubleValue() < 0) {
+                    conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
+
+                } else {
+                    conta.setPrecoAreaComum(consumoAreaComum);
+                }
+
+                BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubicoAreaComum().doubleValue() * 100) / conta.getConsumoAreaComum().doubleValue()));
+
+                rateio.setPercentualRateioAreaComum(valor);
             }
         } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_CONSUMO) {
         } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_FRACAO) {
         } else if (parametro == FormaRateioAreaComum.VALOR_FIXO) {
             if (condominio.getParametros().getValorFixoAreaComum().intValue() > 0) {
-                rateio.setConsumoEmDinheiroAreaComum(condominio.getParametros().getValorFixoAreaComum());
-            }else{
+
+                
+                 if (conta.getConsumoAreaComum().intValue() > 0) {
+                BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
+                Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
+                double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
+                if (total < 0) {
+                    rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
+                } else {
+                    rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
+                }
+
+                Moeda consumoEmDinheiro = new Moeda (condominio.getParametros().getValorFixoAreaComum());
+                if (consumoEmDinheiro. doubleValue() < 0) {
+                    rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
+                } else {
+                    rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
+                }
+
+               BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                if ( consumoAreaComum.doubleValue() < 0) {
+                    conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
+
+                } else {
+                    conta.setPrecoAreaComum(consumoAreaComum);
+                }
+
+                BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubicoAreaComum().doubleValue() * 100) / conta.getConsumoAreaComum().doubleValue()));
+
+                rateio.setPercentualRateioAreaComum(valor);
+            }
+
+
+
+            } else {
                 ApresentacaoUtil.exibirAdvertencia("O valor fixo na aba de Parâmetros deve ser maior que 0 (Zero)!", this);
             }
+        } else if (parametro == FormaRateioAreaComum.NAO_COBRAR) {
+            rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(0));
+            rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
+            conta.setPrecoAreaComum(new BigDecimal(0));
+            rateio.setPercentualRateioAreaComum(new BigDecimal(0));
         }
 
 
@@ -393,7 +456,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     private void calcularPercentual(Rateio rateio) {
         if (modeloContaAgua.getObjetoSelecionado().getConsumoProlagos().intValue() > 0) {
-            BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubico().doubleValue() * 100)/ conta.getConsumoProlagos().doubleValue()));
+            BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubico().doubleValue() * 100) / conta.getConsumoProlagos().doubleValue()));
             rateio.setPercentualGasto(valor);
         }
     }

@@ -47,6 +47,10 @@
     <class>condominioPlus.negocio.cobranca.agua.ContaAgua</class>
     <class>condominioPlus.negocio.cobranca.agua.Rateio</class>
     <class>condominioPlus.negocio.cobranca.agua.Pipa</class>
+    <class>condominioPlus.negocio.cobranca.AcordoCobranca</class>
+    <class>condominioPlus.negocio.cobranca.HistoricoAcordo</class>
+    <class>condominioPlus.negocio.cobranca.MensagemBoleto</class>
+    <class>condominioPlus.negocio.financeiro.DadosBoleto</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>
