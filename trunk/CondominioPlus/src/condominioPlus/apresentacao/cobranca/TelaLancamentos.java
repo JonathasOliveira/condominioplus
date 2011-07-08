@@ -26,6 +26,7 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
+import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -34,6 +35,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.event.ChangeEvent;
@@ -1317,6 +1319,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     }
 
+    private void imprimirDetalheAcordo(){
+        new Relatorios().imprimir("RelatorioDetalheAcordo", new HashMap<String, String>(), new ArrayList(), false);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -1348,6 +1354,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             tabelaAcordo.addMouseListener(this);
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuRemoverAcordo.addActionListener(this);
+            itemMenuImprimirDetalheAcordo.addActionListener(this);
             tabelaAcordo.addKeyListener(this);
         }
 
@@ -1438,6 +1445,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 esconderPainelDetalheAcordo();
             } else if (origem == itemMenuRemoverAcordo) {
                 removerAcordo();
+            } else if (origem == itemMenuImprimirDetalheAcordo){
+                imprimirDetalheAcordo();
             }
         }
 
@@ -1516,6 +1525,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
         popupMenuAcordo = new javax.swing.JPopupMenu();
         itemMenuExibirDetalheAcordo = new javax.swing.JMenuItem();
+        itemMenuImprimirDetalheAcordo = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         itemMenuRemoverAcordo = new javax.swing.JMenuItem();
         painelCondominos = new javax.swing.JPanel();
@@ -1610,6 +1620,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuExibirDetalheAcordo.setText("Exibir Detalhes");
         popupMenuAcordo.add(itemMenuExibirDetalheAcordo);
+
+        itemMenuImprimirDetalheAcordo.setText("Imprimir Detalhes");
+        popupMenuAcordo.add(itemMenuImprimirDetalheAcordo);
         popupMenuAcordo.add(jSeparator2);
 
         itemMenuRemoverAcordo.setText("Remover Selecionado(s)");
@@ -1690,7 +1703,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCobrancaBase.setBorder(javax.swing.BorderFactory.createTitledBorder("Cobranças Base"));
 
-        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -1722,7 +1735,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelBoletos.setBorder(javax.swing.BorderFactory.createTitledBorder("Boletos Gerados"));
 
-        tabelaCobrancas.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCobrancas.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCobrancas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2100,7 +2113,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Mensagens", jPanel4);
 
-        tabelaAcordo.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaAcordo.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaAcordo.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2116,7 +2129,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelDetalheAcordo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        tabelaCobrancasOriginais.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCobrancasOriginais.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCobrancasOriginais.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2134,7 +2147,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel14.setText("Cobranças Geradas");
 
-        tabelaCobrancasGeradas.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCobrancasGeradas.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCobrancasGeradas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2257,6 +2270,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuMudarAltura;
     private javax.swing.JMenuItem itemMenuRemoverAcordo;
