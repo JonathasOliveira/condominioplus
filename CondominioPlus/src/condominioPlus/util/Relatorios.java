@@ -22,7 +22,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import logicpoint.util.Util;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperManager;
+import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperPrintManager;
 import net.sf.jasperreports.engine.JasperReport;
@@ -52,12 +52,12 @@ public class Relatorios implements Printable {
             imagem =NegocioUtil.getConfiguracao().getLogoEmpresa();
                      
             if (imagem != null) {
-                new Util().redimensionarImagem(imagem, 110, 38, 100);
+                Util.redimensionarImagem(imagem, 110, 38, 100);
                 parametros.put("ImagemEmpresa", imagem.getImage());
             }
 
-            caminhoImagem = getClass().getResource("/condominiosPlus/relatorios/imagens/logo.jpg");
-            parametros.put("caminhoImagem", caminhoImagem.toString());
+//            caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/cancelar.jpg");
+//            parametros.put("caminhoImagem", caminhoImagem.toString());
             
             String minuto = "";
             if (new DateTime().getMinuteOfHour() <= 9) {
@@ -74,7 +74,7 @@ public class Relatorios implements Printable {
             parametros.put("enderecoEmpresa", NegocioUtil.getConfiguracao().getEnderecoEmpresa());
             
             JRBeanCollectionDataSource ds = new JRBeanCollectionDataSource(lista);
-            JasperPrint jprint = JasperManager.fillReport(
+            JasperPrint jprint = JasperFillManager.fillReport(
                     obterRelatorio(relatorio), parametros, ds);
 
             if (impressaoDireta) {
@@ -88,9 +88,10 @@ public class Relatorios implements Printable {
                     "Falha de Impressão", JOptionPane.ERROR_MESSAGE);
         }
     }
-
+    
     public JasperReport obterRelatorio(String nome) {
         URL url = getClass().getResource("/condominioPlus/relatorios/" + nome + ".jasper");
+        System.out.println("URL: " + url.toString());
         JasperReport relatorio = null;
         try {
             relatorio = (JasperReport) JRLoader.loadObject(url);
@@ -101,7 +102,7 @@ public class Relatorios implements Printable {
     }
 
     /**
-     * Os método print será usado para imprimir texto diretamente para a impressora sem usar
+     * Os método print será usado para impri mir texto diretamente para a impressora sem usar
      * o JasperReports
      */
     @Override

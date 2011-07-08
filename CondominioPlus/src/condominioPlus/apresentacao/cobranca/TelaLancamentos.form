@@ -69,6 +69,11 @@
             <Property name="text" type="java.lang.String" value="Exibir Detalhes"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirDetalheAcordo">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Detalhes"/>
+          </Properties>
+        </MenuItem>
         <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
         </Component>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuRemoverAcordo">
