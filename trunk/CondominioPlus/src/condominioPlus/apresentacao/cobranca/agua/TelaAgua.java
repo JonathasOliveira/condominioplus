@@ -385,14 +385,14 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 }
 
                 Moeda consumoEmDinheiro = new Moeda(total).multiplica(valorMetroCubico);
-                if ( consumoEmDinheiro. doubleValue() < 0) {
+                if (consumoEmDinheiro.doubleValue() < 0) {
                     rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
                 } else {
                     rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
                 }
 
-               BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
-                if ( consumoAreaComum.doubleValue() < 0) {
+                BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                if (consumoAreaComum.doubleValue() < 0) {
                     conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
 
                 } else {
@@ -404,30 +404,33 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 rateio.setPercentualRateioAreaComum(valor);
             }
         } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_CONSUMO) {
-        } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_FRACAO) {
-        } else if (parametro == FormaRateioAreaComum.VALOR_FIXO) {
-            if (condominio.getParametros().getValorFixoAreaComum().intValue() > 0) {
 
-                
-                 if (conta.getConsumoAreaComum().intValue() > 0) {
+            if (conta.getConsumoAreaComum().intValue() > 0) {
                 BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
                 Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
-                double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
+
+                double resultado = (conta.getConsumoAreaComum().doubleValue() * getMaiorConsumo()) / 100;
+
+                double total = (rateio.getConsumoMetroCubico().doubleValue() * resultado) / getMaiorConsumo();
+
+
+
                 if (total < 0) {
                     rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
                 } else {
                     rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
                 }
 
-                Moeda consumoEmDinheiro = new Moeda (condominio.getParametros().getValorFixoAreaComum());
-                if (consumoEmDinheiro. doubleValue() < 0) {
+                Moeda consumoEmDinheiro = new Moeda(total).multiplica(valorMetroCubico);
+
+                if (consumoEmDinheiro.doubleValue() < 0) {
                     rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
                 } else {
                     rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
                 }
 
-               BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
-                if ( consumoAreaComum.doubleValue() < 0) {
+                BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                if (consumoAreaComum.doubleValue() < 0) {
                     conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
 
                 } else {
@@ -438,6 +441,79 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
                 rateio.setPercentualRateioAreaComum(valor);
             }
+
+
+        } else if (parametro == FormaRateioAreaComum.PROPORCIONAL_FRACAO) {
+
+            if (conta.getConsumoAreaComum().intValue() > 0) {
+                BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
+                Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
+
+                double resultado = (conta.getConsumoAreaComum().doubleValue() * getMaiorFracaoIdeal()) / 100;
+
+                double total = (rateio.getUnidade().getFracaoIdeal() * resultado) / getMaiorFracaoIdeal();
+
+                if (total < 0) {
+                    rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
+                } else {
+                    rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
+                }
+
+                Moeda consumoEmDinheiro = new Moeda(total).multiplica(valorMetroCubico);
+
+                if (consumoEmDinheiro.doubleValue() < 0) {
+                    rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
+                } else {
+                    rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
+                }
+
+                BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                if (consumoAreaComum.doubleValue() < 0) {
+                    conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
+
+                } else {
+                    conta.setPrecoAreaComum(consumoAreaComum);
+                }
+
+                BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubicoAreaComum().doubleValue() * 100) / conta.getConsumoAreaComum().doubleValue()));
+
+                rateio.setPercentualRateioAreaComum(valor);
+            }
+
+
+        } else if (parametro == FormaRateioAreaComum.VALOR_FIXO) {
+            if (condominio.getParametros().getValorFixoAreaComum().intValue() > 0) {
+
+
+                if (conta.getConsumoAreaComum().intValue() > 0) {
+                    BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
+                    Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
+                    double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
+                    if (total < 0) {
+                        rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
+                    } else {
+                        rateio.setConsumoMetroCubicoAreaComum(new BigDecimal(total));
+                    }
+
+                    Moeda consumoEmDinheiro = new Moeda(condominio.getParametros().getValorFixoAreaComum());
+                    if (consumoEmDinheiro.doubleValue() < 0) {
+                        rateio.setConsumoEmDinheiroAreaComum(new BigDecimal(0));
+                    } else {
+                        rateio.setConsumoEmDinheiroAreaComum(consumoEmDinheiro.bigDecimalValue());
+                    }
+
+                    BigDecimal consumoAreaComum = conta.getConsumoAreaComum().multiply(valorMetroCubico.bigDecimalValue());
+                    if (consumoAreaComum.doubleValue() < 0) {
+                        conta.setPrecoAreaComum(new BigDecimal(BigInteger.ZERO));
+
+                    } else {
+                        conta.setPrecoAreaComum(consumoAreaComum);
+                    }
+
+                    BigDecimal valor = new BigDecimal(((rateio.getConsumoMetroCubicoAreaComum().doubleValue() * 100) / conta.getConsumoAreaComum().doubleValue()));
+
+                    rateio.setPercentualRateioAreaComum(valor);
+                }
 
 
 
@@ -452,6 +528,32 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         }
 
 
+    }
+
+//    private double calcularPorFracaoIdeal(Unidade u, Rateio rateio) {
+//        double resultado = 0;
+//        resultado = (u.getFracaoIdeal() * rateio.getConsumoMetroCubicoAreaComum()) / getMaiorFracaoIdeal();
+//        System.out.println("resultado - " + resultado);
+//        return resultado;
+//    }
+    private double getMaiorConsumo() {
+        double resultado = 0;
+        for (Rateio r : conta.getRateios()) {
+            if (r.getConsumoMetroCubico().doubleValue() > resultado) {
+                resultado = r.getConsumoMetroCubico().doubleValue();
+            }
+        }
+        return resultado;
+    }
+
+    private double getMaiorFracaoIdeal() {
+        double resultado = 0;
+        for (Unidade u : condominio.getUnidades()) {
+            if (u.getFracaoIdeal() > resultado) {
+                resultado = u.getFracaoIdeal();
+            }
+        }
+        return resultado;
     }
 
     private void calcularPercentual(Rateio rateio) {
