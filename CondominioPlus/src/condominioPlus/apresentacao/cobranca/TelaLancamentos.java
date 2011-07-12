@@ -1319,8 +1319,48 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     }
 
-    private void imprimirDetalheAcordo(){
-        new Relatorios().imprimir("RelatorioDetalheAcordo", new HashMap<String, String>(), new ArrayList(), false);
+    private void imprimirDetalheAcordo(AcordoCobranca ac) {
+
+        HashMap<String, String> parametros = new HashMap();
+        parametros.put("codigo", String.valueOf(ac.getCodigo()));
+        parametros.put("valor", PagamentoUtil.formatarMoeda(ac.getValor().doubleValue()));
+        parametros.put("numeroParcelas", String.valueOf(ac.getNumeroParcelas()));
+        parametros.put("forma", ac.getForma().name());
+        parametros.put("condominio", ac.getUnidade().getCondominio().getRazaoSocial());
+        parametros.put("unidade", ac.getUnidade().getUnidade());
+        parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
+
+        Comparator<Cobranca> comparador = new Comparator<Cobranca>() {
+
+            public int compare(Cobranca o1, Cobranca o2) {
+                return o1.getDataVencimento().compareTo(o2.getDataVencimento());
+            }
+        };
+
+        List<HashMap<String, String>> listaCobrancasOriginais = new ArrayList<HashMap<String, String>>();
+        Collections.sort(ac.getHistorico().getCobrancasOriginais(), comparador);
+        Collections.sort(ac.getCobrancasGeradas(), comparador);
+        for (Cobranca co : ac.getHistorico().getCobrancasOriginais()) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("valorPrestacao", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+            mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
+            mapa.put("pagamento", "-");
+            mapa.put("documento", co.getNumeroDocumento());
+            mapa.put("tipo", "ORIGINAL");
+            listaCobrancasOriginais.add(mapa);
+        }
+
+        for (Cobranca co : ac.getCobrancasGeradas()) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("valorPrestacao", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+            mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
+            mapa.put("pagamento", DataUtil.toString(co.getDataPagamento()));
+            mapa.put("documento", co.getNumeroDocumento());
+            mapa.put("tipo", "GERADA");
+            listaCobrancasOriginais.add(mapa);
+        }
+
+        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasOriginais, false);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -1445,8 +1485,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 esconderPainelDetalheAcordo();
             } else if (origem == itemMenuRemoverAcordo) {
                 removerAcordo();
-            } else if (origem == itemMenuImprimirDetalheAcordo){
-                imprimirDetalheAcordo();
+            } else if (origem == itemMenuImprimirDetalheAcordo) {
+                if (modeloTabelaAcordo.getObjetosSelecionados().size() == 1) {
+                    imprimirDetalheAcordo(modeloTabelaAcordo.getObjetoSelecionado());
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia(("Selecione um acordo, para visualizar os detalhes."), TelaLancamentos.this);
+                }
             }
         }
 
