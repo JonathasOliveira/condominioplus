@@ -8,7 +8,6 @@ package condominioPlus.negocio.cobranca.agua;
 import condominioPlus.negocio.Condominio;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -42,7 +41,7 @@ public class ContaAgua implements Serializable {
     @OneToMany(mappedBy="conta", cascade = CascadeType.ALL)
     private List<Rateio> rateios = new ArrayList<Rateio>();
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
-    private List<Pipa> pipas;
+    private List<Pipa> pipas =  new ArrayList<Pipa>();
     @Column(name="data_inicial")
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataInicial;

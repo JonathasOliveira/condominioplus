@@ -17,6 +17,7 @@ import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.FormaCalculoMetroCubico;
 import condominioPlus.negocio.cobranca.agua.FormaRateioAreaComum;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
+import condominioPlus.negocio.cobranca.agua.Pipa;
 import condominioPlus.negocio.cobranca.agua.Rateio;
 import condominioPlus.negocio.cobranca.agua.TarifaProlagos;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
@@ -56,6 +57,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private TabelaModelo_2<TarifaProlagos> modelo;
     private TabelaModelo_2<ContaAgua> modeloContaAgua;
     private TabelaModelo_2<Rateio> modeloRateio;
+    private TabelaModelo_2<Pipa> modeloPipa;
     private ControladorEventos controlador;
     private ParametrosCalculoAgua parametros;
     private Condominio condominio;
@@ -83,6 +85,13 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         controlador = new ControladorEventos();
 
         preencherTela();
+
+        if (modeloContaAgua.size() > 0) {
+            conta = modeloContaAgua.getObjeto(0);
+            carregarTabelaPipa();
+            carregarTabelaRateio();
+            modeloContaAgua.selecionar(conta, 0);
+        }
     }
 
     private void carregarComboFormaPrecoMetroCubico() {
@@ -186,7 +195,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                         return new Moeda(conta.getPrecoAreaComum());
 
                     case 12:
-                        return conta.getTotalDespesasPipa();
+                        return new Moeda(conta.getTotalDespesasPipa());
                     default:
                         return null;
 
@@ -262,9 +271,6 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 3:
                         rateio.setLeituraAtual(verificarValor(valor));
                         break;
-
-
-
                 }
             }
 
@@ -298,7 +304,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 12:
                         return new Moeda(rateio.getConsumoEmDinheiroAreaComum());
                     case 13:
-                        return rateio.getValorTotalCobrar();
+                        return new Moeda(rateio.getValorTotalCobrar());
                     default:
                         return null;
 
@@ -335,6 +341,78 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
+    private void carregarTabelaPipa() {
+        modeloPipa = new TabelaModelo_2<Pipa>(tabelaPipa, "Data, Descrição, Quantidade x 1000 , Total Pago ".split(",")) {
+
+            @Override
+            protected List<Pipa> getCarregarObjetos() {
+                return getPipas();
+            }
+
+            @Override
+            public void setValor(Pipa pipa, Object valor, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        pipa.setData(DataUtil.getCalendar(valor));
+                        break;
+                    case 1:
+                        pipa.setDescricao((String) valor);
+                        break;
+                    case 2:
+                        pipa.setQuantidadeLitrosPorMil((Integer) valor);
+                        break;
+                    case 3:
+                        pipa.setTotalPago(((Moeda) valor).bigDecimalValue());
+                        break;
+                }
+            }
+
+            @Override
+            public Object getValor(Pipa pipa, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return DataUtil.getDateTime(pipa.getDataCadastro());
+                    case 1:
+                        return pipa.getDescricao();
+                    case 2:
+                        return pipa.getQuantidadeLitrosPorMil();
+                    case 3:
+                        return new Moeda(pipa.getTotalPago());
+                    default:
+                        return null;
+
+                }
+            }
+        };
+
+        RenderizadorCelulaCentralizada centralizado = new RenderizadorCelulaCentralizada();
+
+        modeloPipa.setEditaveis(0, 1, 2, 3);
+
+
+        for (int i = 0; i <= 3; i++) {
+            tabelaPipa.getColumn(modeloPipa.getCampo(0)).setCellRenderer(centralizado);
+        }
+
+        tabelaPipa.getColumn(modeloPipa.getCampo(0)).setCellRenderer(new RenderizadorCelulaData());
+        JTableCustomizer.setEditorForRow(tabelaPipa, 0);
+
+        tabelaPipa.getColumn(modeloPipa.getCampo(0)).setMinWidth(100);
+        tabelaPipa.getColumn(modeloPipa.getCampo(1)).setMinWidth(200);
+        tabelaPipa.getColumn(modeloPipa.getCampo(2)).setMinWidth(100);
+        tabelaPipa.getColumn(modeloPipa.getCampo(3)).setMinWidth(100);
+
+        tabelaPipa.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).
+                put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                "selectNextColumnCell");
+
+
+    }
+
+    private List<Pipa> getPipas() {
+        return conta.getPipas();
+    }
+
     private List<Rateio> getUnidadesRateio() {
         return conta.getRateios();
     }
@@ -343,7 +421,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         FormaCalculoMetroCubico parametro = condominio.getParametros().getFormaMetroCubico();
         if (parametro == FormaCalculoMetroCubico.DIVIDIR_METROS_CUBICOS) {
             if (conta.getValorProlagos() != null && conta.getConsumoProlagos() != null) {
-                double valor = conta.getValorProlagos().doubleValue() / conta.getConsumoProlagos().doubleValue();
+                double valor = (conta.getValorProlagos().doubleValue() + conta.getValorPipa().doubleValue()) / (conta.getConsumoProlagos().doubleValue() + conta.getConsumoPipa().doubleValue());
                 conta.setPrecoMetroCubico(new BigDecimal(valor));
                 rateio.setValorDoMetroCubico(new BigDecimal(0).add(new BigDecimal(valor)));
             } else {
@@ -361,9 +439,10 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         } else if (parametro == FormaCalculoMetroCubico.TABELA_PROLAGOS) {
             for (TarifaProlagos t : getTarifaProlagos()) {
                 if (rateio.getConsumoMetroCubicoACobrar().doubleValue() >= t.getConsumoInicial().doubleValue() && rateio.getConsumoMetroCubicoACobrar().doubleValue() <= t.getConsumoFinal().doubleValue()) {
+                    conta.setPrecoMetroCubico(new BigDecimal(0));
                     rateio.setValorDoMetroCubico(t.getValor());
                 } else {
-                    System.out.println("ferrou tudo meu irmao!");
+                    //System.out.println("ferrou tudo meu irmao!");
                 }
             }
         }
@@ -375,7 +454,8 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         if (parametro == FormaRateioAreaComum.IGUAL_TODOS) {
             if (conta.getConsumoAreaComum().intValue() > 0) {
-                BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
+                BigDecimal valorTotal = conta.getValorProlagos().add(conta.getValorPipa());
+                BigDecimal valorResiduo = valorTotal.subtract(conta.getPrecoTotalUnidades());
                 Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
                 double total = conta.getConsumoAreaComum().doubleValue() / condominio.getUnidades().size();
                 if (total < 0) {
@@ -409,11 +489,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 BigDecimal valorResiduo = conta.getValorProlagos().subtract(conta.getPrecoTotalUnidades());
                 Moeda valorMetroCubico = new Moeda(valorResiduo.divide(conta.getConsumoAreaComum(), RoundingMode.UP));
 
-                double resultado = (conta.getConsumoAreaComum().doubleValue() * getMaiorConsumo()) / 100;
+                double calculo = (rateio.getConsumoMetroCubico().doubleValue() * 100) / conta.getConsumoUnidadesMetroCubico().doubleValue();
 
-                double total = (rateio.getConsumoMetroCubico().doubleValue() * resultado) / getMaiorConsumo();
-
-
+                double total = (conta.getConsumoAreaComum().doubleValue() * calculo) / 100;
 
                 if (total < 0) {
                     rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
@@ -515,8 +593,6 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     rateio.setPercentualRateioAreaComum(valor);
                 }
 
-
-
             } else {
                 ApresentacaoUtil.exibirAdvertencia("O valor fixo na aba de Parâmetros deve ser maior que 0 (Zero)!", this);
             }
@@ -528,22 +604,6 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         }
 
 
-    }
-
-//    private double calcularPorFracaoIdeal(Unidade u, Rateio rateio) {
-//        double resultado = 0;
-//        resultado = (u.getFracaoIdeal() * rateio.getConsumoMetroCubicoAreaComum()) / getMaiorFracaoIdeal();
-//        System.out.println("resultado - " + resultado);
-//        return resultado;
-//    }
-    private double getMaiorConsumo() {
-        double resultado = 0;
-        for (Rateio r : conta.getRateios()) {
-            if (r.getConsumoMetroCubico().doubleValue() > resultado) {
-                resultado = r.getConsumoMetroCubico().doubleValue();
-            }
-        }
-        return resultado;
     }
 
     private double getMaiorFracaoIdeal() {
@@ -577,7 +637,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private void calcularTotalAreaComum() {
-        BigDecimal total = conta.getConsumoProlagos().subtract(conta.getConsumoUnidadesMetroCubico());
+        BigDecimal soma = conta.getConsumoProlagos().add(conta.getConsumoPipa());
+
+        BigDecimal total = soma.subtract(conta.getConsumoUnidadesMetroCubico());
         if (total.intValue() > 0) {
             conta.setConsumoAreaComum(total);
         } else {
@@ -597,11 +659,16 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
             for (Rateio rateio : rateios) {
                 if (rateio.getLeituraAtual() != null && rateio.getLeituraAnterior() != null) {
-                    BigDecimal valorConsumo = rateio.getLeituraAtual().subtract(rateio.getLeituraAnterior());
-                    if (valorConsumo.intValue() < 0) {
-                        rateio.setConsumoMetroCubico(BigDecimal.ZERO);
+                    if (rateio.getLeituraAnterior().doubleValue() > rateio.getLeituraAtual().doubleValue()) {
+                        ApresentacaoUtil.exibirAdvertencia("O valor da leitura atual não pode ser Menor que a anterior!", this);
+                        return;
                     } else {
-                        rateio.setConsumoMetroCubico(valorConsumo);
+                        BigDecimal valorConsumo = rateio.getLeituraAtual().subtract(rateio.getLeituraAnterior());
+                        if (valorConsumo.intValue() < 0) {
+                            rateio.setConsumoMetroCubico(BigDecimal.ZERO);
+                        } else {
+                            rateio.setConsumoMetroCubico(valorConsumo);
+                        }
                     }
                 } else {
                     System.out.println("valor nulo");
@@ -618,10 +685,11 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     }
                 }
 
+                totalPipa();
+
                 verificarParametrosMetroCubico(rateio);
                 calcularPercentual(rateio);
                 calcularTotalConsumoUnidade(rateio);
-                System.out.println("valor atualizado " + rateio.getConsumoMetroCubico());
             }
 
             calcularTotalConsumoUnidades();
@@ -629,15 +697,56 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
             for (Rateio rateio : rateios) {
                 verificarParametrosAreaComum(rateio);
+                rateio.setValorTotalCobrar(new BigDecimal(totalValorRateio(rateio)).setScale(2, RoundingMode.UP));
             }
+
+
+//            modeloContaAgua.carregarObjetos();
+            modeloRateio.carregarObjetos();
+            totalValorConta();
 
         }
     }
 
+    private double totalValorRateio(Rateio rateio) {
+        double total = 0;
+
+        total = rateio.getValorRateioPipa().doubleValue() + rateio.getValorTotalConsumido().doubleValue() + rateio.getConsumoEmDinheiroAreaComum().doubleValue();
+
+        return total;
+    }
+
+    private void totalValorConta() {
+        Moeda somatorio = new Moeda();
+        ContaAgua c = modeloContaAgua.getObjetoSelecionado();
+        c.setTotalDespesas(BigDecimal.ZERO);
+
+        somatorio.soma(c.getPrecoAreaComum());
+        somatorio.soma(c.getTotalDespesasPipa());
+        somatorio.soma(c.getPrecoTotalUnidades());
+
+        c.setTotalDespesas(somatorio.bigDecimalValue());
+
+
+    }
+
+    private void totalPipa() {
+        Moeda totalDinheiro = new Moeda();
+        int totalMetroCubico = 0;
+
+        for (Pipa pipa : conta.getPipas()) {
+            totalDinheiro.soma(pipa.getTotalPago());
+            totalMetroCubico = totalMetroCubico + pipa.getQuantidadeLitrosPorMil();
+        }
+
+        conta.setConsumoPipa(new BigDecimal(totalMetroCubico));
+        conta.setValorPipa(totalDinheiro.bigDecimalValue());
+    }
+
     private void incluirContaAgua() {
         System.out.println("tamanho " + modeloContaAgua.size());
-        conta = new ContaAgua();
 
+        conta = new ContaAgua();
 
         List<Unidade> unidades = new DAO().listar("UnidadePorCondominio", condominio.getCodigo());
         List<Rateio> rateios = new ArrayList<Rateio>();
@@ -661,21 +770,57 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         }
         conta.setRateios(rateios);
+        conta.setCondominio(condominio);
         modeloContaAgua.adicionar(conta);
         modeloContaAgua.selecionar(conta, 0);
         carregarTabelaRateio();
+        carregarTabelaPipa();
 //        modeloContaAgua.setSelecaoMultipla(false);
 
-        System.out.println("rateios " + modeloContaAgua.getObjetoSelecionado().getRateios());
+
+
+    }
+
+    private void incluirPipa() {
+
+        if (modeloContaAgua.size() == 0 || modeloContaAgua.getObjetoSelecionado() == null) {
+            ApresentacaoUtil.exibirAdvertencia("Você deve incluir uma conta de água antes ou selecionar uma já existente!", this);
+        } else {
+
+            abaPipa.setSelectedIndex(1);
+
+            Pipa pipa = new Pipa();
+
+            pipa.setConta(modeloContaAgua.getObjetoSelecionado());
+            modeloPipa.adicionar(pipa);
+            modeloPipa.selecionar(pipa, 0);
+
+        }
 
 
     }
 
     private void removerContaAgua() {
-        if (modeloContaAgua.size() != -1) {
-            modeloContaAgua.remover(modeloContaAgua.getObjetoSelecionado());
-            modeloContaAgua.carregarObjetos();
+        if (modeloContaAgua.getObjetoSelecionado() != null) {
 
+            List<Rateio> rateios = modeloContaAgua.getObjetoSelecionado().getRateios();
+
+           modeloContaAgua.remover(modeloContaAgua.getObjetoSelecionado());
+
+            new DAO().remover(conta);
+
+            conta = null;
+
+            for (Rateio rateio : rateios) {
+                modeloRateio.setObjetos(null);
+            }
+
+            carregarTabelaContaAgua();
+
+            ApresentacaoUtil.exibirInformacao("Removido com Sucesso!", this);
+
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
     }
 
@@ -804,6 +949,21 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
+    private void salvarAgua() {
+        preencherObjeto();
+        try {
+            new DAO().salvar(conta);
+
+            ApresentacaoUtil.exibirInformacao("Conta Salva com Sucesso!", this);
+            preencherTela();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            ApresentacaoUtil.exibirInformacao("Ocorreu um erro ao tentar salvar a conta", this);
+        }
+
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
@@ -819,14 +979,17 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             } else if (origem == btnVoltar) {
                 fechar();
             } else if (origem == btnSalvar) {
-                System.out.println("here");
                 salvar();
-            } else if (origem == btnIncluir) {
+            } else if (origem == btnIncluir || origem == itemMenuIncluirRegistroContaAgua) {
                 incluirContaAgua();
-            } else if (origem == itemMenuRemover) {
+            } else if (origem == itemMenuDeletarRegistroContaAgua) {
                 removerContaAgua();
             } else if (origem == btnCalcular) {
                 calcular();
+            } else if (origem == btnIncluirPipa) {
+                incluirPipa();
+            } else if (origem == btnSalvarAgua) {
+                salvarAgua();
             }
         }
 
@@ -837,6 +1000,8 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             itemMenuAdicionar.addActionListener(this);
             itemMenuEditar.addActionListener(this);
             itemMenuRemover.addActionListener(this);
+            itemMenuIncluirRegistroContaAgua.addActionListener(this);
+            itemMenuDeletarRegistroContaAgua.addActionListener(this);
             tabela.addMouseListener(this);
             btnVoltar.addActionListener(this);
             btnSalvar.addActionListener(this);
@@ -849,6 +1014,8 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             tabelaContaAgua.addKeyListener(this);
             tabelaRateio.addMouseListener(this);
             btnCalcular.addActionListener(this);
+            btnIncluirPipa.addActionListener(this);
+            btnSalvarAgua.addActionListener(this);
         }
 
         @Override
@@ -861,22 +1028,18 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 popupContaAgua.show(e.getComponent(), e.getX(), e.getY());
             } else if (e.isPopupTrigger() && e.getSource() == tabelaPipa) {
                 popupPipa.show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            Object origem = e.getSource();
-            if (origem == tabelaContaAgua) {
-                modeloRateio.setObjetos(modeloContaAgua.getObjetoSelecionado().getRateios());
+            } else if (e.getSource() == tabelaContaAgua) {
+                conta = modeloContaAgua.getObjetoSelecionado();
+                carregarTabelaPipa();
+                carregarTabelaRateio();
             }
         }
 
         @Override
         public void keyReleased(KeyEvent e) {
             Object origem = e.getSource();
-            if (origem == tabelaContaAgua && (e.getKeyCode() == KeyEvent.VK_ENTER)) {
-                System.out.println("Do something here");
+            if (origem == tabelaContaAgua && (e.getKeyCode() == KeyEvent.VK_UP) || origem == tabelaContaAgua && (e.getKeyCode() == KeyEvent.VK_DOWN)) {
+                modeloRateio.setObjetos(modeloContaAgua.getObjetoSelecionado().getRateios());
 
             }
         }
