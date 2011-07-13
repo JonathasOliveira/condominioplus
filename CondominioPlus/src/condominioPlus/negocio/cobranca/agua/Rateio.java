@@ -25,7 +25,7 @@ public class Rateio implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Unidade unidade;
     @Column(name = "leitura_anterior", precision = 20, scale = 3)
     private BigDecimal leituraAnterior = new BigDecimal(0);
