@@ -47,6 +47,7 @@ import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
 import org.jrimum.bopepo.BancoSuportado;
 import org.jrimum.bopepo.Boleto;
@@ -1321,15 +1322,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void imprimirDetalheAcordo(AcordoCobranca ac) {
 
-        HashMap<String, String> parametros = new HashMap();
-        parametros.put("codigo", String.valueOf(ac.getCodigo()));
-        parametros.put("valor", PagamentoUtil.formatarMoeda(ac.getValor().doubleValue()));
-        parametros.put("numeroParcelas", String.valueOf(ac.getNumeroParcelas()));
-        parametros.put("forma", ac.getForma().name());
-        parametros.put("condominio", ac.getUnidade().getCondominio().getRazaoSocial());
-        parametros.put("unidade", ac.getUnidade().getUnidade());
-        parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
-
         Comparator<Cobranca> comparador = new Comparator<Cobranca>() {
 
             public int compare(Cobranca o1, Cobranca o2) {
@@ -1339,7 +1331,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         List<HashMap<String, String>> listaCobrancasOriginais = new ArrayList<HashMap<String, String>>();
         Collections.sort(ac.getHistorico().getCobrancasOriginais(), comparador);
-        Collections.sort(ac.getCobrancasGeradas(), comparador);
         for (Cobranca co : ac.getHistorico().getCobrancasOriginais()) {
             HashMap<String, String> mapa = new HashMap();
             mapa.put("valorPrestacao", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
@@ -1350,6 +1341,19 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             listaCobrancasOriginais.add(mapa);
         }
 
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("codigo", String.valueOf(ac.getCodigo()));
+        parametros.put("valor", PagamentoUtil.formatarMoeda(ac.getValor().doubleValue()));
+        parametros.put("numeroParcelas", String.valueOf(ac.getNumeroParcelas()));
+        parametros.put("forma", ac.getForma().name());
+        parametros.put("condominio", ac.getUnidade().getCondominio().getRazaoSocial());
+        parametros.put("unidade", ac.getUnidade().getUnidade());
+        parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
+        parametros.put("lista", new JRBeanCollectionDataSource(listaCobrancasOriginais));
+        parametros.put("dataEmissao", DataUtil.toString(new DateTime()));
+
+        List<HashMap<String, String>> listaCobrancasGeradas = new ArrayList<HashMap<String, String>>();
+        Collections.sort(ac.getCobrancasGeradas(), comparador);
         for (Cobranca co : ac.getCobrancasGeradas()) {
             HashMap<String, String> mapa = new HashMap();
             mapa.put("valorPrestacao", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
@@ -1357,10 +1361,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             mapa.put("pagamento", DataUtil.toString(co.getDataPagamento()));
             mapa.put("documento", co.getNumeroDocumento());
             mapa.put("tipo", "GERADA");
-            listaCobrancasOriginais.add(mapa);
+            listaCobrancasGeradas.add(mapa);
         }
 
-        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasOriginais, false);
+        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
