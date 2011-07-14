@@ -32,6 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1337,7 +1338,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
             mapa.put("pagamento", "-");
             mapa.put("documento", co.getNumeroDocumento());
-            mapa.put("tipo", "ORIGINAL");
             listaCobrancasOriginais.add(mapa);
         }
 
@@ -1350,17 +1350,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("unidade", ac.getUnidade().getUnidade());
         parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
         parametros.put("lista", new JRBeanCollectionDataSource(listaCobrancasOriginais));
-        parametros.put("dataEmissao", DataUtil.toString(new DateTime()));
-
+        
         List<HashMap<String, String>> listaCobrancasGeradas = new ArrayList<HashMap<String, String>>();
         Collections.sort(ac.getCobrancasGeradas(), comparador);
+        int i = 0;
         for (Cobranca co : ac.getCobrancasGeradas()) {
+            i += 1;
             HashMap<String, String> mapa = new HashMap();
+            mapa.put("numero", i + "/" + ac.getNumeroParcelas());
             mapa.put("valorPrestacao", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
             mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
-            mapa.put("pagamento", DataUtil.toString(co.getDataPagamento()));
+            mapa.put("pagamento", co.getDataPagamento() != null ? DataUtil.toString(co.getDataPagamento()) : "Em aberto");
             mapa.put("documento", co.getNumeroDocumento());
-            mapa.put("tipo", "GERADA");
             listaCobrancasGeradas.add(mapa);
         }
 
