@@ -21,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -38,6 +39,8 @@ public class ContaAgua implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private int codigo;
+    @OneToOne
+    private HidrometroAreaComum hidrometro;
     @OneToMany(mappedBy="conta", cascade = CascadeType.ALL)
     private List<Rateio> rateios = new ArrayList<Rateio>();
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
@@ -209,6 +212,15 @@ public class ContaAgua implements Serializable {
     public void setCondominio(Condominio condominio) {
         this.condominio = condominio;
     }
+
+    public HidrometroAreaComum getHidrometro() {
+        return hidrometro;
+    }
+
+    public void setHidrometro(HidrometroAreaComum hidrometro) {
+        this.hidrometro = hidrometro;
+    }
+
 
 
 }
