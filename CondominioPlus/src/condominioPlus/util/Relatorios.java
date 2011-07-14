@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import logicpoint.util.Util;
+import logicpoint.util.DataUtil;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -47,32 +47,20 @@ public class Relatorios implements Printable {
     public void imprimir(String relatorio, HashMap parametros, List lista, boolean impressaoDireta) {
         try {
 
-            ImageIcon imagem = null;
+            caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
+            parametros.put("logoEmpresa", caminhoImagem.toString());
 
-            imagem =NegocioUtil.getConfiguracao().getLogoEmpresa();
-                     
-            if (imagem != null) {
-                Util.redimensionarImagem(imagem, 110, 38, 100);
-                parametros.put("ImagemEmpresa", imagem.getImage());
-            }
-
-//            caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/cancelar.jpg");
-//            parametros.put("caminhoImagem", caminhoImagem.toString());
-            
             String minuto = "";
             if (new DateTime().getMinuteOfHour() <= 9) {
                 minuto = "0" + new DateTime().getMinuteOfHour();
             } else {
                 minuto = "" + new DateTime().getMinuteOfHour();
             }
-            
+
             parametros.put("hora", new DateTime().getHourOfDay() + ":" + minuto);
-            
-            parametros.put("nomeEmpresa", NegocioUtil.getConfiguracao().getNomeEmpresa());
-            parametros.put("cnpjEmpresa", NegocioUtil.getConfiguracao().getCnpj());
-            parametros.put("telefoneEmpresa", NegocioUtil.getConfiguracao().getTelefoneEmpresa());
-            parametros.put("enderecoEmpresa", NegocioUtil.getConfiguracao().getEnderecoEmpresa());
-            
+
+            parametros.put("dataEmissao", DataUtil.toString(new DateTime()));
+
             JRBeanCollectionDataSource ds = new JRBeanCollectionDataSource(lista);
             JasperPrint jprint = JasperFillManager.fillReport(
                     obterRelatorio(relatorio), parametros, ds);
@@ -88,7 +76,7 @@ public class Relatorios implements Printable {
                     "Falha de Impressão", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public JasperReport obterRelatorio(String nome) {
         URL url = getClass().getResource("/condominioPlus/relatorios/" + nome + ".jasper");
         System.out.println("URL: " + url.toString());
