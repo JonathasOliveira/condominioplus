@@ -37,6 +37,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.ComboModelo;
@@ -54,11 +55,36 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private List<Unidade> unidades;
     private ComboModelo<Advogado> modelo;
+    private TabelaModelo_2 modeloTabela;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondomino(Unidade unidade) {
         this.unidade = unidade;
         this.condominio = unidade.getCondominio();
+
+        initComponents();
+
+        modificarCamposInquilino(false);
+
+        verificarCNPJ();
+        carregarTabelaTelefone();
+        carregarTabelaEndereco();
+
+        carregarComboAdvogado();
+
+
+        controlador = new ControladorEventos();
+
+        if (this.unidade != null) {
+            preencherTela(this.unidade);
+        }
+
+    }
+
+      public TelaDadosCondomino(Unidade unidade, TabelaModelo_2 modelo) {
+        this.unidade = unidade;
+        this.condominio = unidade.getCondominio();
+        this.modeloTabela = modelo;
 
         initComponents();
 
@@ -184,9 +210,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             dao.remover(getModeloEndereco().getObjetosRemovidos());
             dao.concluirTransacao();
 
-            System.out.println("valores " + unidade.getNotificacaoJudicial());
-            System.out.println("processo judicial " + unidade.getProcessoJudicial());
-
+            modeloTabela.carregarObjetos();
             TelaPrincipal.getInstancia().notificarClasse(unidade);
             TelaPrincipal.getInstancia().notificarClasse(condominio);
 
@@ -399,8 +423,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         checkboxImpressaoCobranca.setSelected(unidade.isBloquearImpressaoCobranca());
 
         if (unidade.getNotificacaoJudicial() != null) {
-            System.out.println("here");
-            ativarNotificacao(true);
+           ativarNotificacao(true);
             checkboxNotificadoJudicialmente.setSelected(true);
             modelo.setSelectedItem(unidade.getNotificacaoJudicial().getAdvogado());
             dateInicioJudicial.setValue(DataUtil.getDate(unidade.getNotificacaoJudicial().getData_inicio().getTimeInMillis()));
@@ -1281,7 +1304,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                     .addComponent(jLabel35)
                     .addComponent(jLabel31)
                     .addComponent(txtUfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Inquilino", jPanel5);
@@ -1374,7 +1397,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addComponent(dateProcessoJuridico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                         .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbAdvogado1, 0, 187, Short.MAX_VALUE)
+                            .addComponent(cmbAdvogado1, 0, 189, Short.MAX_VALUE)
                             .addGroup(jPanel10Layout.createSequentialGroup()
                                 .addComponent(txtNumeroProcesso, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1501,7 +1524,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(checkboxImpressaoCertificado))
                             .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1537,7 +1560,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

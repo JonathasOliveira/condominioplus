@@ -61,7 +61,7 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
 
             @Override
             public void editar(Unidade unidade) {
-              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade));
+              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade, modelo));
             }
 
             @Override
