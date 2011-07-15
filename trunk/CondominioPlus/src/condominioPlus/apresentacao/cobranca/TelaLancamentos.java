@@ -508,10 +508,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             pagamento.setCobranca(cobranca);
             pagamento.setConta(co.getConta());
             pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-            if (co.isDividirFracaoIdeal()) {
-                pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)));
+            if (u.getValorPrincipal().doubleValue() != 0) {
+                pagamento.setValor(u.getValorPrincipal());
             } else {
-                pagamento.setValor(co.getValor());
+                if (co.isDividirFracaoIdeal()) {
+                    pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)));
+                } else {
+                    pagamento.setValor(co.getValor());
+                }
             }
             cobranca.getPagamentos().add(pagamento);
             cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
@@ -1350,7 +1354,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("unidade", ac.getUnidade().getUnidade());
         parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
         parametros.put("lista", new JRBeanCollectionDataSource(listaCobrancasOriginais));
-        
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
         List<HashMap<String, String>> listaCobrancasGeradas = new ArrayList<HashMap<String, String>>();
         Collections.sort(ac.getCobrancasGeradas(), comparador);
         int i = 0;

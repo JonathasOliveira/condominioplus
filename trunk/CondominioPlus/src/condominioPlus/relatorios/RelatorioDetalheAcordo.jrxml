@@ -11,12 +11,11 @@
 	<parameter name="condominio" class="java.lang.String"/>
 	<parameter name="unidade" class="java.lang.String"/>
 	<parameter name="condomino" class="java.lang.String"/>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\relatorios\\"]]></defaultValueExpression>
-	</parameter>
 	<parameter name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="dataEmissao" class="java.lang.String"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="subrelatorio" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
 	<field name="valorPrestacao" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
 	<field name="documento" class="java.lang.String"/>
@@ -203,7 +202,7 @@
 			<subreport>
 				<reportElement x="0" y="110" width="555" height="48"/>
 				<dataSourceExpression><![CDATA[$P{lista}]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA[$P{SUBREPORT_DIR} + "SubRelatorioDetalheAcordo.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioDetalheAcordo.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
 				<reportElement positionType="Float" x="6" y="159" width="174" height="20"/>
