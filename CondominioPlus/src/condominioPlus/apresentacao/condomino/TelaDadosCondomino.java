@@ -29,6 +29,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -414,7 +415,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         txtIptu.setText(unidade.getIptu());
         txtBloco.setText(unidade.getBloco());
         txtCoeficiente.setText(unidade.getCoeficiente());
-        txtValorPrincipal.setText(unidade.getValorPrincipal());
+        txtValorPrincipal.setText(unidade.getValorPrincipal().toString().replace(".", ","));
 
         checkBoxSindico.setSelected(unidade.isSindico());
         checkboxAtivo.setSelected(unidade.isAtivo());
@@ -517,7 +518,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.setIptu(txtIptu.getText());
         unidade.setBloco(txtBloco.getText());
         unidade.setCoeficiente(txtCoeficiente.getText());
-        unidade.setValorPrincipal(txtValorPrincipal.getText());
+        unidade.setValorPrincipal(new BigDecimal(txtValorPrincipal.getText().replace(",", ".")));
 
         unidade.setSindico(checkBoxSindico.isSelected());
         unidade.setAtivo(checkboxAtivo.isSelected());
@@ -1304,7 +1305,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                     .addComponent(jLabel35)
                     .addComponent(jLabel31)
                     .addComponent(txtUfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Inquilino", jPanel5);
@@ -1397,7 +1398,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addComponent(dateProcessoJuridico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                         .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmbAdvogado1, 0, 189, Short.MAX_VALUE)
+                            .addComponent(cmbAdvogado1, 0, 187, Short.MAX_VALUE)
                             .addGroup(jPanel10Layout.createSequentialGroup()
                                 .addComponent(txtNumeroProcesso, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1524,7 +1525,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
                                 .addComponent(checkboxImpressaoCertificado))
                             .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1560,7 +1561,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addContainerGap())
         );
 

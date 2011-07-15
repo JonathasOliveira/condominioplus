@@ -7,6 +7,7 @@ package condominioPlus.negocio;
 import condominioPlus.negocio.cobranca.AcordoCobranca;
 import condominioPlus.negocio.cobranca.Cobranca;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -53,8 +54,8 @@ public class Unidade implements Serializable {
     private double  fracaoIdeal;
     private String bloco;
     private String coeficiente;
-    @Column(name = "valor_principal")
-    private String valorPrincipal;
+    @Column(name = "valor_principal", precision = 20, scale = 2)
+    private BigDecimal valorPrincipal;
     private boolean sindico;
     private boolean ativo;
     @Column(name = "bloquear_impressao_certificado")
@@ -221,11 +222,11 @@ public class Unidade implements Serializable {
         this.unidade = unidade;
     }
 
-    public String getValorPrincipal() {
+    public BigDecimal getValorPrincipal() {
         return valorPrincipal;
     }
 
-    public void setValorPrincipal(String valorPrincipal) {
+    public void setValorPrincipal(BigDecimal valorPrincipal) {
         this.valorPrincipal = valorPrincipal;
     }
 
