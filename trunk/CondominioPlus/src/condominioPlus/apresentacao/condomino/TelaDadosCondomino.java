@@ -1322,9 +1322,17 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jLabel11.setText("Valor da Cota:");
 
+        txtIptu.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        txtFracaoIdeal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtFracaoIdeal.setName("Aba Unidade - Fração Ideal"); // NOI18N
 
+        txtBloco.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        txtCoeficiente.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         txtCoeficiente.setName("Aba Unidade - Coeficiente"); // NOI18N
+
+        txtValorPrincipal.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
