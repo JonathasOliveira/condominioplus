@@ -55,7 +55,7 @@ public class Unidade implements Serializable {
     private String bloco;
     private String coeficiente;
     @Column(name = "valor_principal", precision = 20, scale = 2)
-    private BigDecimal valorPrincipal;
+    private BigDecimal valorPrincipal = new BigDecimal(0);
     private boolean sindico;
     private boolean ativo;
     @Column(name = "bloquear_impressao_certificado")
