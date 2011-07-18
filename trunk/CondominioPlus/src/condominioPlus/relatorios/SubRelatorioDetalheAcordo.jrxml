@@ -4,6 +4,7 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="totalOriginal" class="java.lang.String"/>
 	<field name="documento" class="java.lang.String"/>
 	<field name="pagamento" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
@@ -94,4 +95,20 @@
 			</textField>
 		</band>
 	</detail>
+	<pageFooter>
+		<band height="28">
+			<staticText>
+				<reportElement x="365" y="5" width="41" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="409" y="5" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalOriginal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
 </jasperReport>

@@ -15,7 +15,8 @@
 	<parameter name="dataEmissao" class="java.lang.String"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="subrelatorio" class="java.lang.String"/>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
+	<parameter name="totalGerado" class="java.lang.String"/>
+	<parameter name="totalOriginal" class="java.lang.String"/>
 	<field name="valorPrestacao" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
 	<field name="documento" class="java.lang.String"/>
@@ -87,7 +88,7 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="202" splitType="Stretch">
+		<band height="218" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="40" width="554" height="20" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -127,31 +128,31 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidade}]]></textFieldExpression>
 			</textField>
 			<rectangle>
-				<reportElement positionType="Float" x="0" y="182" width="555" height="20" forecolor="#FFFFFF" backcolor="#999999"/>
+				<reportElement positionType="Float" x="0" y="198" width="555" height="20" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="109" y="182" width="100" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="109" y="198" width="100" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="224" y="182" width="100" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="224" y="198" width="100" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Vencimento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="339" y="182" width="100" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="339" y="198" width="100" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Pagamento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="454" y="182" width="70" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="454" y="198" width="70" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
@@ -201,11 +202,14 @@
 			</staticText>
 			<subreport>
 				<reportElement x="0" y="110" width="555" height="48"/>
+				<subreportParameter name="totalOriginal">
+					<subreportParameterExpression><![CDATA[$P{totalOriginal}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[$P{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioDetalheAcordo.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement positionType="Float" x="6" y="159" width="174" height="20"/>
+				<reportElement positionType="Float" x="6" y="175" width="174" height="20"/>
 				<textElement verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
@@ -219,7 +223,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{condomino}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="31" y="182" width="63" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="31" y="198" width="63" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
@@ -278,10 +282,20 @@
 			</textField>
 		</band>
 	</detail>
-	<pageFooter>
-		<band height="54" splitType="Stretch"/>
-	</pageFooter>
 	<summary>
-		<band height="42" splitType="Stretch"/>
+		<band height="28">
+			<textField>
+				<reportElement positionType="Float" x="454" y="5" width="60" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalGerado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="410" y="5" width="41" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+		</band>
 	</summary>
 </jasperReport>
