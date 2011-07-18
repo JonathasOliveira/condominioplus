@@ -16,6 +16,7 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.FormaCalculoMetroCubico;
 import condominioPlus.negocio.cobranca.agua.FormaRateioAreaComum;
+import condominioPlus.negocio.cobranca.agua.HidrometroAreaComum;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.cobranca.agua.Pipa;
 import condominioPlus.negocio.cobranca.agua.Rateio;
@@ -24,6 +25,7 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.FormatadorNumeros;
 import condominioPlus.util.RenderizadorCelulaCorGenerico;
 import condominioPlus.util.RenderizadorCelulaDireita;
+import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -93,6 +95,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             carregarTabelaPipa();
             carregarTabelaRateio();
             modeloContaAgua.selecionar(conta, 0);
+            preencherTelaHidrometro();
         }
     }
 
@@ -338,7 +341,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
         tabelaRateio.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).
                 put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-                "selectNextColumnCell");
+                "selectNextCell");
 
 
     }
@@ -659,9 +662,24 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         } else {
             soma = conta.getConsumoProlagos().add(conta.getConsumoPipa());
         }
-        BigDecimal total = soma.subtract(conta.getConsumoUnidadesMetroCubico());
+        BigDecimal total = BigDecimal.ZERO;
+        if (checkHidrometroAreaComum.isSelected()) {
+            if (txtTotalAreaComum.getText().length() > 0) {
+                Moeda valorSomado = new Moeda(txtTotalAreaComum.getText().replace(",", "."));
+                System.out.println("soma dentro do check hidrometro " + total.toString());
+                System.out.println("conta.getCosumoPipa" + conta.getConsumoPipa());
+                valorSomado.soma(conta.getConsumoPipa());
+                total = valorSomado.bigDecimalValue();
+                System.out.println("soma dentro do check hidrometro depois d add pipa " + total.toString());
+            } else {
+                ApresentacaoUtil.exibirInformacao("Digite um valor pra Area Comum e salve!", this);
+            }
+
+        } else {
+            total = soma.subtract(conta.getConsumoUnidadesMetroCubico());
+        }
         if (total.intValue() > 0) {
-            conta.setConsumoAreaComum(total);
+            conta.setConsumoAreaComum(FormatadorNumeros.casasDecimais(3, total));
         } else {
             conta.setConsumoAreaComum(new BigDecimal(BigInteger.ZERO));
         }
@@ -768,6 +786,9 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private void incluirContaAgua() {
+
+        limparCampos();
+
         System.out.println("tamanho " + modeloContaAgua.size());
 
         conta = new ContaAgua();
@@ -971,10 +992,47 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         txtValorSindico.setText(new Moeda(parametros.getValorMetroCubicoSindico()).toString());
 
         verificarHidrometroAreaComum();
+
     }
 
     private void fechar() {
         doDefaultCloseAction();
+    }
+
+    private void preencherTelaHidrometro() {
+        if (conta.getHidrometro() != null) {
+            txtLeituraAnteriorAreaComum.setText(conta.getHidrometro().getLeituraAtual().toString());
+            txtLeituraAtualAreaComum.setText(conta.getHidrometro().getLeituraFinal().toString());
+
+            BigDecimal total = conta.getHidrometro().getLeituraFinal().subtract(conta.getHidrometro().getLeituraAtual());
+            txtTotalAreaComum.setText(total.toString());
+        }
+
+    }
+
+    private void preencherHidrometro() {
+
+        if (checkHidrometroAreaComum.isSelected()) {
+            HidrometroAreaComum h = new HidrometroAreaComum();
+
+            h.setLeituraAtual(new BigDecimal(txtLeituraAnteriorAreaComum.getText().replace(",", ".")));
+            if (txtLeituraAtualAreaComum.getText().length() > 0) {
+                h.setLeituraFinal(new BigDecimal(txtLeituraAtualAreaComum.getText().replace(",", ".")));
+            }
+
+            conta.setHidrometro(h);
+
+            new DAO().salvar(h);
+
+            BigDecimal total = h.getLeituraFinal().subtract(h.getLeituraAtual());
+            txtLeituraAnteriorAreaComum.setText(h.getLeituraAtual().toString());
+
+            txtTotalAreaComum.setText(FormatadorNumeros.casasDecimais(3, total).toString());
+
+
+
+        }
+
     }
 
     private void salvar() {
@@ -993,9 +1051,69 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     }
 
+    private void limparCampos() {
+        txtLeituraAnteriorAreaComum.setText("");
+        txtLeituraAtualAreaComum.setText("");
+        txtTotalAreaComum.setText("");
+
+        System.out.println("condominio size " + condominio.getContasDeAgua().size());
+        if (condominio.getContasDeAgua().size() >= 1) {
+            txtLeituraAnteriorAreaComum.setText(condominio.getContasDeAgua().get((condominio.getContasDeAgua().size() - 1)).getHidrometro().getLeituraFinal().toString());
+
+        } else {
+
+            txtLeituraAnteriorAreaComum.setText("0");
+        }
+
+    }
+
+    private List listaCampos() {
+        List<Object> campos = new ArrayList<Object>();
+        if (checkHidrometroAreaComum.isSelected()) {
+            campos.add(txtLeituraAtualAreaComum);
+        }
+
+        return campos;
+    }
+
+    private boolean validarCampos() {
+        if (conta.getDataInicial() != null && conta.getDataFinal() != null) {
+            if (DataUtil.compararData(DataUtil.getDateTime(conta.getDataInicial()), DataUtil.getDateTime(conta.getDataFinal())) == 1) {
+                ApresentacaoUtil.exibirErro("Data Inicial nâo pode ser maior que a data Final", this);
+                return false;
+            }
+        } else {
+            ApresentacaoUtil.exibirErro("Por favor insira uma data Inicial e Final!", this);
+            return false;
+        }
+
+        if (conta.getValorProlagos().doubleValue() > 0 && conta.getConsumoProlagos().doubleValue() > 0) {
+            if (conta.getDataVencimentoConta() == null) {
+                ApresentacaoUtil.exibirAdvertencia("Por favor entre com o vencimento da conta!", this);
+                return false;
+            } else {
+                return false;
+            }
+
+
+        }
+
+        return true;
+    }
+
     private void salvarAgua() {
         preencherObjeto();
+        preencherHidrometro();
         try {
+            ValidadorGenerico validador = new ValidadorGenerico();
+            if (!validador.validar(listaCampos())) {
+                validador.exibirErros(this);
+                return;
+            }
+
+            if (!validarCampos()) {
+                return;
+            }
             new DAO().salvar(conta);
 
             ApresentacaoUtil.exibirInformacao("Conta Salva com Sucesso!", this);
@@ -1080,6 +1198,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 conta = modeloContaAgua.getObjetoSelecionado();
                 carregarTabelaPipa();
                 carregarTabelaRateio();
+                preencherTelaHidrometro();
             }
         }
 
@@ -1088,6 +1207,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             Object origem = e.getSource();
             if (origem == tabelaContaAgua && (e.getKeyCode() == KeyEvent.VK_UP) || origem == tabelaContaAgua && (e.getKeyCode() == KeyEvent.VK_DOWN)) {
                 modeloRateio.setObjetos(modeloContaAgua.getObjetoSelecionado().getRateios());
+                preencherTelaHidrometro();
 
             }
         }
