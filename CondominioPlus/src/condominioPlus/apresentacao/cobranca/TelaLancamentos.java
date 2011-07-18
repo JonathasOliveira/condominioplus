@@ -18,6 +18,8 @@ import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
+import condominioPlus.negocio.cobranca.agua.ContaAgua;
+import condominioPlus.negocio.cobranca.agua.Rateio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.FormaPagamento;
@@ -520,6 +522,23 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             cobranca.getPagamentos().add(pagamento);
             cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
             cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+        }
+        for (ContaAgua c : condominio.getContasDeAgua()) {
+            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getDateTime(cobranca.getDataVencimento())) == 0) {
+                for (Rateio r : c.getRateios()) {
+                    if (r.getUnidade().getCodigo() == u.getCodigo()) {
+                        Pagamento pagamento = new Pagamento();
+                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                        pagamento.setCobranca(cobranca);
+                        pagamento.setConta(new DAO().localizar(Conta.class, 11452));
+                        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                        pagamento.setValor(r.getValorTotalCobrar());
+                        cobranca.getPagamentos().add(pagamento);
+                        cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
+                        cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+                    }
+                }
+            }
         }
         verificarResiduoAnterior(cobranca);
     }
@@ -1327,6 +1346,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void imprimirDetalheAcordo(AcordoCobranca ac) {
 
+        Moeda totalOriginal = new Moeda();
+        Moeda totalGerado = new Moeda();
+
         Comparator<Cobranca> comparador = new Comparator<Cobranca>() {
 
             public int compare(Cobranca o1, Cobranca o2) {
@@ -1342,6 +1364,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
             mapa.put("pagamento", "-");
             mapa.put("documento", co.getNumeroDocumento());
+            totalOriginal.soma(co.getValorTotal());
             listaCobrancasOriginais.add(mapa);
         }
 
@@ -1354,6 +1377,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("unidade", ac.getUnidade().getUnidade());
         parametros.put("condomino", ac.getUnidade().getCondomino().getNome());
         parametros.put("lista", new JRBeanCollectionDataSource(listaCobrancasOriginais));
+        parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
 
@@ -1371,8 +1395,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             mapa.put("dataVencimento", DataUtil.toString(co.getDataVencimento()));
             mapa.put("pagamento", co.getDataPagamento() != null ? DataUtil.toString(co.getDataPagamento()) : "Em aberto");
             mapa.put("documento", co.getNumeroDocumento());
+            totalGerado.soma(co.getValorTotal());
             listaCobrancasGeradas.add(mapa);
         }
+
+        parametros.put("totalGerado", PagamentoUtil.formatarMoeda(totalGerado.doubleValue()));
 
         new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false);
     }
