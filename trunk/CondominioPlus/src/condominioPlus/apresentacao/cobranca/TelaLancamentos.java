@@ -1356,6 +1356,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("lista", new JRBeanCollectionDataSource(listaCobrancasOriginais));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+
+        System.out.println("caminha.tostring" + caminho.toString());
         parametros.put("subrelatorio", caminho.toString());
 
         List<HashMap<String, String>> listaCobrancasGeradas = new ArrayList<HashMap<String, String>>();
