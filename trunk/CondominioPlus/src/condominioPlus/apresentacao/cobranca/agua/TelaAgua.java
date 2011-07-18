@@ -33,6 +33,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JTable;
@@ -164,6 +166,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                         break;
                     case 7:
                         conta.setDataVencimentoConta(DataUtil.getCalendar(valor));
+                                System.out.println("conta vencimento " + DataUtil.getDateTime(conta.getDataVencimentoConta()));
                         break;
 
 
@@ -263,7 +266,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaRateio() {
-        modeloRateio = new TabelaModelo_2<Rateio>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(M3), Consumo a Cobrar(M3), Valor(M3), Percentual, Valor do Rateio PIPA(R$), Total Consumido Unidades(R$), Percentual para Rateio Area Comum, Consumo Área Comum(M3), Valor do Consumo Area Comum(R$), Valor Total a Cobrar ".split(",")) {
+        modeloRateio = new TabelaModelo_2<Rateio>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(M3), Consumo a Cobrar(M3), Valor(M3), Percentual, Valor PIPA(R$), Total Unidades(R$), Percentual Area Comum, Consumo Área Comum(M3), Valor Area Comum(R$), Valor Total a Cobrar ".split(",")) {
 
             @Override
             protected List<Rateio> getCarregarObjetos() {
@@ -419,6 +422,21 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private List<Rateio> getUnidadesRateio() {
+           Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Rateio r1 = (Rateio) o1;
+                Rateio r2 = (Rateio) o2;
+                return (r1.getUnidade().getUnidade()).compareTo(r2.getUnidade().getUnidade());
+            }
+        };
+
+        Collections.sort(conta.getRateios(), c);
+
+
+
         return conta.getRateios();
     }
 
@@ -1092,7 +1110,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 ApresentacaoUtil.exibirAdvertencia("Por favor entre com o vencimento da conta!", this);
                 return false;
             } else {
-                return false;
+                return true;
             }
 
 
