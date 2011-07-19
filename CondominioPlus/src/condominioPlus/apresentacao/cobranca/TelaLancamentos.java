@@ -34,6 +34,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -514,7 +515,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 pagamento.setValor(u.getValorPrincipal());
             } else {
                 if (co.isDividirFracaoIdeal()) {
-                    pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)));
+                    pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co)).setScale(2, RoundingMode.UP));
                 } else {
                     pagamento.setValor(co.getValor());
                 }
@@ -524,7 +525,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
         }
         for (ContaAgua c : condominio.getContasDeAgua()) {
-            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getDateTime(cobranca.getDataVencimento())) == 0) {
+            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).plusDays(5)) == -1) {
                 for (Rateio r : c.getRateios()) {
                     if (r.getUnidade().getCodigo() == u.getCodigo()) {
                         Pagamento pagamento = new Pagamento();
