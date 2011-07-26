@@ -65,6 +65,11 @@
                 <Property name="text" type="java.lang.String" value="Cobran&#xe7;a Base"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemTaxaExtra">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Taxa Extra"/>
+              </Properties>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemCalculoMaiorCota">
               <Properties>
                 <Property name="text" type="java.lang.String" value="C&#xe1;lculo maior Cota"/>
