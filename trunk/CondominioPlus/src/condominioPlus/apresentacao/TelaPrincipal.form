@@ -75,6 +75,11 @@
                 <Property name="text" type="java.lang.String" value="C&#xe1;lculo maior Cota"/>
               </Properties>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemGas">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="G&#xe1;s"/>
+              </Properties>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="menuFinanceiro">
