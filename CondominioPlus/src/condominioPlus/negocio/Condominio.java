@@ -8,6 +8,7 @@ import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
+import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conciliacao;
 import condominioPlus.negocio.financeiro.Consignacao;
@@ -120,6 +121,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private boolean calcularMultaProximoMes;
     @Column(name="parcelas_acordo")
     private int numeroMinimoParcelasAcordo;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<TaxaExtra> taxas;
 
     public Condominio() {
     }
@@ -492,6 +495,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setNumeroMinimoParcelasAcordo(int numeroMinimoParcelasAcordo) {
         this.numeroMinimoParcelasAcordo = numeroMinimoParcelasAcordo;
+    }
+
+    public List<TaxaExtra> getTaxas() {
+        return taxas;
+    }
+
+    public void setTaxas(List<TaxaExtra> taxas) {
+        this.taxas = taxas;
     }
     
 }
