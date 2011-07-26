@@ -2,16 +2,21 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.cobranca.gas;
 
+import condominioPlus.negocio.Condominio;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 
@@ -20,21 +25,31 @@ import javax.persistence.Temporal;
  * @author Administrador
  */
 @Entity
-@Table(name="conta_gas")
+@Table(name = "conta_gas")
 public class ContaGas implements Serializable {
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataInicial;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataFinal;
-    private BigDecimal valorUnitarioKg;
-    private BigDecimal quantidadeKg;
-    private BigDecimal valorTotal;
-    private BigDecimal valorUnitarioMetroCubico;
-    private BigDecimal quantidadeMetroCubico;
-    private double densidadeMedia;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Calendar dataVencimento;
+    private BigDecimal valorUnitarioKg = new BigDecimal(0);
+    private BigDecimal quantidadeKg = new BigDecimal(0);
+    private BigDecimal valorTotal = new BigDecimal(0);
+    private BigDecimal valorUnitarioMetroCubico = new BigDecimal(0);
+    private BigDecimal quantidadeMetroCubico = new BigDecimal(0);
+    private BigDecimal densidadeMedia = new BigDecimal(0);
+    private BigDecimal totalCosumoUnidades = new BigDecimal(0);
+    private BigDecimal totalUnidadesDinheiro = new BigDecimal(0);
+    private BigDecimal totalCosumoAreaComum = new BigDecimal(0);
+    @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
+    private List<RateioGas> rateios = new ArrayList<RateioGas>();
+    @ManyToOne
+    private Condominio condominio;
 
     public int getCodigo() {
         return codigo;
@@ -44,11 +59,11 @@ public class ContaGas implements Serializable {
         this.codigo = codigo;
     }
 
-    public double getDensidadeMedia() {
+    public BigDecimal getDensidadeMedia() {
         return densidadeMedia;
     }
 
-    public void setDensidadeMedia(double densidadeMedia) {
+    public void setDensidadeMedia(BigDecimal densidadeMedia) {
         this.densidadeMedia = densidadeMedia;
     }
 
@@ -108,8 +123,52 @@ public class ContaGas implements Serializable {
         this.dataInicial = dataInicial;
     }
 
-    
+    public List<RateioGas> getRateios() {
+        return rateios;
+    }
 
-    
+    public void setRateios(List<RateioGas> rateios) {
+        this.rateios = rateios;
+    }
 
+    public BigDecimal getTotalCosumoUnidades() {
+        return totalCosumoUnidades;
+    }
+
+    public void setTotalCosumoUnidades(BigDecimal totalCosumoUnidades) {
+        this.totalCosumoUnidades = totalCosumoUnidades;
+    }
+
+    public BigDecimal getTotalUnidadesDinheiro() {
+        return totalUnidadesDinheiro;
+    }
+
+    public void setTotalUnidadesDinheiro(BigDecimal totalUnidadesDinheiro) {
+        this.totalUnidadesDinheiro = totalUnidadesDinheiro;
+    }
+
+    public BigDecimal getTotalCosumoAreaComum() {
+        return totalCosumoAreaComum;
+    }
+
+    public void setTotalCosumoAreaComum(BigDecimal totalCosumoAreaComum) {
+        this.totalCosumoAreaComum = totalCosumoAreaComum;
+    }
+
+    public Condominio getCondominio() {
+        return condominio;
+    }
+
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
+    }
+
+    public Calendar getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(Calendar dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    }
+    
 }

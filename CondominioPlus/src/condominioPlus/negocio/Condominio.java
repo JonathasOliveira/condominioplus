@@ -8,6 +8,7 @@ import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
+import condominioPlus.negocio.cobranca.gas.ContaGas;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conciliacao;
@@ -109,6 +110,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<CobrancaBase> cobrancasBase;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<ContaAgua> contasDeAgua;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<ContaGas> contasDeGas;
     @OneToOne
     private Conciliacao conciliacao;
     @OneToOne
@@ -497,6 +500,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.numeroMinimoParcelasAcordo = numeroMinimoParcelasAcordo;
     }
 
+    public List<ContaGas> getContasDeGas() {
+        return contasDeGas;
+    }
+
+    public void setContasDeGas(List<ContaGas> contasDeGas) {
+        this.contasDeGas = contasDeGas;
+    }
+
     public List<TaxaExtra> getTaxas() {
         return taxas;
     }
@@ -504,5 +515,6 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setTaxas(List<TaxaExtra> taxas) {
         this.taxas = taxas;
     }
+
     
 }
