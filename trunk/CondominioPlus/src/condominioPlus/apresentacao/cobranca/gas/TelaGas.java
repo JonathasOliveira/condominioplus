@@ -12,19 +12,15 @@ package condominioPlus.apresentacao.cobranca.gas;
 
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
-import condominioPlus.negocio.cobranca.agua.ContaAgua;
-import condominioPlus.negocio.cobranca.agua.Pipa;
 import condominioPlus.negocio.cobranca.agua.Rateio;
 import condominioPlus.negocio.cobranca.gas.ContaGas;
 import condominioPlus.negocio.cobranca.gas.RateioGas;
 import condominioPlus.util.FormatadorNumeros;
 import condominioPlus.util.RenderizadorCelulaCorGenerico;
-import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +74,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaContaGas() {
-        modeloContaGas = new TabelaModelo_2<ContaGas>(tabelaContaGas, "Data Inicial, Data Final, densidade, Quantidade KG, Quantidade M3, Valor Unitário KG, Valor Unitário M3, Total Despesas".split(",")) {
+        modeloContaGas = new TabelaModelo_2<ContaGas>(tabelaContaGas, "Data Inicial, Data Final, densidade, Quantidade KG, Valor Unitário KG, Quantidade M3, Valor Unitário M3, Total Despesas".split(",")) {
 
             @Override
             protected List<ContaGas> getCarregarObjetos() {
@@ -101,10 +97,10 @@ public class TelaGas extends javax.swing.JInternalFrame {
                         conta.setQuantidadeKg((BigDecimal) valor);
                         break;
                     case 4:
-                        conta.setQuantidadeMetroCubico(((BigDecimal) valor));
+                        conta.setValorUnitarioKg(((BigDecimal) valor));
                         break;
                     case 5:
-                        conta.setValorUnitarioKg(((BigDecimal) valor));
+                        conta.setQuantidadeMetroCubico(((BigDecimal) valor));
                         break;
                     case 6:
                         conta.setValorUnitarioMetroCubico(((BigDecimal) valor));
@@ -127,9 +123,9 @@ public class TelaGas extends javax.swing.JInternalFrame {
                     case 3:
                         return conta.getQuantidadeKg();
                     case 4:
-                        return conta.getQuantidadeMetroCubico();
-                    case 5:
                         return conta.getValorUnitarioKg();
+                    case 5:
+                        return conta.getQuantidadeMetroCubico();
                     case 6:
                         return conta.getValorUnitarioMetroCubico();
                     case 7:
@@ -147,7 +143,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
         tabelaContaGas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //
 //
-        modeloContaGas.setEditaveis(0, 1, 2, 3, 7);
+        modeloContaGas.setEditaveis(0, 1, 2, 3, 4);
 //
         tabelaContaGas.getColumn(modeloContaGas.getCampo(0)).setCellRenderer(new RenderizadorCelulaData());
         tabelaContaGas.getColumn(modeloContaGas.getCampo(1)).setCellRenderer(new RenderizadorCelulaData());
@@ -165,11 +161,10 @@ public class TelaGas extends javax.swing.JInternalFrame {
 //        tabelaContaGas.getColumn(modeloContaAgua.getCampo(8)).setCellRenderer(centralizado);
 //
         for (int i = 0; i <= 7; i++) {
-            tabelaContaGas.getColumn(modeloContaGas.getCampo(i)).setMinWidth(150);
+            tabelaContaGas.getColumn(modeloContaGas.getCampo(i)).setMinWidth(100);
 
         }
 //
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(4)).setCellRenderer(new RenderizadorCelulaCorGenerico());
         tabelaContaGas.getColumn(modeloContaGas.getCampo(5)).setCellRenderer(new RenderizadorCelulaCorGenerico());
         tabelaContaGas.getColumn(modeloContaGas.getCampo(6)).setCellRenderer(new RenderizadorCelulaCorGenerico());
         tabelaContaGas.getColumn(modeloContaGas.getCampo(7)).setCellRenderer(new RenderizadorCelulaCorGenerico());
@@ -183,6 +178,15 @@ public class TelaGas extends javax.swing.JInternalFrame {
         return condominio.getContasDeGas();
     }
 
+    private void calcularMetroCubico() {
+        if (conta != null) {
+            conta.setValorUnitarioMetroCubico(conta.getValorUnitarioKg().multiply(conta.getDensidadeMedia()));
+            conta.setQuantidadeMetroCubico(conta.getQuantidadeKg().divide(conta.getDensidadeMedia()));
+            conta.setValorTotal(conta.getValorUnitarioMetroCubico().multiply(conta.getQuantidadeMetroCubico()).setScale(2, RoundingMode.UP));
+
+        }
+    }
+
     private BigDecimal verificarValor(Object valor) {
 
         if (valor instanceof String) {
@@ -194,7 +198,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaRateio() {
-        modeloRateio = new TabelaModelo_2<RateioGas>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(M3), Consumo a Cobrar(M3), Valor(M3), Consumo Área Comum(R$, Valor Total a Cobrar ".split(",")) {
+        modeloRateio = new TabelaModelo_2<RateioGas>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(M3), Consumo a Cobrar(R$), Consumo Área Comum(R$), Valor Total a Cobrar ".split(",")) {
 
             @Override
             protected List<RateioGas> getCarregarObjetos() {
@@ -224,11 +228,11 @@ public class TelaGas extends javax.swing.JInternalFrame {
                     case 4:
                         return rateio.getConsumoMetroCubico();
                     case 5:
-                        return rateio.getConsumoEmReaisUnidade();
+                        return new Moeda(rateio.getConsumoEmReaisUnidade());
                     case 6:
-                        return rateio.getConsumoReaisAreaComum();
+                        return new Moeda(rateio.getConsumoReaisAreaComum());
                     case 7:
-                        return rateio.getConsumoTotal();
+                        return new Moeda(rateio.getConsumoTotal());
                     default:
                         return null;
 
@@ -253,7 +257,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
 //        tabelaRateio.getColumn(modeloRateio.getCampo(8)).setCellRenderer(centralizado);
 //        tabelaRateio.getColumn(modeloRateio.getCampo(3)).setCellRenderer(new RenderizadorCelulaCorGenerico());
 //
-        for (int i = 2; i < 9; i++) {
+        for (int i = 2; i <= 7; i++) {
             tabelaRateio.getColumn(modeloRateio.getCampo(i)).setMinWidth(150);
 
         }
@@ -279,57 +283,13 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
         Collections.sort(conta.getRateios(), c);
 
-
-
         return conta.getRateios();
-    }
-
-    private double getMaiorFracaoIdeal() {
-        double resultado = 0;
-        for (Unidade u : condominio.getUnidades()) {
-            if (u.getFracaoIdeal() > resultado) {
-                resultado = u.getFracaoIdeal();
-            }
-        }
-        return resultado;
-    }
-
-    private void calcularTotalConsumoUnidades() {
-        List<RateioGas> rateios = modeloContaGas.getObjetoSelecionado().getRateios();
-        Moeda total = new Moeda(BigDecimal.ZERO);
-        Moeda totalDinheiro = new Moeda(0);
-        for (RateioGas rateio : rateios) {
-            total.soma(rateio.getConsumoMetroCubico());
-            totalDinheiro.soma(conta.getValorUnitarioMetroCubico().multiply(rateio.getConsumoMetroCubico()));
-        }
-
-        conta.setTotalCosumoUnidades(total.bigDecimalValue());
-        conta.setTotalUnidadesDinheiro(totalDinheiro.bigDecimalValue());
-    }
-
-//    private void calcularTotalAreaComum() {
-//        BigDecimal soma = BigDecimal.ZERO;
-//
-//
-//        } else {
-//            total = soma.subtract(conta.getConsumoUnidadesMetroCubico());
-//        }
-//        if (total.intValue() > 0) {
-//            conta.setConsumoAreaComum(FormatadorNumeros.casasDecimais(3, total));
-//        } else {
-//            conta.setConsumoAreaComum(new BigDecimal(BigInteger.ZERO));
-//        }
-//    }
-    private void calcularTotalConsumoUnidade(RateioGas rateio) {
-        Moeda total = new Moeda(rateio.getConsumoMetroCubico());
-        total.multiplica(conta.getValorUnitarioMetroCubico());
-        rateio.setConsumoTotal(total.bigDecimalValue());
     }
 
     private void calcular() {
         List<RateioGas> rateios = modeloContaGas.getObjetoSelecionado().getRateios();
         if (!rateios.isEmpty()) {
-
+            calcularMetroCubico();
             for (RateioGas rateio : rateios) {
                 if (rateio.getLeituraAtual() != null && rateio.getLeituraAnterior() != null) {
                     if (rateio.getLeituraAnterior().doubleValue() > rateio.getLeituraAtual().doubleValue()) {
@@ -342,24 +302,47 @@ public class TelaGas extends javax.swing.JInternalFrame {
                         } else {
                             rateio.setConsumoMetroCubico(valorConsumo);
                         }
+                        valorMetroCubicoPorRateio(rateio);
                     }
                 } else {
                     System.out.println("valor nulo");
                 }
 
 
-                calcularTotalConsumoUnidade(rateio);
             }
 
-            calcularTotalConsumoUnidades();
-//            calcularTotalAreaComum();
 
+            calcularTotalAreaComum();
+
+            
 
 //            modeloContaAgua.carregarObjetos();
             modeloRateio.carregarObjetos();
 ////            totalValorConta();
 
         }
+    }
+
+    private void valorMetroCubicoPorRateio(RateioGas rateio) {
+        if (rateio != null) {
+            rateio.setConsumoEmReaisUnidade(rateio.getConsumoMetroCubico().multiply(conta.getValorUnitarioMetroCubico()).setScale(2, RoundingMode.UP));
+        }
+    }
+
+    private void calcularTotalAreaComum(){
+        Moeda soma = new Moeda();
+        for (RateioGas rateio : conta.getRateios()) {
+            soma.soma(rateio.getConsumoEmReaisUnidade());
+        }
+
+       Moeda valorAtualizado =  new Moeda (conta.getValorTotal().subtract(soma.bigDecimalValue()));
+
+       Moeda valorAreaComum = new Moeda (valorAtualizado.doubleValue() / condominio.getUnidades().size());
+
+       for (RateioGas rateio : conta.getRateios()) {
+            rateio.setConsumoReaisAreaComum(valorAreaComum.bigDecimalValue());
+        }
+
     }
 
     private double totalValorRateio(Rateio rateio) {
@@ -369,20 +352,6 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
         return total;
     }
-
-//    private void totalValorConta() {
-//        Moeda somatorio = new Moeda();
-//        ContaGas c = modeloContaGas.getObjetoSelecionado();
-//        c.setTotalDespesas(BigDecimal.ZERO);
-//
-//        somatorio.soma(c.getPrecoAreaComum());
-//        somatorio.soma(c.getTotalDespesasPipa());
-//        somatorio.soma(c.getPrecoTotalUnidades());
-//
-//        c.setTotalDespesas(somatorio.bigDecimalValue());
-//
-//
-//    }
 
     private void incluirContaGas() {
 
