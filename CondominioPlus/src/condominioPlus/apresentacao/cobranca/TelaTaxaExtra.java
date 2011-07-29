@@ -13,16 +13,11 @@ package condominioPlus.apresentacao.cobranca;
 import condominioPlus.apresentacao.financeiro.*;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
-import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
-import condominioPlus.negocio.financeiro.DadosDOC;
-import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
-import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
-import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.LimitarCaracteres;
@@ -33,6 +28,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
@@ -45,7 +42,6 @@ import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
-import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
 
 /**
@@ -58,7 +54,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private TaxaExtra taxa;
     private List<TaxaExtra> listaTaxas;
     private TabelaModelo_2<TaxaExtra> modelo;
-    private TabelaModelo_2<RateioTaxaExtra> modeloRateio;
+    private TabelaModelo_2<ParcelaTaxaExtra> modeloParcela;
     private Conta conta;
 
     /** Creates new form TelaEmprestimo */
@@ -243,93 +239,25 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             taxa.setConta(conta);
         }
 
-//        if (contrato.getNumeroParcelas() > 0) {
-//            String texto = "";
-//            if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
-//                for (int i = 0; i < contrato.getNumeroParcelas(); i++) {
-//                    texto = "PAGAMENTO PARCELA " + (i + 1);
-//                    pagamento = new Pagamento();
-//                    if (i == 0) {
-//                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
-//                    } else {
-//                        pagamento.setDataVencimento(DataUtil.getCalendar(new DateTime(txtDataFinal.getValue()).plusMonths(i)));
-//                    }
-//                    pagamento.setConta(conta.getContaVinculada());
-//                        if (pagamento.getConta().isCredito()) {
-//                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
-//                        } else {
-//                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
-//                        }
+        int diferencaMeses = (int) DataUtil.getDiferencaEmMeses(DataUtil.getDateTime(taxa.getDataFinal()), DataUtil.getDateTime(taxa.getDataInicial()));
 
-//                    pagamento.setContratoEmprestimo(contrato);
-//                    pagamento.setHistorico(texto + " " + contrato.getDescricao());
-//                    System.out.println("pagamento historico " + pagamento.getHistorico());
-//                    pagamento.setForma(FormaPagamento.DINHEIRO);
-//                    pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
-//
-//                    if (conta.isCredito()) {
-//                        new DAO().salvar(pagamento);
-//                    } else {
-//                        if (i == 0) {
-//                            verificarVinculo(pagamento, texto);
-//                        } else {
-//                            verificarVinculo(pagamento, texto);
-//                        }
-//                    }
-//
-//                }
-//
-//            } else {
-//                System.out.println("teste");
-//                texto = "PAGAMENTO ";
-//                pagamento = new Pagamento();
-//                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
-//                pagamento.setConta(conta.getContaVinculada());
-//                if (pagamento.getConta().isCredito()) {
-//                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-//                } else {
-//                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-//                }
-//
-//                pagamento.setContratoEmprestimo(contrato);
-//                pagamento.setHistorico(texto + " " + contrato.getDescricao());
-//                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
-//                pagamento.setForma(FormaPagamento.DINHEIRO);
-//
-//                if (conta.isCredito()) {
-//                    new DAO().salvar(pagamento);
-//                } else {
-//                    verificarVinculo(pagamento, texto);
-//                }
-//            }
+        System.out.println("diferença em meses: " + diferencaMeses);
 
-//            Pagamento p = new Pagamento();
-//            p.setDataPagamento(DataUtil.getCalendar(txtDataInicial.getValue()));
-//            p.setHistorico(conta.getContaVinculada().getNome() + " " + contrato.getDescricao());
-//            p.setConta(conta.getContaVinculada());
-//            p.setContratoEmprestimo(contrato);
-//            if (p.getConta().isCredito()) {
-//                p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-//            } else {
-//                p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-//            }
-//            p.setSaldo(new BigDecimal(0));
-//            p.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()) + 1));
-//
-//            p.setContaCorrente(condominio.getContaCorrente());
-//            p.setPago(true);
+        for (int i = 0; i < diferencaMeses; i++) {
+            ParcelaTaxaExtra parcela = new ParcelaTaxaExtra();
+            parcela.setNumeroParcela(i + 1);
+            parcela.setValor(taxa.getValor().divide(new BigDecimal(diferencaMeses)));
+
+            parcela.setTaxa(taxa);
+            taxa.getParcelas().add(parcela);
+        }
 
         taxa.setCondominio(condominio);
         condominio.getTaxas().add(taxa);
         new DAO().salvar(condominio);
 
-
         limparCampos();
-//                calcularSaldo();
-//            return true;
 
-//        }
-//        return false;
     }
 
     private void salvar() {
@@ -394,71 +322,77 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     public List<ParcelaTaxaExtra> listarParcelas(TaxaExtra t) {
         List<ParcelaTaxaExtra> lista = t.getParcelas();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                ParcelaTaxaExtra p1 = (ParcelaTaxaExtra) o1;
+                ParcelaTaxaExtra p2 = (ParcelaTaxaExtra) o2;
+                return new Integer(p1.getNumeroParcela()).compareTo(new Integer(p2.getNumeroParcela()));
+            }
+        };
+
+        Collections.sort(lista, c);
+
         return lista;
     }
 
-//    public void carregarTabelaPagamentos() {
+    public void carregarTabelaParcelas() {
+
+        modeloParcela = new TabelaModelo_2<ParcelaTaxaExtra>(tabelaParcelas, "Número Parcela, Valor".split(",")) {
+
+            @Override
+            protected List<ParcelaTaxaExtra> getCarregarObjetos() {
+                return listarParcelas(modelo.getObjetoSelecionado());
+            }
+
+            @Override
+            public Object getValor(ParcelaTaxaExtra parcela, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return parcela.getNumeroParcela();
+                    case 1:
+                        return PagamentoUtil.formatarMoeda(parcela.getValor().doubleValue());
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+
+        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(2)).setCellRenderer(direita);
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
 //
-//        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data Vencimento, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
-//
-//            @Override
-//            protected List<Pagamento> getCarregarObjetos() {
-//                return listarPagamentos();
-//            }
-//
-//            @Override
-//            public Object getValor(Pagamento pagamento, int indiceColuna) {
-//                switch (indiceColuna) {
-//                    case 0:
-//                        return DataUtil.getDateTime(pagamento.getDataVencimento());
-//                    case 1:
-//                        return pagamento.getHistorico();
-//                    case 2:
-//                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
-//                    case 3:
-//                        return pagamento.getConta().getCodigo();
-//                    case 4:
-//                        return pagamento.getConta().isCredito() ? "C" : "D";
-//                    case 5:
-//                        return pagamento.isPago() ? DataUtil.toString(DataUtil.getDateTime(pagamento.getDataPagamento())) : "Não pago";
-//                    default:
-//                        return null;
-//                }
-//            }
-//        };
-//
-//        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
-//        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-//        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-//
-//        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
-//        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-//        direita.setHorizontalAlignment(SwingConstants.RIGHT);
-//
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setCellRenderer(direita);
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
-//
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(1)).setMinWidth(300);
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setMaxWidth(140);
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(3)).setMaxWidth(140);
-//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setMaxWidth(50);
-//
-//    }
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(1)).setMinWidth(300);
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(2)).setMaxWidth(140);
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(3)).setMaxWidth(140);
+//        tabelaParcelas.getColumn(modeloTabelaPagamentos.getCampo(4)).setMaxWidth(50);
+
+    }
+
 //    private void desabilitarCamposContrato() {
 //        txtDataContrato.setEnabled(false);
 //        txtCodigoContrato.setEnabled(false);
 //        txtParcelasContrato.setEnabled(false);
 //        txtValorContrato.setEnabled(false);
 //    }
-
     private void exibirPainelContrato(TaxaExtra t) {
         if (t != null) {
             paineTaxaExtra.setVisible(true);
             taxa = t;
 //            desabilitarCamposContrato();
             preencherPainelContrato(t);
-//            carregarTabelaPagamentos();
+            carregarTabelaParcelas();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione uma taxa!", this);
         }
@@ -565,7 +499,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             txtValor.addFocusListener(this);
             radioSindicoNao.addActionListener(this);
             btnSalvar.addActionListener(this);
-            tabelaPagamentos.addMouseListener(this);
+            tabelaParcelas.addMouseListener(this);
             txtDataInicial.addChangeListener(this);
             tabela.addKeyListener(this);
         }
@@ -619,7 +553,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             origem = e.getSource();
             if (origem == tabela && paineTaxaExtra.isVisible()) {
                 exibirPainelContrato(modelo.getObjetoSelecionado());
-            } else if (origem == tabelaPagamentos && e.getClickCount() == 2) {
+            } else if (origem == tabelaParcelas && e.getClickCount() == 2) {
 //                editarPagamentoContrato();
             }
         }
@@ -695,7 +629,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tabelaPagamentos = new javax.swing.JTable();
+        tabelaParcelas = new javax.swing.JTable();
         txtCodigoContrato = new javax.swing.JTextField();
         txtDescricao = new javax.swing.JTextField();
         txtParcelasContrato = new javax.swing.JTextField();
@@ -925,7 +859,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         jLabel11.setText("Código:");
 
-        tabelaPagamentos.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaParcelas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -936,8 +870,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabelaPagamentos.setToolTipText("Clique no pagamento para editá-lo.");
-        jScrollPane2.setViewportView(tabelaPagamentos);
+        tabelaParcelas.setToolTipText("Clique no pagamento para editá-lo.");
+        jScrollPane2.setViewportView(tabelaParcelas);
 
         btnVoltar.setText("Voltar");
 
@@ -1145,7 +1079,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton radioSindicoSim1;
     private javax.swing.JSpinner spnDia;
     private javax.swing.JTable tabela;
-    private javax.swing.JTable tabelaPagamentos;
+    private javax.swing.JTable tabelaParcelas;
     private javax.swing.JTextField txtCodigoContrato;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
