@@ -9,6 +9,7 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.Conta;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -47,7 +48,7 @@ public class TaxaExtra implements Serializable{
     private boolean cobrarComCondominio;
     private boolean sindicoPaga;
     @OneToMany(mappedBy = "taxa", cascade = CascadeType.ALL)
-    private List<ParcelaTaxaExtra> parcelas;
+    private List<ParcelaTaxaExtra> parcelas = new ArrayList<ParcelaTaxaExtra>();
 
     public boolean isCobrarComCondominio() {
         return cobrarComCondominio;
