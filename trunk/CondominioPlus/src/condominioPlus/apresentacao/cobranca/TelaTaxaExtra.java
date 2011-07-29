@@ -12,10 +12,12 @@ package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.apresentacao.financeiro.*;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContratoEmprestimo;
 import condominioPlus.negocio.financeiro.DadosDOC;
-import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
@@ -32,6 +34,7 @@ import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
@@ -52,35 +55,22 @@ import org.joda.time.DateTime;
 public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     private Condominio condominio;
-    private Emprestimo emprestimo;
-    private Pagamento pagamento;
-    private ContratoEmprestimo contrato;
-    private List<ContratoEmprestimo> contratos;
-    private TabelaModelo_2<ContratoEmprestimo> modelo;
-    private TabelaModelo_2<Pagamento> modeloTabelaPagamentos;
+    private TaxaExtra taxa;
+    private List<TaxaExtra> listaTaxas;
+    private TabelaModelo_2<TaxaExtra> modelo;
+    private TabelaModelo_2<RateioTaxaExtra> modeloRateio;
     private Conta conta;
 
     /** Creates new form TelaEmprestimo */
     public TelaTaxaExtra(Condominio condominio) {
 
         this.condominio = condominio;
-        if (condominio.getEmprestimo() == null) {
-            emprestimo = new Emprestimo();
-            condominio.setEmprestimo(emprestimo);
-            emprestimo.setCondominio(condominio);
-            new DAO().salvar(condominio);
-        } else {
-            emprestimo = condominio.getEmprestimo();
-            if (emprestimo.getCondominio() == null) {
-                emprestimo.setCondominio(condominio);
-                new DAO().salvar(condominio);
-            }
-        }
+
         initComponents();
 
         desabilitarBotoesUmaParcela();
 
-        painelDadosContrato.setVisible(false);
+        paineTaxaExtra.setVisible(false);
 
         new ControladorEventos();
 
@@ -96,9 +86,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     private void preencherTela() {
         txtDataFinal.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
-        if (emprestimo.getSaldo() != null) {
-//            calcularSaldo();
-        }
     }
 
     private void desabilitarBotoesUmaParcela() {
@@ -132,28 +119,34 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabela() {
-        modelo = new TabelaModelo_2<ContratoEmprestimo>(tabela, "Data, Descrição, Forma Pgto., Parcelas, Valor, Saldo".split(",")) {
+        modelo = new TabelaModelo_2<TaxaExtra>(tabela, "Período, Conta, Descrição, Valor, Nº Cotas, Vencimento, Sindico Paga?, Dividir Fração Ideal?, Cobrar com Condomínio?".split(",")) {
 
             @Override
-            protected List<ContratoEmprestimo> getCarregarObjetos() {
-                return getContratos();
+            protected List<TaxaExtra> getCarregarObjetos() {
+                return getTaxas();
             }
 
             @Override
-            public Object getValor(ContratoEmprestimo c, int indiceColuna) {
+            public Object getValor(TaxaExtra t, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
-                        return DataUtil.getDateTime(c.getDataContrato());
+                        return DataUtil.toString(t.getDataInicial()) + " a " + DataUtil.toString(t.getDataFinal());
                     case 1:
-                        return c.getDescricao();
+                        return t.getConta().getCodigo();
                     case 2:
-                        return obterFormaPagamento(c);
+                        return t.getDescricao();
                     case 3:
-                        return c.getNumeroParcelas();
+                        return PagamentoUtil.formatarMoeda(t.getValor().doubleValue());
                     case 4:
-                        return PagamentoUtil.formatarMoeda(c.getValor().doubleValue());
+                        return t.getNumeroCotas();
                     case 5:
-                        return PagamentoUtil.formatarMoeda(c.getSaldo().doubleValue());
+                        return t.getDiaVencimento();
+                    case 6:
+                        return t.isSindicoPaga();
+                    case 7:
+                        return t.isDividirFracaoIdeal();
+                    case 8:
+                        return t.isCobrarComCondominio();
                     default:
                         return null;
 
@@ -168,15 +161,19 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         tabela.getColumn(modelo.getCampo(4)).setCellRenderer(direita);
         tabela.getColumn(modelo.getCampo(5)).setCellRenderer(direita);
 
-        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(80);
-        tabela.getColumn(modelo.getCampo(1)).setMinWidth(150);
+        tabela.getColumn(modelo.getCampo(0)).setMinWidth(140);
+        tabela.getColumn(modelo.getCampo(1)).setMinWidth(80);
         tabela.getColumn(modelo.getCampo(2)).setMinWidth(150);
         tabela.getColumn(modelo.getCampo(3)).setMaxWidth(60);
+        tabela.getColumn(modelo.getCampo(6)).setMinWidth(80);
+        tabela.getColumn(modelo.getCampo(7)).setMinWidth(115);
+        tabela.getColumn(modelo.getCampo(8)).setMinWidth(135);
 
+        tabela.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
-    private List<ContratoEmprestimo> getContratos() {
-        return contratos = new DAO().listar("ContratosPorData", emprestimo);
+    private List<TaxaExtra> getTaxas() {
+        return listaTaxas = condominio.getTaxas();
     }
 
     private List listaCampos() {
@@ -193,7 +190,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false, "EM");
+        DialogoConta c = new DialogoConta(null, true, true, false, "");
         c.setVisible(true);
 
         if (c.getConta() != null) {
@@ -213,170 +210,126 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         return c;
     }
 
-    private boolean preencherObjeto() {
-        if (conta.getNomeVinculo().equals("EM")) {
-            contrato = new ContratoEmprestimo();
-            contrato.setDataContrato(DataUtil.getCalendar(txtDataInicial.getValue()));
-            contrato.setDescricao(txtHistorico.getText());
-            contrato.setEmprestimo(emprestimo);
+    private void preencherObjeto() {
 
-//            if (radioSindicoSim.isSelected()) {
-//                contrato.setForma(FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA);
-//            } else if (radioConformeDisponibilidade.isSelected()) {
-//                contrato.setForma(FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE);
-//            } else if (RadioSindicoNao.isSelected()) {
-//                contrato.setForma(FormaPagamentoEmprestimo.PARCELADO);
-//            }
+        taxa = new TaxaExtra();
+        taxa.setDataInicial(DataUtil.getCalendar(txtDataInicial.getValue()));
+        taxa.setDataFinal(DataUtil.getCalendar(txtDataFinal.getValue()));
+        taxa.setDescricao(txtHistorico.getText());
+        taxa.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
 
-            contrato.setNumeroParcelas(Integer.valueOf(txtNumeroParcelas.getText()));
+        if (radioSindicoSim.isSelected()) {
+            taxa.setSindicoPaga(true);
+        } else if (radioSindicoNao.isSelected()) {
+            taxa.setSindicoPaga(false);
+        }
 
-            if (conta != null) {
-                if (conta.isCredito()) {
-                    contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-                } else {
-                    contrato.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-                }
-            }
+        if (radioFracaoSim.isSelected()) {
+            taxa.setDividirFracaoIdeal(true);
+        } else if (radioFracaoNao.isSelected()) {
+            taxa.setDividirFracaoIdeal(false);
+        }
 
+        if (radioCondominioSim.isSelected()) {
+            taxa.setCobrarComCondominio(true);
+        } else if (radioCondominioNao.isSelected()) {
+            taxa.setCobrarComCondominio(false);
+        }
 
-            if (contrato.getNumeroParcelas() > 0) {
-                String texto = "";
-                if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
-                    for (int i = 0; i < contrato.getNumeroParcelas(); i++) {
-                        texto = "PAGAMENTO PARCELA " + (i + 1);
-                        pagamento = new Pagamento();
-                        if (i == 0) {
-                            pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
-                        } else {
-                            pagamento.setDataVencimento(DataUtil.getCalendar(new DateTime(txtDataFinal.getValue()).plusMonths(i)));
-                        }
-                        pagamento.setConta(conta.getContaVinculada());
+        taxa.setNumeroCotas(Integer.valueOf(txtNumeroParcelas.getText()));
+        taxa.setDiaVencimento((Integer) spnDia.getValue());
+
+        if (conta != null) {
+            taxa.setConta(conta);
+        }
+
+//        if (contrato.getNumeroParcelas() > 0) {
+//            String texto = "";
+//            if (contrato.getForma() == FormaPagamentoEmprestimo.PARCELADO && contrato.getNumeroParcelas() > 1) {
+//                for (int i = 0; i < contrato.getNumeroParcelas(); i++) {
+//                    texto = "PAGAMENTO PARCELA " + (i + 1);
+//                    pagamento = new Pagamento();
+//                    if (i == 0) {
+//                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
+//                    } else {
+//                        pagamento.setDataVencimento(DataUtil.getCalendar(new DateTime(txtDataFinal.getValue()).plusMonths(i)));
+//                    }
+//                    pagamento.setConta(conta.getContaVinculada());
 //                        if (pagamento.getConta().isCredito()) {
 //                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")));
 //                        } else {
 //                            pagamento.setValor(new BigDecimal(txtValorParcelas.getText().replace(",", ".")).negate());
 //                        }
 
-                        pagamento.setContratoEmprestimo(contrato);
-                        pagamento.setHistorico(texto + " " + contrato.getDescricao());
-                        System.out.println("pagamento historico " + pagamento.getHistorico());
-                        pagamento.setForma(FormaPagamento.DINHEIRO);
-                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+//                    pagamento.setContratoEmprestimo(contrato);
+//                    pagamento.setHistorico(texto + " " + contrato.getDescricao());
+//                    System.out.println("pagamento historico " + pagamento.getHistorico());
+//                    pagamento.setForma(FormaPagamento.DINHEIRO);
+//                    pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+//
+//                    if (conta.isCredito()) {
+//                        new DAO().salvar(pagamento);
+//                    } else {
+//                        if (i == 0) {
+//                            verificarVinculo(pagamento, texto);
+//                        } else {
+//                            verificarVinculo(pagamento, texto);
+//                        }
+//                    }
+//
+//                }
+//
+//            } else {
+//                System.out.println("teste");
+//                texto = "PAGAMENTO ";
+//                pagamento = new Pagamento();
+//                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
+//                pagamento.setConta(conta.getContaVinculada());
+//                if (pagamento.getConta().isCredito()) {
+//                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+//                } else {
+//                    pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+//                }
+//
+//                pagamento.setContratoEmprestimo(contrato);
+//                pagamento.setHistorico(texto + " " + contrato.getDescricao());
+//                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+//                pagamento.setForma(FormaPagamento.DINHEIRO);
+//
+//                if (conta.isCredito()) {
+//                    new DAO().salvar(pagamento);
+//                } else {
+//                    verificarVinculo(pagamento, texto);
+//                }
+//            }
 
-                        if (conta.isCredito()) {
-                            new DAO().salvar(pagamento);
-                        } else {
-                            if (i == 0) {
-                                verificarVinculo(pagamento, texto);
-                            } else {
-                                verificarVinculo(pagamento, texto);
-                            }
-                        }
+//            Pagamento p = new Pagamento();
+//            p.setDataPagamento(DataUtil.getCalendar(txtDataInicial.getValue()));
+//            p.setHistorico(conta.getContaVinculada().getNome() + " " + contrato.getDescricao());
+//            p.setConta(conta.getContaVinculada());
+//            p.setContratoEmprestimo(contrato);
+//            if (p.getConta().isCredito()) {
+//                p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+//            } else {
+//                p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
+//            }
+//            p.setSaldo(new BigDecimal(0));
+//            p.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()) + 1));
+//
+//            p.setContaCorrente(condominio.getContaCorrente());
+//            p.setPago(true);
 
-                    }
-
-                } else {
-                    System.out.println("teste");
-                    texto = "PAGAMENTO ";
-                    pagamento = new Pagamento();
-                    pagamento.setDataVencimento(DataUtil.getCalendar(txtDataFinal.getValue()));
-                    pagamento.setConta(conta.getContaVinculada());
-                    if (pagamento.getConta().isCredito()) {
-                        pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-                    } else {
-                        pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-                    }
-
-                    pagamento.setContratoEmprestimo(contrato);
-                    pagamento.setHistorico(texto + " " + contrato.getDescricao());
-                    pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
-                    pagamento.setForma(FormaPagamento.DINHEIRO);
-
-                    if (conta.isCredito()) {
-                        new DAO().salvar(pagamento);
-                    } else {
-                        verificarVinculo(pagamento, texto);
-                    }
-                }
-
-                Pagamento p = new Pagamento();
-                p.setDataPagamento(DataUtil.getCalendar(txtDataInicial.getValue()));
-                p.setHistorico(conta.getContaVinculada().getNome() + " " + contrato.getDescricao());
-                p.setConta(conta.getContaVinculada());
-                p.setContratoEmprestimo(contrato);
-                if (p.getConta().isCredito()) {
-                    p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
-                } else {
-                    p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
-                }
-                p.setSaldo(new BigDecimal(0));
-                p.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()) + 1));
-
-                p.setContaCorrente(condominio.getContaCorrente());
-                p.setPago(true);
-
-                condominio.getContaCorrente().adicionarPagamento(p);
-                new DAO().salvar(contrato);
+        taxa.setCondominio(condominio);
+        condominio.getTaxas().add(taxa);
+        new DAO().salvar(condominio);
 
 
-                limparCampos();
+        limparCampos();
 //                calcularSaldo();
-                return true;
+//            return true;
 
-            }
-        } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione uma conta vinculada a Empréstimo!", this);
-            return false;
-        }
-
-        return false;
-    }
-
-    private void verificarVinculo(Pagamento p1, String texto) {
-        if (conta.getContaVinculada() != null) {
-
-            TransacaoBancaria transacao = new TransacaoBancaria();
-            if (p1.getTransacaoBancaria() != null) {
-                transacao = p1.getTransacaoBancaria();
-            }
-
-            Pagamento pagamentoRelacionado = new Pagamento();
-            if (transacao.getPagamentos() != null) {
-                for (Pagamento p : transacao.getPagamentos()) {
-                    if (!p.equals(p1)) {
-                        pagamentoRelacionado = p;
-                    }
-                }
-            }
-
-            pagamentoRelacionado.setDataVencimento(p1.getDataVencimento());
-            pagamentoRelacionado.setConta(conta);
-            pagamentoRelacionado.setHistorico(texto + " " + contrato.getDescricao());
-            pagamentoRelacionado.setContratoEmprestimo(contrato);
-
-            pagamentoRelacionado.setValor(p1.getValor().negate());
-
-            pagamentoRelacionado.setSaldo(new BigDecimal(0));
-            pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
-
-            if (!pagamentoRelacionado.getConta().isCredito()) {
-                pagamentoRelacionado.setContaPagar(condominio.getContaPagar());
-            }
-            pagamentoRelacionado.setPago(false);
-
-            transacao.adicionarPagamento(p1);
-            transacao.adicionarPagamento(pagamentoRelacionado);
-
-            condominio.getContaPagar().adicionarPagamento(pagamentoRelacionado);
-
-            System.out.println("Transacao Bancária: " + transacao);
-
-            p1.setTransacaoBancaria(transacao);
-            pagamentoRelacionado.setTransacaoBancaria(transacao);
-
-
-        }
-
+//        }
+//        return false;
     }
 
     private void salvar() {
@@ -387,9 +340,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 validador.exibirErros(this);
                 return;
             }
-            if (!preencherObjeto()) {
-                return;
-            }
+            preencherObjeto();
 
             TipoAcesso tipo = null;
             if (condominio.getCodigo() == 0) {
@@ -400,7 +351,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
             new DAO().salvar(condominio);
 
-            String descricao = "Contrato de Empréstimo adicionado! " + contrato.getDescricao() + ".";
+            String descricao = "Taxa Extra adicionada! " + taxa.getDescricao() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
         } catch (Throwable t) {
@@ -409,41 +360,23 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     }
 
     private void remover() {
-        if (!ApresentacaoUtil.perguntar("Desejar remover o(s) contrato(s)?", this)) {
+        if (!ApresentacaoUtil.perguntar("Desejar remover a(s) taxa(s)?", this)) {
             return;
         }
         if (modelo.getLinhaSelecionada() > -1) {
             System.out.println("removendo... " + modelo.getObjetosSelecionados());
-            List<ContratoEmprestimo> itensRemover = modelo.getObjetosSelecionados();
+            List<TaxaExtra> itensRemover = modelo.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
-                for (ContratoEmprestimo c : itensRemover) {
-                    c.setEmprestimo(null);
-                    modelo.remover(c);
-                    for (Pagamento p : c.getPagamentos()) {
-                        p.setContratoEmprestimo(null);
-                        if (p.getTransacaoBancaria() != null) {
-                            TransacaoBancaria transacao = p.getTransacaoBancaria();
-                            Pagamento pagamentoRelacionado;
-                            for (Pagamento p2 : transacao.getPagamentos()) {
-                                if (!p.equals(p2)) {
-                                    pagamentoRelacionado = p2;
-                                    pagamentoRelacionado.setDadosPagamento(null);
-                                }
-                            }
-                            new DAO().remover(transacao);
-
-                        }
-
-                    }
-                    new DAO().remover(c);
+                for (TaxaExtra t : itensRemover) {
+                    modelo.remover(t);
+                    new DAO().remover(t);
                 }
             }
             new DAO().remover(itensRemover);
             new DAO().salvar(condominio);
-//            calcularSaldo();
 
-            painelDadosContrato.setVisible(false);
-            ApresentacaoUtil.exibirInformacao("Contrato(s) removido(s) com sucesso!", this);
+            paineTaxaExtra.setVisible(false);
+            ApresentacaoUtil.exibirInformacao("Taxa(s) removida(s) com sucesso!", this);
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
@@ -455,131 +388,123 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtConta.setText("");
         txtHistorico.setText("");
         txtNumeroParcelas.setText("");
+        definirMinimoSpinner();
 //        txtValorParcelas.setText("");
     }
 
-    public List<Pagamento> listarPagamentos() {
-        List<Pagamento> lista = new DAO().listar("PagamentosPorContratoEmprestimo", contrato);
-        List<Pagamento> novaLista = new ArrayList<Pagamento>();
-        for (Pagamento p : lista) {
-            if (p.getContaCorrente() == null && p.getContaPagar() == null) {
-                novaLista.add(p);
-            }
-        }
-        return novaLista;
+    public List<ParcelaTaxaExtra> listarParcelas(TaxaExtra t) {
+        List<ParcelaTaxaExtra> lista = t.getParcelas();
+        return lista;
     }
 
-    public void carregarTabelaPagamentos() {
+//    public void carregarTabelaPagamentos() {
+//
+//        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data Vencimento, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
+//
+//            @Override
+//            protected List<Pagamento> getCarregarObjetos() {
+//                return listarPagamentos();
+//            }
+//
+//            @Override
+//            public Object getValor(Pagamento pagamento, int indiceColuna) {
+//                switch (indiceColuna) {
+//                    case 0:
+//                        return DataUtil.getDateTime(pagamento.getDataVencimento());
+//                    case 1:
+//                        return pagamento.getHistorico();
+//                    case 2:
+//                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
+//                    case 3:
+//                        return pagamento.getConta().getCodigo();
+//                    case 4:
+//                        return pagamento.getConta().isCredito() ? "C" : "D";
+//                    case 5:
+//                        return pagamento.isPago() ? DataUtil.toString(DataUtil.getDateTime(pagamento.getDataPagamento())) : "Não pago";
+//                    default:
+//                        return null;
+//                }
+//            }
+//        };
+//
+//        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
+//        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+//        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
+//
+//        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
+//        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+//        direita.setHorizontalAlignment(SwingConstants.RIGHT);
+//
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setCellRenderer(direita);
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
+//
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(1)).setMinWidth(300);
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setMaxWidth(140);
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(3)).setMaxWidth(140);
+//        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setMaxWidth(50);
+//
+//    }
+//    private void desabilitarCamposContrato() {
+//        txtDataContrato.setEnabled(false);
+//        txtCodigoContrato.setEnabled(false);
+//        txtParcelasContrato.setEnabled(false);
+//        txtValorContrato.setEnabled(false);
+//    }
 
-        modeloTabelaPagamentos = new TabelaModelo_2<Pagamento>(tabelaPagamentos, "Data Vencimento, Histórico, Valor, Conta, Tipo, Pago?".split(",")) {
-
-            @Override
-            protected List<Pagamento> getCarregarObjetos() {
-                return listarPagamentos();
-            }
-
-            @Override
-            public Object getValor(Pagamento pagamento, int indiceColuna) {
-                switch (indiceColuna) {
-                    case 0:
-                        return DataUtil.getDateTime(pagamento.getDataVencimento());
-                    case 1:
-                        return pagamento.getHistorico();
-                    case 2:
-                        return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
-                    case 3:
-                        return pagamento.getConta().getCodigo();
-                    case 4:
-                        return pagamento.getConta().isCredito() ? "C" : "D";
-                    case 5:
-                        return pagamento.isPago() ? DataUtil.toString(DataUtil.getDateTime(pagamento.getDataPagamento())) : "Não pago";
-                    default:
-                        return null;
-                }
-            }
-        };
-
-        DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
-        DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-
-        esquerda.setHorizontalAlignment(SwingConstants.LEFT);
-        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-        direita.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setCellRenderer(direita);
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setCellRenderer(centralizado);
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(5)).setCellRenderer(centralizado);
-
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(1)).setMinWidth(300);
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(2)).setMaxWidth(140);
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(3)).setMaxWidth(140);
-        tabelaPagamentos.getColumn(modeloTabelaPagamentos.getCampo(4)).setMaxWidth(50);
-
-    }
-
-    private void desabilitarCamposContrato() {
-        txtDataContrato.setEnabled(false);
-        txtCodigoContrato.setEnabled(false);
-        txtParcelasContrato.setEnabled(false);
-        txtValorContrato.setEnabled(false);
-    }
-
-    private void exibirPainelContrato(ContratoEmprestimo c) {
-        if (c != null) {
-            painelDadosContrato.setVisible(true);
-            contrato = c;
-            desabilitarCamposContrato();
-            preencherPainelContrato(c);
-            carregarTabelaPagamentos();
+    private void exibirPainelContrato(TaxaExtra t) {
+        if (t != null) {
+            paineTaxaExtra.setVisible(true);
+            taxa = t;
+//            desabilitarCamposContrato();
+            preencherPainelContrato(t);
+//            carregarTabelaPagamentos();
         } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione um contrato!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione uma taxa!", this);
         }
 
     }
 
     private void cancelar() {
-        painelDadosContrato.setVisible(false);
+        paineTaxaExtra.setVisible(false);
         carregarTabela();
     }
 
-    public BigDecimal calculaSaldo() {
-        BigDecimal valor = new BigDecimal(0);
-        List<ContratoEmprestimo> lista = new DAO().listar("ContratosPorData", emprestimo);
-        for (ContratoEmprestimo c : lista) {
-            valor = valor.add(c.getSaldo());
-
-
-
-//            valor = valor.soma(c.getSaldo());
-        }
-        emprestimo.setSaldo(valor);
-        new DAO().salvar(emprestimo);
-        return valor;
+//    public BigDecimal calculaSaldo() {
+//        BigDecimal valor = new BigDecimal(0);
+//        List<ContratoEmprestimo> lista = new DAO().listar("ContratosPorData", emprestimo);
+//        for (ContratoEmprestimo c : lista) {
+//            valor = valor.add(c.getSaldo());
+//
+//
+//
+////            valor = valor.soma(c.getSaldo());
+//        }
+//        emprestimo.setSaldo(valor);
+//        new DAO().salvar(emprestimo);
+//        return valor;
+//    }
+    public void preencherPainelContrato(TaxaExtra t) {
+        txtPeriodo.setText(DataUtil.toString(t.getDataInicial()) + " a " + DataUtil.toString(t.getDataFinal()));
+//        txtCodigoContrato.setText(String.valueOf(c.getCodigo()));
+        txtDescricao.setText(t.getDescricao());
+//        txtParcelasContrato.setText(String.valueOf(c.getNumeroParcelas()));
+//        txtValorContrato.setText(new Moeda(c.getValor()).toString());
     }
 
-    public void preencherPainelContrato(ContratoEmprestimo c) {
-        txtDataContrato.setValue(DataUtil.toString(c.getDataContrato()));
-        txtCodigoContrato.setText(String.valueOf(c.getCodigo()));
-        txtDescricao.setText(c.getDescricao());
-        txtParcelasContrato.setText(String.valueOf(c.getNumeroParcelas()));
-        txtValorContrato.setText(new Moeda(c.getValor()).toString());
-    }
-
-    private void editarPagamentoContrato() {
-        if (!modeloTabelaPagamentos.getObjetosSelecionados().isEmpty()) {
-            DialogoEditarPagamentoContrato tela = new DialogoEditarPagamentoContrato(modeloTabelaPagamentos.getObjetoSelecionado());
-            tela.setLocationRelativeTo(this);
-            tela.setVisible(true);
-            modeloTabelaPagamentos.carregarObjetos();
-        } else {
-            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
-        }
-    }
-
-    private void salvarContrato() {
-        contrato.setDescricao(txtDescricao.getText());
-        new DAO().salvar(contrato);
+//    private void editarPagamentoContrato() {
+//        if (!modeloTabelaPagamentos.getObjetosSelecionados().isEmpty()) {
+//            DialogoEditarPagamentoContrato tela = new DialogoEditarPagamentoContrato(modeloTabelaPagamentos.getObjetoSelecionado());
+//            tela.setLocationRelativeTo(this);
+//            tela.setVisible(true);
+//            modeloTabelaPagamentos.carregarObjetos();
+//        } else {
+//            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+//        }
+//    }
+    private void salvarTaxa() {
+        taxa.setDescricao(txtDescricao.getText());
+        new DAO().salvar(taxa);
         carregarTabela();
 
         ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
@@ -610,7 +535,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 remover();
             } else if (origem == btnConta) {
                 pegarConta();
-            } else if (origem == itemMenuVisualizarContrato) {
+            } else if (origem == itemMenuVisualizarTaxa) {
                 exibirPainelContrato(modelo.getObjetoSelecionado());
             } else if (origem == btnVoltar) {
                 cancelar();
@@ -621,7 +546,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             } else if (origem == radioSindicoNao) {
                 desabilitarBotoesUmaParcela();
             } else if (origem == btnSalvar) {
-                salvarContrato();
+                salvarTaxa();
             }
         }
 
@@ -634,11 +559,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             tabela.addMouseListener(this);
             txtConta.addFocusListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
-            itemMenuVisualizarContrato.addActionListener(this);
+            itemMenuVisualizarTaxa.addActionListener(this);
             btnVoltar.addActionListener(this);
             radioSindicoSim.addActionListener(this);
             txtValor.addFocusListener(this);
-//            radioConformeDisponibilidade.addActionListener(this);
             radioSindicoNao.addActionListener(this);
             btnSalvar.addActionListener(this);
             tabelaPagamentos.addMouseListener(this);
@@ -693,10 +617,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         @Override
         public void mouseClicked(MouseEvent e) {
             origem = e.getSource();
-            if (origem == tabela && painelDadosContrato.isVisible()) {
+            if (origem == tabela && paineTaxaExtra.isVisible()) {
                 exibirPainelContrato(modelo.getObjetoSelecionado());
             } else if (origem == tabelaPagamentos && e.getClickCount() == 2) {
-                editarPagamentoContrato();
+//                editarPagamentoContrato();
             }
         }
 
@@ -711,7 +635,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         @Override
         public void keyReleased(KeyEvent e) {
             origem = e.getSource();
-            if ((origem == tabela && painelDadosContrato.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
+            if ((origem == tabela && paineTaxaExtra.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
                 exibirPainelContrato(modelo.getObjetoSelecionado());
             }
         }
@@ -728,11 +652,14 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         popupMenu = new javax.swing.JPopupMenu();
-        itemMenuVisualizarContrato = new javax.swing.JMenuItem();
+        itemMenuVisualizarTaxa = new javax.swing.JMenuItem();
         itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
         itemMenuImprimir = new javax.swing.JMenuItem();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup3 = new javax.swing.ButtonGroup();
+        buttonGroup4 = new javax.swing.ButtonGroup();
+        buttonGroup5 = new javax.swing.ButtonGroup();
+        buttonGroup6 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         txtDataInicial = new net.sf.nachocalendar.components.DateField();
         jLabel1 = new javax.swing.JLabel();
@@ -761,8 +688,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         spnDia = new javax.swing.JSpinner();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
-        painelDadosContrato = new javax.swing.JPanel();
-        txtDataContrato = new net.sf.nachocalendar.components.DateField();
+        paineTaxaExtra = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -776,9 +702,19 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtValorContrato = new javax.swing.JTextField();
         btnVoltar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
+        txtPeriodo = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
+        radioSindicoSim1 = new javax.swing.JRadioButton();
+        radioSindicoNao1 = new javax.swing.JRadioButton();
+        jLabel16 = new javax.swing.JLabel();
+        radioFracaoSim1 = new javax.swing.JRadioButton();
+        radioFracaoNao1 = new javax.swing.JRadioButton();
+        jLabel17 = new javax.swing.JLabel();
+        radioCondominioSim1 = new javax.swing.JRadioButton();
+        radioCondominioNao1 = new javax.swing.JRadioButton();
 
-        itemMenuVisualizarContrato.setText("Visualizar Dados Contrato");
-        popupMenu.add(itemMenuVisualizarContrato);
+        itemMenuVisualizarTaxa.setText("Visualizar Detalhes");
+        popupMenu.add(itemMenuVisualizarTaxa);
 
         itemMenuRemoverSelecionados.setText("Remover Selecionados");
         popupMenu.add(itemMenuRemoverSelecionados);
@@ -788,7 +724,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         setClosable(true);
         setTitle("Taxa Extra");
-        setPreferredSize(new java.awt.Dimension(762, 600));
+        setPreferredSize(new java.awt.Dimension(750, 534));
         setVisible(true);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -831,7 +767,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioSindicoSim.setText("Sim");
 
         buttonGroup1.add(radioSindicoNao);
-        radioSindicoNao.setSelected(true);
         radioSindicoNao.setText("Não");
 
         jLabel6.setText("Data Final:");
@@ -846,7 +781,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioFracaoSim.setText("Sim");
 
         buttonGroup2.add(radioFracaoNao);
-        radioFracaoNao.setSelected(true);
         radioFracaoNao.setText("Não");
 
         jLabel14.setText("Cobrar com Cota Condomínio?");
@@ -855,10 +789,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioCondominioNao.setText("Não");
 
         buttonGroup3.add(radioCondominioSim);
-        radioCondominioSim.setSelected(true);
         radioCondominioSim.setText("Sim");
 
-        jLabel5.setText("Dia Venc.");
+        jLabel5.setText("Dia Venc.:");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -884,34 +817,34 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                             .addComponent(txtNumeroParcelas)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(spnDia)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnConta))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jLabel2)
+                            .addComponent(txtHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE))
+                        .addGap(10, 10, 10)
                         .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(6, 6, 6)
-                        .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(spnDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radioSindicoSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radioSindicoNao)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioFracaoSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(radioFracaoNao)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel14)
                         .addGap(2, 2, 2)
                         .addComponent(radioCondominioSim)
@@ -938,28 +871,32 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                             .addComponent(txtDataFinal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(txtDataInicial, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(btnConta, javax.swing.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spnDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel5)
+                        .addGap(26, 26, 26))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnConta, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE)
+                            .addComponent(jLabel2))
+                        .addGap(26, 26, 26))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(7, 7, 7)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioSindicoNao)
                     .addComponent(radioSindicoSim)
-                    .addComponent(jLabel14)
-                    .addComponent(radioCondominioNao)
-                    .addComponent(radioCondominioSim)
                     .addComponent(jLabel13)
                     .addComponent(radioFracaoSim)
                     .addComponent(radioFracaoNao)
-                    .addComponent(jLabel5)
-                    .addComponent(spnDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel14)
+                    .addComponent(radioCondominioNao)
+                    .addComponent(radioCondominioSim)
                     .addComponent(jLabel12)))
         );
 
@@ -976,13 +913,13 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tabela);
 
-        painelDadosContrato.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        paineTaxaExtra.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel7.setText("Data:");
+        jLabel7.setText("Período:");
 
         jLabel8.setText("Valor:");
 
-        jLabel9.setText("Nº Parcelas:");
+        jLabel9.setText("Nº Cotas:");
 
         jLabel10.setText("Descrição:");
 
@@ -1006,68 +943,126 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         btnSalvar.setText("Salvar");
 
-        javax.swing.GroupLayout painelDadosContratoLayout = new javax.swing.GroupLayout(painelDadosContrato);
-        painelDadosContrato.setLayout(painelDadosContratoLayout);
-        painelDadosContratoLayout.setHorizontalGroup(
-            painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelDadosContratoLayout.createSequentialGroup()
+        txtPeriodo.setEnabled(false);
+
+        jLabel15.setText("Síndico Paga?");
+
+        buttonGroup4.add(radioSindicoSim1);
+        radioSindicoSim1.setText("Sim");
+
+        buttonGroup4.add(radioSindicoNao1);
+        radioSindicoNao1.setSelected(true);
+        radioSindicoNao1.setText("Não");
+
+        jLabel16.setText("Dividir Fração Ideal?");
+
+        buttonGroup5.add(radioFracaoSim1);
+        radioFracaoSim1.setText("Sim");
+
+        buttonGroup5.add(radioFracaoNao1);
+        radioFracaoNao1.setSelected(true);
+        radioFracaoNao1.setText("Não");
+
+        jLabel17.setText("Cobrar com Cota Condomínio?");
+
+        buttonGroup6.add(radioCondominioSim1);
+        radioCondominioSim1.setSelected(true);
+        radioCondominioSim1.setText("Sim");
+
+        buttonGroup6.add(radioCondominioNao1);
+        radioCondominioNao1.setText("Não");
+
+        javax.swing.GroupLayout paineTaxaExtraLayout = new javax.swing.GroupLayout(paineTaxaExtra);
+        paineTaxaExtra.setLayout(paineTaxaExtraLayout);
+        paineTaxaExtraLayout.setHorizontalGroup(
+            paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                 .addGap(273, 273, 273)
                 .addComponent(btnSalvar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnVoltar)
                 .addGap(12, 12, 12))
-            .addGroup(painelDadosContratoLayout.createSequentialGroup()
+            .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 702, Short.MAX_VALUE)
+                .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(paineTaxaExtraLayout.createSequentialGroup()
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioSindicoSim1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioSindicoNao1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel16)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioFracaoSim1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioFracaoNao1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel17)
+                        .addGap(2, 2, 2)
+                        .addComponent(radioCondominioSim1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioCondominioNao1))
+                    .addGroup(paineTaxaExtraLayout.createSequentialGroup()
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel11))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(txtValorContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
-            .addGroup(painelDadosContratoLayout.createSequentialGroup()
+            .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel7)
-                    .addComponent(txtDataContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel11))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(painelDadosContratoLayout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addGap(302, 302, 302))
-                    .addGroup(painelDadosContratoLayout.createSequentialGroup()
-                        .addComponent(txtDescricao)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel9)
-                    .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(txtValorContrato, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 690, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        painelDadosContratoLayout.setVerticalGroup(
-            painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelDadosContratoLayout.createSequentialGroup()
+        paineTaxaExtraLayout.setVerticalGroup(
+            paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, paineTaxaExtraLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel7)
-                    .addComponent(jLabel11)
-                    .addComponent(jLabel10)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txtDataContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtValorContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(paineTaxaExtraLayout.createSequentialGroup()
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel10))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtValorContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(radioSindicoNao1)
+                    .addComponent(radioSindicoSim1)
+                    .addComponent(jLabel16)
+                    .addComponent(radioFracaoSim1)
+                    .addComponent(radioFracaoNao1)
+                    .addComponent(jLabel17)
+                    .addComponent(radioCondominioNao1)
+                    .addComponent(radioCondominioSim1)
+                    .addComponent(jLabel15))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(painelDadosContratoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnVoltar)
                     .addComponent(btnSalvar))
                 .addContainerGap())
@@ -1079,21 +1074,21 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(painelDadosContrato, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 726, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
+                    .addComponent(paineTaxaExtra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelDadosContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+                .addGap(13, 13, 13)
+                .addComponent(paineTaxaExtra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -1108,15 +1103,21 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.ButtonGroup buttonGroup4;
+    private javax.swing.ButtonGroup buttonGroup5;
+    private javax.swing.ButtonGroup buttonGroup6;
     private javax.swing.JMenuItem itemMenuImprimir;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
-    private javax.swing.JMenuItem itemMenuVisualizarContrato;
+    private javax.swing.JMenuItem itemMenuVisualizarTaxa;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1128,26 +1129,32 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JPanel painelDadosContrato;
+    private javax.swing.JPanel paineTaxaExtra;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JRadioButton radioCondominioNao;
+    private javax.swing.JRadioButton radioCondominioNao1;
     private javax.swing.JRadioButton radioCondominioSim;
+    private javax.swing.JRadioButton radioCondominioSim1;
     private javax.swing.JRadioButton radioFracaoNao;
+    private javax.swing.JRadioButton radioFracaoNao1;
     private javax.swing.JRadioButton radioFracaoSim;
+    private javax.swing.JRadioButton radioFracaoSim1;
     private javax.swing.JRadioButton radioSindicoNao;
+    private javax.swing.JRadioButton radioSindicoNao1;
     private javax.swing.JRadioButton radioSindicoSim;
+    private javax.swing.JRadioButton radioSindicoSim1;
     private javax.swing.JSpinner spnDia;
     private javax.swing.JTable tabela;
     private javax.swing.JTable tabelaPagamentos;
     private javax.swing.JTextField txtCodigoContrato;
     private javax.swing.JTextField txtConta;
-    private net.sf.nachocalendar.components.DateField txtDataContrato;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private javax.swing.JTextField txtDescricao;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroParcelas;
     private javax.swing.JTextField txtParcelasContrato;
+    private javax.swing.JTextField txtPeriodo;
     private javax.swing.JTextField txtValor;
     private javax.swing.JTextField txtValorContrato;
     // End of variables declaration//GEN-END:variables
