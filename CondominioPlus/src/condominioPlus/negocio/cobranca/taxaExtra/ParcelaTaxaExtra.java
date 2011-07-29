@@ -5,37 +5,39 @@
 
 package condominioPlus.negocio.cobranca.taxaExtra;
 
-import condominioPlus.negocio.Unidade;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 
 /**
  *
  * @author eugenia
  */
+
 @Entity
-@Table(name="rateio_taxa_extra")
-public class RateioTaxaExtra implements Serializable{
+public class ParcelaTaxaExtra implements Serializable{
 
     @Id
     @GeneratedValue
     private int codigo;
-    @ManyToOne
-    private Unidade unidade;
-    @ManyToOne
-    private ParcelaTaxaExtra parcela;
-    @Column(name="valor", precision=20, scale=2)
-    private BigDecimal valosACobrar;
+    private int numeroParcela;
+    @Column(precision=20, scale=2)
+    private BigDecimal valor;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataVencimento;
+    @ManyToOne
+    private TaxaExtra taxa;
+    @OneToMany(mappedBy = "parcela", cascade = CascadeType.ALL)
+    private List<RateioTaxaExtra> rateios;
 
     public int getCodigo() {
         return codigo;
@@ -53,28 +55,36 @@ public class RateioTaxaExtra implements Serializable{
         this.dataVencimento = dataVencimento;
     }
 
-    public ParcelaTaxaExtra getParcela() {
-        return parcela;
+    public int getNumeroParcela() {
+        return numeroParcela;
     }
 
-    public void setParcela(ParcelaTaxaExtra parcela) {
-        this.parcela = parcela;
+    public void setNumeroParcela(int numeroParcela) {
+        this.numeroParcela = numeroParcela;
     }
 
-    public Unidade getUnidade() {
-        return unidade;
+    public TaxaExtra getTaxa() {
+        return taxa;
     }
 
-    public void setUnidade(Unidade unidade) {
-        this.unidade = unidade;
+    public void setTaxa(TaxaExtra taxa) {
+        this.taxa = taxa;
     }
 
-    public BigDecimal getValosACobrar() {
-        return valosACobrar;
+    public BigDecimal getValor() {
+        return valor;
     }
 
-    public void setValosACobrar(BigDecimal valosACobrar) {
-        this.valosACobrar = valosACobrar;
+    public void setValor(BigDecimal valor) {
+        this.valor = valor;
+    }
+
+    public List<RateioTaxaExtra> getRateios() {
+        return rateios;
+    }
+
+    public void setRateios(List<RateioTaxaExtra> rateios) {
+        this.rateios = rateios;
     }
 
 }

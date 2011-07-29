@@ -47,7 +47,7 @@ public class TaxaExtra implements Serializable{
     private boolean cobrarComCondominio;
     private boolean sindicoPaga;
     @OneToMany(mappedBy = "taxa", cascade = CascadeType.ALL)
-    private List<RateioTaxaExtra> rateios;
+    private List<ParcelaTaxaExtra> parcelas;
 
     public boolean isCobrarComCondominio() {
         return cobrarComCondominio;
@@ -145,12 +145,12 @@ public class TaxaExtra implements Serializable{
         this.valor = valor;
     }
 
-    public List<RateioTaxaExtra> getRateios() {
-        return rateios;
+    public List<ParcelaTaxaExtra> getParcelas() {
+        return parcelas;
     }
 
-    public void setRateios(List<RateioTaxaExtra> rateios) {
-        this.rateios = rateios;
+    public void setParcelas(List<ParcelaTaxaExtra> parcelas) {
+        this.parcelas = parcelas;
     }
 
 }
