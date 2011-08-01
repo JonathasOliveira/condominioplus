@@ -321,6 +321,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup1"/>
             </Property>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
           </Properties>
         </Component>
@@ -357,6 +358,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup2"/>
             </Property>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
           </Properties>
         </Component>
@@ -370,6 +372,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup3"/>
             </Property>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
           </Properties>
         </Component>
@@ -436,41 +439,46 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabel15" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="radioSindicoSim1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheSindicoSim" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="radioSindicoNao1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheSindicoNao" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioFracaoSim1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheFracaoSim" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="radioFracaoNao1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheFracaoNao" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                          <Component id="radioCondominioSim1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheCondominioSim" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="radioCondominioNao1" min="-2" max="-2" attributes="0"/>
+                          <Component id="radioDetalheCondominioNao" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                               <Component id="txtPeriodo" min="-2" pref="132" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="65" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="spnDiaVencimento" max="32767" attributes="1"/>
+                              <Component id="jLabel18" alignment="1" pref="53" max="32767" attributes="1"/>
+                          </Group>
+                          <EmptySpace pref="10" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtCodigoContrato" min="-2" pref="56" max="-2" attributes="0"/>
+                              <Component id="txtCodigoConta" min="-2" pref="56" max="-2" attributes="0"/>
                               <Component id="jLabel11" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="txtDescricao" min="-2" pref="266" max="-2" attributes="0"/>
+                              <Component id="txtDescricao" min="-2" pref="258" max="-2" attributes="0"/>
                               <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jLabel9" min="-2" max="-2" attributes="1"/>
-                              <Component id="txtParcelasContrato" min="-2" pref="67" max="-2" attributes="1"/>
+                              <Component id="txtCotas" min="-2" pref="67" max="-2" attributes="1"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -496,31 +504,40 @@
                       <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel10" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="txtCodigoContrato" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtDescricao" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtValorContrato" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="txtParcelasContrato" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="txtCotas" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="txtPeriodo" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel18" alignment="3" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="txtCodigoConta" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="spnDiaVencimento" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="radioSindicoNao1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="radioSindicoSim1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheSindicoNao" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheSindicoSim" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel16" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="radioFracaoSim1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="radioFracaoNao1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheFracaoSim" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheFracaoNao" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel17" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="radioCondominioNao1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="radioCondominioSim1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheCondominioNao" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="radioDetalheCondominioSim" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel15" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -558,7 +575,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel11">
           <Properties>
-            <Property name="text" type="java.lang.String" value="C&#xf3;digo:"/>
+            <Property name="text" type="java.lang.String" value="Conta:"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPane2">
@@ -610,13 +627,22 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JTextField" name="txtCodigoContrato">
+        <Component class="javax.swing.JTextField" name="txtCodigoConta">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtDescricao">
         </Component>
-        <Component class="javax.swing.JTextField" name="txtParcelasContrato">
+        <Component class="javax.swing.JTextField" name="txtCotas">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="txtValorContrato">
+          <Properties>
+            <Property name="editable" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btnVoltar">
           <Properties>
@@ -630,6 +656,7 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtPeriodo">
           <Properties>
+            <Property name="editable" type="boolean" value="false"/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
@@ -638,21 +665,23 @@
             <Property name="text" type="java.lang.String" value="S&#xed;ndico Paga?"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioSindicoSim1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheSindicoSim">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup4"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Sim"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioSindicoNao1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheSindicoNao">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup4"/>
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel16">
@@ -660,21 +689,23 @@
             <Property name="text" type="java.lang.String" value="Dividir Fra&#xe7;&#xe3;o Ideal?"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioFracaoSim1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheFracaoSim">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup5"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Sim"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioFracaoNao1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheFracaoNao">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup5"/>
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel17">
@@ -682,22 +713,31 @@
             <Property name="text" type="java.lang.String" value="Cobrar com Cota Condom&#xed;nio?"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioCondominioSim1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheCondominioSim">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup6"/>
             </Property>
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Sim"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="radioCondominioNao1">
+        <Component class="javax.swing.JRadioButton" name="radioDetalheCondominioNao">
           <Properties>
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="buttonGroup6"/>
             </Property>
             <Property name="text" type="java.lang.String" value="N&#xe3;o"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel18">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Dia Venc.:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JSpinner" name="spnDiaVencimento">
         </Component>
       </SubComponents>
     </Container>
