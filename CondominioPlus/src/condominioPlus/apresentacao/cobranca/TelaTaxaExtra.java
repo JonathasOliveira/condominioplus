@@ -83,17 +83,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtDataFinal.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
     }
 
-    private String obterFormaPagamento(ContratoEmprestimo c) {
-        if (c.getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
-            return "Conforme Disponibilidade Financeira";
-        } else if (c.getForma() == FormaPagamentoEmprestimo.PAGAMENTO_A_VISTA) {
-            return "À vista";
-        } else if (c.getForma() == FormaPagamentoEmprestimo.PARCELADO) {
-            return "Parcelado";
-        }
-        return "";
-    }
-
     private void carregarTabela() {
         modelo = new TabelaModelo_2<TaxaExtra>(tabela, "Período, Conta, Descrição, Valor, Nº Cotas, Vencimento, Sindico Paga?, Dividir Fração Ideal?, Cobrar com Condomínio?".split(",")) {
 
