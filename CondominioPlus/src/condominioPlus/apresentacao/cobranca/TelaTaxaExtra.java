@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -64,13 +65,11 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         initComponents();
 
-        desabilitarBotoesUmaParcela();
-
         paineTaxaExtra.setVisible(false);
 
         new ControladorEventos();
 
-        definirMinimoSpinner();
+        definirMinimoSpinner(spnDia);
 
         carregarTabela();
         preencherTela();
@@ -82,25 +81,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     private void preencherTela() {
         txtDataFinal.setValue(DataUtil.toString(new DateTime(DataUtil.hoje().plusMonths(1))));
-    }
-
-    private void desabilitarBotoesUmaParcela() {
-//        if (radioSindicoSim.isSelected()) {
-//            txtNumeroParcelas.setText("1");
-//            txtValorParcelas.setText(txtValor.getText());
-//            txtNumeroParcelas.setEnabled(false);
-//            txtValorParcelas.setEnabled(false);
-//        } else if (RadioSindicoNao.isSelected()) {
-//            txtValorParcelas.setText("");
-//            txtNumeroParcelas.setText("");
-//            txtNumeroParcelas.setEnabled(true);
-//            txtValorParcelas.setEnabled(true);
-//        } else if (radioConformeDisponibilidade.isSelected()) {
-//            txtNumeroParcelas.setText("1");
-//            txtValorParcelas.setText(txtValor.getText());
-//            txtNumeroParcelas.setEnabled(false);
-//            txtValorParcelas.setEnabled(false);
-//        }
     }
 
     private String obterFormaPagamento(ContratoEmprestimo c) {
@@ -316,8 +296,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtConta.setText("");
         txtHistorico.setText("");
         txtNumeroParcelas.setText("");
-        definirMinimoSpinner();
-//        txtValorParcelas.setText("");
+        definirMinimoSpinner(spnDia);
+        radioSindicoNao.setSelected(true);
+        radioFracaoNao.setSelected(true);
+        radioCondominioNao.setSelected(true);
     }
 
     public List<ParcelaTaxaExtra> listarParcelas(TaxaExtra t) {
@@ -386,12 +368,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 //        txtParcelasContrato.setEnabled(false);
 //        txtValorContrato.setEnabled(false);
 //    }
-    private void exibirPainelContrato(TaxaExtra t) {
+    private void exibirPainelDetalhes(TaxaExtra t) {
         if (t != null) {
             paineTaxaExtra.setVisible(true);
             taxa = t;
 //            desabilitarCamposContrato();
-            preencherPainelContrato(t);
+            preencherPainelDetalhes(t);
             carregarTabelaParcelas();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione uma taxa!", this);
@@ -418,12 +400,31 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 //        new DAO().salvar(emprestimo);
 //        return valor;
 //    }
-    public void preencherPainelContrato(TaxaExtra t) {
+    public void preencherPainelDetalhes(TaxaExtra t) {
         txtPeriodo.setText(DataUtil.toString(t.getDataInicial()) + " a " + DataUtil.toString(t.getDataFinal()));
-//        txtCodigoContrato.setText(String.valueOf(c.getCodigo()));
+        txtCodigoConta.setText(String.valueOf(t.getConta().getCodigo()));
         txtDescricao.setText(t.getDescricao());
-//        txtParcelasContrato.setText(String.valueOf(c.getNumeroParcelas()));
-//        txtValorContrato.setText(new Moeda(c.getValor()).toString());
+        txtCotas.setText(String.valueOf(t.getNumeroCotas()));
+        definirMinimoSpinner(spnDiaVencimento);
+        spnDiaVencimento.setValue(t.getDiaVencimento());
+        txtValorContrato.setText(PagamentoUtil.formatarMoeda(t.getValor().doubleValue()));
+        if (taxa.isSindicoPaga()) {
+            radioDetalheSindicoSim.setSelected(true);
+        } else {
+            radioDetalheSindicoNao.setSelected(true);
+        }
+
+        if (taxa.isDividirFracaoIdeal()) {
+            radioDetalheFracaoSim.setSelected(true);
+        } else {
+            radioDetalheFracaoNao.setSelected(true);
+        }
+
+        if (taxa.isCobrarComCondominio()) {
+            radioDetalheCondominioSim.setSelected(true);
+        } else {
+            radioDetalheCondominioNao.setSelected(true);
+        }
     }
 
 //    private void editarPagamentoContrato() {
@@ -437,6 +438,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 //        }
 //    }
     private void salvarTaxa() {
+        taxa.setDiaVencimento((Integer) spnDiaVencimento.getValue());
         taxa.setDescricao(txtDescricao.getText());
         new DAO().salvar(taxa);
         carregarTabela();
@@ -444,12 +446,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         ApresentacaoUtil.exibirInformacao("Informações salvas com sucesso!", this);
     }
 
-    private void definirMinimoSpinner() {
+    private void definirMinimoSpinner(JSpinner spinner) {
         SpinnerNumberModel nm = new SpinnerNumberModel();
         nm.setValue(1);
         nm.setMinimum(1);
         nm.setMaximum(31);
-        spnDia.setModel(nm);
+        spinner.setModel(nm);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -470,15 +472,13 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             } else if (origem == btnConta) {
                 pegarConta();
             } else if (origem == itemMenuVisualizarTaxa) {
-                exibirPainelContrato(modelo.getObjetoSelecionado());
+                exibirPainelDetalhes(modelo.getObjetoSelecionado());
             } else if (origem == btnVoltar) {
                 cancelar();
             } else if (origem == radioSindicoSim) {
-                desabilitarBotoesUmaParcela();
 //            } else if (origem == radioConformeDisponibilidade) {
 //                desabilitarBotoesUmaParcela();
             } else if (origem == radioSindicoNao) {
-                desabilitarBotoesUmaParcela();
             } else if (origem == btnSalvar) {
                 salvarTaxa();
             }
@@ -552,7 +552,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         public void mouseClicked(MouseEvent e) {
             origem = e.getSource();
             if (origem == tabela && paineTaxaExtra.isVisible()) {
-                exibirPainelContrato(modelo.getObjetoSelecionado());
+                exibirPainelDetalhes(modelo.getObjetoSelecionado());
             } else if (origem == tabelaParcelas && e.getClickCount() == 2) {
 //                editarPagamentoContrato();
             }
@@ -570,7 +570,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         public void keyReleased(KeyEvent e) {
             origem = e.getSource();
             if ((origem == tabela && paineTaxaExtra.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
-                exibirPainelContrato(modelo.getObjetoSelecionado());
+                exibirPainelDetalhes(modelo.getObjetoSelecionado());
             }
         }
     }
@@ -630,22 +630,24 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         jLabel11 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaParcelas = new javax.swing.JTable();
-        txtCodigoContrato = new javax.swing.JTextField();
+        txtCodigoConta = new javax.swing.JTextField();
         txtDescricao = new javax.swing.JTextField();
-        txtParcelasContrato = new javax.swing.JTextField();
+        txtCotas = new javax.swing.JTextField();
         txtValorContrato = new javax.swing.JTextField();
         btnVoltar = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         txtPeriodo = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
-        radioSindicoSim1 = new javax.swing.JRadioButton();
-        radioSindicoNao1 = new javax.swing.JRadioButton();
+        radioDetalheSindicoSim = new javax.swing.JRadioButton();
+        radioDetalheSindicoNao = new javax.swing.JRadioButton();
         jLabel16 = new javax.swing.JLabel();
-        radioFracaoSim1 = new javax.swing.JRadioButton();
-        radioFracaoNao1 = new javax.swing.JRadioButton();
+        radioDetalheFracaoSim = new javax.swing.JRadioButton();
+        radioDetalheFracaoNao = new javax.swing.JRadioButton();
         jLabel17 = new javax.swing.JLabel();
-        radioCondominioSim1 = new javax.swing.JRadioButton();
-        radioCondominioNao1 = new javax.swing.JRadioButton();
+        radioDetalheCondominioSim = new javax.swing.JRadioButton();
+        radioDetalheCondominioNao = new javax.swing.JRadioButton();
+        jLabel18 = new javax.swing.JLabel();
+        spnDiaVencimento = new javax.swing.JSpinner();
 
         itemMenuVisualizarTaxa.setText("Visualizar Detalhes");
         popupMenu.add(itemMenuVisualizarTaxa);
@@ -701,6 +703,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioSindicoSim.setText("Sim");
 
         buttonGroup1.add(radioSindicoNao);
+        radioSindicoNao.setSelected(true);
         radioSindicoNao.setText("Não");
 
         jLabel6.setText("Data Final:");
@@ -715,11 +718,13 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioFracaoSim.setText("Sim");
 
         buttonGroup2.add(radioFracaoNao);
+        radioFracaoNao.setSelected(true);
         radioFracaoNao.setText("Não");
 
         jLabel14.setText("Cobrar com Cota Condomínio?");
 
         buttonGroup3.add(radioCondominioNao);
+        radioCondominioNao.setSelected(true);
         radioCondominioNao.setText("Não");
 
         buttonGroup3.add(radioCondominioSim);
@@ -857,7 +862,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         jLabel10.setText("Descrição:");
 
-        jLabel11.setText("Código:");
+        jLabel11.setText("Conta:");
 
         tabelaParcelas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -873,38 +878,53 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         tabelaParcelas.setToolTipText("Clique no pagamento para editá-lo.");
         jScrollPane2.setViewportView(tabelaParcelas);
 
+        txtCodigoConta.setEditable(false);
+
+        txtCotas.setEditable(false);
+
+        txtValorContrato.setEditable(false);
+
         btnVoltar.setText("Voltar");
 
         btnSalvar.setText("Salvar");
 
+        txtPeriodo.setEditable(false);
         txtPeriodo.setEnabled(false);
 
         jLabel15.setText("Síndico Paga?");
 
-        buttonGroup4.add(radioSindicoSim1);
-        radioSindicoSim1.setText("Sim");
+        buttonGroup4.add(radioDetalheSindicoSim);
+        radioDetalheSindicoSim.setText("Sim");
+        radioDetalheSindicoSim.setEnabled(false);
 
-        buttonGroup4.add(radioSindicoNao1);
-        radioSindicoNao1.setSelected(true);
-        radioSindicoNao1.setText("Não");
+        buttonGroup4.add(radioDetalheSindicoNao);
+        radioDetalheSindicoNao.setSelected(true);
+        radioDetalheSindicoNao.setText("Não");
+        radioDetalheSindicoNao.setEnabled(false);
 
         jLabel16.setText("Dividir Fração Ideal?");
 
-        buttonGroup5.add(radioFracaoSim1);
-        radioFracaoSim1.setText("Sim");
+        buttonGroup5.add(radioDetalheFracaoSim);
+        radioDetalheFracaoSim.setText("Sim");
+        radioDetalheFracaoSim.setEnabled(false);
 
-        buttonGroup5.add(radioFracaoNao1);
-        radioFracaoNao1.setSelected(true);
-        radioFracaoNao1.setText("Não");
+        buttonGroup5.add(radioDetalheFracaoNao);
+        radioDetalheFracaoNao.setSelected(true);
+        radioDetalheFracaoNao.setText("Não");
+        radioDetalheFracaoNao.setEnabled(false);
 
         jLabel17.setText("Cobrar com Cota Condomínio?");
 
-        buttonGroup6.add(radioCondominioSim1);
-        radioCondominioSim1.setSelected(true);
-        radioCondominioSim1.setText("Sim");
+        buttonGroup6.add(radioDetalheCondominioSim);
+        radioDetalheCondominioSim.setSelected(true);
+        radioDetalheCondominioSim.setText("Sim");
+        radioDetalheCondominioSim.setEnabled(false);
 
-        buttonGroup6.add(radioCondominioNao1);
-        radioCondominioNao1.setText("Não");
+        buttonGroup6.add(radioDetalheCondominioNao);
+        radioDetalheCondominioNao.setText("Não");
+        radioDetalheCondominioNao.setEnabled(false);
+
+        jLabel18.setText("Dia Venc.:");
 
         javax.swing.GroupLayout paineTaxaExtraLayout = new javax.swing.GroupLayout(paineTaxaExtra);
         paineTaxaExtra.setLayout(paineTaxaExtraLayout);
@@ -922,37 +942,41 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                         .addComponent(jLabel15)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radioSindicoSim1)
+                        .addComponent(radioDetalheSindicoSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radioSindicoNao1)
+                        .addComponent(radioDetalheSindicoNao)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel16)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioFracaoSim1)
+                        .addComponent(radioDetalheFracaoSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radioFracaoNao1)
+                        .addComponent(radioDetalheFracaoNao)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel17)
                         .addGap(2, 2, 2)
-                        .addComponent(radioCondominioSim1)
+                        .addComponent(radioDetalheCondominioSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(radioCondominioNao1))
+                        .addComponent(radioDetalheCondominioNao))
                     .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel7)
                             .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 65, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(spnDiaVencimento)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtCodigoConta, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel11))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel10))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
-                            .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtCotas, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel8)
@@ -971,27 +995,33 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     .addComponent(jLabel7)
                     .addGroup(paineTaxaExtraLayout.createSequentialGroup()
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel11)
                             .addComponent(jLabel9)
                             .addComponent(jLabel8)
                             .addComponent(jLabel10))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(txtCodigoContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtValorContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtParcelasContrato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(txtCotas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(paineTaxaExtraLayout.createSequentialGroup()
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel11)
+                            .addComponent(jLabel18))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtCodigoConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(spnDiaVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(paineTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioSindicoNao1)
-                    .addComponent(radioSindicoSim1)
+                    .addComponent(radioDetalheSindicoNao)
+                    .addComponent(radioDetalheSindicoSim)
                     .addComponent(jLabel16)
-                    .addComponent(radioFracaoSim1)
-                    .addComponent(radioFracaoNao1)
+                    .addComponent(radioDetalheFracaoSim)
+                    .addComponent(radioDetalheFracaoNao)
                     .addComponent(jLabel17)
-                    .addComponent(radioCondominioNao1)
-                    .addComponent(radioCondominioSim1)
+                    .addComponent(radioDetalheCondominioNao)
+                    .addComponent(radioDetalheCondominioSim)
                     .addComponent(jLabel15))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1052,6 +1082,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1066,28 +1097,29 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JPanel paineTaxaExtra;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JRadioButton radioCondominioNao;
-    private javax.swing.JRadioButton radioCondominioNao1;
     private javax.swing.JRadioButton radioCondominioSim;
-    private javax.swing.JRadioButton radioCondominioSim1;
+    private javax.swing.JRadioButton radioDetalheCondominioNao;
+    private javax.swing.JRadioButton radioDetalheCondominioSim;
+    private javax.swing.JRadioButton radioDetalheFracaoNao;
+    private javax.swing.JRadioButton radioDetalheFracaoSim;
+    private javax.swing.JRadioButton radioDetalheSindicoNao;
+    private javax.swing.JRadioButton radioDetalheSindicoSim;
     private javax.swing.JRadioButton radioFracaoNao;
-    private javax.swing.JRadioButton radioFracaoNao1;
     private javax.swing.JRadioButton radioFracaoSim;
-    private javax.swing.JRadioButton radioFracaoSim1;
     private javax.swing.JRadioButton radioSindicoNao;
-    private javax.swing.JRadioButton radioSindicoNao1;
     private javax.swing.JRadioButton radioSindicoSim;
-    private javax.swing.JRadioButton radioSindicoSim1;
     private javax.swing.JSpinner spnDia;
+    private javax.swing.JSpinner spnDiaVencimento;
     private javax.swing.JTable tabela;
     private javax.swing.JTable tabelaParcelas;
-    private javax.swing.JTextField txtCodigoContrato;
+    private javax.swing.JTextField txtCodigoConta;
     private javax.swing.JTextField txtConta;
+    private javax.swing.JTextField txtCotas;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private javax.swing.JTextField txtDescricao;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroParcelas;
-    private javax.swing.JTextField txtParcelasContrato;
     private javax.swing.JTextField txtPeriodo;
     private javax.swing.JTextField txtValor;
     private javax.swing.JTextField txtValorContrato;
