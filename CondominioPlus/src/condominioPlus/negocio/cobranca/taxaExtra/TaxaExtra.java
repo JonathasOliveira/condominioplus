@@ -38,6 +38,7 @@ public class TaxaExtra implements Serializable{
     private Calendar dataFinal;
     private int diaVencimento;
     private int numeroCotas;
+    private int cobrancasADescartar;
     private BigDecimal valor;
     @ManyToOne
     private Condominio condominio;
@@ -128,6 +129,14 @@ public class TaxaExtra implements Serializable{
 
     public void setNumeroCotas(int numeroCotas) {
         this.numeroCotas = numeroCotas;
+    }
+
+    public int getCobrancasADescartar() {
+        return cobrancasADescartar;
+    }
+
+    public void setCobrancasADescartar(int cobrancasADescartar) {
+        this.cobrancasADescartar = cobrancasADescartar;
     }
 
     public boolean isSindicoPaga() {
