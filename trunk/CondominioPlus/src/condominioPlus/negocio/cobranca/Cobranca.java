@@ -64,6 +64,7 @@ public class Cobranca implements Serializable {
     private BigDecimal diferencaPagamento = new BigDecimal(0);
     @Column(name = "desconto", precision = 20, scale = 2)
     private BigDecimal desconto = new BigDecimal(0);
+    @Column(precision = 20, scale = 2)
     private BigDecimal multa = new BigDecimal(0);
     @OneToMany(mappedBy = "cobranca", cascade = CascadeType.ALL)
     private List<Pagamento> pagamentos = new ArrayList<Pagamento>();

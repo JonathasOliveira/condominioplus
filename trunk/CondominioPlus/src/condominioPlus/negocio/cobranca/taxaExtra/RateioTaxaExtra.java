@@ -6,6 +6,7 @@
 package condominioPlus.negocio.cobranca.taxaExtra;
 
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.Cobranca;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -14,6 +15,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 
@@ -36,6 +38,8 @@ public class RateioTaxaExtra implements Serializable{
     private BigDecimal valosACobrar;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataVencimento;
+    @OneToOne
+    private Cobranca cobranca;
 
     public int getCodigo() {
         return codigo;
@@ -75,6 +79,14 @@ public class RateioTaxaExtra implements Serializable{
 
     public void setValosACobrar(BigDecimal valosACobrar) {
         this.valosACobrar = valosACobrar;
+    }
+
+    public Cobranca getCobranca() {
+        return cobranca;
+    }
+
+    public void setCobranca(Cobranca cobranca) {
+        this.cobranca = cobranca;
     }
 
 }
