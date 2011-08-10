@@ -181,8 +181,8 @@ public class TelaGas extends javax.swing.JInternalFrame {
     private void calcularMetroCubico() {
         if (conta != null) {
             conta.setValorUnitarioMetroCubico(conta.getValorUnitarioKg().multiply(conta.getDensidadeMedia()));
-            conta.setQuantidadeMetroCubico(conta.getQuantidadeKg().divide(conta.getDensidadeMedia()));
-            conta.setValorTotal(conta.getValorUnitarioMetroCubico().multiply(conta.getQuantidadeMetroCubico()).setScale(2, RoundingMode.UP));
+            conta.setQuantidadeMetroCubico(new Moeda(conta.getQuantidadeKg().doubleValue() / (conta.getDensidadeMedia().doubleValue())).bigDecimalValue().setScale(2, RoundingMode.UP));
+            conta.setValorTotal(new Moeda(conta.getValorUnitarioMetroCubico()).multiplica(conta.getQuantidadeMetroCubico()).bigDecimalValue().setScale(2, RoundingMode.UP));
 
         }
     }
@@ -303,6 +303,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
                             rateio.setConsumoMetroCubico(valorConsumo);
                         }
                         valorMetroCubicoPorRateio(rateio);
+                        
                     }
                 } else {
                     System.out.println("valor nulo");
@@ -341,16 +342,17 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
        for (RateioGas rateio : conta.getRateios()) {
             rateio.setConsumoReaisAreaComum(valorAreaComum.bigDecimalValue());
+            totalValorRateio(rateio);
         }
 
     }
 
-    private double totalValorRateio(Rateio rateio) {
-        double total = 0;
+    private void totalValorRateio(RateioGas rateio) {
+        
+        Moeda total = new Moeda(rateio.getConsumoEmReaisUnidade()).soma(rateio.getConsumoReaisAreaComum());
+        
+        rateio.setConsumoTotal(total.bigDecimalValue());
 
-        total = rateio.getValorRateioPipa().doubleValue() + rateio.getValorTotalConsumido().doubleValue() + rateio.getConsumoEmDinheiroAreaComum().doubleValue();
-
-        return total;
     }
 
     private void incluirContaGas() {
