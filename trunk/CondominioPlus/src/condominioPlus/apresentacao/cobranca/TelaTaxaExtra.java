@@ -983,7 +983,11 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         jLabel18.setText("Dia Venc.:");
 
+        spnDiaVencimento.setEnabled(false);
+
         jLabel20.setText("Cobr. a Descartar");
+
+        spnCobrancasADescartarDetalhe.setEnabled(false);
 
         btnCalcular.setText("Calcular");
 

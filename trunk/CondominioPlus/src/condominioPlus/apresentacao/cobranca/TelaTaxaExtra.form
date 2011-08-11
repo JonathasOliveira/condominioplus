@@ -790,6 +790,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="spnDiaVencimento">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel20">
           <Properties>
@@ -797,6 +800,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JSpinner" name="spnCobrancasADescartarDetalhe">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btnCalcular">
           <Properties>
