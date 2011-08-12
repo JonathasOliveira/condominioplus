@@ -429,7 +429,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     }
 
     private void salvarTaxa() {
-        taxa.setDiaVencimento((Integer) spnDiaVencimento.getValue());
         taxa.setDescricao(txtDescricao.getText());
         new DAO().salvar(taxa);
         carregarTabela();
@@ -936,8 +935,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         jScrollPane2.setViewportView(tabelaParcelas);
 
         txtCodigoConta.setEditable(false);
+        txtCodigoConta.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         txtCotas.setEditable(false);
+        txtCotas.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         txtValorTaxa.setEditable(false);
 
