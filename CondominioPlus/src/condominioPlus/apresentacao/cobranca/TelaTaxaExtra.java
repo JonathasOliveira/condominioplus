@@ -436,6 +436,19 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 return;
             }
             if (tx.isDividirFracaoIdeal()) {
+                RATEIO:
+                for (Unidade u : tx.getCondominio().getUnidades()){
+                    if (u.isSindico() && !tx.isSindicoPaga()) {
+                        continue RATEIO;
+                    }
+                    RateioTaxaExtra rateio = new RateioTaxaExtra();
+                    rateio.setUnidade(u);
+                    rateio.setParcela(modeloParcela.getObjetoSelecionado());
+                    rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela)));
+                    parcela.getRateios().add(rateio);
+                    new DAO().salvar(parcela);
+                    ApresentacaoUtil.exibirAdvertencia("Cálculo efetuado com sucesso.", this);
+                }
             } else {
                 for (Unidade u : tx.getCondominio().getUnidades()) {
                     if (u.isSindico() || verificarInadimplencia(tx.getCobrancasADescartar(), u)) {
@@ -464,6 +477,23 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirAdvertencia("Selecione uma parcela.", this);
             return;
         }
+    }
+
+    private double calcularPorFracaoIdeal(Unidade u, ParcelaTaxaExtra parcela) {
+        double resultado = 0;
+        resultado = (u.getFracaoIdeal() * parcela.getValor().doubleValue()) / getMaiorFracaoIdeal();
+        System.out.println("resultado - " + resultado);
+        return resultado;
+    }
+
+    private double getMaiorFracaoIdeal() {
+        double resultado = 0;
+        for (Unidade u : condominio.getUnidades()) {
+            if (u.getFracaoIdeal() > resultado) {
+                resultado = u.getFracaoIdeal();
+            }
+        }
+        return resultado;
     }
 
     private boolean verificarInadimplencia(int cobrancasADescartar, Unidade u) {
