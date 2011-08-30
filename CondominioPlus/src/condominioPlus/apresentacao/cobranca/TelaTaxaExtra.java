@@ -436,19 +436,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 return;
             }
             if (tx.isDividirFracaoIdeal()) {
-                RATEIO:
-                for (Unidade u : tx.getCondominio().getUnidades()){
-                    if (u.isSindico() && !tx.isSindicoPaga()) {
-                        continue RATEIO;
-                    }
-                    RateioTaxaExtra rateio = new RateioTaxaExtra();
-                    rateio.setUnidade(u);
-                    rateio.setParcela(modeloParcela.getObjetoSelecionado());
-                    rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela)));
-                    parcela.getRateios().add(rateio);
-                    new DAO().salvar(parcela);
-                    ApresentacaoUtil.exibirAdvertencia("Cálculo efetuado com sucesso.", this);
-                }
+                efetuarCalculo(new BigDecimal(0), parcela);
             } else {
                 for (Unidade u : tx.getCondominio().getUnidades()) {
                     if (u.isSindico() || verificarInadimplencia(tx.getCobrancasADescartar(), u)) {
@@ -459,19 +447,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 valorRateio = valorRateio.add(modeloParcela.getObjetoSelecionado().getValor());
                 valorRateio = valorRateio.divide(new BigDecimal(numero));
                 System.out.println("valor rateio " + PagamentoUtil.formatarMoeda(valorRateio.doubleValue()));
-                RATEIO:
-                for (Unidade u : tx.getCondominio().getUnidades()) {
-                    if (u.isSindico() && !tx.isSindicoPaga()) {
-                        continue RATEIO;
-                    }
-                    RateioTaxaExtra rateio = new RateioTaxaExtra();
-                    rateio.setUnidade(u);
-                    rateio.setParcela(modeloParcela.getObjetoSelecionado());
-                    rateio.setValosACobrar(valorRateio);
-                    parcela.getRateios().add(rateio);
-                    new DAO().salvar(parcela);
-                    ApresentacaoUtil.exibirAdvertencia("Cálculo efetuado com sucesso.", this);
-                }
+                efetuarCalculo(valorRateio, parcela);
             }
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione uma parcela.", this);
@@ -479,9 +455,29 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         }
     }
 
-    private double calcularPorFracaoIdeal(Unidade u, ParcelaTaxaExtra parcela) {
+    private void efetuarCalculo(BigDecimal valor, ParcelaTaxaExtra parcela) {
+        RATEIO:
+        for (Unidade u : parcela.getTaxa().getCondominio().getUnidades()) {
+            if (u.isSindico() && !parcela.getTaxa().isSindicoPaga()) {
+                continue RATEIO;
+            }
+            RateioTaxaExtra rateio = new RateioTaxaExtra();
+            rateio.setUnidade(u);
+            rateio.setParcela(modeloParcela.getObjetoSelecionado());
+            if (parcela.getTaxa().isDividirFracaoIdeal()) {
+                rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor())));
+            } else {
+                rateio.setValosACobrar(valor);
+            }
+            parcela.getRateios().add(rateio);
+            new DAO().salvar(parcela);
+            ApresentacaoUtil.exibirAdvertencia("Cálculo efetuado com sucesso.", this);
+        }
+    }
+
+    private double calcularPorFracaoIdeal(Unidade u, BigDecimal valor) {
         double resultado = 0;
-        resultado = (u.getFracaoIdeal() * parcela.getValor().doubleValue()) / getMaiorFracaoIdeal();
+        resultado = (u.getFracaoIdeal() * valor.doubleValue()) / getMaiorFracaoIdeal();
         System.out.println("resultado - " + resultado);
         return resultado;
     }
@@ -806,8 +802,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addGap(1, 1, 1))
+                            .addComponent(jLabel2)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(radioFracaoSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1046,9 +1041,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                                 .addComponent(radioDetalheCondominioNao)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnCalcular)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelTaxaExtraLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 688, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1109,8 +1104,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 709, Short.MAX_VALUE)
-                    .addComponent(painelTaxaExtra, javax.swing.GroupLayout.Alignment.LEADING, 0, 709, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
+                    .addComponent(painelTaxaExtra, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 709, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );

@@ -67,8 +67,8 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
-                  <Component id="jScrollPane1" alignment="0" pref="709" max="32767" attributes="1"/>
-                  <Component id="painelTaxaExtra" alignment="0" min="0" pref="709" max="32767" attributes="1"/>
+                  <Component id="jScrollPane1" alignment="0" pref="714" max="32767" attributes="1"/>
+                  <Component id="painelTaxaExtra" alignment="0" min="0" max="32767" attributes="1"/>
                   <Component id="jPanel1" alignment="1" min="-2" pref="709" max="-2" attributes="3"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -143,7 +143,6 @@
                               <Component id="txtHistorico" min="-2" pref="167" max="-2" attributes="0"/>
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="radioFracaoSim" min="-2" max="-2" attributes="0"/>
@@ -519,10 +518,10 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="12" max="32767" attributes="0"/>
                   <Component id="jScrollPane2" min="-2" pref="688" max="-2" attributes="1"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
