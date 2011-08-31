@@ -70,8 +70,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         new ControladorEventos();
 
-        definirMinimoSpinner(spnDia);
-
         carregarTabela();
         preencherTela();
 
@@ -108,7 +106,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     case 5:
                         return t.getCobrancasADescartar();
                     case 6:
-                        return t.getDiaVencimento();
+                        return DataUtil.getDateTime(t.getPrimeiroVencimento());
                     case 7:
                         return t.isSindicoPaga();
                     case 8:
@@ -128,7 +126,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         tabela.getColumn(modelo.getCampo(3)).setCellRenderer(direita);
         tabela.getColumn(modelo.getCampo(4)).setCellRenderer(direita);
-        tabela.getColumn(modelo.getCampo(6)).setCellRenderer(direita);
 
         tabela.getColumn(modelo.getCampo(0)).setMinWidth(140);
         tabela.getColumn(modelo.getCampo(1)).setMinWidth(80);
@@ -206,7 +203,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         taxa.setNumeroCotas(Integer.valueOf(txtNumeroParcelas.getText()));
         taxa.setCobrancasADescartar((Integer) spnCobrancasADescartar.getValue());
-        taxa.setDiaVencimento((Integer) spnDia.getValue());
+        taxa.setPrimeiroVencimento(DataUtil.getCalendar(txtPrimeiroVencimento.getValue()));
 
         if (conta != null) {
             taxa.setConta(conta);
@@ -215,6 +212,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         for (int i = 0; i < taxa.getNumeroCotas(); i++) {
             ParcelaTaxaExtra parcela = new ParcelaTaxaExtra();
             parcela.setNumeroParcela(i + 1);
+            parcela.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(taxa.getPrimeiroVencimento()).plusMonths(i)));
             parcela.setValor(taxa.getValor().divide(new BigDecimal(taxa.getNumeroCotas())));
 
             parcela.setTaxa(taxa);
@@ -285,7 +283,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtConta.setText("");
         txtHistorico.setText("");
         txtNumeroParcelas.setText("");
-        definirMinimoSpinner(spnDia);
+//        definirMinimoSpinner(spnDia);
         radioSindicoNao.setSelected(true);
         radioFracaoNao.setSelected(true);
         radioCondominioNao.setSelected(true);
@@ -312,7 +310,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     public void carregarTabelaParcelas() {
 
-        modeloParcela = new TabelaModelo_2<ParcelaTaxaExtra>(tabelaParcelas, "Número Parcela, Valor".split(",")) {
+        modeloParcela = new TabelaModelo_2<ParcelaTaxaExtra>(tabelaParcelas, "Número Parcela, Vencimento, Valor".split(",")) {
 
             @Override
             protected List<ParcelaTaxaExtra> getCarregarObjetos() {
@@ -325,6 +323,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     case 0:
                         return parcela.getNumeroParcela();
                     case 1:
+                        return DataUtil.getDateTime(parcela.getDataVencimento());
+                    case 2:
                         return PagamentoUtil.formatarMoeda(parcela.getValor().doubleValue());
                     default:
                         return null;
@@ -374,7 +374,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtDescricao.setText(t.getDescricao());
         txtCotas.setText(String.valueOf(t.getNumeroCotas()));
         definirMinimoSpinner(spnDiaVencimento);
-        spnDiaVencimento.setValue(t.getDiaVencimento());
+        if (t.getPrimeiroVencimento() != null) {
+            spnDiaVencimento.setValue(DataUtil.getDateTime(t.getPrimeiroVencimento()).getDayOfMonth());
+        }
         txtValorTaxa.setText(PagamentoUtil.formatarMoeda(t.getValor().doubleValue()));
         if (taxa.isSindicoPaga()) {
             radioDetalheSindicoSim.setSelected(true);
@@ -465,7 +467,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             rateio.setUnidade(u);
             rateio.setParcela(modeloParcela.getObjetoSelecionado());
             if (parcela.getTaxa().isDividirFracaoIdeal()) {
-                rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor())));
+                rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
             } else {
                 rateio.setValosACobrar(valor);
             }
@@ -475,20 +477,24 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         }
     }
 
-    private double calcularPorFracaoIdeal(Unidade u, BigDecimal valor) {
-        double resultado = 0;
-        resultado = (u.getFracaoIdeal() * valor.doubleValue()) / getMaiorFracaoIdeal();
-        System.out.println("resultado - " + resultado);
-        return resultado;
-    }
-
-    private double getMaiorFracaoIdeal() {
-        double resultado = 0;
-        for (Unidade u : condominio.getUnidades()) {
-            if (u.getFracaoIdeal() > resultado) {
-                resultado = u.getFracaoIdeal();
+    private Unidade getSindico() {
+        Unidade u = new Unidade();
+        for (Unidade unidade : condominio.getUnidades()) {
+            if (unidade.isSindico()) {
+                u = unidade;
             }
         }
+        return u;
+    }
+
+    private double calcularPorFracaoIdeal(Unidade u, BigDecimal valor, boolean sindicoPaga) {
+        double resultado = 0;
+        double soma = 0;
+        if (!sindicoPaga) {
+            soma = getSindico().getFracaoIdeal() / (u.getCondominio().getUnidades().size() - 1);
+        }
+        resultado = (u.getFracaoIdeal() + soma) * valor.doubleValue();
+        System.out.println("resultado - " + resultado);
         return resultado;
     }
 
@@ -650,9 +656,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioCondominioNao = new javax.swing.JRadioButton();
         radioCondominioSim = new javax.swing.JRadioButton();
         jLabel5 = new javax.swing.JLabel();
-        spnDia = new javax.swing.JSpinner();
         spnCobrancasADescartar = new javax.swing.JSpinner();
         jLabel19 = new javax.swing.JLabel();
+        txtPrimeiroVencimento = new net.sf.nachocalendar.components.DateField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         painelTaxaExtra = new javax.swing.JPanel();
@@ -765,7 +771,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         buttonGroup3.add(radioCondominioSim);
         radioCondominioSim.setText("Sim");
 
-        jLabel5.setText("Dia Venc.:");
+        jLabel5.setText("1º Venc.:");
 
         jLabel19.setText("Cobr. a Descartar");
 
@@ -792,8 +798,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                             .addComponent(txtNumeroParcelas)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(spnDia)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtPrimeiroVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -819,18 +825,15 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                         .addComponent(radioCondominioSim)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(radioCondominioNao)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
                         .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(spnCobrancasADescartar)
-                            .addComponent(jLabel19))))
-                .addGap(10, 10, 10))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(spnCobrancasADescartar)
+                        .addComponent(jLabel19))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -845,18 +848,29 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                         .addGroup(jPanel1Layout.createSequentialGroup()
                             .addComponent(jLabel4)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(spnDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jLabel5)
-                            .addGap(26, 26, 26))
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(btnConta, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE)
-                                .addComponent(jLabel2))
-                            .addGap(26, 26, 26))
-                        .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel5)
+                                    .addGap(6, 6, 6)
+                                    .addComponent(txtPrimeiroVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(btnConta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGap(26, 26, 26))
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGap(20, 20, 20)
+                                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(26, 26, 26))
+                                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel19)
+                                        .addGap(26, 26, 26))
+                                    .addComponent(spnCobrancasADescartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGap(2, 2, 2)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1)
@@ -864,26 +878,25 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtDataFinal, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtDataInicial, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txtDataInicial, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel19)
-                        .addGap(26, 26, 26))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(spnCobrancasADescartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(11, 11, 11)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(radioFracaoSim)
-                        .addComponent(radioFracaoNao)
-                        .addComponent(jLabel12)
-                        .addComponent(radioSindicoSim)
-                        .addComponent(radioSindicoNao)
-                        .addComponent(jLabel14)
-                        .addComponent(radioCondominioSim)
-                        .addComponent(radioCondominioNao))
-                    .addComponent(btnImprimir)
-                    .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(22, 22, 22)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(radioFracaoSim)
+                            .addComponent(radioFracaoNao)
+                            .addComponent(jLabel12)
+                            .addComponent(radioSindicoSim)
+                            .addComponent(radioSindicoNao)
+                            .addComponent(jLabel14)
+                            .addComponent(radioCondominioSim)
+                            .addComponent(radioCondominioNao)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnImprimir)
+                            .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap())
         );
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
@@ -986,66 +999,65 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         painelTaxaExtraLayout.setHorizontalGroup(
             painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelTaxaExtraLayout.createSequentialGroup()
-                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(painelTaxaExtraLayout.createSequentialGroup()
-                        .addGap(275, 275, 275)
-                        .addComponent(btnSalvar)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel7)
+                            .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnVoltar))
-                    .addGroup(painelTaxaExtraLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(painelTaxaExtraLayout.createSequentialGroup()
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel7)
-                                    .addComponent(txtPeriodo, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(spnDiaVencimento)
-                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel11)
-                                    .addComponent(txtCodigoConta, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel10)
-                                    .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(spnCobrancasADescartarDetalhe, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel20, javax.swing.GroupLayout.Alignment.TRAILING))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtCotas, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel9))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(txtValorTaxa, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelTaxaExtraLayout.createSequentialGroup()
-                                .addComponent(radioDetalheFracaoSim)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioDetalheFracaoNao)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel15)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioDetalheSindicoSim)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(radioDetalheSindicoNao)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel17)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioDetalheCondominioSim)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(radioDetalheCondominioNao)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnCalcular)))))
-                .addContainerGap(14, Short.MAX_VALUE))
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(spnDiaVencimento)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11)
+                            .addComponent(txtCodigoConta, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel10)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(spnCobrancasADescartarDetalhe, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel20, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtCotas, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(txtValorTaxa, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelTaxaExtraLayout.createSequentialGroup()
+                        .addComponent(radioDetalheFracaoSim)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioDetalheFracaoNao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioDetalheSindicoSim)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioDetalheSindicoNao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel17)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioDetalheCondominioSim)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(radioDetalheCondominioNao)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnCalcular)))
+                .addContainerGap(15, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelTaxaExtraLayout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
+                .addContainerGap(13, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 688, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .addGroup(painelTaxaExtraLayout.createSequentialGroup()
+                .addGap(285, 285, 285)
+                .addComponent(btnSalvar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnVoltar)
+                .addContainerGap(296, Short.MAX_VALUE))
         );
         painelTaxaExtraLayout.setVerticalGroup(
             painelTaxaExtraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1101,19 +1113,19 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE)
-                    .addComponent(painelTaxaExtra, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 709, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(painelTaxaExtra, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 715, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -1176,7 +1188,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton radioSindicoSim;
     private javax.swing.JSpinner spnCobrancasADescartar;
     private javax.swing.JSpinner spnCobrancasADescartarDetalhe;
-    private javax.swing.JSpinner spnDia;
     private javax.swing.JSpinner spnDiaVencimento;
     private javax.swing.JTable tabela;
     private javax.swing.JTable tabelaParcelas;
@@ -1189,6 +1200,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroParcelas;
     private javax.swing.JTextField txtPeriodo;
+    private net.sf.nachocalendar.components.DateField txtPrimeiroVencimento;
     private javax.swing.JTextField txtValor;
     private javax.swing.JTextField txtValorTaxa;
     // End of variables declaration//GEN-END:variables

@@ -36,7 +36,8 @@ public class TaxaExtra implements Serializable{
     private Calendar dataInicial;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataFinal;
-    private int diaVencimento;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Calendar primeiroVencimento;
     private int numeroCotas;
     private int cobrancasADescartar;
     private BigDecimal valor;
@@ -107,12 +108,12 @@ public class TaxaExtra implements Serializable{
         this.descricao = descricao;
     }
 
-    public int getDiaVencimento() {
-        return diaVencimento;
+    public Calendar getPrimeiroVencimento() {
+        return primeiroVencimento;
     }
 
-    public void setDiaVencimento(int diaVencimento) {
-        this.diaVencimento = diaVencimento;
+    public void setPrimeiroVencimento(Calendar primeiroVencimento) {
+        this.primeiroVencimento = primeiroVencimento;
     }
 
     public boolean isDividirFracaoIdeal() {
