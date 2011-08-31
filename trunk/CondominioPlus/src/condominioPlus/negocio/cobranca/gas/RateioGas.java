@@ -7,6 +7,7 @@ package condominioPlus.negocio.cobranca.gas;
 import condominioPlus.negocio.Unidade;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,11 +28,17 @@ public class RateioGas implements Serializable {
     private int codigo;
     @ManyToOne
     private Unidade unidade;
+    @Column(name="leitura_anterior")
     private BigDecimal leituraAnterior = new BigDecimal(0);
+    @Column(name="leitura_atual")
     private BigDecimal leituraAtual = new BigDecimal(0);
+    @Column(name="consumo_metro_cubico")
     private BigDecimal consumoMetroCubico = new BigDecimal(0);
+    @Column(name="consumo_reais_unidades")
     private BigDecimal consumoEmReaisUnidade = new BigDecimal(0);
+    @Column(name="consumo_reais_area_comum")
     private BigDecimal consumoReaisAreaComum = new BigDecimal(0);
+    @Column(name="consumo_total")
     private BigDecimal consumoTotal = new BigDecimal(0);
     @ManyToOne
     private ContaGas conta;

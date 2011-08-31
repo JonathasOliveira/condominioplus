@@ -166,7 +166,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                         break;
                     case 7:
                         conta.setDataVencimentoConta(DataUtil.getCalendar(valor));
-                                System.out.println("conta vencimento " + DataUtil.getDateTime(conta.getDataVencimentoConta()));
+                        System.out.println("conta vencimento " + DataUtil.getDateTime(conta.getDataVencimentoConta()));
                         break;
 
 
@@ -422,7 +422,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     }
 
     private List<Rateio> getUnidadesRateio() {
-           Comparator c = null;
+        Comparator c = null;
 
         c = new Comparator() {
 
@@ -865,19 +865,21 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
     private void removerContaAgua() {
         if (modeloContaAgua.getObjetoSelecionado() != null) {
+            if (ApresentacaoUtil.perguntar("Tem certeza que deseja excluir? ", this) == true) {
 
 
-            modeloContaAgua.remover(modeloContaAgua.getObjetoSelecionado());
+                modeloContaAgua.remover(modeloContaAgua.getObjetoSelecionado());
 
-            new DAO().remover(conta);
+                new DAO().remover(conta);
 
-            conta = null;
+                conta = null;
 
-            modeloRateio.setObjetos(null);
+                modeloRateio.setObjetos(null);
 
-            carregarTabelaContaAgua();
+                carregarTabelaContaAgua();
 
-            ApresentacaoUtil.exibirInformacao("Removido com Sucesso!", this);
+                ApresentacaoUtil.exibirInformacao("Removido com Sucesso!", this);
+            }
 
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
