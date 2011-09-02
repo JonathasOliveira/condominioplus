@@ -7,6 +7,7 @@ package condominioPlus.negocio.cobranca.taxaExtra;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.CascadeType;
@@ -37,7 +38,7 @@ public class ParcelaTaxaExtra implements Serializable{
     @ManyToOne
     private TaxaExtra taxa;
     @OneToMany(mappedBy = "parcela", cascade = CascadeType.ALL)
-    private List<RateioTaxaExtra> rateios;
+    private List<RateioTaxaExtra> rateios = new ArrayList();
 
     public int getCodigo() {
         return codigo;
