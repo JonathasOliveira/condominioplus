@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package condominioPlus.negocio.cobranca.taxaExtra;
 
 import condominioPlus.negocio.Condominio;
@@ -26,16 +25,12 @@ import javax.persistence.Temporal;
  * @author eugenia
  */
 @Entity
-@Table(name="taxa_extra")
-public class TaxaExtra implements Serializable{
+@Table(name = "taxa_extra")
+public class TaxaExtra implements Serializable {
 
     @Id
     @GeneratedValue
     private int codigo;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Calendar dataInicial;
-    @Temporal(javax.persistence.TemporalType.DATE)
-    private Calendar dataFinal;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar primeiroVencimento;
     private int numeroCotas;
@@ -82,22 +77,6 @@ public class TaxaExtra implements Serializable{
 
     public void setConta(Conta conta) {
         this.conta = conta;
-    }
-
-    public Calendar getDataFinal() {
-        return dataFinal;
-    }
-
-    public void setDataFinal(Calendar dataFinal) {
-        this.dataFinal = dataFinal;
-    }
-
-    public Calendar getDataInicial() {
-        return dataInicial;
-    }
-
-    public void setDataInicial(Calendar dataInicial) {
-        this.dataInicial = dataInicial;
     }
 
     public String getDescricao() {
@@ -163,5 +142,4 @@ public class TaxaExtra implements Serializable{
     public void setParcelas(List<ParcelaTaxaExtra> parcelas) {
         this.parcelas = parcelas;
     }
-
 }

@@ -16,10 +16,12 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
+import logicpoint.apresentacao.RenderizadorCelulaData;
 import logicpoint.apresentacao.TabelaModelo_2;
+import logicpoint.util.DataUtil;
+import net.sf.nachocalendar.table.JTableCustomizer;
 
 /**
  *
@@ -46,6 +48,15 @@ public class DialogoRateioTaxaExtra extends javax.swing.JDialog {
             }
 
             @Override
+            public void setValor(RateioTaxaExtra rateio, Object valor, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 1:
+                        rateio.setDataVencimento(DataUtil.getCalendar(valor));
+                        break;
+                }
+            }
+
+            @Override
             public Object getValor(RateioTaxaExtra r, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
@@ -67,7 +78,12 @@ public class DialogoRateioTaxaExtra extends javax.swing.JDialog {
 
         tabela.getColumn(modelo.getCampo(0)).setCellRenderer(direita);
         tabela.getColumn(modelo.getCampo(2)).setCellRenderer(direita);
- 
+
+        modelo.setEditaveis(1);
+
+        tabela.getColumn(modelo.getCampo(1)).setCellRenderer(new RenderizadorCelulaData());
+        JTableCustomizer.setEditorForRow(tabela, 1);
+
     }
 
     public List<RateioTaxaExtra> getRateios() {
