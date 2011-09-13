@@ -8,12 +8,13 @@
  *
  * Created on 18/05/2011, 16:04:14
  */
-package condominioPlus.apresentacao.cobranca.gas;
+package condominioPlus.apresentacao.cobranca.luz;
 
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
-import condominioPlus.negocio.cobranca.gas.ContaGas;
 import condominioPlus.negocio.cobranca.gas.RateioGas;
+import condominioPlus.negocio.cobranca.luz.ContaLuz;
+import condominioPlus.negocio.cobranca.luz.RateioLuz;
 import condominioPlus.util.FormatadorNumeros;
 import condominioPlus.util.RenderizadorCelulaCorGenerico;
 import java.awt.event.ActionEvent;
@@ -43,45 +44,45 @@ import net.sf.nachocalendar.table.JTableCustomizer;
  *
  * @author Administrador
  */
-public class TelaGas extends javax.swing.JInternalFrame {
+public class TelaLuz extends javax.swing.JInternalFrame {
 
-    private TabelaModelo_2<ContaGas> modeloContaGas;
-    private TabelaModelo_2<RateioGas> modeloRateio;
+    private TabelaModelo_2<ContaLuz> modeloContaLuz;
+    private TabelaModelo_2<RateioLuz> modeloRateio;
     private ControladorEventos controlador;
     private Condominio condominio;
-    private ContaGas conta;
+    private ContaLuz conta;
 
     /** Creates new form TelaAgua */
-    public TelaGas(Condominio condominio) {
+    public TelaLuz(Condominio condominio) {
         initComponents();
 
         this.condominio = condominio;
 
         carregarTabelaContaGas();
-        tabelaContaGas.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        tabelaContaLuz.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
         controlador = new ControladorEventos();
 
 
 
 
-        if (modeloContaGas.size() > 0) {
-            conta = modeloContaGas.getObjeto(0);
+        if (modeloContaLuz.size() > 0) {
+            conta = modeloContaLuz.getObjeto(0);
             carregarTabelaRateio();
-            modeloContaGas.selecionar(conta, 0);
+            modeloContaLuz.selecionar(conta, 0);
         }
     }
 
     private void carregarTabelaContaGas() {
-        modeloContaGas = new TabelaModelo_2<ContaGas>(tabelaContaGas, "Data Inicial, Data Final, Densidade, Quantidade KG, Valor Unitário KG, Quantidade M3, Valor Unitário M3, Total Despesas".split(",")) {
+        modeloContaLuz = new TabelaModelo_2<ContaLuz>(tabelaContaLuz, "Data Inicial, Data Final, Constante, Quantidade KWH, Valor Unitário KWH, Taxa Pública, Data Vencimento , Total Unidades, Total Area Comum,Total".split(",")) {
 
             @Override
-            protected List<ContaGas> getCarregarObjetos() {
-                return getContasGas();
+            protected List<ContaLuz> getCarregarObjetos() {
+                return getContasLuz();
             }
 
             @Override
-            public void setValor(ContaGas conta, Object valor, int indiceColuna) {
+            public void setValor(ContaLuz conta, Object valor, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
                         conta.setDataInicial(DataUtil.getCalendar(valor));
@@ -90,45 +91,47 @@ public class TelaGas extends javax.swing.JInternalFrame {
                         conta.setDataFinal(DataUtil.getCalendar(valor));
                         break;
                     case 2:
-                        conta.setDensidadeMedia(((BigDecimal) valor));
+                        conta.setConstante(((BigDecimal) valor));
                         break;
                     case 3:
-                        conta.setQuantidadeKg(verificarValor(valor));
+                        conta.setQuantidadeWatts((BigDecimal) valor);
                         break;
                     case 4:
-                        conta.setValorUnitarioKg(((BigDecimal) valor));
+                        conta.setValorUnitarioWatts(((BigDecimal) valor));
                         break;
                     case 5:
-                        conta.setQuantidadeMetroCubico(((BigDecimal) valor));
+                        conta.setTaxaPublica(((BigDecimal) valor));
                         break;
                     case 6:
-                        conta.setValorUnitarioMetroCubico(((BigDecimal) valor));
+                        conta.setDataVencimento(DataUtil.getCalendar(valor));
                         break;
-                    case 7:
-                        conta.setValorTotal(((BigDecimal) valor));
-                        break;
+
                 }
             }
 
             @Override
-            public Object getValor(ContaGas conta, int indiceColuna) {
+            public Object getValor(ContaLuz conta, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
                         return conta.getDataInicial();
                     case 1:
                         return conta.getDataFinal();
                     case 2:
-                        return conta.getDensidadeMedia();
+                        return conta.getConstante();
                     case 3:
-                        return conta.getQuantidadeKg();
+                        return conta.getQuantidadeWatts();
                     case 4:
-                        return conta.getValorUnitarioKg();
+                        return conta.getValorUnitarioWatts();
                     case 5:
-                        return conta.getQuantidadeMetroCubico();
+                        return conta.getTaxaPublica();
                     case 6:
-                        return conta.getValorUnitarioMetroCubico();
+                        return conta.getDataVencimento();
                     case 7:
-                        return conta.getValorTotal();
+                        return new Moeda(conta.getTotalUnidadesDinheiro());
+                    case 8:
+                        return new Moeda(conta.getTotalConsumoAreaComum());
+                    case 9:
+                        return new Moeda(conta.getTotalFatura());
                     default:
                         return null;
 
@@ -139,55 +142,47 @@ public class TelaGas extends javax.swing.JInternalFrame {
         RenderizadorCelulaADireita direito = new RenderizadorCelulaADireita();
 //        RenderizadorCelulaCentralizada centralizado = new RenderizadorCelulaCentralizada();
 
-        tabelaContaGas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        tabelaContaLuz.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //
 //
-        modeloContaGas.setEditaveis(0, 1, 2, 3, 4);
+        modeloContaLuz.setEditaveis(0, 1, 2, 3, 4, 5, 6);
 //
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(0)).setCellRenderer(new RenderizadorCelulaData());
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(1)).setCellRenderer(new RenderizadorCelulaData());
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(0)).setCellRenderer(new RenderizadorCelulaData());
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(1)).setCellRenderer(new RenderizadorCelulaData());
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(6)).setCellRenderer(new RenderizadorCelulaData());
 //        tabelaContaGas.getColumn(modeloContaAgua.getCampo(7)).setCellRenderer(new RenderizadorCelulaData());
-        JTableCustomizer.setEditorForRow(tabelaContaGas, 0);
-        JTableCustomizer.setEditorForRow(tabelaContaGas, 1);
-//        JTableCustomizer.setEditorForRow(tabelaContaGas, 7);
+        JTableCustomizer.setEditorForRow(tabelaContaLuz, 0);
+        JTableCustomizer.setEditorForRow(tabelaContaLuz, 1);
+        JTableCustomizer.setEditorForRow(tabelaContaLuz, 6);
 
 
 
-        for (int i = 2; i <= 7; i++) {
-            tabelaContaGas.getColumn(modeloContaGas.getCampo(i)).setCellRenderer(direito);
+        for (int i = 2; i <= 5; i++) {
+            tabelaContaLuz.getColumn(modeloContaLuz.getCampo(i)).setCellRenderer(direito);
 
         }
 //        tabelaContaGas.getColumn(modeloContaAgua.getCampo(8)).setCellRenderer(centralizado);
 //
         for (int i = 0; i <= 7; i++) {
-            tabelaContaGas.getColumn(modeloContaGas.getCampo(i)).setMinWidth(100);
+            tabelaContaLuz.getColumn(modeloContaLuz.getCampo(i)).setMinWidth(100);
 
         }
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(8)).setMinWidth(100);
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(9)).setMinWidth(100);
 //
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(5)).setCellRenderer(new RenderizadorCelulaCorGenerico());
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(6)).setCellRenderer(new RenderizadorCelulaCorGenerico());
-        tabelaContaGas.getColumn(modeloContaGas.getCampo(7)).setCellRenderer(new RenderizadorCelulaCorGenerico());
+        tabelaContaLuz.getColumn(modeloContaLuz.getCampo(7)).setCellRenderer(new RenderizadorCelulaCorGenerico());
 
-        tabelaContaGas.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).
+        tabelaContaLuz.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).
                 put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                 "selectNextColumnCell");
     }
 
-    private List<ContaGas> getContasGas() {
-        List<ContaGas> contas = new DAO().listar("ContasGasPorCondominio", condominio);
+    private List<ContaLuz> getContasLuz() {
+        List<ContaLuz> contas = new DAO().listar("ContasLuzPorCondominio", condominio);
         return contas;
     }
 
-    private void calcularMetroCubico() {
-        if (conta != null) {
-            conta.setValorUnitarioMetroCubico(conta.getValorUnitarioKg().multiply(conta.getDensidadeMedia()));
-            conta.setQuantidadeMetroCubico(new Moeda(conta.getQuantidadeKg().doubleValue() / (conta.getDensidadeMedia().doubleValue())).bigDecimalValue().setScale(2, RoundingMode.UP));
-            conta.setValorTotal(new Moeda(conta.getValorUnitarioMetroCubico()).multiplica(conta.getQuantidadeMetroCubico()).bigDecimalValue().setScale(2, RoundingMode.UP));
-
-        }
-    }
-
-    private BigDecimal verificarValor(Object valor) {
+   private BigDecimal verificarValor(Object valor) {
 
         if (valor instanceof String) {
             return FormatadorNumeros.casasDecimais(3, new BigDecimal(((String) valor).replaceAll(",", ".")));
@@ -198,15 +193,15 @@ public class TelaGas extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaRateio() {
-        modeloRateio = new TabelaModelo_2<RateioGas>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(M3), Consumo a Cobrar(R$), Consumo Área Comum(R$), Valor Total a Cobrar ".split(",")) {
+        modeloRateio = new TabelaModelo_2<RateioLuz>(tabelaRateio, "Unidade, Fração Ideal, Leitura Anterior, Leitura Atual, Consumo(Kwh), Consumo a Cobrar(R$), Consumo Área Comum(R$), Valor Total a Cobrar ".split(",")) {
 
             @Override
-            protected List<RateioGas> getCarregarObjetos() {
+            protected List<RateioLuz> getCarregarObjetos() {
                 return getUnidadesRateio();
             }
 
             @Override
-            public void setValor(RateioGas rateio, Object valor, int indiceColuna) {
+            public void setValor(RateioLuz rateio, Object valor, int indiceColuna) {
                 switch (indiceColuna) {
                     case 3:
                         rateio.setLeituraAtual(verificarValor(valor));
@@ -215,7 +210,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
             }
 
             @Override
-            public Object getValor(RateioGas rateio, int indiceColuna) {
+            public Object getValor(RateioLuz rateio, int indiceColuna) {
                 switch (indiceColuna) {
                     case 0:
                         return rateio.getUnidade().getUnidade();
@@ -226,7 +221,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
                     case 3:
                         return rateio.getLeituraAtual();
                     case 4:
-                        return rateio.getConsumoMetroCubico();
+                        return rateio.getConsumoWatts();
                     case 5:
                         return new Moeda(rateio.getConsumoEmReaisUnidade());
                     case 6:
@@ -245,7 +240,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
         tabelaRateio.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-    
+
 
         modeloRateio.setEditaveis(3);
 
@@ -270,14 +265,14 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
     }
 
-    private List<RateioGas> getUnidadesRateio() {
+    private List<RateioLuz> getUnidadesRateio() {
         Comparator c = null;
 
         c = new Comparator() {
 
             public int compare(Object o1, Object o2) {
-                RateioGas r1 = (RateioGas) o1;
-                RateioGas r2 = (RateioGas) o2;
+                RateioLuz r1 = (RateioLuz) o1;
+                RateioLuz r2 = (RateioLuz) o2;
                 return (r1.getUnidade().getUnidade()).compareTo(r2.getUnidade().getUnidade());
             }
         };
@@ -286,12 +281,16 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
         return conta.getRateios();
     }
+    
+    private void somarValoresContaLuz(){
+        conta.setTotalFatura(new Moeda((conta.getValorUnitarioWatts().multiply(conta.getQuantidadeWatts())).add(conta.getTaxaPublica())).bigDecimalValue());
+    }
 
     private void calcular() {
-        List<RateioGas> rateios = modeloContaGas.getObjetoSelecionado().getRateios();
+        List<RateioLuz> rateios = modeloContaLuz.getObjetoSelecionado().getRateios();
         if (!rateios.isEmpty()) {
-            calcularMetroCubico();
-            for (RateioGas rateio : rateios) {
+            somarValoresContaLuz();
+            for (RateioLuz rateio : rateios) {
                 if (rateio.getLeituraAtual() != null && rateio.getLeituraAnterior() != null) {
                     if (rateio.getLeituraAnterior().doubleValue() > rateio.getLeituraAtual().doubleValue()) {
                         ApresentacaoUtil.exibirAdvertencia("O valor da leitura atual não pode ser Menor que a anterior!", this);
@@ -299,11 +298,11 @@ public class TelaGas extends javax.swing.JInternalFrame {
                     } else {
                         BigDecimal valorConsumo = rateio.getLeituraAtual().subtract(rateio.getLeituraAnterior());
                         if (valorConsumo.intValue() < 0) {
-                            rateio.setConsumoMetroCubico(BigDecimal.ZERO);
+                            rateio.setConsumoWatts(BigDecimal.ZERO);
                         } else {
-                            rateio.setConsumoMetroCubico(valorConsumo);
+                            rateio.setConsumoWatts(valorConsumo);
                         }
-                        valorMetroCubicoPorRateio(rateio);
+                        valorWattsPorRateio(rateio);
 
                     }
                 } else {
@@ -313,8 +312,9 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
             }
 
-            
+            calcularTotalConsumoUnidades();
             calcularTotalAreaComum();
+            calcularTotalConsumoAreaComum();
 
             modeloRateio.carregarObjetos();
 ////            totalValorConta();
@@ -322,23 +322,21 @@ public class TelaGas extends javax.swing.JInternalFrame {
         }
     }
 
-    private void valorMetroCubicoPorRateio(RateioGas rateio) {
+    private void valorWattsPorRateio(RateioLuz rateio) {
         if (rateio != null) {
-            rateio.setConsumoEmReaisUnidade(rateio.getConsumoMetroCubico().multiply(conta.getValorUnitarioMetroCubico()).setScale(2, RoundingMode.UP));
+            rateio.setConsumoEmReaisUnidade(rateio.getConsumoWatts().multiply(conta.getValorUnitarioWatts()).setScale(2, RoundingMode.UP));
         }
     }
 
     private void calcularTotalAreaComum() {
-        Moeda soma = new Moeda();
-        for (RateioGas rateio : conta.getRateios()) {
-            soma.soma(rateio.getConsumoEmReaisUnidade());
-        }
+ 
 
-        Moeda valorAtualizado = new Moeda(conta.getValorTotal().subtract(soma.bigDecimalValue()));
+        Moeda valorAtualizado = new Moeda(conta.getTotalFatura().subtract(conta.getTotalUnidadesDinheiro()));
 
         Moeda valorAreaComum = new Moeda(valorAtualizado.doubleValue() / condominio.getUnidades().size());
+        System.out.println("valor area comum " + valorAreaComum);
 
-        for (RateioGas rateio : conta.getRateios()) {
+        for (RateioLuz rateio : conta.getRateios()) {
             if (valorAreaComum.doubleValue() >= 0) {
                 rateio.setConsumoReaisAreaComum(valorAreaComum.bigDecimalValue());
                 totalValorRateio(rateio);
@@ -349,8 +347,29 @@ public class TelaGas extends javax.swing.JInternalFrame {
         }
 
     }
+    
+     private void calcularTotalConsumoUnidades() {
+        List<RateioLuz> rateios = modeloContaLuz.getObjetoSelecionado().getRateios();
+        Moeda totalDinheiro = new Moeda(0);
+        for (RateioLuz rateio : rateios) {
+              totalDinheiro.soma(rateio.getConsumoEmReaisUnidade());
+        }
 
-    private void totalValorRateio(RateioGas rateio) {
+        conta.setTotalUnidadesDinheiro(totalDinheiro.bigDecimalValue());
+    }
+     
+       private void calcularTotalConsumoAreaComum() {
+        List<RateioLuz> rateios = modeloContaLuz.getObjetoSelecionado().getRateios();
+        Moeda totalDinheiro = new Moeda(0);
+        for (RateioLuz rateio : rateios) {
+              totalDinheiro.soma(rateio.getConsumoReaisAreaComum());
+        }
+
+        conta.setTotalConsumoAreaComum(totalDinheiro.bigDecimalValue());
+    }
+
+
+    private void totalValorRateio(RateioLuz rateio) {
 
         Moeda total = new Moeda(rateio.getConsumoEmReaisUnidade()).soma(rateio.getConsumoReaisAreaComum());
 
@@ -358,22 +377,22 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
     }
 
-    private void incluirContaGas() {
+    private void incluirContaLuz() {
 
 
-        conta = new ContaGas();
+        conta = new ContaLuz();
 
         List<Unidade> unidades = new DAO().listar("UnidadePorCondominio", condominio.getCodigo());
-        List<RateioGas> rateios = new ArrayList<RateioGas>();
+        List<RateioLuz> rateios = new ArrayList<RateioLuz>();
 
         for (Unidade unidade : unidades) {
 
-            RateioGas rateio = new RateioGas(unidade);
-            if (modeloContaGas.size() == 0) {
+            RateioLuz rateio = new RateioLuz(unidade);
+            if (modeloContaLuz.size() == 0) {
                 rateio.setLeituraAnterior(BigDecimal.ZERO);
             } else {
-                ContaGas c = modeloContaGas.getObjeto(modeloContaGas.size() - 1);
-                for (RateioGas r : c.getRateios()) {
+                ContaLuz c = modeloContaLuz.getObjeto(modeloContaLuz.size() - 1);
+                for (RateioLuz r : c.getRateios()) {
                     if (r.getUnidade().equals(rateio.getUnidade())) {
                         rateio.setLeituraAnterior(r.getLeituraAtual());
                     }
@@ -386,8 +405,8 @@ public class TelaGas extends javax.swing.JInternalFrame {
         }
         conta.setRateios(rateios);
         conta.setCondominio(condominio);
-        modeloContaGas.adicionar(conta);
-        modeloContaGas.selecionar(conta, 0);
+        modeloContaLuz.adicionar(conta);
+        modeloContaLuz.selecionar(conta, 0);
         carregarTabelaRateio();
 //        modeloContaAgua.setSelecaoMultipla(false);
 
@@ -395,12 +414,12 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
     }
 
-    private void removerContaGas() {
-        if (modeloContaGas.getObjetoSelecionado() != null) {
+    private void removerContaLuz() {
+        if (modeloContaLuz.getObjetoSelecionado() != null) {
             if (ApresentacaoUtil.perguntar("Tem certeza que deseja excluir? ", this) == true) {
 
 
-                modeloContaGas.remover(modeloContaGas.getObjetoSelecionado());
+                modeloContaLuz.remover(modeloContaLuz.getObjetoSelecionado());
 
                 new DAO().remover(conta);
 
@@ -447,7 +466,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
 //        return true;
     }
 
-    private void salvarGas() {
+    private void salvarLuz() {
         try {
             if (!validarCampos()) {
                 return;
@@ -469,13 +488,13 @@ public class TelaGas extends javax.swing.JInternalFrame {
             Object origem = e.getSource();
 
             if (origem == btnIncluir || origem == itemMenuIncluirRegistroContaAgua) {
-                incluirContaGas();
+                incluirContaLuz();
             } else if (origem == itemMenuDeletarRegistroContaAgua) {
-                removerContaGas();
+                removerContaLuz();
             } else if (origem == btnCalcular) {
                 calcular();
-            } else if (origem == btnSalvarAgua || origem == itemMenuGravarAlteracoesContaAgua || origem == itemMenuGravarAlteracoesPipa) {
-                salvarGas();
+            } else if (origem == btnSalvarLuz || origem == itemMenuGravarAlteracoesContaAgua || origem == itemMenuGravarAlteracoesPipa) {
+                salvarLuz();
             }
         }
 
@@ -493,16 +512,16 @@ public class TelaGas extends javax.swing.JInternalFrame {
             itemMenuIncluirPipa.addActionListener(this);
             itemMenuDeletarPipa.addActionListener(this);
             btnIncluir.addActionListener(this);
-            tabelaContaGas.addMouseListener(this);
-            tabelaContaGas.addKeyListener(this);
+            tabelaContaLuz.addMouseListener(this);
+            tabelaContaLuz.addKeyListener(this);
             tabelaRateio.addMouseListener(this);
             btnCalcular.addActionListener(this);
-            btnSalvarAgua.addActionListener(this);
+            btnSalvarLuz.addActionListener(this);
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger() && e.getSource() == tabelaContaGas) {
+            if (e.isPopupTrigger() && e.getSource() == tabelaContaLuz) {
                 popupContaAgua.show(e.getComponent(), e.getX(), e.getY());
             }
         }
@@ -510,8 +529,8 @@ public class TelaGas extends javax.swing.JInternalFrame {
         @Override
         public void keyReleased(KeyEvent e) {
             Object origem = e.getSource();
-            if (origem == tabelaContaGas && (e.getKeyCode() == KeyEvent.VK_UP) || origem == tabelaContaGas && (e.getKeyCode() == KeyEvent.VK_DOWN)) {
-                modeloRateio.setObjetos(modeloContaGas.getObjetoSelecionado().getRateios());
+            if (origem == tabelaContaLuz && (e.getKeyCode() == KeyEvent.VK_UP) || origem == tabelaContaLuz && (e.getKeyCode() == KeyEvent.VK_DOWN)) {
+                modeloRateio.setObjetos(modeloContaLuz.getObjetoSelecionado().getRateios());
 
             }
         }
@@ -545,11 +564,11 @@ public class TelaGas extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         btnIncluir = new javax.swing.JButton();
-        btnSalvarAgua = new javax.swing.JButton();
+        btnSalvarLuz = new javax.swing.JButton();
         btnCalcular = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
-        tabelaContaGas = new javax.swing.JTable();
+        tabelaContaLuz = new javax.swing.JTable();
         abaPipa = new javax.swing.JTabbedPane();
         jPanel8 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -586,11 +605,11 @@ public class TelaGas extends javax.swing.JInternalFrame {
         popupPipa.add(itemMenuGravarAlteracoesPipa);
 
         setClosable(true);
-        setTitle("Cálculo de Gás");
+        setTitle("Cálculo de Luz");
 
         btnIncluir.setText("Incluir");
 
-        btnSalvarAgua.setText("Salvar");
+        btnSalvarLuz.setText("Salvar");
 
         btnCalcular.setText("Calcular");
 
@@ -604,7 +623,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
                 .addGap(135, 135, 135)
                 .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSalvarAgua)
+                .addComponent(btnSalvarLuz)
                 .addGap(18, 18, 18)
                 .addComponent(btnCalcular)
                 .addGap(27, 27, 27)
@@ -612,23 +631,23 @@ public class TelaGas extends javax.swing.JInternalFrame {
                 .addContainerGap(161, Short.MAX_VALUE))
         );
 
-        jPanel7Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnSalvarAgua});
+        jPanel7Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnSalvarLuz});
 
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSalvarAgua)
+                    .addComponent(btnSalvarLuz)
                     .addComponent(btnCalcular)
                     .addComponent(btnImprimir)
                     .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        jPanel7Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnSalvarAgua});
+        jPanel7Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnIncluir, btnSalvarLuz});
 
-        tabelaContaGas.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaContaLuz.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -636,7 +655,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
 
             }
         ));
-        jScrollPane2.setViewportView(tabelaContaGas);
+        jScrollPane2.setViewportView(tabelaContaLuz);
 
         tabelaRateio.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -691,7 +710,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
-        abaCalculoMensal.addTab("Cálculos Mensais de Àgua", jPanel1);
+        abaCalculoMensal.addTab("Cálculos Mensais de Luz", jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -718,7 +737,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
-    private javax.swing.JButton btnSalvarAgua;
+    private javax.swing.JButton btnSalvarLuz;
     private javax.swing.JMenuItem itemMenuAdicionar;
     private javax.swing.JMenuItem itemMenuDeletarPipa;
     private javax.swing.JMenuItem itemMenuDeletarRegistroContaAgua;
@@ -739,7 +758,7 @@ public class TelaGas extends javax.swing.JInternalFrame {
     private javax.swing.JPopupMenu popupContaAgua;
     private javax.swing.JPopupMenu popupPipa;
     private javax.swing.JPopupMenu popupTarifaProlagos;
-    private javax.swing.JTable tabelaContaGas;
+    private javax.swing.JTable tabelaContaLuz;
     private javax.swing.JTable tabelaRateio;
     // End of variables declaration//GEN-END:variables
 }

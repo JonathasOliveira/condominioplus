@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package condominioPlus.negocio.cobranca.gas;
+package condominioPlus.negocio.cobranca.luz;
 
 import condominioPlus.negocio.Unidade;
 import java.io.Serializable;
@@ -20,8 +20,8 @@ import javax.persistence.Table;
  * @author Administrador
  */
 @Entity
-@Table(name = "rateio_gas")
-public class RateioGas implements Serializable {
+@Table(name = "rateio_luz")
+public class RateioLuz implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,8 +32,8 @@ public class RateioGas implements Serializable {
     private BigDecimal leituraAnterior = new BigDecimal(0);
     @Column(name="leitura_atual", precision = 20, scale = 3)
     private BigDecimal leituraAtual = new BigDecimal(0);
-    @Column(name="consumo_metro_cubico", precision = 20, scale = 3)
-    private BigDecimal consumoMetroCubico = new BigDecimal(0);
+    @Column(name="consumo_watts", precision = 20, scale = 3)
+    private BigDecimal consumoWatts = new BigDecimal(0);
     @Column(name="consumo_reais_unidades", precision = 20, scale = 2)
     private BigDecimal consumoEmReaisUnidade = new BigDecimal(0);
     @Column(name="consumo_reais_area_comum", precision = 20, scale = 2)
@@ -41,13 +41,13 @@ public class RateioGas implements Serializable {
     @Column(name="consumo_total", precision = 20, scale = 2)
     private BigDecimal consumoTotal = new BigDecimal(0);
     @ManyToOne
-    private ContaGas conta;
+    private ContaLuz conta;
 
-    public RateioGas(Unidade unidade) {
+    public RateioLuz(Unidade unidade) {
         this.unidade = unidade;
     }
 
-    public RateioGas() {
+    public RateioLuz() {
     }
 
     public int getCodigo() {
@@ -74,14 +74,14 @@ public class RateioGas implements Serializable {
         this.consumoTotal = consumoTotal;
     }
 
-    public BigDecimal getConsumoMetroCubico() {
-        return consumoMetroCubico;
+    public BigDecimal getConsumoWatts() {
+        return consumoWatts;
     }
 
-    public void setConsumoMetroCubico(BigDecimal consumoMetroCubico) {
-        this.consumoMetroCubico = consumoMetroCubico;
+    public void setConsumoWatts(BigDecimal consumoWatts) {
+        this.consumoWatts = consumoWatts;
     }
-
+    
     public BigDecimal getConsumoReaisAreaComum() {
         return consumoReaisAreaComum;
     }
@@ -114,11 +114,11 @@ public class RateioGas implements Serializable {
         this.unidade = unidade;
     }
 
-    public ContaGas getConta() {
+    public ContaLuz getConta() {
         return conta;
     }
 
-    public void setConta(ContaGas conta) {
+    public void setConta(ContaLuz conta) {
         this.conta = conta;
     }
 }

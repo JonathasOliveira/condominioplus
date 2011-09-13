@@ -9,6 +9,7 @@ import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.cobranca.gas.ContaGas;
+import condominioPlus.negocio.cobranca.luz.ContaLuz;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conciliacao;
@@ -112,6 +113,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<ContaAgua> contasDeAgua;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<ContaGas> contasDeGas;
+    @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
+    private List<ContaGas> contasDeLuz;
     @OneToOne
     private Conciliacao conciliacao;
     @OneToOne
@@ -515,6 +518,15 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setTaxas(List<TaxaExtra> taxas) {
         this.taxas = taxas;
     }
+
+    public List<ContaGas> getContasDeLuz() {
+        return contasDeLuz;
+    }
+
+    public void setContasDeLuz(List<ContaGas> contasDeLuz) {
+        this.contasDeLuz = contasDeLuz;
+    }
+    
 
     
 }

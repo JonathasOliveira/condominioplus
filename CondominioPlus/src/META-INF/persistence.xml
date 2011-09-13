@@ -51,6 +51,14 @@
     <class>condominioPlus.negocio.cobranca.HistoricoAcordo</class>
     <class>condominioPlus.negocio.cobranca.MensagemBoleto</class>
     <class>condominioPlus.negocio.financeiro.DadosBoleto</class>
+    <class>condominioPlus.negocio.cobranca.agua.HidrometroAreaComum</class>
+    <class>condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra</class>
+    <class>condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra</class>
+    <class>condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra</class>
+    <class>condominioPlus.negocio.cobranca.luz.ContaLuz</class>
+    <class>condominioPlus.negocio.cobranca.luz.RateioLuz</class>
+    <class>condominioPlus.negocio.cobranca.gas.ContaGas</class>
+    <class>condominioPlus.negocio.cobranca.gas.RateioGas</class>
     <properties>
       <property name="toplink.jdbc.user" value="administrador"/>
       <property name="toplink.jdbc.password" value="senha"/>
