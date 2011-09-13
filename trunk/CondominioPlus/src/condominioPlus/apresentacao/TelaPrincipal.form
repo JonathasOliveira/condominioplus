@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.4" maxVersion="1.4" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
@@ -78,6 +78,11 @@
             <MenuItem class="javax.swing.JMenuItem" name="menuItemGas">
               <Properties>
                 <Property name="text" type="java.lang.String" value="G&#xe1;s"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemLuz">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Luz"/>
               </Properties>
             </MenuItem>
           </SubComponents>

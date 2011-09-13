@@ -45,23 +45,23 @@ public class ContaGas implements Serializable {
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name="data_vencimento")
     private Calendar dataVencimento;
-    @Column(name="valor_unitario_quilo")
+    @Column(name="valor_unitario_quilo", precision = 20, scale = 3)
     private BigDecimal valorUnitarioKg = new BigDecimal(0);
-    @Column(name="quantidade_quilo")
+    @Column(name="quantidade_quilo", precision = 20, scale = 3)
     private BigDecimal quantidadeKg = new BigDecimal(0);
-    @Column(name="valor_total")
+    @Column(name="valor_total", precision = 20, scale = 2)
     private BigDecimal valorTotal = new BigDecimal(0);
-    @Column(name="valor_unitario_metro_cubico")
+    @Column(name="valor_unitario_metro_cubico", precision = 20, scale = 2)
     private BigDecimal valorUnitarioMetroCubico = new BigDecimal(0);
     @Column(name="quantidade_metro_cubico")
     private BigDecimal quantidadeMetroCubico = new BigDecimal(0);
-    @Column(name="densidade_media")
+    @Column(name="densidade_media", precision = 20, scale = 2)
     private BigDecimal densidadeMedia = new BigDecimal(0);
-    @Column(name="total_consumo_unidades")
+    @Column(name="total_consumo_unidades", precision = 20, scale = 2)
     private BigDecimal totalCosumoUnidades = new BigDecimal(0);
-    @Column(name="total_unidades_dinheiro")
+    @Column(name="total_unidades_dinheiro", precision = 20, scale = 2)
     private BigDecimal totalUnidadesDinheiro = new BigDecimal(0);
-    @Column(name="total_consumo_area_comum")
+    @Column(name="total_consumo_area_comum", precision = 20, scale = 2)
     private BigDecimal totalConsumoAreaComum = new BigDecimal(0);
     @OneToMany(mappedBy = "conta", cascade = CascadeType.ALL)
     private List<RateioGas> rateios = new ArrayList<RateioGas>();
