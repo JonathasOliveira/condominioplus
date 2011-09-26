@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -44,6 +45,8 @@ public class TaxaExtra implements Serializable {
     private boolean dividirFracaoIdeal;
     private boolean cobrarComCondominio;
     private boolean sindicoPaga;
+    @Column(name = "totalmente_paga")
+    private boolean totalmentePaga;
     @OneToMany(mappedBy = "taxa", cascade = CascadeType.ALL)
     private List<ParcelaTaxaExtra> parcelas = new ArrayList<ParcelaTaxaExtra>();
 
@@ -127,6 +130,14 @@ public class TaxaExtra implements Serializable {
         this.sindicoPaga = sindicoPaga;
     }
 
+    public boolean isTotalmentePaga() {
+        return totalmentePaga;
+    }
+
+    public void setTotalmentePaga(boolean totalmentePaga) {
+        this.totalmentePaga = totalmentePaga;
+    }
+
     public BigDecimal getValor() {
         return valor;
     }
@@ -142,4 +153,5 @@ public class TaxaExtra implements Serializable {
     public void setParcelas(List<ParcelaTaxaExtra> parcelas) {
         this.parcelas = parcelas;
     }
+
 }

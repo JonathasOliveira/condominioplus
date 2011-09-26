@@ -73,10 +73,28 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         new ControladorEventos();
 
+        verificarParcelas();
         carregarTabela();
 
         if (condominio != null) {
             this.setTitle("Taxa Extra - " + condominio.getRazaoSocial());
+        }
+    }
+
+    public void verificarParcelas() {
+        for (TaxaExtra taxaExtra : condominio.getTaxas()) {
+            BigDecimal somaPagamentos = new BigDecimal(0);
+            for (ParcelaTaxaExtra parcela : taxaExtra.getParcelas()) {
+                for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                    if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
+                        somaPagamentos.add(rateio.getValosACobrar());
+                    }
+                }
+            }
+            if (!taxaExtra.isTotalmentePaga() && somaPagamentos.doubleValue() == taxaExtra.getValor().doubleValue()) {
+                taxaExtra.setTotalmentePaga(true);
+                new DAO().salvar(taxaExtra);
+            }
         }
     }
 
