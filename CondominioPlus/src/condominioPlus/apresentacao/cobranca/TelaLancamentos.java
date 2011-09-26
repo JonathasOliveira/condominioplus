@@ -20,6 +20,9 @@ import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.Rateio;
+import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.FormaPagamento;
@@ -537,6 +540,29 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         cobranca.getPagamentos().add(pagamento);
                         cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
                         cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+                    }
+                }
+            }
+        }
+        for (TaxaExtra txe : condominio.getTaxas()) {
+            if (!txe.isTotalmentePaga()) {
+                for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                    for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                        if (rateio.getDataVencimento() != null && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(rateio.getDataVencimento()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(rateio.getDataVencimento()).plusDays(5)) == -1) {
+                            if (rateio.getUnidade().getCodigo() == u.getCodigo()) {
+                                rateio.setCobranca(cobranca);
+                                Pagamento pagamento = new Pagamento();
+                                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                                pagamento.setCobranca(cobranca);
+                                pagamento.setConta(new DAO().localizar(Conta.class, 47452));
+                                pagamento.setHistorico("Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da" + pagamento.getConta().getNome() + " " + txe.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                pagamento.setValor(rateio.getValosACobrar());
+                                cobranca.getPagamentos().add(pagamento);
+                                cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
+                                cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+                                new DAO().salvar(rateio);
+                            }
+                        }
                     }
                 }
             }
