@@ -777,7 +777,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         btnImprimir.setToolTipText("Imprimir Cheque");
 
         btnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnIncluir.setToolTipText("Incluir Conta");
+        btnIncluir.setToolTipText("Gerar Taxa Extra");
         btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         jLabel4.setText("Nº de Cotas:");
