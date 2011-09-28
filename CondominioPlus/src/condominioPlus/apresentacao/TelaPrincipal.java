@@ -549,14 +549,14 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemIdentificadores = new javax.swing.JMenuItem();
         menuItemFornecedores = new javax.swing.JMenuItem();
         menuCobrancas = new javax.swing.JMenu();
-        menuItemLancamentos = new javax.swing.JMenuItem();
-        jSeparator6 = new javax.swing.JSeparator();
-        menuItemAgua = new javax.swing.JMenuItem();
         menuItemCobrancaBase = new javax.swing.JMenuItem();
-        menuItemTaxaExtra = new javax.swing.JMenuItem();
-        menuItemCalculoMaiorCota = new javax.swing.JMenuItem();
+        menuItemAgua = new javax.swing.JMenuItem();
         menuItemGas = new javax.swing.JMenuItem();
         menuItemLuz = new javax.swing.JMenuItem();
+        menuItemTaxaExtra = new javax.swing.JMenuItem();
+        menuItemCalculoMaiorCota = new javax.swing.JMenuItem();
+        jSeparator6 = new javax.swing.JSeparator();
+        menuItemLancamentos = new javax.swing.JMenuItem();
         menuFinanceiro = new javax.swing.JMenu();
         menuItemContaCorrente = new javax.swing.JMenuItem();
         menuItemExtratoBancario = new javax.swing.JMenuItem();
@@ -762,27 +762,28 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 
         menuCobrancas.setText("Cobranças");
 
-        menuItemLancamentos.setText("Lançamentos/Inadimplência/Pagos");
-        menuCobrancas.add(menuItemLancamentos);
-        menuCobrancas.add(jSeparator6);
-
-        menuItemAgua.setText("Água");
-        menuCobrancas.add(menuItemAgua);
-
         menuItemCobrancaBase.setText("Cobrança Base");
         menuCobrancas.add(menuItemCobrancaBase);
 
-        menuItemTaxaExtra.setText("Taxa Extra");
-        menuCobrancas.add(menuItemTaxaExtra);
-
-        menuItemCalculoMaiorCota.setText("Cálculo maior Cota");
-        menuCobrancas.add(menuItemCalculoMaiorCota);
+        menuItemAgua.setText("Água");
+        menuCobrancas.add(menuItemAgua);
 
         menuItemGas.setText("Gás");
         menuCobrancas.add(menuItemGas);
 
         menuItemLuz.setText("Luz");
         menuCobrancas.add(menuItemLuz);
+
+        menuItemTaxaExtra.setText("Taxa Extra");
+        menuCobrancas.add(menuItemTaxaExtra);
+
+        menuItemCalculoMaiorCota.setText("Cálculo maior Cota");
+        menuCobrancas.add(menuItemCalculoMaiorCota);
+        menuCobrancas.add(jSeparator6);
+
+        menuItemLancamentos.setText("Geração/Inadimplência/Pagos");
+        menuItemLancamentos.setActionCommand("Geração/Inadimplência/Pagos");
+        menuCobrancas.add(menuItemLancamentos);
 
         menu.add(menuCobrancas);
 
