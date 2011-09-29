@@ -218,7 +218,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="painelCobrancaBase" alignment="1" max="32767" attributes="1"/>
                           <Component id="painelBoletos" alignment="1" max="32767" attributes="1"/>
-                          <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -227,9 +227,9 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="painelCobrancaBase" max="32767" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="painelBoletos" max="32767" attributes="0"/>
@@ -240,22 +240,40 @@
           </Layout>
           <SubComponents>
             <Container class="javax.swing.JPanel" name="jPanel1">
+              <Properties>
+                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+                  <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+                    <EtchetBorder/>
+                  </Border>
+                </Property>
+              </Properties>
 
               <Layout>
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" pref="60" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtDataVencimento" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="jLabel1" min="-2" pref="60" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="txtDataVencimento" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="txtNumeroDocumento" min="-2" pref="127" max="-2" attributes="1"/>
+                              <Component id="jLabel15" min="-2" max="-2" attributes="1"/>
+                          </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="txtNumeroDocumento" min="-2" pref="128" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="btnGerarCobranca" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnCarregarInformacoesCobranca" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
+                          <Component id="btnGerarCobranca" min="-2" pref="34" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="btnImprimirBoleto" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="19" max="32767" attributes="0"/>
+                          <Component id="btnImprimirBoleto" min="-2" pref="37" max="-2" attributes="0"/>
+                          <EmptySpace pref="51" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -264,12 +282,21 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="txtDataVencimento" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                               <Group type="103" alignment="1" groupAlignment="3" attributes="0">
-                                  <Component id="txtNumeroDocumento" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnGerarCobranca" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnGerarCobranca" alignment="3" min="-2" pref="33" max="-2" attributes="0"/>
                                   <Component id="btnImprimirBoleto" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <Component id="btnCarregarInformacoesCobranca" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel15" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="txtDataVencimento" min="-2" max="-2" attributes="0"/>
+                                      <Component id="txtNumeroDocumento" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <EmptySpace max="32767" attributes="0"/>
@@ -289,12 +316,28 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="btnGerarCobranca">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Gerar Cobran&#xe7;a"/>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="2" name="C:\Users\eugenia\Documents\NetBeansProjects\trunk\CondominioPlus\src\condominioPlus\recursos\imagens\adicionar.gif"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Gerar Cobran&#xe7;a"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnImprimirBoleto">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Imprimir Boleto"/>
+                    <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                      <Image iconType="2" name="C:\Users\eugenia\Documents\NetBeansProjects\trunk\CondominioPlus\src\condominioPlus\recursos\imagens\Print24.gif"/>
+                    </Property>
+                    <Property name="toolTipText" type="java.lang.String" value="Imprimir Boleto"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="jLabel15">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="N&#xba; Documento"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnCarregarInformacoesCobranca">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Carregar B&#xe1;sicas"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -321,7 +364,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jScrollPane2" pref="136" max="32767" attributes="0"/>
+                          <Component id="jScrollPane2" pref="126" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -403,7 +446,7 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="jScrollPane3" pref="175" max="32767" attributes="0"/>
+                          <Component id="jScrollPane3" pref="164" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
