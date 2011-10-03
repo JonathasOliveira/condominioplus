@@ -197,7 +197,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 //
 //        return listaCobrancasBase;
 //    }
-
     private void carregarTabelaCobrancaBase() {
         modeloTabelaItemCobranca = new TabelaModelo_2<ItemCobranca>(tabelaCobrancasBase, "Conta, Descrição, Valor, Dividir?".split(",")) {
 
@@ -234,6 +233,80 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private List<ItemCobranca> getItensCobrancas() {
         listaItensCobranca = new ArrayList<ItemCobranca>();
+
+        ItemCobranca ultimoItem = new ItemCobranca();
+
+        COBRANCABASE:
+        for (CobrancaBase co : condominio.getCobrancasBase()) {
+            if (co.getConta().getCodigo() == 28103) {
+                ultimoItem.setCodigoConta(co.getConta().getCodigo());
+                ultimoItem.setCodigoObjeto(co.getCodigo());
+                ultimoItem.setDescricao(co.getConta().getNome());
+                ultimoItem.setDividirFracaoIdeal(co.isDividirFracaoIdeal());
+                ultimoItem.setValor(co.getValor());
+                continue COBRANCABASE;
+
+            }
+            ItemCobranca item = new ItemCobranca();
+            item.setCodigoConta(co.getConta().getCodigo());
+            item.setCodigoObjeto(co.getCodigo());
+            item.setDescricao(co.getConta().getNome());
+            item.setDividirFracaoIdeal(co.isDividirFracaoIdeal());
+            item.setValor(co.getValor());
+            listaItensCobranca.add(item);
+
+        }
+//        for (ContaAgua c : condominio.getContasDeAgua()) {
+//            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).plusDays(5)) == -1) {
+//                for (Rateio r : c.getRateios()) {
+//                    if (r.getUnidade().getCodigo() == u.getCodigo()) {
+//                        Pagamento pagamento = new Pagamento();
+//                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+//                        pagamento.setCobranca(cobranca);
+//                        pagamento.setConta(new DAO().localizar(Conta.class, 11452));
+//                        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+//                        pagamento.setValor(r.getValorTotalCobrar());
+//                        cobranca.getPagamentos().add(pagamento);
+//                        cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
+//                        cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+//                    }
+//                }
+//            }
+//        }
+        for (TaxaExtra txe : condominio.getTaxas()) {
+            RateioTaxaExtra rateioAuxiliar = new RateioTaxaExtra();
+            if (!txe.isTotalmentePaga() && txe.isCobrarComCondominio()) {
+                ItemCobranca item = new ItemCobranca();
+                int codigoConta = 0;
+                String descricao = "";
+                int codigoObjeto = 0;
+                boolean dividirFracaoIdeal = false;
+                for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                    for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                        if (rateio.getDataVencimento() != null && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(rateio.getDataVencimento()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(rateio.getDataVencimento()).plusDays(5)) == -1) {
+                            rateioAuxiliar.setValorACobrar(new BigDecimal(0));
+                            if (rateio.getValorACobrar().doubleValue() > rateioAuxiliar.getValorACobrar().doubleValue()) {
+                                codigoConta = txe.getConta().getCodigo();
+                                descricao = "Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da Taxa Extra " + txe.getDescricao();
+                                codigoObjeto = rateio.getCodigo();
+                                dividirFracaoIdeal = txe.isDividirFracaoIdeal();
+                                rateioAuxiliar.setValorACobrar(rateio.getValorACobrar());
+                            }
+                        }
+                    }
+                }
+                if (rateioAuxiliar.getValorACobrar() != null) {
+                    item.setCodigoConta(codigoConta);
+                    item.setCodigoObjeto(codigoObjeto);
+                    item.setDescricao(descricao);
+                    item.setDividirFracaoIdeal(dividirFracaoIdeal);
+                    item.setValor(rateioAuxiliar.getValorACobrar());
+                    listaItensCobranca.add(item);
+                }
+            }
+        }
+
+        listaItensCobranca.add(ultimoItem);
 
         return listaItensCobranca;
     }
@@ -599,8 +672,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                                 pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                                 pagamento.setCobranca(cobranca);
                                 pagamento.setConta(new DAO().localizar(Conta.class, 47452));
-                                pagamento.setHistorico("Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da" + pagamento.getConta().getNome() + " " + txe.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                                pagamento.setValor(rateio.getValosACobrar());
+                                pagamento.setHistorico("Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da " + pagamento.getConta().getNome() + " " + txe.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                pagamento.setValor(rateio.getValorACobrar());
                                 cobranca.getPagamentos().add(pagamento);
                                 cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
                                 cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
@@ -616,19 +689,30 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private double calcularPorFracaoIdeal(Unidade u, CobrancaBase cobrancaBase) {
         double resultado = 0;
-        resultado = (u.getFracaoIdeal() * cobrancaBase.getValor().doubleValue()) / getMaiorFracaoIdeal();
+        resultado = (u.getFracaoIdeal() * cobrancaBase.getValor().doubleValue()) / getMaiorFracaoIdeal().getFracaoIdeal();
         System.out.println("resultado - " + resultado);
         return resultado;
     }
 
-    private double getMaiorFracaoIdeal() {
+//    private double getMaiorFracaoIdeal() {
+//        double resultado = 0;
+//        for (Unidade u : condominio.getUnidades()) {
+//            if (u.getFracaoIdeal() > resultado) {
+//                resultado = u.getFracaoIdeal();
+//            }
+//        }
+//        return resultado;
+//    }
+    private Unidade getMaiorFracaoIdeal() {
         double resultado = 0;
+        Unidade unidade = new Unidade();
         for (Unidade u : condominio.getUnidades()) {
             if (u.getFracaoIdeal() > resultado) {
                 resultado = u.getFracaoIdeal();
+                unidade = u;
             }
         }
-        return resultado;
+        return unidade;
     }
 
     private boolean verificarData(DateTime data) {
@@ -1604,7 +1688,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia(("Selecione um acordo, para visualizar os detalhes."), TelaLancamentos.this);
                 }
-            } else if (origem == btnCarregarInformacoesCobranca){
+            } else if (origem == btnCarregarInformacoesCobranca) {
                 painelCobrancaBase.setVisible(true);
                 carregarTabelaCobrancaBase();
             }

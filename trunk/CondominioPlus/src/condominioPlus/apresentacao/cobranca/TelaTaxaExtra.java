@@ -87,7 +87,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             for (ParcelaTaxaExtra parcela : taxaExtra.getParcelas()) {
                 for (RateioTaxaExtra rateio : parcela.getRateios()) {
                     if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
-                        somaPagamentos.add(rateio.getValosACobrar());
+                        somaPagamentos.add(rateio.getValorACobrar());
                     }
                 }
             }
@@ -462,9 +462,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             rateio.setParcela(parcela);
             rateio.setDataVencimento(parcela.getDataVencimento());
             if (parcela.getTaxa().isDividirFracaoIdeal()) {
-                rateio.setValosACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
+                rateio.setValorACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
             } else {
-                rateio.setValosACobrar(valor);
+                rateio.setValorACobrar(valor);
             }
             parcela.getRateios().add(rateio);
 
@@ -531,7 +531,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     case 1:
                         return r.getDataVencimento();
                     case 2:
-                        return PagamentoUtil.formatarMoeda(r.getValosACobrar().doubleValue());
+                        return PagamentoUtil.formatarMoeda(r.getValorACobrar().doubleValue());
                     default:
                         return null;
 

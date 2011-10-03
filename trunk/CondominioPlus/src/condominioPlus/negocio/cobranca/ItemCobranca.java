@@ -13,10 +13,10 @@ import java.math.BigDecimal;
  */
 public class ItemCobranca {
 
-    private int codigoObjeto;
-    private int codigoConta;
-    private String descricao;
-    private BigDecimal valor;
+    private int codigoObjeto = 0;;
+    private int codigoConta = 0;
+    private String descricao = "";
+    private BigDecimal valor = new BigDecimal(0);
     private boolean dividirFracaoIdeal;
 
     public int getCodigoConta() {
