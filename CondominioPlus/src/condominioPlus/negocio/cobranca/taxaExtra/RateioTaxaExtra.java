@@ -35,7 +35,7 @@ public class RateioTaxaExtra implements Serializable{
     @ManyToOne
     private ParcelaTaxaExtra parcela;
     @Column(name="valor", precision=20, scale=2)
-    private BigDecimal valosACobrar;
+    private BigDecimal valorACobrar;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Calendar dataVencimento;
     @OneToOne
@@ -73,12 +73,12 @@ public class RateioTaxaExtra implements Serializable{
         this.unidade = unidade;
     }
 
-    public BigDecimal getValosACobrar() {
-        return valosACobrar;
+    public BigDecimal getValorACobrar() {
+        return valorACobrar;
     }
 
-    public void setValosACobrar(BigDecimal valosACobrar) {
-        this.valosACobrar = valosACobrar;
+    public void setValorACobrar(BigDecimal valorACobrar) {
+        this.valorACobrar = valorACobrar;
     }
 
     public Cobranca getCobranca() {
