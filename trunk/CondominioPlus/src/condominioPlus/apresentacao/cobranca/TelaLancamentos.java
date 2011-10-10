@@ -238,6 +238,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         COBRANCABASE:
         for (CobrancaBase co : condominio.getCobrancasBase()) {
+            // Se a conta for Tarifa Bancária, colocar na ultima posição da lista
             if (co.getConta().getCodigo() == 28103) {
                 ultimoItem.setCodigoConta(co.getConta().getCodigo());
                 ultimoItem.setCodigoObjeto(co.getCodigo());
@@ -306,7 +307,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         }
 
-        listaItensCobranca.add(ultimoItem);
+        if (ultimoItem.getValor().doubleValue() != 0) {
+            listaItensCobranca.add(ultimoItem);
+        }
 
         return listaItensCobranca;
     }
