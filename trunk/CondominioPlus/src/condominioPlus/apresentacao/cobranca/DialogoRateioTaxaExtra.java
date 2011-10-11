@@ -64,7 +64,7 @@ public class DialogoRateioTaxaExtra extends javax.swing.JDialog {
                     case 1:
                         return r.getDataVencimento();
                     case 2:
-                        return PagamentoUtil.formatarMoeda(r.getValosACobrar().doubleValue());
+                        return PagamentoUtil.formatarMoeda(r.getValorACobrar().doubleValue());
                     default:
                         return null;
 
