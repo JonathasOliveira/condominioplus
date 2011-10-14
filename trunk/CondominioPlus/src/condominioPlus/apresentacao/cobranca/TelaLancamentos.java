@@ -108,7 +108,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         carregarTabelaCondominos();
         painelCobrancaBase.setVisible(false);
-//        carregarTabelaCobrancaBase();
         carregarTabelaCobranca();
         carregarDateField();
         verificarMensagens();
@@ -158,51 +157,21 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         return listaUnidades;
     }
 
-//    private void carregarTabelaCobrancaBase() {
-//        modeloTabelaCobrancaBase = new TabelaModelo_2<CobrancaBase>(tabelaCobrancasBase, "Conta, Descrição, Valor, Dividir?".split(",")) {
-//
-//            @Override
-//            protected List<CobrancaBase> getCarregarObjetos() {
-//                return getCobrancasBase();
-//            }
-//
-//            @Override
-//            public Object getValor(CobrancaBase cobranca, int indiceColuna) {
-//                switch (indiceColuna) {
-//                    case 0:
-//                        return cobranca.getConta().getCodigo();
-//                    case 1:
-//                        return cobranca.getConta().getNome();
-//                    case 2:
-//                        return PagamentoUtil.formatarMoeda(cobranca.getValor().doubleValue());
-//                    case 3:
-//                        return cobranca.isDividirFracaoIdeal() ? "Sim" : "Não";
-//                    default:
-//                        return null;
-//                }
-//            }
-//        };
-//
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(0)).setMaxWidth(50);
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(1)).setMinWidth(180);
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(2)).setMaxWidth(70);
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(3)).setMaxWidth(50);
-//
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
-//        tabelaCobrancasBase.getColumn(modeloTabelaCobrancaBase.getCampo(3)).setCellRenderer(new RenderizadorCelulaCentralizada());
-//    }
-//
-//    private List<CobrancaBase> getCobrancasBase() {
-//        listaCobrancasBase = condominio.getCobrancasBase();
-//
-//        return listaCobrancasBase;
-//    }
     private void carregarTabelaCobrancaBase() {
         modeloTabelaItemCobranca = new TabelaModelo_2<ItemCobranca>(tabelaCobrancasBase, "Conta, Descrição, Valor, Dividir?".split(",")) {
 
             @Override
             protected List<ItemCobranca> getCarregarObjetos() {
                 return getItensCobrancas();
+            }
+
+            @Override
+            public void setValor(ItemCobranca item, Object valor, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 1:
+                        item.setDescricao((String) valor);
+                        break;
+                }
             }
 
             @Override
@@ -229,6 +198,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         tabelaCobrancasBase.getColumn(modeloTabelaItemCobranca.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasBase.getColumn(modeloTabelaItemCobranca.getCampo(3)).setCellRenderer(new RenderizadorCelulaCentralizada());
+
+        modeloTabelaItemCobranca.setEditaveis(1);
+
     }
 
     private List<ItemCobranca> getItensCobrancas() {
@@ -257,23 +229,37 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             listaItensCobranca.add(item);
 
         }
-//        for (ContaAgua c : condominio.getContasDeAgua()) {
-//            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(c.getDataVencimentoConta()).plusDays(5)) == -1) {
-//                for (Rateio r : c.getRateios()) {
-//                    if (r.getUnidade().getCodigo() == u.getCodigo()) {
-//                        Pagamento pagamento = new Pagamento();
-//                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
-//                        pagamento.setCobranca(cobranca);
-//                        pagamento.setConta(new DAO().localizar(Conta.class, 11452));
-//                        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-//                        pagamento.setValor(r.getValorTotalCobrar());
-//                        cobranca.getPagamentos().add(pagamento);
-//                        cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
-//                        cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
-//                    }
-//                }
-//            }
-//        }
+
+        for (ContaAgua c : condominio.getContasDeAgua()) {
+            RateioTaxaExtra rateioAuxiliar = new RateioTaxaExtra();
+            Conta conta = new DAO().localizar(Conta.class, 11452);
+            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(c.getDataVencimentoConta()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(c.getDataVencimentoConta()).plusDays(5)) == -1) {
+                ItemCobranca item = new ItemCobranca();
+                int codigoConta = 0;
+                String descricao = "";
+                int codigoObjeto = 0;
+                boolean dividirFracaoIdeal = false;
+                rateioAuxiliar.setValorACobrar(new BigDecimal(0));
+                for (Rateio r : c.getRateios()) {
+                    if (r.getValorTotalCobrar().doubleValue() > rateioAuxiliar.getValorACobrar().doubleValue()) {
+                        codigoConta = conta.getCodigo();
+                        descricao = conta.getNome();
+                        codigoObjeto = r.getCodigo();
+                        dividirFracaoIdeal = false;
+                        rateioAuxiliar.setValorACobrar(r.getValorTotalCobrar());
+                    }
+                }
+                if (rateioAuxiliar.getValorACobrar() != null && rateioAuxiliar.getValorACobrar().doubleValue() != 0) {
+                    item.setCodigoConta(codigoConta);
+                    item.setCodigoObjeto(codigoObjeto);
+                    item.setDescricao(descricao);
+                    item.setDividirFracaoIdeal(dividirFracaoIdeal);
+                    item.setValor(rateioAuxiliar.getValorACobrar());
+                    listaItensCobranca.add(item);
+                }
+            }
+        }
+
         for (TaxaExtra txe : condominio.getTaxas()) {
             RateioTaxaExtra rateioAuxiliar = new RateioTaxaExtra();
             if (!txe.isTotalmentePaga() && txe.isCobrarComCondominio()) {
@@ -283,9 +269,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 int codigoObjeto = 0;
                 boolean dividirFracaoIdeal = false;
                 for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                    rateioAuxiliar.setValorACobrar(new BigDecimal(0));
                     for (RateioTaxaExtra rateio : parcela.getRateios()) {
                         if (rateio.getDataVencimento() != null && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(rateio.getDataVencimento()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(rateio.getDataVencimento()).plusDays(5)) == -1) {
-                            rateioAuxiliar.setValorACobrar(new BigDecimal(0));
                             if (rateio.getValorACobrar().doubleValue() > rateioAuxiliar.getValorACobrar().doubleValue()) {
                                 codigoConta = txe.getConta().getCodigo();
                                 descricao = "Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da Taxa Extra " + txe.getDescricao();
@@ -296,7 +282,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         }
                     }
                 }
-                if (rateioAuxiliar.getValorACobrar() != null) {
+                if (rateioAuxiliar.getValorACobrar() != null && rateioAuxiliar.getValorACobrar().doubleValue() != 0) {
                     item.setCodigoConta(codigoConta);
                     item.setCodigoObjeto(codigoObjeto);
                     item.setDescricao(descricao);
@@ -628,12 +614,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void calcularCobrancas(Unidade u, Cobranca cobranca) {
+        String texto = "";
         for (CobrancaBase co : condominio.getCobrancasBase()) {
             Pagamento pagamento = new Pagamento();
             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
             pagamento.setCobranca(cobranca);
             pagamento.setConta(co.getConta());
-            pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+            for (ItemCobranca item : listaItensCobranca) {
+                if (co.getCodigo() == item.getCodigoObjeto()) {
+                    texto = item.getDescricao();
+                }
+            }
+            pagamento.setHistorico(texto + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
             if (u.getValorPrincipal().doubleValue() != 0) {
                 pagamento.setValor(u.getValorPrincipal());
             } else {
@@ -655,7 +647,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                         pagamento.setCobranca(cobranca);
                         pagamento.setConta(new DAO().localizar(Conta.class, 11452));
-                        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                        for (ItemCobranca item : listaItensCobranca) {
+                            if (item.getCodigoConta() == 11452) {
+                                texto = item.getDescricao();
+                            }
+                        }
+                        pagamento.setHistorico(texto + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
                         pagamento.setValor(r.getValorTotalCobrar());
                         cobranca.getPagamentos().add(pagamento);
                         cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
@@ -1568,34 +1565,35 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         @Override
         public void configurar() {
+            btnCarregarInformacoesCobranca.addActionListener(this);
+            btnConfirmar.addActionListener(this);
+            btnEfetuarAcordo.addActionListener(this);
+            btnEsconderPainel.addActionListener(this);
             btnGerarCobranca.addActionListener(this);
             btnImprimirBoleto.addActionListener(this);
+            btnLerArquivoRetorno.addActionListener(this);
             btnLimpar.addActionListener(this);
             btnImprimirBoletoInadimplente.addActionListener(this);
+            btnSalvarMensagem.addActionListener(this);
             itemMenuBaixaManual.addActionListener(this);
             itemMenuBaixaManualInadimplente.addActionListener(this);
+            itemMenuExibirDetalheAcordo.addActionListener(this);
+            itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
             itemMenuCalcularJurosMulta.addActionListener(this);
-            itemMenuMudarAltura.addActionListener(this);
+            itemMenuOcultar.addActionListener(this);
+            itemMenuRemoverAcordo.addActionListener(this);
             jTabbedPane1.addChangeListener(this);
+            tabelaAcordo.addKeyListener(this);
+            tabelaAcordo.addMouseListener(this);
             tabelaCobrancas.addMouseListener(this);
+            tabelaCobrancasBase.addMouseListener(this);
             tabelaCondominos.addMouseListener(this);
             tabelaInadimplentes.addMouseListener(this);
             tabelaPagos.addMouseListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
-            btnLerArquivoRetorno.addActionListener(this);
-            btnConfirmar.addActionListener(this);
-            btnSalvarMensagem.addActionListener(this);
-            btnCarregarInformacoesCobranca.addActionListener(this);
-            btnEfetuarAcordo.addActionListener(this);
-            btnEsconderPainel.addActionListener(this);
-            tabelaAcordo.addMouseListener(this);
-            itemMenuExibirDetalheAcordo.addActionListener(this);
-            itemMenuRemoverAcordo.addActionListener(this);
-            itemMenuImprimirDetalheAcordo.addActionListener(this);
-            tabelaAcordo.addKeyListener(this);
         }
 
         @Override
@@ -1628,12 +1626,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Selecione a(s) cobrança(s) que deseja imprimir.", TelaLancamentos.this);
                 }
-            } else if (origem == itemMenuMudarAltura) {
-                if (painelCobrancaBase.isVisible()) {
-                    painelCobrancaBase.setVisible(false);
-                } else {
-                    painelCobrancaBase.setVisible(true);
-                }
+            } else if (origem == itemMenuOcultar) {
+                painelCobrancaBase.setVisible(false);
             } else if (origem == btnLimpar) {
                 limparSelecoesTabelas();
                 if (jTabbedPane1.getSelectedIndex() == 1) {
@@ -1713,6 +1707,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             } else if (e.isPopupTrigger() && e.getSource() == tabelaAcordo) {
                 popupMenuAcordo.show(e.getComponent(), e.getX(), e.getY());
+            } else if (e.isPopupTrigger() && e.getSource() == tabelaCobrancasBase) {
+                popupMenuCobrancaBase.show(e.getComponent(), e.getX(), e.getY());
             }
         }
 
@@ -1721,7 +1717,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             origem = e.getSource();
             if (origem == jTabbedPane1) {
                 if (jTabbedPane1.getSelectedIndex() == 0) {
-                    carregarTabelaCobrancaBase();
                     carregarTabelaCobranca();
                     limparSelecoesTabelas();
                 } else if (jTabbedPane1.getSelectedIndex() == 1) {
@@ -1761,8 +1756,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         popupMenu = new javax.swing.JPopupMenu();
-        itemMenuMudarAltura = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuBaixaManual = new javax.swing.JMenuItem();
         itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
         popupMenuInadimplentes = new javax.swing.JPopupMenu();
@@ -1775,11 +1768,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirDetalheAcordo = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         itemMenuRemoverAcordo = new javax.swing.JMenuItem();
+        popupMenuCobrancaBase = new javax.swing.JPopupMenu();
+        itemMenuOcultar = new javax.swing.JMenuItem();
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         painelLancamentos = new javax.swing.JPanel();
+        painelBoletos = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tabelaCobrancas = new javax.swing.JTable();
+        painelCobrancaBase = new javax.swing.JTabbedPane();
+        jPanel8 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         txtDataVencimento = new net.sf.nachocalendar.components.DateField();
@@ -1787,13 +1787,16 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         btnGerarCobranca = new javax.swing.JButton();
         btnImprimirBoleto = new javax.swing.JButton();
         jLabel15 = new javax.swing.JLabel();
-        btnCarregarInformacoesCobranca = new javax.swing.JButton();
-        painelCobrancaBase = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tabelaCobrancasBase = new javax.swing.JTable();
-        painelBoletos = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tabelaCobrancas = new javax.swing.JTable();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        txtDataVencimentoAvulso = new net.sf.nachocalendar.components.DateField();
+        txtNumeroDocumentoAvulso = new javax.swing.JTextField();
+        btnGerarCobrancaAvulsa = new javax.swing.JButton();
+        btnImprimirBoletoAvulso = new javax.swing.JButton();
+        jLabel17 = new javax.swing.JLabel();
         painelInadimplentes = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaInadimplentes = new javax.swing.JTable();
@@ -1847,10 +1850,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaCobrancasGeradas = new javax.swing.JTable();
         btnEsconderPainel = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
-
-        itemMenuMudarAltura.setText("Mudar altura");
-        popupMenu.add(itemMenuMudarAltura);
-        popupMenu.add(jSeparator1);
+        btnCarregarInformacoesCobranca = new javax.swing.JButton();
 
         itemMenuBaixaManual.setText("Efetuar Baixa Item Selecionado");
         popupMenu.add(itemMenuBaixaManual);
@@ -1877,8 +1877,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuRemoverAcordo.setText("Remover Selecionado(s)");
         popupMenuAcordo.add(itemMenuRemoverAcordo);
 
+        itemMenuOcultar.setText("Mudar Altura da Lista");
+        popupMenuCobrancaBase.add(itemMenuOcultar);
+
         setClosable(true);
         setTitle("Cobranças");
+        setPreferredSize(new java.awt.Dimension(874, 549));
         setVisible(true);
 
         painelCondominos.setBorder(javax.swing.BorderFactory.createTitledBorder("Condôminos"));
@@ -1913,96 +1917,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-
-        jLabel1.setText("Vencimento");
-
-        btnGerarCobranca.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
-        btnGerarCobranca.setToolTipText("Gerar Cobrança");
-
-        btnImprimirBoleto.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
-        btnImprimirBoleto.setToolTipText("Imprimir Boleto");
-
-        jLabel15.setText("Nº Documento");
-
-        btnCarregarInformacoesCobranca.setText("Carregar Básicas");
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel15))
-                .addGap(18, 18, 18)
-                .addComponent(btnCarregarInformacoesCobranca)
-                .addGap(29, 29, 29)
-                .addComponent(btnGerarCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnImprimirBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(51, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnGerarCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnImprimirBoleto))
-                    .addComponent(btnCarregarInformacoesCobranca)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel15))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        painelCobrancaBase.setBorder(javax.swing.BorderFactory.createTitledBorder("Cobranças Base"));
-
-        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10));
-        tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(tabelaCobrancasBase);
-
-        javax.swing.GroupLayout painelCobrancaBaseLayout = new javax.swing.GroupLayout(painelCobrancaBase);
-        painelCobrancaBase.setLayout(painelCobrancaBaseLayout);
-        painelCobrancaBaseLayout.setHorizontalGroup(
-            painelCobrancaBaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelCobrancaBaseLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        painelCobrancaBaseLayout.setVerticalGroup(
-            painelCobrancaBaseLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelCobrancaBaseLayout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
         painelBoletos.setBorder(javax.swing.BorderFactory.createTitledBorder("Boletos Gerados"));
 
         tabelaCobrancas.setFont(new java.awt.Font("Tahoma", 0, 10));
@@ -2025,36 +1939,195 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 515, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
                 .addContainerGap())
         );
         painelBoletosLayout.setVerticalGroup(
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel1.setText("Vencimento");
+
+        btnGerarCobranca.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
+        btnGerarCobranca.setToolTipText("Gerar Cobrança");
+
+        btnImprimirBoleto.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
+        btnImprimirBoleto.setToolTipText("Imprimir Boleto");
+
+        jLabel15.setText("Nº Documento");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(44, 44, 44)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(20, 20, 20))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel15))
+                .addGap(160, 160, 160)
+                .addComponent(btnGerarCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnImprimirBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnGerarCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnImprimirBoleto))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel15))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(tabelaCobrancasBase);
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        painelCobrancaBase.addTab("Cobranças Base", jPanel8);
+
+        jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel16.setText("Vencimento");
+
+        btnGerarCobrancaAvulsa.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
+        btnGerarCobrancaAvulsa.setToolTipText("Gerar Cobrança");
+
+        btnImprimirBoletoAvulso.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
+        btnImprimirBoletoAvulso.setToolTipText("Imprimir Boleto");
+
+        jLabel17.setText("Nº Documento");
+
+        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
+        jPanel10.setLayout(jPanel10Layout);
+        jPanel10Layout.setHorizontalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addGap(44, 44, 44)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(20, 20, 20))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)))
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17))
+                .addGap(160, 160, 160)
+                .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnImprimirBoletoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+        jPanel10Layout.setVerticalGroup(
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel10Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnImprimirBoletoAvulso))
+                    .addGroup(jPanel10Layout.createSequentialGroup()
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel16)
+                            .addComponent(jLabel17))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(142, Short.MAX_VALUE))
+        );
+
+        painelCobrancaBase.addTab("Gerar Boleto Avulso", jPanel9);
 
         javax.swing.GroupLayout painelLancamentosLayout = new javax.swing.GroupLayout(painelLancamentos);
         painelLancamentos.setLayout(painelLancamentosLayout);
         painelLancamentosLayout.setHorizontalGroup(
             painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelLancamentosLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelLancamentosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(painelCobrancaBase, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(painelBoletos, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(painelBoletos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(painelCobrancaBase, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
                 .addContainerGap())
         );
         painelLancamentosLayout.setVerticalGroup(
             painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelLancamentosLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelLancamentosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(painelCobrancaBase, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(painelCobrancaBase, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                .addGap(9, 9, 9)
                 .addComponent(painelBoletos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -2094,7 +2167,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(btnImprimirBoletoInadimplente)
                 .addGap(18, 18, 18)
                 .addComponent(btnEfetuarAcordo)
-                .addContainerGap(105, Short.MAX_VALUE))
+                .addContainerGap(108, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2117,7 +2190,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(painelInadimplentesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
                 .addContainerGap())
         );
         painelInadimplentesLayout.setVerticalGroup(
@@ -2163,7 +2236,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(151, Short.MAX_VALUE))
+                .addContainerGap(154, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2184,7 +2257,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPagosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelPagosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2224,7 +2297,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnLerArquivoRetorno)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -2442,7 +2515,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                             .addComponent(jLabel14)))
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addGap(242, 242, 242)
@@ -2450,7 +2523,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                             .addComponent(jLabel5))))
                 .addContainerGap())
         );
@@ -2474,11 +2547,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(painelDetalheAcordo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 547, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                    .addComponent(painelDetalheAcordo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
@@ -2495,6 +2568,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         btnLimpar.setText("Limpar Seleção");
 
+        btnCarregarInformacoesCobranca.setText("Carregar Básicas");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -2506,22 +2581,28 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(25, 25, 25)
-                        .addComponent(btnLimpar)))
+                        .addComponent(btnLimpar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnCarregarInformacoesCobranca)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 572, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(btnLimpar)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(29, 29, 29)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnLimpar)
+                            .addComponent(btnCarregarInformacoesCobranca))
                         .addGap(18, 18, 18)
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 494, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 494, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         pack();
@@ -2532,7 +2613,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnEfetuarAcordo;
     private javax.swing.JButton btnEsconderPainel;
     private javax.swing.JButton btnGerarCobranca;
+    private javax.swing.JButton btnGerarCobrancaAvulsa;
     private javax.swing.JButton btnImprimirBoleto;
+    private javax.swing.JButton btnImprimirBoletoAvulso;
     private javax.swing.JButton btnImprimirBoletoInadimplente;
     private javax.swing.JButton btnLerArquivoRetorno;
     private javax.swing.JButton btnLimpar;
@@ -2543,7 +2626,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
-    private javax.swing.JMenuItem itemMenuMudarAltura;
+    private javax.swing.JMenuItem itemMenuOcultar;
     private javax.swing.JMenuItem itemMenuRemoverAcordo;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
@@ -2553,6 +2636,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -2562,12 +2647,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -2577,11 +2665,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelBoletos;
-    private javax.swing.JPanel painelCobrancaBase;
+    private javax.swing.JTabbedPane painelCobrancaBase;
     private javax.swing.JPanel painelCondominos;
     private javax.swing.JPanel painelDetalheAcordo;
     private javax.swing.JPanel painelInadimplentes;
@@ -2590,6 +2677,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel painelPagos;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuAcordo;
+    private javax.swing.JPopupMenu popupMenuCobrancaBase;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
     private javax.swing.JPopupMenu popupMenuPagos;
     private javax.swing.JTable tabelaAcordo;
@@ -2604,6 +2692,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private net.sf.nachocalendar.components.DateField txtDataVencimento;
+    private net.sf.nachocalendar.components.DateField txtDataVencimentoAvulso;
     private javax.swing.JTextField txtMensagem1;
     private javax.swing.JTextField txtMensagem2;
     private javax.swing.JTextField txtMensagem3;
@@ -2613,6 +2702,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtMensagem7;
     private javax.swing.JTextField txtMensagem8;
     private javax.swing.JTextField txtNumeroDocumento;
+    private javax.swing.JTextField txtNumeroDocumentoAvulso;
     private net.sf.nachocalendar.components.DateField txtVencimentoProrrogado;
     // End of variables declaration//GEN-END:variables
 }
