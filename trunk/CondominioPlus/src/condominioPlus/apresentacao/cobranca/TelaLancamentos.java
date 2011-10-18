@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao.cobranca;
 
+import condominioPlus.apresentacao.financeiro.DialogoConta;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Unidade;
@@ -33,11 +34,13 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
 import condominioPlus.util.Relatorios;
+import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -81,10 +84,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private TabelaModelo_2<Unidade> modeloTabelaCondominos;
     private List<Unidade> listaUnidades;
-//    private TabelaModelo_2<CobrancaBase> modeloTabelaCobrancaBase;
-//    private List<CobrancaBase> listaCobrancasBase;
     private TabelaModelo_2<ItemCobranca> modeloTabelaItemCobranca;
     private List<ItemCobranca> listaItensCobranca;
+    private TabelaModelo_2<ItemCobranca> modeloTabelaDadosAvulsos;
+    private List<ItemCobranca> listaItensAvulsos = new ArrayList<ItemCobranca>();
     private TabelaModelo_2<Cobranca> modeloTabelaBoleto;
     private List<Cobranca> listaCobrancas;
     private TabelaModelo_2<Cobranca> modeloTabelaInadimplentes;
@@ -97,6 +100,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private List<AcordoCobranca> listaAcordos;
     private TabelaModelo_2<Cobranca> modeloTabelaCobrancasOriginais;
     private TabelaModelo_2<Cobranca> modeloCobrancasGeradas;
+    private Conta conta;
 
     /** Creates new form TelaLancamentos */
     public TelaLancamentos(Condominio condominio) {
@@ -232,7 +236,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         for (ContaAgua c : condominio.getContasDeAgua()) {
             RateioTaxaExtra rateioAuxiliar = new RateioTaxaExtra();
-            Conta conta = new DAO().localizar(Conta.class, 11452);
+            Conta co = new DAO().localizar(Conta.class, 11452);
             if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(c.getDataVencimentoConta()).minusDays(5)) == 1 && DataUtil.compararData(DataUtil.getDateTime(DataUtil.getCalendar(txtDataVencimento.getValue())), DataUtil.getDateTime(c.getDataVencimentoConta()).plusDays(5)) == -1) {
                 ItemCobranca item = new ItemCobranca();
                 int codigoConta = 0;
@@ -242,8 +246,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 rateioAuxiliar.setValorACobrar(new BigDecimal(0));
                 for (Rateio r : c.getRateios()) {
                     if (r.getValorTotalCobrar().doubleValue() > rateioAuxiliar.getValorACobrar().doubleValue()) {
-                        codigoConta = conta.getCodigo();
-                        descricao = conta.getNome();
+                        codigoConta = co.getCodigo();
+                        descricao = co.getNome();
                         codigoObjeto = r.getCodigo();
                         dividirFracaoIdeal = false;
                         rateioAuxiliar.setValorACobrar(r.getValorTotalCobrar());
@@ -298,6 +302,56 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
 
         return listaItensCobranca;
+    }
+
+    private void carregarTabelaDadosAvulsos() {
+        modeloTabelaDadosAvulsos = new TabelaModelo_2<ItemCobranca>(tabelaDadosAvulsos, "Conta, Descrição, Valor, Dividir?".split(",")) {
+
+            @Override
+            protected List<ItemCobranca> getCarregarObjetos() {
+                return getItensCobrancasAvulsas();
+            }
+
+            @Override
+            public void setValor(ItemCobranca item, Object valor, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 1:
+                        item.setDescricao((String) valor);
+                        break;
+                    case 3:
+                        item.setDividirFracaoIdeal((Boolean)valor);
+                }
+            }
+
+            @Override
+            public Object getValor(ItemCobranca item, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return item.getCodigoConta();
+                    case 1:
+                        return item.getDescricao();
+                    case 2:
+                        return PagamentoUtil.formatarMoeda(item.getValor().doubleValue());
+                    case 3:
+                        return item.isDividirFracaoIdeal();
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(0)).setMaxWidth(50);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(1)).setMinWidth(180);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setMaxWidth(70);
+
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
+  
+        modeloTabelaDadosAvulsos.setEditaveis(1,3);
+
+    }
+
+    private List<ItemCobranca> getItensCobrancasAvulsas() {
+        return listaItensAvulsos;
     }
 
     private void carregarTabelaCobranca() {
@@ -1559,6 +1613,48 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false);
     }
 
+    private List listaCampos() {
+        List<Object> campos = new ArrayList<Object>();
+
+        campos.add(txtConta);
+        campos.add(txtHistorico);
+
+        return campos;
+
+    }
+
+    private void pegarConta() {
+        DialogoConta c = new DialogoConta(null, true, true, false, "");
+        c.setVisible(true);
+
+        if (c.getConta() != null) {
+            conta = c.getConta();
+            txtConta.setText(String.valueOf(conta.getCodigo()));
+            txtHistorico.setText(conta.getNome());
+        }
+    }
+
+    private void incluirItemAvulso() {
+        ValidadorGenerico validador = new ValidadorGenerico();
+        if (!validador.validar(listaCampos())) {
+            validador.exibirErros(this);
+            return;
+        }
+        ItemCobranca item = new ItemCobranca();
+        item.setCodigoConta(conta.getCodigo());
+        item.setCodigoObjeto(0);
+        item.setDescricao(txtHistorico.getText());
+        item.setDividirFracaoIdeal(false);
+        item.setValor(new BigDecimal(0));
+        listaItensAvulsos.add(item);
+    }
+
+    private void limparCampos() {
+        txtConta.setText("");
+        txtHistorico.setText("");
+        conta = null;
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -1567,10 +1663,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         public void configurar() {
             btnCarregarInformacoesCobranca.addActionListener(this);
             btnConfirmar.addActionListener(this);
+            btnConta.addActionListener(this);
             btnEfetuarAcordo.addActionListener(this);
             btnEsconderPainel.addActionListener(this);
             btnGerarCobranca.addActionListener(this);
             btnImprimirBoleto.addActionListener(this);
+            btnIncluirItemAvulso.addActionListener(this);
             btnLerArquivoRetorno.addActionListener(this);
             btnLimpar.addActionListener(this);
             btnImprimirBoletoInadimplente.addActionListener(this);
@@ -1583,6 +1681,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuRemoverSelecionados.addActionListener(this);
             itemMenuCalcularJurosMulta.addActionListener(this);
             itemMenuOcultar.addActionListener(this);
+            itemMenuOcultarDados.addActionListener(this);
             itemMenuRemoverAcordo.addActionListener(this);
             jTabbedPane1.addChangeListener(this);
             tabelaAcordo.addKeyListener(this);
@@ -1627,6 +1726,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     ApresentacaoUtil.exibirAdvertencia("Selecione a(s) cobrança(s) que deseja imprimir.", TelaLancamentos.this);
                 }
             } else if (origem == itemMenuOcultar) {
+                painelCobrancaBase.setVisible(false);
+            } else if (origem == itemMenuOcultarDados) {
                 painelCobrancaBase.setVisible(false);
             } else if (origem == btnLimpar) {
                 limparSelecoesTabelas();
@@ -1688,6 +1789,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == btnCarregarInformacoesCobranca) {
                 painelCobrancaBase.setVisible(true);
                 carregarTabelaCobrancaBase();
+                carregarTabelaDadosAvulsos();
+            } else if (origem == btnIncluirItemAvulso) {
+                incluirItemAvulso();
+                carregarTabelaDadosAvulsos();
+                limparCampos();
+            } else if (origem == btnConta) {
+                pegarConta();
             }
         }
 
@@ -1709,6 +1817,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 popupMenuAcordo.show(e.getComponent(), e.getX(), e.getY());
             } else if (e.isPopupTrigger() && e.getSource() == tabelaCobrancasBase) {
                 popupMenuCobrancaBase.show(e.getComponent(), e.getX(), e.getY());
+            } else if (e.isPopupTrigger() && e.getSource() == tabelaDadosAvulsos) {
+                popupMenuDadosAvulsos.show(e.getComponent(), e.getX(), e.getY());
             }
         }
 
@@ -1770,6 +1880,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuRemoverAcordo = new javax.swing.JMenuItem();
         popupMenuCobrancaBase = new javax.swing.JPopupMenu();
         itemMenuOcultar = new javax.swing.JMenuItem();
+        popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
+        itemMenuOcultarDados = new javax.swing.JMenuItem();
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
@@ -1797,6 +1909,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         btnGerarCobrancaAvulsa = new javax.swing.JButton();
         btnImprimirBoletoAvulso = new javax.swing.JButton();
         jLabel17 = new javax.swing.JLabel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        tabelaDadosAvulsos = new javax.swing.JTable();
+        jPanel11 = new javax.swing.JPanel();
+        btnConta = new javax.swing.JButton();
+        txtConta = new javax.swing.JTextField();
+        jLabel21 = new javax.swing.JLabel();
+        txtHistorico = new javax.swing.JTextField();
+        btnIncluirItemAvulso = new javax.swing.JButton();
         painelInadimplentes = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaInadimplentes = new javax.swing.JTable();
@@ -1880,6 +2000,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuOcultar.setText("Mudar Altura da Lista");
         popupMenuCobrancaBase.add(itemMenuOcultar);
 
+        itemMenuOcultarDados.setText("Mudar Altura da Lista");
+        popupMenuDadosAvulsos.add(itemMenuOcultarDados);
+
         setClosable(true);
         setTitle("Cobranças");
         setPreferredSize(new java.awt.Dimension(874, 549));
@@ -1913,7 +2036,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         painelCondominosLayout.setVerticalGroup(
             painelCondominosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCondominosLayout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1939,13 +2062,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 519, Short.MAX_VALUE)
                 .addContainerGap())
         );
         painelBoletosLayout.setVerticalGroup(
             painelBoletosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelBoletosLayout.createSequentialGroup()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 149, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1981,7 +2104,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(btnGerarCobranca, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnImprimirBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2002,7 +2125,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2023,7 +2146,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2033,21 +2156,21 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         painelCobrancaBase.addTab("Cobranças Base", jPanel8);
 
-        jPanel10.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Etapa 2"));
 
         jLabel16.setText("Vencimento");
 
-        btnGerarCobrancaAvulsa.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
-        btnGerarCobrancaAvulsa.setToolTipText("Gerar Cobrança");
+        btnGerarCobrancaAvulsa.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\atualizar.gif")); // NOI18N
+        btnGerarCobrancaAvulsa.setToolTipText("Gerar Cobrança Avulsa");
 
         btnImprimirBoletoAvulso.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
-        btnImprimirBoletoAvulso.setToolTipText("Imprimir Boleto");
+        btnImprimirBoletoAvulso.setToolTipText("Imprimir Boleto Avulso");
 
         jLabel17.setText("Nº Documento");
 
@@ -2055,40 +2178,103 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
-                .addGap(44, 44, 44)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel10Layout.createSequentialGroup()
                         .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20))
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)))
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel17))
-                .addGap(160, 160, 160)
-                .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(2, 2, 2))
+                    .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel17))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnImprimirBoletoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnImprimirBoletoAvulso))
+                    .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel10Layout.createSequentialGroup()
                         .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel16)
                             .addComponent(jLabel17))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtNumeroDocumentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addComponent(txtDataVencimentoAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(btnGerarCobrancaAvulsa, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnImprimirBoletoAvulso)))
+                .addContainerGap(12, Short.MAX_VALUE))
+        );
+
+        tabelaDadosAvulsos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaDadosAvulsos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane10.setViewportView(tabelaDadosAvulsos);
+
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Etapa 1"));
+
+        btnConta.setText("Conta:");
+        btnConta.setBorder(null);
+        btnConta.setBorderPainted(false);
+        btnConta.setContentAreaFilled(false);
+        btnConta.setFocusable(false);
+        btnConta.setRequestFocusEnabled(false);
+        btnConta.setVerifyInputWhenFocusTarget(false);
+
+        txtConta.setName("Conta"); // NOI18N
+
+        jLabel21.setText("Histórico:");
+
+        txtHistorico.setName("Histórico"); // NOI18N
+
+        btnIncluirItemAvulso.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
+        btnIncluirItemAvulso.setToolTipText("Incluir Item");
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnConta)
+                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel21)
+                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnIncluirItemAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnIncluirItemAvulso, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addComponent(jLabel21)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addComponent(btnConta)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -2098,15 +2284,26 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(7, 7, 7))))
         );
         jPanel9Layout.setVerticalGroup(
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel9Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addGap(11, 11, 11)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane10, javax.swing.GroupLayout.DEFAULT_SIZE, 108, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         painelCobrancaBase.addTab("Gerar Boleto Avulso", jPanel9);
@@ -2115,18 +2312,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         painelLancamentos.setLayout(painelLancamentosLayout);
         painelLancamentosLayout.setHorizontalGroup(
             painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelLancamentosLayout.createSequentialGroup()
+            .addGroup(painelLancamentosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(painelBoletos, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(painelCobrancaBase, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
+                .addGroup(painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelCobrancaBase, javax.swing.GroupLayout.PREFERRED_SIZE, 551, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(painelBoletos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         painelLancamentosLayout.setVerticalGroup(
             painelLancamentosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelLancamentosLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(painelCobrancaBase, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                .addComponent(painelCobrancaBase)
                 .addGap(9, 9, 9)
                 .addComponent(painelBoletos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -2167,7 +2364,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(btnImprimirBoletoInadimplente)
                 .addGap(18, 18, 18)
                 .addComponent(btnEfetuarAcordo)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2190,7 +2387,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(painelInadimplentesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE))
                 .addContainerGap())
         );
         painelInadimplentesLayout.setVerticalGroup(
@@ -2236,7 +2433,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addContainerGap(152, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2257,7 +2454,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelPagosLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelPagosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2297,7 +2494,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(btnLerArquivoRetorno)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -2515,7 +2712,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                            .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                             .addComponent(jLabel14)))
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addGap(242, 242, 242)
@@ -2523,7 +2720,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addGroup(painelDetalheAcordoLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(painelDetalheAcordoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                             .addComponent(jLabel5))))
                 .addContainerGap())
         );
@@ -2550,7 +2747,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE)
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 548, Short.MAX_VALUE)
                     .addComponent(painelDetalheAcordo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2577,16 +2774,16 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(25, 25, 25)
                         .addComponent(btnLimpar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnCarregarInformacoesCobranca)))
+                        .addComponent(btnCarregarInformacoesCobranca))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2597,7 +2794,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnLimpar)
                             .addComponent(btnCarregarInformacoesCobranca))
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -2610,6 +2807,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCarregarInformacoesCobranca;
     private javax.swing.JButton btnConfirmar;
+    private javax.swing.JButton btnConta;
     private javax.swing.JButton btnEfetuarAcordo;
     private javax.swing.JButton btnEsconderPainel;
     private javax.swing.JButton btnGerarCobranca;
@@ -2617,6 +2815,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnImprimirBoleto;
     private javax.swing.JButton btnImprimirBoletoAvulso;
     private javax.swing.JButton btnImprimirBoletoInadimplente;
+    private javax.swing.JButton btnIncluirItemAvulso;
     private javax.swing.JButton btnLerArquivoRetorno;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvarMensagem;
@@ -2627,6 +2826,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuOcultar;
+    private javax.swing.JMenuItem itemMenuOcultarDados;
     private javax.swing.JMenuItem itemMenuRemoverAcordo;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
@@ -2639,6 +2839,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -2648,6 +2849,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -2657,6 +2859,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -2678,6 +2881,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuAcordo;
     private javax.swing.JPopupMenu popupMenuCobrancaBase;
+    private javax.swing.JPopupMenu popupMenuDadosAvulsos;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
     private javax.swing.JPopupMenu popupMenuPagos;
     private javax.swing.JTable tabelaAcordo;
@@ -2687,12 +2891,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JTable tabelaCobrancasGeradas;
     private javax.swing.JTable tabelaCobrancasOriginais;
     private javax.swing.JTable tabelaCondominos;
+    private javax.swing.JTable tabelaDadosAvulsos;
     private javax.swing.JTable tabelaInadimplentes;
     private javax.swing.JTable tabelaPagos;
+    private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private net.sf.nachocalendar.components.DateField txtDataVencimento;
     private net.sf.nachocalendar.components.DateField txtDataVencimentoAvulso;
+    private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtMensagem1;
     private javax.swing.JTextField txtMensagem2;
     private javax.swing.JTextField txtMensagem3;
