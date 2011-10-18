@@ -318,8 +318,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 1:
                         item.setDescricao((String) valor);
                         break;
+                    case 2:
+                        item.setValor(((Moeda) valor).bigDecimalValue());
+                        break;
                     case 3:
-                        item.setDividirFracaoIdeal((Boolean)valor);
+                        item.setDividirFracaoIdeal((Boolean) valor);
                 }
             }
 
@@ -331,7 +334,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 1:
                         return item.getDescricao();
                     case 2:
-                        return PagamentoUtil.formatarMoeda(item.getValor().doubleValue());
+                        return new Moeda(item.getValor());
                     case 3:
                         return item.isDividirFracaoIdeal();
                     default:
@@ -345,8 +348,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setMaxWidth(70);
 
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
-  
-        modeloTabelaDadosAvulsos.setEditaveis(1,3);
+
+        modeloTabelaDadosAvulsos.setEditaveis(1, 2, 3);
 
     }
 
