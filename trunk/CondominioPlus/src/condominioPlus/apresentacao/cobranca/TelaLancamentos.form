@@ -100,6 +100,16 @@
             <Property name="text" type="java.lang.String" value="Mudar Altura da Lista"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuLimparDadosAvulsos">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Limpar Lista"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuRemoverItemCobranca">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Remover Selecionado(s)"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
   </NonVisualComponents>
@@ -535,7 +545,7 @@
                     </Container>
                   </SubComponents>
                 </Container>
-                <Container class="javax.swing.JPanel" name="jPanel9">
+                <Container class="javax.swing.JPanel" name="painelDadosAvulsos">
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
                       <JTabbedPaneConstraints tabName="Gerar Boleto Avulso">
