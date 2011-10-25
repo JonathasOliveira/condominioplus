@@ -33,9 +33,11 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
+import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.util.Relatorios;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -1203,14 +1205,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void verificarMensagens() {
         List<MensagemBoleto> mensagens = condominio.getMensagens();
-//        System.out.println("tamanho lista mensagem antes do while: " + mensagens.size());
         while (mensagens.size() < 8) {
             MensagemBoleto mensagem = new MensagemBoleto();
             mensagem.setCondominio(condominio);
             mensagens.add(mensagem);
         }
         condominio.setMensagens(mensagens);
-//        System.out.println("numero lista mensagens: " + condominio.getMensagens().size());
         new DAO().salvar(condominio);
     }
 
@@ -1688,6 +1688,16 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
+    private Conta pesquisarContaPorCodigo(int codigo) {
+        Conta c = null;
+        try {
+            c = (Conta) new DAO().localizar(Conta.class, codigo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return c;
+    }
+
     private void incluirItemAvulso() {
         ValidadorGenerico validador = new ValidadorGenerico();
         if (!validador.validar(listaCampos())) {
@@ -1761,6 +1771,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             tabelaDadosAvulsos.addMouseListener(this);
             tabelaInadimplentes.addMouseListener(this);
             tabelaPagos.addMouseListener(this);
+            txtConta.addFocusListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
         }
@@ -1894,6 +1905,28 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     popupMenuCobrancaBase.show(e.getComponent(), e.getX(), e.getY());
                 } else if (e.getSource() == tabelaDadosAvulsos) {
                     popupMenuDadosAvulsos.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            if (e.getSource() == txtConta) {
+                Conta resultado = null;
+                if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
+                    if (!txtConta.getText().equals("") && txtConta.getText() != null) {
+                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        if (resultado != null) {
+                            conta = resultado;
+                            txtConta.setText(String.valueOf(conta.getCodigo()));
+                            txtHistorico.setText(conta.getNome());
+                        } else {
+                            ApresentacaoUtil.exibirErro("Código Inexistente!", TelaLancamentos.this);
+                            txtConta.setText("");
+                            txtConta.grabFocus();
+                            return;
+                        }
+                    }
                 }
             }
         }

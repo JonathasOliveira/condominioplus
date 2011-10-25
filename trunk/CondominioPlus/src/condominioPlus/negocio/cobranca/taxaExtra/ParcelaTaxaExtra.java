@@ -17,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 
 /**
@@ -25,6 +26,7 @@ import javax.persistence.Temporal;
  */
 
 @Entity
+@Table(name= "parcela_taxa_extra")
 public class ParcelaTaxaExtra implements Serializable{
 
     @Id
