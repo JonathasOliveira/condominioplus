@@ -188,7 +188,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         return c;
     }
 
-    private void preencherObjeto() {
+    private boolean preencherObjeto() {
 
         taxa = new TaxaExtra();
         taxa.setDescricao(txtHistorico.getText());
@@ -233,11 +233,15 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         taxa.setCondominio(condominio);
         condominio.getTaxas().add(taxa);
 
-        calcularRateio(taxa);
+        if (!calcularRateio(taxa)) {
+            return false;
+        }
 
-        new DAO().salvar(condominio);
+//        new DAO().salvar(condominio);
 
         limparCampos();
+
+        return true;
 
     }
 
@@ -249,7 +253,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 validador.exibirErros(this);
                 return;
             }
-            preencherObjeto();
+
+            if (!preencherObjeto()) {
+                return;
+            }
+
+            System.out.println("passei do if");
 
             TipoAcesso tipo = null;
             if (condominio.getCodigo() == 0) {
@@ -259,6 +268,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             }
 
             new DAO().salvar(condominio);
+            carregarTabela();
 
             String descricao = "Taxa Extra adicionada! " + taxa.getDescricao() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
@@ -427,7 +437,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         spinner.setModel(nm);
     }
 
-    private void calcularRateio(TaxaExtra tx) {
+    private boolean calcularRateio(TaxaExtra tx) {
         for (ParcelaTaxaExtra parcela : tx.getParcelas()) {
             int numero = tx.getCondominio().getUnidades().size();
             if (tx.isDividirFracaoIdeal()) {
@@ -441,6 +451,11 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     if (verificarInadimplencia(tx.getCobrancasADescartar(), u)) {
                         numero -= 1;
                     }
+                    System.out.println("Número de unidades ativas: " + numero);
+                }
+                if (numero == 0) {
+                    ApresentacaoUtil.exibirAdvertencia("testando", this);
+                    return false;
                 }
                 double valorRateio = 0;
                 valorRateio = valorRateio + parcela.getValor().doubleValue();
@@ -449,6 +464,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 efetuarCalculo(new BigDecimal(valorRateio).setScale(2, RoundingMode.UP), parcela);
             }
         }
+        return true;
     }
 
     private void efetuarCalculo(BigDecimal valor, ParcelaTaxaExtra parcela) {
@@ -457,16 +473,18 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             if (u.isSindico() && !parcela.getTaxa().isSindicoPaga()) {
                 continue RATEIO;
             }
-            RateioTaxaExtra rateio = new RateioTaxaExtra();
-            rateio.setUnidade(u);
-            rateio.setParcela(parcela);
-            rateio.setDataVencimento(parcela.getDataVencimento());
-            if (parcela.getTaxa().isDividirFracaoIdeal()) {
-                rateio.setValorACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
-            } else {
-                rateio.setValorACobrar(valor);
+            if (!verificarInadimplencia(parcela.getTaxa().getCobrancasADescartar(), u)) {
+                RateioTaxaExtra rateio = new RateioTaxaExtra();
+                rateio.setUnidade(u);
+                rateio.setParcela(parcela);
+                rateio.setDataVencimento(parcela.getDataVencimento());
+                if (parcela.getTaxa().isDividirFracaoIdeal()) {
+                    rateio.setValorACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
+                } else {
+                    rateio.setValorACobrar(valor);
+                }
+                parcela.getRateios().add(rateio);
             }
-            parcela.getRateios().add(rateio);
 
         }
     }
@@ -581,7 +599,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             origem = e.getSource();
             if (origem == btnIncluir) {
                 salvar();
-                carregarTabela();
             } else if (origem == itemMenuRemoverSelecionados) {
                 remover();
             } else if (origem == btnConta) {
@@ -793,6 +810,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioFracaoSim.setText("Dividir Fração Ideal");
 
         buttonGroup2.add(radioFracaoNao);
+        radioFracaoNao.setSelected(true);
         radioFracaoNao.setText("Igual para todos");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -861,6 +879,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         radioSindicoSim.setText("Sim");
 
         buttonGroup1.add(radioSindicoNao);
+        radioSindicoNao.setSelected(true);
         radioSindicoNao.setText("Não");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
