@@ -26,6 +26,7 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
@@ -531,16 +532,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         }
     }
 
-    private Conta pesquisarContaPorCodigo(int codigo) {
-        Conta c = null;
-        try {
-            c = (Conta) new DAO().localizar("LocalizarContas", codigo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return c;
-    }
-
     public void setConta(Conta conta) {
         this.conta = conta;
     }
@@ -838,7 +829,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 Conta resultado = null;
                 if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
                     if (!txtConta.getText().equals("") && txtConta.getText() != null) {
-                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        resultado = ContaUtil.pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
                         if (resultado != null) {
                             conta = resultado;
                             txtConta.setText(String.valueOf(conta.getCodigo()));

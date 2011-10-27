@@ -22,6 +22,7 @@ import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.fornecedor.Fornecedor;
+import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -343,16 +344,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         }
     }
 
-    private Conta pesquisarContaPorCodigo(int codigo) {
-        Conta c = null;
-        try {
-            c = (Conta) new DAO().localizar("LocalizarContas", codigo);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return c;
-    }
-
     public void setConta(Conta conta) {
         this.conta = conta;
     }
@@ -573,7 +564,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 Conta resultado = null;
                 if (new LimitarCaracteres(10).ValidaNumero(txtConta)) {
                     if (!txtConta.getText().equals("") && txtConta.getText() != null) {
-                        resultado = pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
+                        resultado = ContaUtil.pesquisarContaPorCodigo(Integer.valueOf(txtConta.getText()));
                         if (resultado != null) {
                             conta = resultado;
                             txtConta.setText(String.valueOf(conta.getCodigo()));
