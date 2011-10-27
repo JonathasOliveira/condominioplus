@@ -451,10 +451,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     if (verificarInadimplencia(tx.getCobrancasADescartar(), u)) {
                         numero -= 1;
                     }
-                    System.out.println("Número de unidades ativas: " + numero);
                 }
                 if (numero == 0) {
-                    ApresentacaoUtil.exibirAdvertencia("testando", this);
+                    ApresentacaoUtil.exibirAdvertencia("Não é possível fazer o cálculo do rateio, pois nenhum número é dividido por 0.", this);
                     return false;
                 }
                 double valorRateio = 0;
