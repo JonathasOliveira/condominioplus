@@ -473,18 +473,17 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             if (u.isSindico() && !parcela.getTaxa().isSindicoPaga()) {
                 continue RATEIO;
             }
-            if (!verificarInadimplencia(parcela.getTaxa().getCobrancasADescartar(), u)) {
-                RateioTaxaExtra rateio = new RateioTaxaExtra();
-                rateio.setUnidade(u);
-                rateio.setParcela(parcela);
-                rateio.setDataVencimento(parcela.getDataVencimento());
-                if (parcela.getTaxa().isDividirFracaoIdeal()) {
-                    rateio.setValorACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
-                } else {
-                    rateio.setValorACobrar(valor);
-                }
-                parcela.getRateios().add(rateio);
+
+            RateioTaxaExtra rateio = new RateioTaxaExtra();
+            rateio.setUnidade(u);
+            rateio.setParcela(parcela);
+            rateio.setDataVencimento(parcela.getDataVencimento());
+            if (parcela.getTaxa().isDividirFracaoIdeal()) {
+                rateio.setValorACobrar(new BigDecimal(calcularPorFracaoIdeal(u, parcela.getValor(), parcela.getTaxa().isSindicoPaga())));
+            } else {
+                rateio.setValorACobrar(valor);
             }
+            parcela.getRateios().add(rateio);
 
         }
     }
