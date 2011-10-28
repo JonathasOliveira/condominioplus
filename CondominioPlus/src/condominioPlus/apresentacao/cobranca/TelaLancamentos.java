@@ -160,6 +160,19 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private List<Unidade> getUnidades() {
         listaUnidades = condominio.getUnidades();
 
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Unidade u1 = (Unidade) o1;
+                Unidade u2 = (Unidade) o2;
+                return u1.getUnidade().compareTo(u2.getUnidade());
+            }
+        };
+
+        Collections.sort(listaUnidades, c);
+
         return listaUnidades;
     }
 
