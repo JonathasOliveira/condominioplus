@@ -970,7 +970,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tabelaCondominos.setToolTipText("  ");
+        tabelaCondominos.setToolTipText("Selecione as unidades");
         jScrollPane4.setViewportView(tabelaCondominos);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);

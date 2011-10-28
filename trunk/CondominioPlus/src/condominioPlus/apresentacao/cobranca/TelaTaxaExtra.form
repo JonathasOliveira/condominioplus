@@ -513,7 +513,7 @@
                     <Column editable="true" title="Title 4" type="java.lang.Object"/>
                   </Table>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="  "/>
+                <Property name="toolTipText" type="java.lang.String" value="Selecione as unidades"/>
               </Properties>
             </Component>
           </SubComponents>
