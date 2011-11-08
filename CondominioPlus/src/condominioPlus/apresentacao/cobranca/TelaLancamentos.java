@@ -2195,10 +2195,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel1.setText("Vencimento");
 
-        btnGerarCobranca.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\atualizar.gif")); // NOI18N
+        btnGerarCobranca.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnGerarCobranca.setToolTipText("Gerar Cobrança");
 
-        btnImprimirBoleto.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
+        btnImprimirBoleto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
         btnImprimirBoleto.setToolTipText("Imprimir Boleto");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -2274,10 +2274,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel16.setText("Vencimento");
 
-        btnGerarCobrancaAvulsa.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\atualizar.gif")); // NOI18N
+        btnGerarCobrancaAvulsa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnGerarCobrancaAvulsa.setToolTipText("Gerar Cobrança Avulsa");
 
-        btnImprimirBoletoAvulso.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\Print24.gif")); // NOI18N
+        btnImprimirBoletoAvulso.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
         btnImprimirBoletoAvulso.setToolTipText("Imprimir Boleto Avulso");
 
         jLabel17.setText("Nº Documento");
@@ -2350,7 +2350,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         txtHistorico.setName("Histórico"); // NOI18N
 
-        btnIncluirItemAvulso.setIcon(new javax.swing.ImageIcon("C:\\Users\\eugenia\\Documents\\NetBeansProjects\\trunk\\CondominioPlus\\src\\condominioPlus\\recursos\\imagens\\adicionar.gif")); // NOI18N
+        btnIncluirItemAvulso.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnIncluirItemAvulso.setToolTipText("Incluir Item");
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
