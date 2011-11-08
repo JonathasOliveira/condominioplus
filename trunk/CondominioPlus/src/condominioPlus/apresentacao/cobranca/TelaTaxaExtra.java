@@ -856,7 +856,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         setRequestFocusEnabled(false);
         setVisible(true);
 
-        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -914,7 +914,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         jLabel2.setText("Histórico:");
 
         btnImprimir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
-        btnImprimir.setToolTipText("Imprimir Cheque");
+        btnImprimir.setToolTipText("Imprimir Relatório");
 
         btnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnIncluir.setToolTipText("Gerar Taxa Extra");
