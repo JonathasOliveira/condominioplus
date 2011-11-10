@@ -766,7 +766,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                                 Pagamento pagamento = new Pagamento();
                                 pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                                 pagamento.setCobranca(cobranca);
-                                pagamento.setConta(new DAO().localizar(Conta.class, 47452));
+                                pagamento.setConta(txe.getConta());
                                 pagamento.setHistorico("Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da " + pagamento.getConta().getNome() + " " + txe.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
                                 pagamento.setValor(rateio.getValorACobrar());
                                 cobranca.getPagamentos().add(pagamento);
