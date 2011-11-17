@@ -895,7 +895,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     new DAO().remover(c);
                 }
             }
-
             ApresentacaoUtil.exibirInformacao("Cobrança(s) removida(s) com sucesso!", this);
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);

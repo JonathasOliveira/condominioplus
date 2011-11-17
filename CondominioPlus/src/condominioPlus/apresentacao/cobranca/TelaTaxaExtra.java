@@ -13,11 +13,13 @@ package condominioPlus.apresentacao.cobranca;
 import condominioPlus.apresentacao.financeiro.*;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
@@ -28,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -48,6 +51,20 @@ import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import net.sf.nachocalendar.table.JTableCustomizer;
+import org.jrimum.bopepo.BancoSuportado;
+import org.jrimum.bopepo.Boleto;
+import org.jrimum.bopepo.view.BoletoViewer;
+import org.jrimum.domkee.comum.pessoa.endereco.CEP;
+import org.jrimum.domkee.comum.pessoa.endereco.Endereco;
+import org.jrimum.domkee.financeiro.banco.febraban.Agencia;
+import org.jrimum.domkee.financeiro.banco.febraban.Carteira;
+import org.jrimum.domkee.financeiro.banco.febraban.Cedente;
+import org.jrimum.domkee.financeiro.banco.febraban.ContaBancaria;
+import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
+import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
+import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
+import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
+import org.jrimum.domkee.financeiro.banco.febraban.Titulo.EnumAceite;
 
 /**
  *
@@ -254,7 +271,13 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         taxa = new TaxaExtra();
         taxa.setDescricao(txtHistorico.getText());
-        taxa.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+        taxa.setNumeroCotas(Integer.valueOf(txtNumeroParcelas.getText()));
+
+        if (btnValor.isSelected()) {
+            taxa.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).multiply(new BigDecimal(taxa.getNumeroCotas())));
+        } else {
+            taxa.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+        }
 
         if (radioSindicoSim.isSelected()) {
             taxa.setSindicoPaga(true);
@@ -274,7 +297,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             taxa.setCobrarComCondominio(false);
         }
 
-        taxa.setNumeroCotas(Integer.valueOf(txtNumeroParcelas.getText()));
         taxa.setCobrancasADescartar((Integer) spnCobrancasADescartar.getValue());
         taxa.setPrimeiroVencimento(DataUtil.getCalendar(txtPrimeiroVencimento.getValue()));
 
@@ -286,7 +308,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             ParcelaTaxaExtra parcela = new ParcelaTaxaExtra();
             parcela.setNumeroParcela(i + 1);
             parcela.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(taxa.getPrimeiroVencimento()).plusMonths(i)));
-            parcela.setValor(taxa.getValor().divide(new BigDecimal(taxa.getNumeroCotas())));
+
+            if (btnValor.isSelected()) {
+                parcela.setValor(new BigDecimal(txtValor.getText().replace(",", ".")));
+            } else {
+                parcela.setValor(taxa.getValor().divide(new BigDecimal(taxa.getNumeroCotas())));
+            }
 
             parcela.setTaxa(taxa);
             taxa.getParcelas().add(parcela);
@@ -301,10 +328,141 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
 //        new DAO().salvar(condominio);
 
+        if (!taxa.isCobrarComCondominio()) {
+            gerarCobranca(taxa);
+            imprimirCobrancas(taxa);
+            ApresentacaoUtil.exibirAdvertencia("As cobranças foram geradas e seus respectivos boletos impressos.", this);
+        }
+
         limparCampos();
+
+        ApresentacaoUtil.exibirAdvertencia("Rateio efetuado com sucesso.", this);
 
         return true;
 
+    }
+
+    private void gerarCobranca(TaxaExtra txe) {
+        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+            for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                Cobranca cobranca = new Cobranca();
+                cobranca.setUnidade(rateio.getUnidade());
+                cobranca.setValorTotal(new BigDecimal(0));
+                cobranca.setValorOriginal(new BigDecimal(0));
+                cobranca.setDataVencimento(rateio.getDataVencimento());
+                cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(cobranca.getDataVencimento())));
+
+                rateio.setCobranca(cobranca);
+                Pagamento pagamento = new Pagamento();
+                pagamento.setDataVencimento(rateio.getDataVencimento());
+                pagamento.setCobranca(cobranca);
+                pagamento.setConta(txe.getConta());
+                pagamento.setHistorico("Parcela " + parcela.getNumeroParcela() + "/" + txe.getParcelas().size() + " da " + " " + txe.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                pagamento.setValor(rateio.getValorACobrar());
+                cobranca.getPagamentos().add(pagamento);
+                cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
+                cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
+//                new DAO().salvar(rateio);
+
+                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
+                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+            }
+        }
+    }
+
+    private void imprimirCobrancas(TaxaExtra txe) {
+
+        List<Boleto> boletos = new ArrayList<Boleto>();
+        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+            for (RateioTaxaExtra rateio : parcela.getRateios()) {
+
+                /*
+                 * INFORMANDO DADOS SOBRE O CEDENTE.
+                 */
+                Cedente cedente = new Cedente(rateio.getCobranca().getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(rateio.getCobranca().getUnidade().getCondominio().getCnpj()));
+
+                /*
+                 * INFORMANDO DADOS SOBRE O SACADO.
+                 */
+                Sacado sacado = new Sacado(rateio.getCobranca().getUnidade().getUnidade() + " " + rateio.getCobranca().getUnidade().getCondomino().getNome());
+
+                // Informando o endereço do sacado.
+                Endereco enderecoSac = new Endereco();
+
+                for (condominioPlus.negocio.Endereco e : rateio.getCobranca().getUnidade().getCondomino().getEnderecos()) {
+                    if (e.isPadrao()) {
+                        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(e.getEstado()));
+                        enderecoSac.setLocalidade(e.getCidade());
+                        enderecoSac.setCep(new CEP(e.getCep()));
+                        enderecoSac.setBairro(e.getBairro());
+                        enderecoSac.setLogradouro(e.getLogradouro());
+                        enderecoSac.setNumero(e.getNumero() + " " + e.getComplemento());
+                    }
+                }
+
+                sacado.addEndereco(enderecoSac);
+
+                /*
+                 * INFORMANDO OS DADOS SOBRE O TÍTULO.
+                 */
+
+                // Informando dados sobre a conta bancária do título.
+                ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
+                contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(rateio.getCobranca().getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
+                contaBancaria.setCarteira(new Carteira(102));
+                contaBancaria.setAgencia(new Agencia(3918, "0"));
+
+                Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
+                titulo.setNumeroDoDocumento(rateio.getCobranca().getNumeroDocumento().substring(0, 12));
+                titulo.setNossoNumero(rateio.getCobranca().getNumeroDocumento().substring(0, 12));
+                titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(rateio.getCobranca().getNumeroDocumento().substring(0, 12)));
+                titulo.setValor(rateio.getCobranca().getValorTotal());
+                titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
+                if (rateio.getCobranca().getVencimentoProrrogado() != null) {
+                    titulo.setDataDoVencimento(DataUtil.getDate(rateio.getCobranca().getVencimentoProrrogado()));
+                } else {
+                    titulo.setDataDoVencimento(DataUtil.getDate(rateio.getCobranca().getDataVencimento()));
+                }
+                titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
+                titulo.setAceite(EnumAceite.N);
+                titulo.setDesconto(null);
+                titulo.setDeducao(null);
+                titulo.setMora(null);
+                titulo.setAcrecimo(null);
+                titulo.setValorCobrado(null);
+
+                /*
+                 * INFORMANDO OS DADOS SOBRE O BOLETO.
+                 */
+                Boleto boleto = new Boleto(titulo);
+
+                boleto.setLocalPagamento("Pagável preferencialmente na Rede X ou em "
+                        + "qualquer Banco até o Vencimento.");
+//                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
+//                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
+                boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
+                boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
+                boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
+                boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
+                boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
+                boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
+                boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
+                boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
+
+                System.out.println("campo livre " + boleto.getCampoLivre().write());
+                System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
+                System.out.println("Codigo Barras " + boleto.getCodigoDeBarras().write());
+
+                boletos.add(boleto);
+            }
+        }
+
+        /*
+         * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
+         */
+
+        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
+        BoletoBancario.mostreBoletoNaTela(pdf);
     }
 
     private void salvar() {
@@ -500,12 +658,15 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     }
 
     private boolean calcularRateio(TaxaExtra tx) {
+        List<Unidade> lista = new ArrayList<Unidade>();
+        if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            lista = modeloTabelaCondominos.getObjetosSelecionados();
+        }
         for (ParcelaTaxaExtra parcela : tx.getParcelas()) {
-            if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            if (lista.isEmpty() && !chkUnidades.isSelected()) {
                 int numero = tx.getCondominio().getUnidades().size();
                 if (tx.isDividirFracaoIdeal()) {
                     efetuarCalculo(new BigDecimal(0), parcela);
-                    ApresentacaoUtil.exibirAdvertencia("Cálculo efetuado com sucesso.", this);
                 } else {
                     for (Unidade u : tx.getCondominio().getUnidades()) {
                         if (u.isSindico() && !tx.isSindicoPaga()) {
@@ -526,12 +687,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     efetuarCalculo(new BigDecimal(valorRateio).setScale(2, RoundingMode.UP), parcela);
                 }
             } else {
-                for (Unidade u : modeloTabelaCondominos.getObjetosSelecionados()) {
+                for (Unidade u : lista) {
                     RateioTaxaExtra rateio = new RateioTaxaExtra();
                     rateio.setUnidade(u);
                     rateio.setParcela(parcela);
                     rateio.setDataVencimento(parcela.getDataVencimento());
-                    rateio.setValorACobrar(new BigDecimal(parcela.getValor().doubleValue() / modeloTabelaCondominos.getObjetosSelecionados().size()).setScale(2, RoundingMode.UP));
+                    rateio.setValorACobrar(new BigDecimal(parcela.getValor().doubleValue() / lista.size()).setScale(2, RoundingMode.UP));
                     parcela.getRateios().add(rateio);
                 }
                 tabelaCondominos.clearSelection();
@@ -662,6 +823,15 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         return lista;
     }
 
+    private void trocarFormaPagamento() {
+        if (btnValor.isSelected()) {
+            btnValor.setText("Valor Parcela:");
+        } else {
+            btnValor.setText("Valor Rateio:");
+        }
+
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -685,8 +855,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 } else {
                     esconderPainelCondominos();
                 }
-            } else if (origem == btnLimpar){
+            } else if (origem == btnLimpar) {
                 tabelaCondominos.clearSelection();
+            } else if (origem == btnValor) {
+                trocarFormaPagamento();
             }
         }
 
@@ -696,6 +868,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             btnImprimir.addActionListener(this);
             btnIncluir.addActionListener(this);
             btnLimpar.addActionListener(this);
+            btnValor.addActionListener(this);
             tabela.addMouseListener(this);
             txtConta.addFocusListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
@@ -706,7 +879,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             btnSalvar.addActionListener(this);
             tabelaParcelas.addMouseListener(this);
             tabela.addKeyListener(this);
-            tabelaRateio.addKeyListener(this);
+            tabelaParcelas.addKeyListener(this);
             chkUnidades.addActionListener(this);
         }
 
@@ -756,7 +929,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             origem = e.getSource();
             if ((origem == tabela && painelTaxaExtra.isVisible()) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
                 exibirPainelDetalhes(modelo.getObjetoSelecionado());
-            } else if (origem == tabelaRateio && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
+            } else if (origem == tabelaParcelas && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
                 carregarTabelaRateio();
             }
         }
@@ -789,7 +962,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         txtConta = new javax.swing.JTextField();
         txtValor = new javax.swing.JTextField();
         btnConta = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnImprimir = new javax.swing.JButton();
         btnIncluir = new javax.swing.JButton();
@@ -812,6 +984,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         jLabel13 = new javax.swing.JLabel();
         chkUnidades = new javax.swing.JCheckBox();
         txtHistorico = new javax.swing.JTextField();
+        btnValor = new javax.swing.JToggleButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         painelTaxaExtra = new javax.swing.JPanel();
@@ -908,8 +1081,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         btnConta.setFocusable(false);
         btnConta.setRequestFocusEnabled(false);
         btnConta.setVerifyInputWhenFocusTarget(false);
-
-        jLabel3.setText("Valor:");
 
         jLabel2.setText("Histórico:");
 
@@ -1037,43 +1208,53 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         chkUnidades.setText("Unidades");
         chkUnidades.setFocusable(false);
 
+        btnValor.setText("Valor Rateio:");
+        btnValor.setActionCommand("Valor Rateio:");
+        btnValor.setBorderPainted(false);
+        btnValor.setContentAreaFilled(false);
+        btnValor.setFocusPainted(false);
+        btnValor.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        btnValor.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(chkUnidades)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3))
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(chkUnidades)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(60, 60, 60)
+                                .addComponent(btnValor)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel4)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtPrimeiroVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnConta)
+                            .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnConta))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(105, 105, 105))
-                            .addComponent(txtHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
+                            .addComponent(jLabel2)
+                            .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(55, 55, 55)
                                 .addComponent(spnCobrancasADescartar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(10, 10, 10)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1082,50 +1263,59 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(10, 10, 10)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 252, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGap(2, 2, 2)
-                                    .addComponent(jLabel3)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jLabel5)
-                                .addComponent(txtPrimeiroVencimento, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addComponent(jLabel4)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(chkUnidades, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnConta)
-                                    .addComponent(jLabel2))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(btnImprimir, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(btnIncluir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(spnCobrancasADescartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(13, 13, 13)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(btnValor)
+                        .addGap(3, 3, 3)
+                        .addComponent(chkUnidades)
+                        .addGap(13, 13, 13))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnConta)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtPrimeiroVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                            .addComponent(txtNumeroParcelas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel5))
+                                .addGap(1, 1, 1)))
+                        .addGap(18, 18, 18)))
+                .addContainerGap(31, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnImprimir)
+                            .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(spnCobrancasADescartar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(13, 13, 13)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -1423,6 +1613,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnIncluir;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvar;
+    private javax.swing.JToggleButton btnValor;
     private javax.swing.JButton btnVoltar;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
@@ -1443,7 +1634,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel8;
