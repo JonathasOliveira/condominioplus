@@ -471,7 +471,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 2:
                         return DataUtil.getDateTime(cobranca.getDataVencimento());
                     case 3:
-                        return DataUtil.getDateTime(cobranca.getVencimentoProrrogado());
+                        return cobranca.getVencimentoProrrogado() != null ? DataUtil.toString(DataUtil.getDate(cobranca.getVencimentoProrrogado())) : " ";
                     case 4:
                         return cobranca.getNumeroDocumento();
                     case 5:
@@ -493,6 +493,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         };
 
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(0)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(3)).setCellRenderer(new RenderizadorCelulaCentralizada());
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(5)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaInadimplentes.getColumn(modeloTabelaInadimplentes.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
@@ -906,12 +907,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         Moeda juros = new Moeda();
         Moeda multa = new Moeda();
         cobranca.setValorTotal(new BigDecimal(0));
-        cobranca.setValorTotal(cobranca.getValorOriginal());
-        int diferencaDias = 0;
-        diferencaDias = DataUtil.getDiferencaEmDias(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
-        if (diferencaDias > 0) {
-            System.out.println("diferenca dias: " + diferencaDias);
-            juros.soma(diferencaDias).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
+        double diferencaMeses = 0;
+        diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
+        if (diferencaMeses > 0) {
+            System.out.println("diferenca dias: " + new Double(diferencaMeses).intValue());
+            juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
             System.out.println("juros: " + juros);
             juros.multiplica(cobranca.getValorTotal());
             multa.soma(NegocioUtil.getConfiguracao().getPercentualMulta().divide(new BigDecimal(100)));
@@ -932,6 +933,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private void imprimirBoleto(List<Cobranca> listaCobrancas) {
         List<Boleto> boletos = new ArrayList<Boleto>();
         for (Cobranca cobranca : listaCobrancas) {
+
+            calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
 
             /*
              * INFORMANDO DADOS SOBRE O CEDENTE.
@@ -2454,7 +2457,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel4.setText("Vencimento Prorrogado ");
 
-        btnImprimirBoletoInadimplente.setText("Imprimir Boleto");
+        btnImprimirBoletoInadimplente.setText("Imprimir Boleto 2ª via");
 
         btnEfetuarAcordo.setText("Fazer Acordo");
 
@@ -2469,9 +2472,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addComponent(txtVencimentoProrrogado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addComponent(btnImprimirBoletoInadimplente)
-                .addGap(18, 18, 18)
+                .addGap(33, 33, 33)
                 .addComponent(btnEfetuarAcordo)
-                .addContainerGap(106, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2890,7 +2893,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

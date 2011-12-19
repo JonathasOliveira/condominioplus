@@ -25,6 +25,7 @@ import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
+import condominioPlus.util.Relatorios;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -36,6 +37,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -50,6 +52,7 @@ import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import net.sf.nachocalendar.table.JTableCustomizer;
 import org.jrimum.bopepo.BancoSuportado;
 import org.jrimum.bopepo.Boleto;
@@ -832,6 +835,62 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     }
 
+    private void imprimirDetalheTaxaExtra(TaxaExtra txe) {
+
+        Moeda totalOriginal = new Moeda();
+        Moeda totalGerado = new Moeda();
+
+        Comparator<ParcelaTaxaExtra> comparador = new Comparator<ParcelaTaxaExtra>() {
+
+            public int compare(ParcelaTaxaExtra o1, ParcelaTaxaExtra o2) {
+                return o1.getDataVencimento().compareTo(o2.getDataVencimento());
+            }
+        };
+
+        List<HashMap<String, String>> listaParcelas = new ArrayList<HashMap<String, String>>();
+        Collections.sort(txe.getParcelas(), comparador);
+
+        Moeda totalAArrecadar = new Moeda();
+        Moeda totalArrecadado = new Moeda();
+        Moeda totalInadimplencia = new Moeda();
+
+        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+            Moeda valorAArrecadar = new Moeda(parcela.getValor());
+            totalAArrecadar.soma(parcela.getValor());
+            Moeda valorArrecadado = new Moeda();
+            Moeda valorInadimplencia = new Moeda();
+            for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
+                    valorArrecadado.soma(rateio.getCobranca().getValorPago());
+                    totalArrecadado.soma(rateio.getCobranca().getValorPago());
+                } else {
+                    valorInadimplencia.soma(rateio.getValorACobrar());
+                    totalInadimplencia.soma(rateio.getValorACobrar());
+                }
+            }
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("vencimento", DataUtil.toString(parcela.getDataVencimento()));
+            mapa.put("arrecadar", PagamentoUtil.formatarMoeda(valorAArrecadar.doubleValue()));
+            mapa.put("arrecadado", PagamentoUtil.formatarMoeda(valorArrecadado.doubleValue()));
+            mapa.put("inadimplencia", PagamentoUtil.formatarMoeda(valorInadimplencia.doubleValue()));
+            listaParcelas.add(mapa);
+        }
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("codigo", String.valueOf(txe.getCodigo()));
+        parametros.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
+        parametros.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
+        parametros.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
+        parametros.put("condominio", txe.getCondominio().getRazaoSocial());
+        parametros.put("conta", "" + txe.getConta().getCodigo());
+        parametros.put("historico", txe.getDescricao());
+        parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
+
+        parametros.put("totalGerado", PagamentoUtil.formatarMoeda(totalGerado.doubleValue()));
+
+        new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -859,6 +918,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 tabelaCondominos.clearSelection();
             } else if (origem == btnValor) {
                 trocarFormaPagamento();
+            } else if (origem == btnImprimir) {
+                imprimirDetalheTaxaExtra(modelo.getObjetoSelecionado());
             }
         }
 
@@ -1593,7 +1654,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnImprimir;
