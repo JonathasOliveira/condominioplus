@@ -219,7 +219,7 @@ public class DialogoEndereco extends javax.swing.JDialog {
 
         txtReferencia.setName("referencia"); // NOI18N
 
-        checkBoxPadrao.setText("Padrão?");
+        checkBoxPadrao.setText("Atual?");
         checkBoxPadrao.setName("padrao"); // NOI18N
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -268,7 +268,7 @@ public class DialogoEndereco extends javax.swing.JDialog {
                         .addComponent(jLabel24)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
                         .addComponent(checkBoxPadrao)))
                 .addContainerGap())
         );

@@ -159,7 +159,7 @@
                           <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtNumero" min="-2" pref="53" max="-2" attributes="0"/>
-                          <EmptySpace pref="81" max="32767" attributes="0"/>
+                          <EmptySpace pref="91" max="32767" attributes="0"/>
                           <Component id="checkBoxPadrao" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -289,7 +289,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="checkBoxPadrao">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Padr&#xe3;o?"/>
+            <Property name="text" type="java.lang.String" value="Atual?"/>
             <Property name="name" type="java.lang.String" value="padrao" noResource="true"/>
           </Properties>
         </Component>

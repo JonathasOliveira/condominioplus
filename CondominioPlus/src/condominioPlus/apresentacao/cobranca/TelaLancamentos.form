@@ -904,9 +904,9 @@
                           <Component id="txtVencimentoProrrogado" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                           <Component id="btnImprimirBoletoInadimplente" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                           <Component id="btnEfetuarAcordo" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="106" max="32767" attributes="0"/>
+                          <EmptySpace pref="59" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -937,7 +937,7 @@
                 </Component>
                 <Component class="javax.swing.JButton" name="btnImprimirBoletoInadimplente">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Imprimir Boleto"/>
+                    <Property name="text" type="java.lang.String" value="Imprimir Boleto 2&#xaa; via"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnEfetuarAcordo">
