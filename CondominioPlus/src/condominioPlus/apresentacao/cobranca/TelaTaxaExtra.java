@@ -885,9 +885,14 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         parametros.put("conta", "" + txe.getConta().getCodigo());
         parametros.put("historico", txe.getDescricao());
         parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
-
         parametros.put("totalGerado", PagamentoUtil.formatarMoeda(totalGerado.doubleValue()));
-
+        parametros.put("igualPraTodos", txe.isDividirFracaoIdeal() ? "Não" : "Sim");
+        parametros.put("fracaoIdeal", txe.isDividirFracaoIdeal() ? "Sim" : "Não");
+        parametros.put("numeroCotas", "" + txe.getNumeroCotas());
+        parametros.put("sindicoPaga", txe.isSindicoPaga() ? "Sim" : "Não");
+        parametros.put("qtdeInadimplentes", "" + txe.getCobrancasADescartar());
+        parametros.put("cobrarComCondominio", txe.isCobrarComCondominio() ? "Sim" : "Não");
+        
         new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false);
     }
 
