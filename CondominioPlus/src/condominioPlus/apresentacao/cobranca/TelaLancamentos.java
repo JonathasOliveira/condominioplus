@@ -675,13 +675,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 if (txtNumeroDocumento.getText().equals("")) {
                     if (painelCobrancaBase.getSelectedIndex() == 0) {
                         cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimento.getValue())));
-                    } else if (painelCobrancaBase.getSelectedIndex() == 1){
+                    } else if (painelCobrancaBase.getSelectedIndex() == 1) {
                         cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimentoAvulso.getValue())));
                     }
                 } else {
                     cobranca.setNumeroDocumento(txtNumeroDocumento.getText());
                 }
-                
+
                 if (u.isSindico() && !condominio.isSindicoPaga()) {
                     continue UNIDADES;
                 }
@@ -693,7 +693,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         ApresentacaoUtil.exibirAdvertencia("Antes de gerar a cobrança, preencha a lista.", this);
                         return;
                     }
-                    if(!calcularCobrancasAvulsas(u, cobranca)){
+                    if (!calcularCobrancasAvulsas(u, cobranca)) {
                         return;
                     }
                 }
@@ -934,7 +934,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         List<Boleto> boletos = new ArrayList<Boleto>();
         for (Cobranca cobranca : listaCobrancas) {
 
-            calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
+            if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
+                calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
+            }
 
             /*
              * INFORMANDO DADOS SOBRE O CEDENTE.
