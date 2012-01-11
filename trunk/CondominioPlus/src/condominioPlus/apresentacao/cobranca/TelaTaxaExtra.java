@@ -905,7 +905,6 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
             List<HashMap<String, String>> listaParcelas = new ArrayList<HashMap<String, String>>();
 
-
             for (TaxaExtra txe : condominio.getTaxas()) {
                 Moeda totalAArrecadar = new Moeda();
                 Moeda totalArrecadado = new Moeda();
