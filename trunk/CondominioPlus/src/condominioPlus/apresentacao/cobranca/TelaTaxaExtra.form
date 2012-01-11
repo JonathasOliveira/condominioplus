@@ -575,7 +575,7 @@
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                   <Image iconType="3" name="/condominioPlus/recursos/imagens/Print24.gif"/>
                 </Property>
-                <Property name="toolTipText" type="java.lang.String" value="Imprimir Relat&#xf3;rio"/>
+                <Property name="toolTipText" type="java.lang.String" value="Imprimir Relat&#xf3;rio Gerencial"/>
               </Properties>
             </Component>
           </SubComponents>
