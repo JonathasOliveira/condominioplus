@@ -892,8 +892,56 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         parametros.put("sindicoPaga", txe.isSindicoPaga() ? "Sim" : "Não");
         parametros.put("qtdeInadimplentes", "" + txe.getCobrancasADescartar());
         parametros.put("cobrarComCondominio", txe.isCobrarComCondominio() ? "Sim" : "Não");
-        
+
         new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false);
+    }
+
+    private void imprimirRelatorioGerencial() {
+
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true);
+        dialogo.setVisible(true);
+
+        if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
+
+            List<HashMap<String, String>> listaParcelas = new ArrayList<HashMap<String, String>>();
+
+
+            for (TaxaExtra txe : condominio.getTaxas()) {
+                Moeda totalAArrecadar = new Moeda();
+                Moeda totalArrecadado = new Moeda();
+                Moeda totalInadimplencia = new Moeda();
+                for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                    if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataFinal()) == -1) {
+                        Moeda valorAArrecadar = new Moeda(parcela.getValor());
+                        totalAArrecadar.soma(parcela.getValor());
+                        Moeda valorArrecadado = new Moeda();
+                        Moeda valorInadimplencia = new Moeda();
+                        for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                            if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
+                                valorArrecadado.soma(rateio.getCobranca().getValorPago());
+                                totalArrecadado.soma(rateio.getCobranca().getValorPago());
+                            } else {
+                                valorInadimplencia.soma(rateio.getValorACobrar());
+                                totalInadimplencia.soma(rateio.getValorACobrar());
+                            }
+                        }
+                    }
+                }
+                HashMap<String, String> mapa = new HashMap();
+                mapa.put("conta", "" + txe.getConta().getCodigo());
+                mapa.put("historico", txe.getDescricao());
+                mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
+                mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
+                mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
+                listaParcelas.add(mapa);
+            }
+
+            HashMap<String, Object> parametros = new HashMap();
+            parametros.put("condominio", condominio.getRazaoSocial());
+            parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
+
+            new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, listaParcelas, false);
+        } 
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -924,6 +972,8 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             } else if (origem == btnValor) {
                 trocarFormaPagamento();
             } else if (origem == btnImprimir) {
+                imprimirRelatorioGerencial();
+            } else if (origem == itemMenuImprimir) {
                 imprimirDetalheTaxaExtra(modelo.getObjetoSelecionado());
             }
         }
@@ -937,6 +987,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             btnValor.addActionListener(this);
             tabela.addMouseListener(this);
             txtConta.addFocusListener(this);
+            itemMenuImprimir.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
             btnVoltar.addActionListener(this);
             radioSindicoSim.addActionListener(this);
