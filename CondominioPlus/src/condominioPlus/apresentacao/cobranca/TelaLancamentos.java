@@ -1685,6 +1685,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false);
     }
 
+    private void imprimirCartaSintetica() {
+        if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirInformacao("If testando...", this);
+        } else {
+            ApresentacaoUtil.exibirInformacao("Else testando...", this);
+        }
+    }
+
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
@@ -1762,6 +1770,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuBaixaManualInadimplente.addActionListener(this);
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuImprimirDetalheAcordo.addActionListener(this);
+            itemMenuImprimirCartaSintetica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuLimparDadosAvulsos.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
@@ -1889,6 +1898,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 limparCampos();
             } else if (origem == btnConta) {
                 pegarConta();
+            } else if (origem == itemMenuImprimirCartaSintetica) {
+                imprimirCartaSintetica();
             }
         }
 
@@ -1988,6 +1999,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         popupMenuInadimplentes = new javax.swing.JPopupMenu();
         itemMenuCalcularJurosMulta = new javax.swing.JMenuItem();
         itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        itemMenuImprimirCartaSintetica = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
         popupMenuAcordo = new javax.swing.JPopupMenu();
@@ -2100,6 +2113,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuBaixaManualInadimplente.setText("Efetuar Baixa Item Selecionado");
         popupMenuInadimplentes.add(itemMenuBaixaManualInadimplente);
+        popupMenuInadimplentes.add(jSeparator1);
+
+        itemMenuImprimirCartaSintetica.setText("Imprimir Carta Sintética");
+        popupMenuInadimplentes.add(itemMenuImprimirCartaSintetica);
 
         itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
         popupMenuPagos.add(itemMenuLancarNoCaixa);
@@ -2895,7 +2912,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2935,6 +2952,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;
@@ -2980,6 +2998,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelBoletos;
