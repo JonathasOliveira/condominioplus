@@ -1692,57 +1692,38 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
             if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
                 for (Unidade u : condominio.getUnidades()) {
-                    HashMap<String, Object> parametros = new HashMap();
-                    List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
-
-                    parametros.put("condominio", u.getCondominio().getRazaoSocial());
-                    parametros.put("nome", u.getCondomino().getNome());
-                    parametros.put("unidade", u.getUnidade());
-
-                    for (Cobranca co : u.getCobrancas()) {
-                        if (co.getDataPagamento() == null && DataUtil.compararData(dialogo.getDataIncial(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dialogo.getDataFinal(), DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
-                            HashMap<String, String> mapa = new HashMap();
-                            mapa.put("documento", co.getNumeroDocumento());
-                            mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
-                            mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
-                            mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
-                            mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
-                            mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
-                            listaCobrancas.add(mapa);
-                        }
-                    }
-                    if (!listaCobrancas.isEmpty()) {
-                        new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false);
-                    }
+                    exibirRelatorio(u, dialogo.getDataIncial(), dialogo.getDataFinal());
                 }
             } else {
                 Unidade u = modeloTabelaCondominos.getObjetoSelecionado();
-                
-                HashMap<String, Object> parametros = new HashMap();
-                List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
-
-                parametros.put("condominio", u.getCondominio().getRazaoSocial());
-                parametros.put("nome", u.getCondomino().getNome());
-                parametros.put("unidade", u.getUnidade());
-
-                for (Cobranca co : u.getCobrancas()) {
-                    if (co.getDataPagamento() == null && DataUtil.compararData(dialogo.getDataIncial(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dialogo.getDataFinal(), DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
-                        HashMap<String, String> mapa = new HashMap();
-                        mapa.put("documento", co.getNumeroDocumento());
-                        mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
-                        mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
-                        mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
-                        mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
-                        mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
-                        listaCobrancas.add(mapa);
-                    }
-                }
-                if (!listaCobrancas.isEmpty()) {
-                    new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false);
-                }
+                exibirRelatorio(u, dialogo.getDataIncial(), dialogo.getDataFinal());
             }
         }
+    }
 
+    private void exibirRelatorio(Unidade u, DateTime dataInicial, DateTime dataFinal) {
+        List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("nome", u.getCondomino().getNome());
+        parametros.put("unidade", u.getUnidade());
+
+        for (Cobranca co : u.getCobrancas()) {
+            if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
+                HashMap<String, String> mapa = new HashMap();
+                mapa.put("documento", co.getNumeroDocumento());
+                mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
+                mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
+                mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
+                mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
+                mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+                listaCobrancas.add(mapa);
+            }
+        }
+        if (!listaCobrancas.isEmpty()) {
+            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false);
+        }
     }
 
     private List listaCampos() {

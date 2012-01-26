@@ -164,6 +164,9 @@
 				</textElement>
 				<text><![CDATA[Valor Original]]></text>
 			</staticText>
+			<rectangle>
+				<reportElement x="0" y="8" width="554" height="36" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+			</rectangle>
 			<staticText>
 				<reportElement x="6" y="8" width="46" height="16"/>
 				<textElement/>
