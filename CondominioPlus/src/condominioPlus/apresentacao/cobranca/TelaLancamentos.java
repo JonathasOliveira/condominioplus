@@ -1709,9 +1709,18 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("nome", u.getCondomino().getNome());
         parametros.put("unidade", u.getUnidade());
 
+        BigDecimal totalOriginal = new BigDecimal(0);
+        BigDecimal totalJuros = new BigDecimal(0);
+        BigDecimal totalMulta = new BigDecimal(0);
+        BigDecimal totalGeral = new BigDecimal(0);
+
         for (Cobranca co : u.getCobrancas()) {
             if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
                 HashMap<String, String> mapa = new HashMap();
+                totalOriginal = totalOriginal.add(co.getValorOriginal());
+                totalJuros = totalJuros.add(co.getJuros());
+                totalMulta = totalMulta.add(co.getMulta());
+                totalGeral = totalGeral.add(co.getValorTotal());
                 mapa.put("documento", co.getNumeroDocumento());
                 mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
                 mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
@@ -1721,6 +1730,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 listaCobrancas.add(mapa);
             }
         }
+
+        parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
+        parametros.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
+        parametros.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
+        parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+
         if (!listaCobrancas.isEmpty()) {
             new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false);
         }

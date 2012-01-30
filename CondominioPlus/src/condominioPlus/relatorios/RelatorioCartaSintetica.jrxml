@@ -10,6 +10,10 @@
 	<parameter name="periodo" class="java.lang.String"/>
 	<parameter name="unidade" class="java.lang.String"/>
 	<parameter name="nome" class="java.lang.String"/>
+	<parameter name="totalOriginal" class="java.lang.String"/>
+	<parameter name="totalJuros" class="java.lang.String"/>
+	<parameter name="totalMulta" class="java.lang.String"/>
+	<parameter name="totalGeral" class="java.lang.String"/>
 	<field name="documento" class="java.lang.String"/>
 	<field name="vencimento" class="java.lang.String"/>
 	<field name="valorOriginal" class="java.lang.String"/>
@@ -237,11 +241,43 @@
 			</textField>
 			<textField>
 				<reportElement x="171" y="0" width="69" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorOriginal}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
+	<summary>
+		<band height="39">
+			<textField>
+				<reportElement x="171" y="12" width="69" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalOriginal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="262" y="12" width="69" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalJuros}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="361" y="12" width="69" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalMulta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="12" width="77" height="20"/>
+				<textElement textAlignment="Right">
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalGeral}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
 </jasperReport>
