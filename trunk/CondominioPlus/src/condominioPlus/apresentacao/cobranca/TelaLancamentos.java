@@ -1705,6 +1705,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
         parametros.put("condominio", condominio.getRazaoSocial());
         parametros.put("nome", u.getCondomino().getNome());
         parametros.put("unidade", u.getUnidade());
