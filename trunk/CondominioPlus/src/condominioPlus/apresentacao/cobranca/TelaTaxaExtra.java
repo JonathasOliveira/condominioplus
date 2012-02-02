@@ -896,7 +896,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false);
     }
 
-    private void imprimirRelatorioGerencial() {
+    private void imprimirRelatorioGlobal() {
 
         DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true);
         dialogo.setVisible(true);
@@ -939,7 +939,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             parametros.put("condominio", condominio.getRazaoSocial());
             parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
 
-            new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, listaParcelas, false);
+            new Relatorios().imprimir("RelatorioGlobalTaxaExtra", parametros, listaParcelas, false);
         } 
     }
 
@@ -971,7 +971,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             } else if (origem == btnValor) {
                 trocarFormaPagamento();
             } else if (origem == btnImprimir) {
-                imprimirRelatorioGerencial();
+                imprimirRelatorioGlobal();
             } else if (origem == itemMenuImprimir) {
                 imprimirDetalheTaxaExtra(modelo.getObjetoSelecionado());
             }
