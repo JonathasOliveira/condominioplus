@@ -11,6 +11,7 @@
 	<parameter name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="totalOriginal" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
+	<field name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -81,7 +82,7 @@
 		</band>
 	</title>
 	<detail>
-		<band height="72" splitType="Stretch">
+		<band height="76" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="6" width="555" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -100,11 +101,11 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="0" y="40" width="555" height="31"/>
+				<reportElement x="0" y="36" width="555" height="31"/>
 				<subreportParameter name="totalOriginal">
 					<subreportParameterExpression><![CDATA[$P{totalOriginal}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[$P{lista}]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioGerencialTaxaExtra.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
