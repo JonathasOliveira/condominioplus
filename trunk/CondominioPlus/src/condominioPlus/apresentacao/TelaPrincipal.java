@@ -300,13 +300,15 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 
         if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
 
-            List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
-            List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
+            List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
             List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
 
             CONDOMINIOS:
             for (Condominio condominio : listaCondominios) {
+
+                List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
+
                 if (condominio.getTaxas().isEmpty()) {
                     continue CONDOMINIOS;
                 } else {
@@ -344,8 +346,9 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     if (listaTaxas.isEmpty()) {
                         continue CONDOMINIOS;
                     } else {
-                        HashMap<String, String> mapa2 = new HashMap();
+                        HashMap<String, Object> mapa2 = new HashMap();
                         mapa2.put("condominio", condominio.getRazaoSocial());
+                        mapa2.put("lista", new JRBeanCollectionDataSource(listaTaxas));
                         lista.add(mapa2);
                     }
 
@@ -354,7 +357,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 
             HashMap<String, Object> parametros = new HashMap();
             parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
-            parametros.put("lista", new JRBeanCollectionDataSource(listaTaxas));
 
             URL caminho = getClass().getResource("/condominioPlus/relatorios/");
 
