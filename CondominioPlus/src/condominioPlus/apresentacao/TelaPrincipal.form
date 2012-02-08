@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.4" maxVersion="1.4" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
@@ -83,7 +83,6 @@
             <MenuItem class="javax.swing.JMenuItem" name="menuItemLancamentos">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Gera&#xe7;&#xe3;o/Inadimpl&#xea;ncia/Pagos"/>
-                <Property name="actionCommand" type="java.lang.String" value="Gera&#xe7;&#xe3;o/Inadimpl&#xea;ncia/Pagos"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -177,9 +176,9 @@
             <Property name="text" type="java.lang.String" value="Relat&#xf3;rios"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioCliente">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioTaxaExtra">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Clientes"/>
+                <Property name="text" type="java.lang.String" value="Taxa Extra - Gerencial"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioFornecedor">

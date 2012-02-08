@@ -13,6 +13,7 @@ package condominioPlus.apresentacao;
 import condominioPlus.apresentacao.cobranca.TelaCobrancaBase;
 import condominioPlus.Main;
 import condominioPlus.apresentacao.advogado.TelaAdvogado;
+import condominioPlus.apresentacao.cobranca.DialogoDadosRelatorioGerencial;
 import condominioPlus.apresentacao.cobranca.TelaLancamentos;
 import condominioPlus.apresentacao.cobranca.TelaTaxaExtra;
 import condominioPlus.apresentacao.cobranca.agua.TelaAgua;
@@ -50,15 +51,25 @@ import condominioPlus.apresentacao.financeiro.TelaOrcamento;
 import condominioPlus.apresentacao.financeiro.TelaPoupanca;
 import condominioPlus.apresentacao.fornecedor.TelaFornecedor;
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
+import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.funcionario.CaracteristicaAcesso;
+import condominioPlus.util.Relatorios;
+import java.net.URL;
+import java.util.HashMap;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.Identificavel;
 import logicpoint.apresentacao.NotificavelAtalho;
 import logicpoint.apresentacao.NotificavelClasse;
 import logicpoint.exception.TratadorExcecao;
+import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
+import logicpoint.util.Moeda;
 import logicpoint.util.Util;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
 
 /**
@@ -283,6 +294,76 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         lblData.setText(texto);
     }
 
+    private void imprimirTaxaExtraGerencial() {
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true);
+        dialogo.setVisible(true);
+
+        if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
+
+            List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+            List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
+
+            List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
+
+            CONDOMINIOS:
+            for (Condominio condominio : listaCondominios) {
+                if (condominio.getTaxas().isEmpty()) {
+                    continue CONDOMINIOS;
+                } else {
+                    for (TaxaExtra txe : condominio.getTaxas()) {
+                        Moeda totalAArrecadar = new Moeda();
+                        Moeda totalArrecadado = new Moeda();
+                        Moeda totalInadimplencia = new Moeda();
+                        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                            if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataFinal()) == -1) {
+                                totalAArrecadar.soma(parcela.getValor());
+                                Moeda valorArrecadado = new Moeda();
+                                Moeda valorInadimplencia = new Moeda();
+                                for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                                    if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
+                                        valorArrecadado.soma(rateio.getCobranca().getValorPago());
+                                        totalArrecadado.soma(rateio.getCobranca().getValorPago());
+                                    } else {
+                                        valorInadimplencia.soma(rateio.getValorACobrar());
+                                        totalInadimplencia.soma(rateio.getValorACobrar());
+                                    }
+                                }
+                            }
+                        }
+                        if (totalAArrecadar.doubleValue() != 0 || totalArrecadado.doubleValue() != 0 || totalInadimplencia.doubleValue() != 0) {
+                            HashMap<String, String> mapa = new HashMap();
+                            mapa.put("conta", "" + txe.getConta().getCodigo());
+                            mapa.put("historico", txe.getDescricao());
+                            mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
+                            mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
+                            mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
+                            listaTaxas.add(mapa);
+                        }
+                    }
+
+                    if (listaTaxas.isEmpty()) {
+                        continue CONDOMINIOS;
+                    } else {
+                        HashMap<String, String> mapa2 = new HashMap();
+                        mapa2.put("condominio", condominio.getRazaoSocial());
+                        lista.add(mapa2);
+                    }
+
+                }
+            }
+
+            HashMap<String, Object> parametros = new HashMap();
+            parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
+            parametros.put("lista", new JRBeanCollectionDataSource(listaTaxas));
+
+            URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+
+            parametros.put("subrelatorio", caminho.toString());
+
+            new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
+        }
+    }
+
     private class ListenerJanela implements WindowListener {
 
         public void windowOpened(WindowEvent evento) {
@@ -365,16 +446,16 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
-                }else if (source == menuItemLuz) {
+                } else if (source == menuItemLuz) {
                     if (Main.getCondominio() != null) {
                         criarFrame(new TelaLuz(Main.getCondominio()));
                     } else {
                         ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
                     }
-                }else if (source == menuItemControleAcesso) {
+                } else if (source == menuItemControleAcesso) {
                     criarFrame(new TelaControleAcesso());
-                } else if (source == menuItemRelatorioCliente) {
-//                    Relatorio.imprimirRelatorioCliente();
+                } else if (source == menuItemRelatorioTaxaExtra) {
+                    imprimirTaxaExtraGerencial();
                 } else if (source == menuItemRelatorioFornecedor) {
 //                    Relatorio.imprimirRelatorioFornecedor();
                 } else if (source == menuItemRelatorioFuncionarios) {
@@ -479,7 +560,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemCondominos.addActionListener(this);
             menuItemLancamentos.addActionListener(this);
             menuItemControleAcesso.addActionListener(this);
-            menuItemRelatorioCliente.addActionListener(this);
+            menuItemRelatorioTaxaExtra.addActionListener(this);
             menuItemRelatorioFornecedor.addActionListener(this);
             menuItemRelatorioFuncionarios.addActionListener(this);
             menuItemRelatorioProduto.addActionListener(this);
@@ -574,7 +655,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemContasDispensaveis = new javax.swing.JMenuItem();
         menuItemContasIndispensaveis = new javax.swing.JMenuItem();
         menuRelatorio = new javax.swing.JMenu();
-        menuItemRelatorioCliente = new javax.swing.JMenuItem();
+        menuItemRelatorioTaxaExtra = new javax.swing.JMenuItem();
         menuItemRelatorioFornecedor = new javax.swing.JMenuItem();
         menuItemRelatorioFuncionarios = new javax.swing.JMenuItem();
         menuItemRelatorioProduto = new javax.swing.JMenuItem();
@@ -782,7 +863,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuCobrancas.add(jSeparator6);
 
         menuItemLancamentos.setText("Geração/Inadimplência/Pagos");
-        menuItemLancamentos.setActionCommand("Geração/Inadimplência/Pagos");
         menuCobrancas.add(menuItemLancamentos);
 
         menu.add(menuCobrancas);
@@ -839,8 +919,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
 
         menuRelatorio.setText("Relatórios");
 
-        menuItemRelatorioCliente.setText("Clientes");
-        menuRelatorio.add(menuItemRelatorioCliente);
+        menuItemRelatorioTaxaExtra.setText("Taxa Extra - Gerencial");
+        menuRelatorio.add(menuItemRelatorioTaxaExtra);
 
         menuItemRelatorioFornecedor.setText("Fornecedores");
         menuRelatorio.add(menuItemRelatorioFornecedor);
@@ -958,12 +1038,12 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemLuz;
     private javax.swing.JMenuItem menuItemOrcamento;
     private javax.swing.JMenuItem menuItemPoupanca;
-    private javax.swing.JMenuItem menuItemRelatorioCliente;
     private javax.swing.JMenuItem menuItemRelatorioEstorno;
     private javax.swing.JMenuItem menuItemRelatorioFornecedor;
     private javax.swing.JMenuItem menuItemRelatorioFuncionarios;
     private javax.swing.JMenuItem menuItemRelatorioProduto;
     private javax.swing.JMenuItem menuItemRelatorioProdutoNegativo;
+    private javax.swing.JMenuItem menuItemRelatorioTaxaExtra;
     private javax.swing.JMenuItem menuItemRemessaSalario;
     private javax.swing.JMenuItem menuItemSobre;
     private javax.swing.JMenuItem menuItemTaxaExtra;
