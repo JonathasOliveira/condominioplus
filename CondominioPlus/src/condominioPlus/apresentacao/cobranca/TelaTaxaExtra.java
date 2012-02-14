@@ -323,11 +323,12 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         }
 
         taxa.setCondominio(condominio);
-        condominio.getTaxas().add(taxa);
 
         if (!calcularRateio(taxa)) {
             return false;
         }
+
+        condominio.getTaxas().add(taxa);
 
 //        new DAO().salvar(condominio);
 
@@ -940,7 +941,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
 
             new Relatorios().imprimir("RelatorioGlobalTaxaExtra", parametros, listaParcelas, false);
-        } 
+        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
