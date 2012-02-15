@@ -13,7 +13,7 @@ package condominioPlus.apresentacao;
 import condominioPlus.apresentacao.cobranca.TelaCobrancaBase;
 import condominioPlus.Main;
 import condominioPlus.apresentacao.advogado.TelaAdvogado;
-import condominioPlus.apresentacao.cobranca.DialogoDadosRelatorioGerencial;
+import condominioPlus.apresentacao.cobranca.TelaDadosRelatorioGerencial;
 import condominioPlus.apresentacao.cobranca.TelaLancamentos;
 import condominioPlus.apresentacao.cobranca.TelaTaxaExtra;
 import condominioPlus.apresentacao.cobranca.agua.TelaAgua;
@@ -294,78 +294,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         lblData.setText(texto);
     }
 
-    private void imprimirTaxaExtraGerencial() {
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true);
-        dialogo.setVisible(true);
-
-        if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
-
-            List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
-
-            List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
-
-            CONDOMINIOS:
-            for (Condominio condominio : listaCondominios) {
-
-                List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
-
-                if (condominio.getTaxas().isEmpty()) {
-                    continue CONDOMINIOS;
-                } else {
-                    for (TaxaExtra txe : condominio.getTaxas()) {
-                        Moeda totalAArrecadar = new Moeda();
-                        Moeda totalArrecadado = new Moeda();
-                        Moeda totalInadimplencia = new Moeda();
-                        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
-                            if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataFinal()) == -1) {
-                                totalAArrecadar.soma(parcela.getValor());
-                                Moeda valorArrecadado = new Moeda();
-                                Moeda valorInadimplencia = new Moeda();
-                                for (RateioTaxaExtra rateio : parcela.getRateios()) {
-                                    if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
-                                        valorArrecadado.soma(rateio.getCobranca().getValorPago());
-                                        totalArrecadado.soma(rateio.getCobranca().getValorPago());
-                                    } else {
-                                        valorInadimplencia.soma(rateio.getValorACobrar());
-                                        totalInadimplencia.soma(rateio.getValorACobrar());
-                                    }
-                                }
-                            }
-                        }
-                        if (totalAArrecadar.doubleValue() != 0 || totalArrecadado.doubleValue() != 0 || totalInadimplencia.doubleValue() != 0) {
-                            HashMap<String, String> mapa = new HashMap();
-                            mapa.put("conta", "" + txe.getConta().getCodigo());
-                            mapa.put("historico", txe.getDescricao());
-                            mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
-                            mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
-                            mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
-                            listaTaxas.add(mapa);
-                        }
-                    }
-
-                    if (listaTaxas.isEmpty()) {
-                        continue CONDOMINIOS;
-                    } else {
-                        HashMap<String, Object> mapa2 = new HashMap();
-                        mapa2.put("condominio", condominio.getRazaoSocial());
-                        mapa2.put("lista", new JRBeanCollectionDataSource(listaTaxas));
-                        lista.add(mapa2);
-                    }
-
-                }
-            }
-
-            HashMap<String, Object> parametros = new HashMap();
-            parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
-
-            URL caminho = getClass().getResource("/condominioPlus/relatorios/");
-
-            parametros.put("subrelatorio", caminho.toString());
-
-            new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
-        }
-    }
-
     private class ListenerJanela implements WindowListener {
 
         public void windowOpened(WindowEvent evento) {
@@ -457,7 +385,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                 } else if (source == menuItemControleAcesso) {
                     criarFrame(new TelaControleAcesso());
                 } else if (source == menuItemRelatorioTaxaExtra) {
-                    imprimirTaxaExtraGerencial();
+                    criarFrame(new TelaDadosRelatorioGerencial());
                 } else if (source == menuItemRelatorioFornecedor) {
 //                    Relatorio.imprimirRelatorioFornecedor();
                 } else if (source == menuItemRelatorioFuncionarios) {

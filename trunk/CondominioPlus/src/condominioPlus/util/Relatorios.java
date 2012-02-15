@@ -8,7 +8,6 @@
  */
 package condominioPlus.util;
 
-import condominioPlus.negocio.NegocioUtil;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -18,7 +17,6 @@ import java.awt.print.PrinterJob;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import logicpoint.util.DataUtil;
 import net.sf.jasperreports.engine.JRException;
@@ -79,7 +77,7 @@ public class Relatorios implements Printable {
 
     public JasperReport obterRelatorio(String nome) {
         URL url = getClass().getResource("/condominioPlus/relatorios/" + nome + ".jasper");
-        System.out.println("URL: " + url.toString());
+//        System.out.println("URL: " + url.toString());
         JasperReport relatorio = null;
         try {
             relatorio = (JasperReport) JRLoader.loadObject(url);
@@ -90,7 +88,7 @@ public class Relatorios implements Printable {
     }
 
     /**
-     * Os método print será usado para impri mir texto diretamente para a impressora sem usar
+     * Os método print será usado para imprimir texto diretamente para a impressora sem usar
      * o JasperReports
      */
     @Override
