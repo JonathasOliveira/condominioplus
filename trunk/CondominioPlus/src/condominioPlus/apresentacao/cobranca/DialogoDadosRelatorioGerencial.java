@@ -4,7 +4,7 @@
  */
 
 /*
- * DialogoDadosAcordo.java
+ * DialogoDadosRelatorioGerencial.java
  *
  * Created on 07/10/2010, 14:33:06
  */
@@ -24,7 +24,7 @@ public class DialogoDadosRelatorioGerencial extends javax.swing.JDialog {
     private DateTime dataInicial;
     private DateTime dataFinal;
 
-    /** Creates new form DialogoDadosAcordo */
+    /** Creates new form DialogoDadosRelatorioGerencial */
     public DialogoDadosRelatorioGerencial(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
