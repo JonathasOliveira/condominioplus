@@ -385,9 +385,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                 } else if (source == menuItemControleAcesso) {
                     criarFrame(new TelaControleAcesso());
                 } else if (source == menuItemRelatorioTaxaExtra) {
-                    criarFrame(new TelaDadosRelatorioGerencial());
-                } else if (source == menuItemRelatorioFornecedor) {
-//                    Relatorio.imprimirRelatorioFornecedor();
+                    criarFrame(new TelaDadosRelatorioGerencial(null));
+                } else if (source == menuItemInadimplenciaSintetica) {
+                    if (Main.getCondominio() != null) {
+                        criarFrame(new TelaDadosRelatorioGerencial(Main.getCondominio()));
+                    } else {
+                        ApresentacaoUtil.exibirAdvertencia("Você deve selecionar um condomínio!", null);
+                    }
                 } else if (source == menuItemRelatorioFuncionarios) {
 //                    Relatorio.imprimirRelatorioFuncionario();
                 } else if (source == menuItemRelatorioProduto) {
@@ -491,7 +495,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemLancamentos.addActionListener(this);
             menuItemControleAcesso.addActionListener(this);
             menuItemRelatorioTaxaExtra.addActionListener(this);
-            menuItemRelatorioFornecedor.addActionListener(this);
+            menuItemInadimplenciaSintetica.addActionListener(this);
             menuItemRelatorioFuncionarios.addActionListener(this);
             menuItemRelatorioProduto.addActionListener(this);
             menuItemRelatorioProdutoNegativo.addActionListener(this);
@@ -586,7 +590,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemContasIndispensaveis = new javax.swing.JMenuItem();
         menuRelatorio = new javax.swing.JMenu();
         menuItemRelatorioTaxaExtra = new javax.swing.JMenuItem();
-        menuItemRelatorioFornecedor = new javax.swing.JMenuItem();
+        menuItemInadimplenciaSintetica = new javax.swing.JMenuItem();
         menuItemRelatorioFuncionarios = new javax.swing.JMenuItem();
         menuItemRelatorioProduto = new javax.swing.JMenuItem();
         menuItemRelatorioProdutoNegativo = new javax.swing.JMenuItem();
@@ -852,8 +856,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemRelatorioTaxaExtra.setText("Taxa Extra - Gerencial");
         menuRelatorio.add(menuItemRelatorioTaxaExtra);
 
-        menuItemRelatorioFornecedor.setText("Fornecedores");
-        menuRelatorio.add(menuItemRelatorioFornecedor);
+        menuItemInadimplenciaSintetica.setText("Inadimplência Sintética");
+        menuRelatorio.add(menuItemInadimplenciaSintetica);
 
         menuItemRelatorioFuncionarios.setText("Funcionários");
         menuRelatorio.add(menuItemRelatorioFuncionarios);
@@ -963,13 +967,13 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemFuncionario;
     private javax.swing.JMenuItem menuItemGas;
     private javax.swing.JMenuItem menuItemIdentificadores;
+    private javax.swing.JMenuItem menuItemInadimplenciaSintetica;
     private javax.swing.JMenuItem menuItemIntegracao;
     private javax.swing.JMenuItem menuItemLancamentos;
     private javax.swing.JMenuItem menuItemLuz;
     private javax.swing.JMenuItem menuItemOrcamento;
     private javax.swing.JMenuItem menuItemPoupanca;
     private javax.swing.JMenuItem menuItemRelatorioEstorno;
-    private javax.swing.JMenuItem menuItemRelatorioFornecedor;
     private javax.swing.JMenuItem menuItemRelatorioFuncionarios;
     private javax.swing.JMenuItem menuItemRelatorioProduto;
     private javax.swing.JMenuItem menuItemRelatorioProdutoNegativo;

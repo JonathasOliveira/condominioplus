@@ -11,12 +11,15 @@
 package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,11 +39,17 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
 
     private DateTime dataInicial;
     private DateTime dataFinal;
+    private Condominio condominio;
 
     /** Creates new form TelaDadosRelatorioGerencial */
-    public TelaDadosRelatorioGerencial() {
+    public TelaDadosRelatorioGerencial(Condominio condominio) {
         initComponents();
         new ControladorEventos();
+        this.condominio = condominio;
+        if (condominio != null) {
+            txtDataInicial.setValue(DataUtil.getDate(new DateTime(1970, 1, 1, 0, 0, 0, 0)));
+            txtDataInicial.setEnabled(false);
+        }
     }
 
     public DateTime getDataIncial() {
@@ -54,7 +63,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
     private void salvarDados() {
         dataInicial = DataUtil.getDateTime(txtDataInicial.getValue());
         dataFinal = DataUtil.getDateTime(txtDataFinal.getValue());
-        
+
         imprimir();
 
     }
@@ -66,69 +75,128 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
     private void imprimir() {
         if (this.getDataIncial() != null && this.getDataFinal() != null) {
 
-            List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+            if (condominio == null) {
+                List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
-            List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
+                List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
 
-            CONDOMINIOS:
-            for (Condominio condominio : listaCondominios) {
+                CONDOMINIOS:
+                for (Condominio condominio : listaCondominios) {
 
-                List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
+                    List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
 
-                if (condominio.getTaxas().isEmpty()) {
-                    continue CONDOMINIOS;
-                } else {
-                    for (TaxaExtra txe : condominio.getTaxas()) {
-                        Moeda totalAArrecadar = new Moeda();
-                        Moeda totalArrecadado = new Moeda();
-                        Moeda totalInadimplencia = new Moeda();
-                        for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
-                            if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataFinal()) == -1) {
-                                totalAArrecadar.soma(parcela.getValor());
-                                Moeda valorArrecadado = new Moeda();
-                                Moeda valorInadimplencia = new Moeda();
-                                for (RateioTaxaExtra rateio : parcela.getRateios()) {
-                                    if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
-                                        valorArrecadado.soma(rateio.getCobranca().getValorPago());
-                                        totalArrecadado.soma(rateio.getCobranca().getValorPago());
-                                    } else {
-                                        valorInadimplencia.soma(rateio.getValorACobrar());
-                                        totalInadimplencia.soma(rateio.getValorACobrar());
+                    if (condominio.getTaxas().isEmpty()) {
+                        continue CONDOMINIOS;
+                    } else {
+                        for (TaxaExtra txe : condominio.getTaxas()) {
+                            Moeda totalAArrecadar = new Moeda();
+                            Moeda totalArrecadado = new Moeda();
+                            Moeda totalInadimplencia = new Moeda();
+                            for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
+                                if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataFinal()) == -1) {
+                                    totalAArrecadar.soma(parcela.getValor());
+                                    Moeda valorArrecadado = new Moeda();
+                                    Moeda valorInadimplencia = new Moeda();
+                                    for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                                        if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
+                                            valorArrecadado.soma(rateio.getCobranca().getValorPago());
+                                            totalArrecadado.soma(rateio.getCobranca().getValorPago());
+                                        } else {
+                                            valorInadimplencia.soma(rateio.getValorACobrar());
+                                            totalInadimplencia.soma(rateio.getValorACobrar());
+                                        }
                                     }
                                 }
                             }
+                            if (totalAArrecadar.doubleValue() != 0 || totalArrecadado.doubleValue() != 0 || totalInadimplencia.doubleValue() != 0) {
+                                HashMap<String, String> mapa = new HashMap();
+                                mapa.put("conta", "" + txe.getConta().getCodigo());
+                                mapa.put("historico", txe.getDescricao());
+                                mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
+                                mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
+                                mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
+                                listaTaxas.add(mapa);
+                            }
                         }
-                        if (totalAArrecadar.doubleValue() != 0 || totalArrecadado.doubleValue() != 0 || totalInadimplencia.doubleValue() != 0) {
+
+                        if (listaTaxas.isEmpty()) {
+                            continue CONDOMINIOS;
+                        } else {
+                            HashMap<String, Object> mapa2 = new HashMap();
+                            mapa2.put("condominio", condominio.getRazaoSocial());
+                            mapa2.put("lista", new JRBeanCollectionDataSource(listaTaxas));
+                            lista.add(mapa2);
+                        }
+
+                    }
+                }
+
+                HashMap<String, Object> parametros = new HashMap();
+                parametros.put("periodo", DataUtil.toString(this.getDataIncial()) + " a " + DataUtil.toString(this.getDataFinal()));
+
+                URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+
+                parametros.put("subrelatorio", caminho.toString());
+
+                new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
+
+            } else {
+
+                List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+                HashMap<String, Object> parametros = new HashMap();
+
+                UNIDADES:
+                for (Unidade u : condominio.getUnidades()) {
+
+                    List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
+
+                    parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+                    parametros.put("condominio", condominio.getRazaoSocial());
+
+                    BigDecimal totalOriginal = new BigDecimal(0);
+                    BigDecimal totalJuros = new BigDecimal(0);
+                    BigDecimal totalMulta = new BigDecimal(0);
+                    BigDecimal totalGeral = new BigDecimal(0);
+
+                    for (Cobranca co : u.getCobrancas()) {
+                        if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
                             HashMap<String, String> mapa = new HashMap();
-                            mapa.put("conta", "" + txe.getConta().getCodigo());
-                            mapa.put("historico", txe.getDescricao());
-                            mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
-                            mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
-                            mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
-                            listaTaxas.add(mapa);
+                            totalOriginal = totalOriginal.add(co.getValorOriginal());
+                            totalJuros = totalJuros.add(co.getJuros());
+                            totalMulta = totalMulta.add(co.getMulta());
+                            totalGeral = totalGeral.add(co.getValorTotal());
+                            mapa.put("documento", co.getNumeroDocumento());
+                            mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
+                            mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
+                            mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
+                            mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
+                            mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+                            listaCobrancas.add(mapa);
                         }
                     }
 
-                    if (listaTaxas.isEmpty()) {
-                        continue CONDOMINIOS;
+                    if (listaCobrancas.isEmpty()) {
+                        continue UNIDADES;
                     } else {
                         HashMap<String, Object> mapa2 = new HashMap();
-                        mapa2.put("condominio", condominio.getRazaoSocial());
-                        mapa2.put("lista", new JRBeanCollectionDataSource(listaTaxas));
+                        mapa2.put("unidade", u.getUnidade());
+                        mapa2.put("nome", u.getCondomino().getNome());
+                        mapa2.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
+                        mapa2.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
+                        mapa2.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
+                        mapa2.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+                        mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
                         lista.add(mapa2);
                     }
 
+                    URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+                    parametros.put("subrelatorio", caminho.toString());
+
                 }
+
+                new Relatorios().imprimir("InadimplenciaSintetica", parametros, lista, false);
+
             }
-
-            HashMap<String, Object> parametros = new HashMap();
-            parametros.put("periodo", DataUtil.toString(this.getDataIncial()) + " a " + DataUtil.toString(this.getDataFinal()));
-
-            URL caminho = getClass().getResource("/condominioPlus/relatorios/");
-
-            parametros.put("subrelatorio", caminho.toString());
-
-            new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
         }
     }
 
