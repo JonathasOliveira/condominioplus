@@ -181,9 +181,9 @@
                 <Property name="text" type="java.lang.String" value="Taxa Extra - Gerencial"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioFornecedor">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemInadimplenciaSintetica">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Fornecedores"/>
+                <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia Sint&#xe9;tica"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioFuncionarios">
