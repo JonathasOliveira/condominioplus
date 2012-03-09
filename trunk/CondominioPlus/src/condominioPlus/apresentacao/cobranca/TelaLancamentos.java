@@ -919,9 +919,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             multa.multiplica(cobranca.getValorTotal());
             cobranca.setVencimentoProrrogado(DataUtil.getCalendar(dataProrrogada));
         }
-        cobranca.setJuros(juros.bigDecimalValue());
-        cobranca.setMulta(multa.bigDecimalValue());
-        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())));
+        cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
+        cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
         cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
         if (jTabbedPane1.getSelectedIndex() == 1) {
             System.out.println("Dentro do if em calcularJurosMulta.");
