@@ -11,7 +11,9 @@
 package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
@@ -20,6 +22,7 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,6 +163,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
 
                     for (Cobranca co : u.getCobrancas()) {
                         if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
+                            calcularJurosMulta(co, dataFinal);
                             HashMap<String, String> mapa = new HashMap();
                             totalOriginal = totalOriginal.add(co.getValorOriginal());
                             totalJuros = totalJuros.add(co.getJuros());
@@ -198,6 +202,30 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
 
             }
         }
+    }
+
+    private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
+        Moeda juros = new Moeda();
+        Moeda multa = new Moeda();
+        cobranca.setValorTotal(new BigDecimal(0));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
+        double diferencaMeses = 0;
+        diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
+        if (diferencaMeses > 0) {
+            System.out.println("diferenca meses: " + new Double(diferencaMeses).intValue());
+            juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
+            System.out.println("juros: " + juros);
+            juros.multiplica(cobranca.getValorTotal());
+            multa.soma(NegocioUtil.getConfiguracao().getPercentualMulta().divide(new BigDecimal(100)));
+            multa.multiplica(cobranca.getValorTotal());
+            cobranca.setVencimentoProrrogado(DataUtil.getCalendar(dataProrrogada));
+        }
+        cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
+        cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
+        cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
+
+        new DAO().salvar(cobranca);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
