@@ -63,7 +63,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="18" isBold="true" isItalic="false"/>
 				</textElement>
-				<text><![CDATA[Inadimplência Sintética]]></text>
+				<text><![CDATA[Inadimplência Analítica]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="496" y="108" width="54" height="15"/>
@@ -169,7 +169,7 @@
 					<subreportParameterExpression><![CDATA[$F{totalOriginal}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaSintetica.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
