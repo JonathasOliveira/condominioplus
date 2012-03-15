@@ -12,6 +12,7 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
+import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -206,6 +207,11 @@ public class Relatorios implements Printable {
         Moeda multa = new Moeda();
         cobranca.setValorTotal(new BigDecimal(0));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
+        for (Pagamento pagamento : cobranca.getPagamentos()) {
+            if (pagamento.getConta().getCodigo() == 28103) {
+                cobranca.setValorTotal(cobranca.getValorTotal().subtract(pagamento.getValor()));
+            }
+        }
         double diferencaMeses = 0;
         diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
         if (diferencaMeses > 0) {
