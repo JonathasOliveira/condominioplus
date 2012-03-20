@@ -138,7 +138,7 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirRelatorioInadimplencia(Condominio condominio, DateTime dataInicial, DateTime dataFinal) {
+    public void imprimirRelatorioInadimplencia(Condominio condominio, DateTime dataInicial, DateTime dataFinal, DateTime dataCalculo) {
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> parametros = new HashMap();
 
@@ -149,6 +149,7 @@ public class Relatorios implements Printable {
 
             parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
             parametros.put("condominio", condominio.getRazaoSocial());
+            parametros.put("dataCalculo", DataUtil.toString(dataCalculo));
 
             BigDecimal totalOriginal = new BigDecimal(0);
             BigDecimal totalJuros = new BigDecimal(0);
@@ -165,7 +166,7 @@ public class Relatorios implements Printable {
                 cobrancaAux.setExibir(co.isExibir());
                 cobrancaAux.setNumeroDocumento(co.getNumeroDocumento());
                 if (cobrancaAux.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(cobrancaAux.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(cobrancaAux.getDataVencimento())) == 1 && cobrancaAux.isExibir()) {
-                    calcularJurosMulta(cobrancaAux, dataFinal);
+                    calcularJurosMulta(cobrancaAux, dataCalculo);
                     HashMap<String, String> mapa = new HashMap();
                     totalOriginal = totalOriginal.add(cobrancaAux.getValorOriginal());
                     totalJuros = totalJuros.add(cobrancaAux.getJuros());
