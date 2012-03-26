@@ -1819,6 +1819,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuImprimirCartaSintetica.addActionListener(this);
+            itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuLimparDadosAvulsos.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
@@ -1948,6 +1949,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 pegarConta();
             } else if (origem == itemMenuImprimirCartaSintetica) {
                 imprimirCartaSintetica();
+            } else if (origem == itemMenuImprimirInadimplenciaSintetica) {
+                DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio);
+                dialogo.setVisible(true);
             }
         }
 
@@ -2049,6 +2053,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirCartaSintetica = new javax.swing.JMenuItem();
+        itemMenuImprimirInadimplenciaSintetica = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
         popupMenuAcordo = new javax.swing.JPopupMenu();
@@ -2165,6 +2170,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuImprimirCartaSintetica.setText("Imprimir Carta Sintética");
         popupMenuInadimplentes.add(itemMenuImprimirCartaSintetica);
+
+        itemMenuImprimirInadimplenciaSintetica.setText("Inadimplência Sintética");
+        popupMenuInadimplentes.add(itemMenuImprimirInadimplenciaSintetica);
 
         itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
         popupMenuPagos.add(itemMenuLancarNoCaixa);
@@ -3002,6 +3010,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;
     private javax.swing.JMenuItem itemMenuOcultar;
