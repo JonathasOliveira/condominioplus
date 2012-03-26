@@ -24,6 +24,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -143,7 +145,7 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
 
         UNIDADES:
-        for (Unidade u : condominio.getUnidades()) {
+        for (Unidade u : getUnidades(condominio)) {
 
             List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
 
@@ -155,7 +157,7 @@ public class Relatorios implements Printable {
             BigDecimal totalJuros = new BigDecimal(0);
             BigDecimal totalMulta = new BigDecimal(0);
             BigDecimal totalGeral = new BigDecimal(0);
-            for (Cobranca co : u.getCobrancas()) {
+            for (Cobranca co : getCobrancas(u)) {
                 Cobranca cobrancaAux = new Cobranca();
                 cobrancaAux.setValorOriginal(co.getValorOriginal());
                 cobrancaAux.setJuros(co.getJuros());
@@ -226,5 +228,43 @@ public class Relatorios implements Printable {
         cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
+    }
+    
+    private List<Unidade> getUnidades(Condominio condominio) {
+        List<Unidade> listaUnidades = condominio.getUnidades();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Unidade u1 = (Unidade) o1;
+                Unidade u2 = (Unidade) o2;
+                return u1.getUnidade().compareTo(u2.getUnidade());
+            }
+        };
+
+        Collections.sort(listaUnidades, c);
+
+        return listaUnidades;
+    }
+    
+    private List<Cobranca> getCobrancas(Unidade unidade) {
+        List<Cobranca> listaCobrancas = unidade.getCobrancas();
+       
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(listaCobrancas, c);
+
+        return listaCobrancas;
     }
 }

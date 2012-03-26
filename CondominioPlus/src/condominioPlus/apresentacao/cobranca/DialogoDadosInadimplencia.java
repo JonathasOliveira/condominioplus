@@ -4,52 +4,39 @@
  */
 
 /*
- * TelaDadosRelatorioGerencial.java
+ * DialogoDadosRelatorioGerencial.java
  *
- * Created on 14/02/2012, 11:48:39
+ * Created on 07/10/2010, 14:33:06
  */
 package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.negocio.Condominio;
-import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
-import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
-import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
-import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
-import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
-import logicpoint.util.Moeda;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
 
 /**
  *
- * @author eugenia
+ * @author Administrador
  */
-public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
+public class DialogoDadosInadimplencia extends javax.swing.JDialog {
 
     private DateTime dataInicial;
     private DateTime dataFinal;
     private DateTime dataCalculoJurosMulta;
     private Condominio condominio;
 
-    /** Creates new form TelaDadosRelatorioGerencial */
-    public TelaDadosRelatorioGerencial(Condominio condominio) {
+    /** Creates new form DialogoDadosRelatorioGerencial */
+    public DialogoDadosInadimplencia(java.awt.Frame parent, boolean modal, Condominio condominio) {
+        super(parent, modal);
         initComponents();
         new ControladorEventos();
-        esconderDataCalculo();
+        this.setLocationRelativeTo(null);
         this.condominio = condominio;
-        if (condominio != null) {
-            txtDataInicial.setValue(DataUtil.getDate(new DateTime(1970, 1, 1, 0, 0, 0, 0)));
-            txtDataInicial.setEnabled(false);
-            mostrarDataCalculo();
-        }
+        txtDataInicial.setEnabled(false);
+        txtDataInicial.setValue(DataUtil.getDate(new DateTime(1970, 1, 1, 0, 0, 0, 0)));
     }
 
     public DateTime getDataIncial() {
@@ -60,105 +47,27 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
         return dataFinal;
     }
 
+    public DateTime getDataCalculoJurosMulta() {
+        return dataCalculoJurosMulta;
+    }
+
     private void salvarDados() {
         dataInicial = DataUtil.getDateTime(txtDataInicial.getValue());
         dataFinal = DataUtil.getDateTime(txtDataFinal.getValue());
-        dataCalculoJurosMulta = DataUtil.getDateTime(txtDataCaluloJurosMulta.getValue());
+        dataCalculoJurosMulta = DataUtil.getDateTime(txtDataCaluloJurosMulta);
         imprimir();
-    }
 
-    private void sair() {
-        dispose();
+//        sair();
     }
 
     private void imprimir() {
         if (this.getDataIncial() != null && this.getDataFinal() != null) {
-
-            if (condominio == null) {
-                List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
-
-                List<Condominio> listaCondominios = new DAO().listar(Condominio.class);
-
-                CONDOMINIOS:
-                for (Condominio condominio : listaCondominios) {
-
-                    List<HashMap<String, String>> listaTaxas = new ArrayList<HashMap<String, String>>();
-
-                    if (condominio.getTaxas().isEmpty()) {
-                        continue CONDOMINIOS;
-                    } else {
-                        for (TaxaExtra txe : condominio.getTaxas()) {
-                            Moeda totalAArrecadar = new Moeda();
-                            Moeda totalArrecadado = new Moeda();
-                            Moeda totalInadimplencia = new Moeda();
-                            for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
-                                if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), this.getDataFinal()) == -1) {
-                                    totalAArrecadar.soma(parcela.getValor());
-                                    Moeda valorArrecadado = new Moeda();
-                                    Moeda valorInadimplencia = new Moeda();
-                                    for (RateioTaxaExtra rateio : parcela.getRateios()) {
-                                        if (rateio.getCobranca() != null && rateio.getCobranca().getDataPagamento() != null) {
-                                            valorArrecadado.soma(rateio.getCobranca().getValorPago());
-                                            totalArrecadado.soma(rateio.getCobranca().getValorPago());
-                                        } else {
-                                            valorInadimplencia.soma(rateio.getValorACobrar());
-                                            totalInadimplencia.soma(rateio.getValorACobrar());
-                                        }
-                                    }
-                                }
-                            }
-                            if (totalAArrecadar.doubleValue() != 0 || totalArrecadado.doubleValue() != 0 || totalInadimplencia.doubleValue() != 0) {
-                                HashMap<String, String> mapa = new HashMap();
-                                mapa.put("conta", "" + txe.getConta().getCodigo());
-                                mapa.put("historico", txe.getDescricao());
-                                mapa.put("totalAArrecadar", PagamentoUtil.formatarMoeda(totalAArrecadar.doubleValue()));
-                                mapa.put("totalArrecadado", PagamentoUtil.formatarMoeda(totalArrecadado.doubleValue()));
-                                mapa.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
-                                listaTaxas.add(mapa);
-                            }
-                        }
-
-                        if (listaTaxas.isEmpty()) {
-                            continue CONDOMINIOS;
-                        } else {
-                            HashMap<String, Object> mapa2 = new HashMap();
-                            mapa2.put("condominio", condominio.getRazaoSocial());
-                            mapa2.put("lista", new JRBeanCollectionDataSource(listaTaxas));
-                            lista.add(mapa2);
-                        }
-
-                    }
-                }
-
-                HashMap<String, Object> parametros = new HashMap();
-                parametros.put("periodo", DataUtil.toString(this.getDataIncial()) + " a " + DataUtil.toString(this.getDataFinal()));
-
-                URL caminho = getClass().getResource("/condominioPlus/relatorios/");
-
-                parametros.put("subrelatorio", caminho.toString());
-
-                new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
-
-            } else {
-
-                new Relatorios().imprimirRelatorioInadimplencia(condominio, dataInicial, dataFinal, dataCalculoJurosMulta);
-
-            }
+            new Relatorios().imprimirRelatorioInadimplencia(condominio, dataInicial, dataFinal, dataCalculoJurosMulta);
         }
     }
 
-    private void mostrarDataCalculo() {
-        this.setSize(352, 203);
-        this.setTitle("Inadimplência Sintética");
-        painelDados.setSize(316, 148);
-        painelCalculoJurosMulta.setVisible(true);
-    }
-
-    private void esconderDataCalculo() {
-        this.setSize(352, 170);
-        this.setTitle("Taxa Extra - Gerencial");
-        painelDados.setSize(316, 119);
-        painelCalculoJurosMulta.setVisible(false);
+    private void sair() {
+        dispose();
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -190,6 +99,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         painelDados = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
@@ -202,7 +112,9 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         txtDataCaluloJurosMulta = new net.sf.nachocalendar.components.DateField();
 
-        setClosable(true);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Inadimplência Sintética");
+        setAlwaysOnTop(true);
 
         painelDados.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -307,7 +219,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(painelDados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -315,6 +227,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOk;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
