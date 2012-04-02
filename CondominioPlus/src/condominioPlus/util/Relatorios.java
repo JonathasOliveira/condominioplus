@@ -144,10 +144,12 @@ public class Relatorios implements Printable {
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> parametros = new HashMap();
 
-        UNIDADES:
-        for (Unidade u : getUnidades(condominio)) {
+        List<Unidade> listaUnidades = getUnidades(condominio);
 
-            List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
+        UNIDADES:
+        for (Unidade u : listaUnidades) {
+
+            List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
 
             parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
             parametros.put("condominio", condominio.getRazaoSocial());
@@ -157,7 +159,11 @@ public class Relatorios implements Printable {
             BigDecimal totalJuros = new BigDecimal(0);
             BigDecimal totalMulta = new BigDecimal(0);
             BigDecimal totalGeral = new BigDecimal(0);
-            for (Cobranca co : getCobrancas(u)) {
+
+            List<Cobranca> cobrancas = new ArrayList<Cobranca>();
+            cobrancas = getCobrancas(u);
+
+            for (Cobranca co : cobrancas) {
                 Cobranca cobrancaAux = new Cobranca();
                 cobrancaAux.setValorOriginal(co.getValorOriginal());
                 cobrancaAux.setJuros(co.getJuros());
@@ -167,9 +173,10 @@ public class Relatorios implements Printable {
                 cobrancaAux.setDataPagamento(co.getDataPagamento());
                 cobrancaAux.setExibir(co.isExibir());
                 cobrancaAux.setNumeroDocumento(co.getNumeroDocumento());
+                cobrancaAux.setPagamentos(co.getPagamentos());
                 if (cobrancaAux.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(cobrancaAux.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(cobrancaAux.getDataVencimento())) == 1 && cobrancaAux.isExibir()) {
                     calcularJurosMulta(cobrancaAux, dataCalculo);
-                    HashMap<String, String> mapa = new HashMap();
+                    HashMap<String, Object> mapa = new HashMap();
                     totalOriginal = totalOriginal.add(cobrancaAux.getValorOriginal());
                     totalJuros = totalJuros.add(cobrancaAux.getJuros());
                     totalMulta = totalMulta.add(cobrancaAux.getMulta());
@@ -180,6 +187,21 @@ public class Relatorios implements Printable {
                     mapa.put("juros", PagamentoUtil.formatarMoeda(cobrancaAux.getJuros().doubleValue()));
                     mapa.put("multa", PagamentoUtil.formatarMoeda(cobrancaAux.getMulta().doubleValue()));
                     mapa.put("total", PagamentoUtil.formatarMoeda(cobrancaAux.getValorTotal().doubleValue()));
+
+                    List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+
+//                    if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
+                    for (Pagamento pagamento : cobrancaAux.getPagamentos()) {
+                        HashMap<String, String> mapa2 = new HashMap();
+                        mapa2.put("descricao", pagamento.getHistorico());
+                        mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                        listaPagamentos.add(mapa2);
+                    }
+//                    }                    
+
+                    mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+
+
                     listaCobrancas.add(mapa);
                 }
             }
@@ -199,10 +221,11 @@ public class Relatorios implements Printable {
 
             URL caminho = getClass().getResource("/condominioPlus/relatorios/");
             parametros.put("subrelatorio", caminho.toString());
+            parametros.put("subrelatorio2", caminho.toString());
 
         }
 
-        imprimir("InadimplenciaSintetica", parametros, lista, false);
+        imprimir("InadimplenciaAnalitica", parametros, lista, false);
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
@@ -229,7 +252,7 @@ public class Relatorios implements Printable {
         cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
     }
-    
+
     private List<Unidade> getUnidades(Condominio condominio) {
         List<Unidade> listaUnidades = condominio.getUnidades();
 
@@ -248,10 +271,10 @@ public class Relatorios implements Printable {
 
         return listaUnidades;
     }
-    
+
     private List<Cobranca> getCobrancas(Unidade unidade) {
         List<Cobranca> listaCobrancas = unidade.getCobrancas();
-       
+
         Comparator c = null;
 
         c = new Comparator() {

@@ -4,17 +4,14 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
-	<parameter name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-	<parameter name="dataEmissao" class="java.lang.String"/>
-	<parameter name="logoEmpresa" class="java.lang.String"/>
-	<parameter name="periodo" class="java.lang.String"/>
-	<parameter name="subrelatorio" class="java.lang.String"/>
+	<parameter name="subrelatorio2" class="java.lang.String"/>
 	<field name="valorOriginal" class="java.lang.String"/>
 	<field name="total" class="java.lang.String"/>
 	<field name="vencimento" class="java.lang.String"/>
 	<field name="multa" class="java.lang.String"/>
 	<field name="juros" class="java.lang.String"/>
 	<field name="documento" class="java.lang.String"/>
+	<field name="listaPagamentos" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -111,17 +108,12 @@
 			</textField>
 			<subreport>
 				<reportElement x="150" y="2" width="251" height="59"/>
-				<subreportParameter name="totalOriginal">
-					<subreportParameterExpression><![CDATA[]]></subreportParameterExpression>
+				<subreportParameter name="subrelatorio2">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
 				</subreportParameter>
+				<dataSourceExpression><![CDATA[$F{listaPagamentos}]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio2} + "SubRelatorioInadimplenciaAnalitica2.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
-	<summary>
-		<band height="2">
-			<line>
-				<reportElement positionType="Float" x="0" y="1" width="554" height="1"/>
-			</line>
-		</band>
-	</summary>
 </jasperReport>

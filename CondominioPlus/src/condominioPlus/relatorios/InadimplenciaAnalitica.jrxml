@@ -10,6 +10,7 @@
 	<parameter name="periodo" class="java.lang.String"/>
 	<parameter name="subrelatorio" class="java.lang.String"/>
 	<parameter name="dataCalculo" class="java.lang.String"/>
+	<parameter name="subrelatorio2" class="java.lang.String"/>
 	<field name="nome" class="java.lang.String"/>
 	<field name="unidade" class="java.lang.String"/>
 	<field name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -17,6 +18,7 @@
 	<field name="totalJuros" class="java.lang.String"/>
 	<field name="totalMulta" class="java.lang.String"/>
 	<field name="totalGeral" class="java.lang.String"/>
+	<field name="listaPagamentos" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -118,52 +120,58 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataCalculo}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 		</band>
 	</title>
 	<detail>
-		<band height="76" splitType="Stretch">
+		<band height="71" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="8" width="554" height="16" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="3" width="554" height="16" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="9" width="42" height="16"/>
+				<reportElement x="6" y="4" width="42" height="16"/>
 				<textElement>
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="96" y="9" width="60" height="16"/>
+				<reportElement x="96" y="4" width="60" height="16"/>
 				<textElement>
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<text><![CDATA[Proprietário]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="48" y="9" width="34" height="16"/>
+				<reportElement x="48" y="4" width="34" height="16"/>
 				<textElement textAlignment="Left">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="156" y="9" width="394" height="16"/>
+				<reportElement x="156" y="4" width="394" height="16"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="476" y="56" width="60" height="16" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="476" y="51" width="60" height="16" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalGeral}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 			<subreport>
-				<reportElement x="0" y="24" width="554" height="31"/>
-				<subreportParameter name="totalOriginal">
-					<subreportParameterExpression><![CDATA[$F{totalOriginal}]]></subreportParameterExpression>
+				<reportElement x="0" y="19" width="554" height="31"/>
+				<subreportParameter name="subrelatorio2">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>
