@@ -25,7 +25,7 @@
 	<title>
 		<band height="126" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="3" width="385" height="105"/>
+				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
