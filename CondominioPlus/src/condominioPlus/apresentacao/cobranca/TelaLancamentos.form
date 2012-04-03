@@ -48,6 +48,11 @@
             <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia Sint&#xe9;tica"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirInadimplenciaAnalitica">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia Anal&#xed;tica"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuPagos">

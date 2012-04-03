@@ -67,6 +67,7 @@ public class Pagamento implements Serializable {
     @Column(precision = 20, scale = 2)
     private BigDecimal valor = new BigDecimal(0);
     private String historico;
+    private String descricao;
     @ManyToOne
     private Fornecedor fornecedor;
     @ManyToOne
@@ -160,6 +161,14 @@ public class Pagamento implements Serializable {
 
     public void setHistorico(String historico) {
         this.historico = historico;
+    }
+    
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public BigDecimal getValor() {
