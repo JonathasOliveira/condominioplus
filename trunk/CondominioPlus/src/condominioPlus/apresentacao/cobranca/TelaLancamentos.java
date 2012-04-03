@@ -33,6 +33,7 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.util.Relatorios;
@@ -721,6 +722,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     texto = item.getDescricao();
                 }
             }
+            pagamento.setDescricao(texto);
             pagamento.setHistorico(texto + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
             if (u.getValorPrincipal().doubleValue() != 0) {
                 pagamento.setValor(u.getValorPrincipal());
@@ -791,6 +793,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 pagamento.setCobranca(cobranca);
                 Conta c = new DAO().localizar(Conta.class, item.getCodigoConta());
                 pagamento.setConta(c);
+                pagamento.setDescricao(item.getDescricao());
                 pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
                 if (u.getValorPrincipal().doubleValue() != 0) {
                     pagamento.setValor(u.getValorPrincipal());
@@ -1820,6 +1823,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuImprimirCartaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
+            itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuLimparDadosAvulsos.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
@@ -1846,7 +1850,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         public void actionPerformed(ActionEvent e) {
             origem = e.getSource();
             if (origem == btnGerarCobranca || origem == btnGerarCobrancaAvulsa) {
-                if (modeloTabelaCondominos.getObjetosSelecionados().size() == 0) {
+                if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
                     gerarCobrancas(condominio.getUnidades());
                 } else {
                     gerarCobrancas(modeloTabelaCondominos.getObjetosSelecionados());
@@ -1950,8 +1954,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuImprimirCartaSintetica) {
                 imprimirCartaSintetica();
             } else if (origem == itemMenuImprimirInadimplenciaSintetica) {
-                DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio);
+                DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, TipoRelatorio.INADIMPLENCIA_SINTETICA, null);
                 dialogo.setVisible(true);
+            } else if (origem == itemMenuImprimirInadimplenciaAnalitica) {
+                if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+                    DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, TipoRelatorio.INADIMPLENCIA_ANALITICA, modeloTabelaCondominos.getObjetosSelecionados());
+                    dialogo.setVisible(true);
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia(("Selecione as unidades que deseja para a impressão do relatório."), TelaLancamentos.this);
+                }
             }
         }
 
@@ -2054,6 +2065,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirCartaSintetica = new javax.swing.JMenuItem();
         itemMenuImprimirInadimplenciaSintetica = new javax.swing.JMenuItem();
+        itemMenuImprimirInadimplenciaAnalitica = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
         popupMenuAcordo = new javax.swing.JPopupMenu();
@@ -2173,6 +2185,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuImprimirInadimplenciaSintetica.setText("Inadimplência Sintética");
         popupMenuInadimplentes.add(itemMenuImprimirInadimplenciaSintetica);
+
+        itemMenuImprimirInadimplenciaAnalitica.setText("Inadimplência Analítica");
+        popupMenuInadimplentes.add(itemMenuImprimirInadimplenciaAnalitica);
 
         itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
         popupMenuPagos.add(itemMenuLancarNoCaixa);
@@ -3010,6 +3025,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;

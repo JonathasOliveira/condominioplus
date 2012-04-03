@@ -14,6 +14,7 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.relatorios.TipoRelatorio;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -140,20 +141,21 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirRelatorioInadimplencia(Condominio condominio, DateTime dataInicial, DateTime dataFinal, DateTime dataCalculo) {
+    public void imprimirRelatorioInadimplencia(Condominio condominio, List<Unidade> unidades, DateTime dataInicial, DateTime dataFinal, DateTime dataCalculo, TipoRelatorio tipo) {
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
         HashMap<String, Object> parametros = new HashMap();
+        List<Unidade> listaUnidades = new ArrayList<Unidade>();
 
-        List<Unidade> listaUnidades = getUnidades(condominio);
+        if (unidades == null) {
+            listaUnidades = ordenarUnidades(condominio.getUnidades());
+        } else {
+            listaUnidades = ordenarUnidades(unidades);
+        }
 
         UNIDADES:
         for (Unidade u : listaUnidades) {
 
             List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
-
-            parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
-            parametros.put("condominio", condominio.getRazaoSocial());
-            parametros.put("dataCalculo", DataUtil.toString(dataCalculo));
 
             BigDecimal totalOriginal = new BigDecimal(0);
             BigDecimal totalJuros = new BigDecimal(0);
@@ -190,14 +192,14 @@ public class Relatorios implements Printable {
 
                     List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
 
-//                    if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
-                    for (Pagamento pagamento : cobrancaAux.getPagamentos()) {
-                        HashMap<String, String> mapa2 = new HashMap();
-                        mapa2.put("descricao", pagamento.getHistorico());
-                        mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                        listaPagamentos.add(mapa2);
+                    if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
+                        for (Pagamento pagamento : cobrancaAux.getPagamentos()) {
+                            HashMap<String, String> mapa2 = new HashMap();
+                            mapa2.put("descricao", pagamento.getDescricao());
+                            mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                            listaPagamentos.add(mapa2);
+                        }
                     }
-//                    }                    
 
                     mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
 
@@ -219,13 +221,23 @@ public class Relatorios implements Printable {
                 lista.add(mapa2);
             }
 
-            URL caminho = getClass().getResource("/condominioPlus/relatorios/");
-            parametros.put("subrelatorio", caminho.toString());
-            parametros.put("subrelatorio2", caminho.toString());
-
         }
 
-        imprimir("InadimplenciaAnalitica", parametros, lista, false);
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("dataCalculo", DataUtil.toString(dataCalculo));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
+            parametros.put("subrelatorio2", caminho.toString());
+            imprimir("InadimplenciaAnalitica", parametros, lista, false);
+        } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA){
+            imprimir("InadimplenciaSintetica", parametros, lista, false);
+        }
+
+
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
@@ -253,8 +265,8 @@ public class Relatorios implements Printable {
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
     }
 
-    private List<Unidade> getUnidades(Condominio condominio) {
-        List<Unidade> listaUnidades = condominio.getUnidades();
+    private List<Unidade> ordenarUnidades(List<Unidade> lista) {
+        List<Unidade> listaUnidades = lista;
 
         Comparator c = null;
 

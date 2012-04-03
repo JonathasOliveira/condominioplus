@@ -11,8 +11,12 @@
 package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.Unidade;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.util.DataUtil;
 import org.joda.time.DateTime;
@@ -27,14 +31,18 @@ public class DialogoDadosInadimplencia extends javax.swing.JDialog {
     private DateTime dataFinal;
     private DateTime dataCalculoJurosMulta;
     private Condominio condominio;
+    private TipoRelatorio tipo;
+    private List<Unidade> unidades;
 
     /** Creates new form DialogoDadosRelatorioGerencial */
-    public DialogoDadosInadimplencia(java.awt.Frame parent, boolean modal, Condominio condominio) {
+    public DialogoDadosInadimplencia(java.awt.Frame parent, boolean modal, Condominio condominio, TipoRelatorio tipo, List<Unidade> unidades) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
         this.condominio = condominio;
+        this.tipo = tipo;
+        this.unidades = unidades;
         txtDataInicial.setEnabled(false);
         txtDataInicial.setValue(DataUtil.getDate(new DateTime(1970, 1, 1, 0, 0, 0, 0)));
     }
@@ -62,7 +70,7 @@ public class DialogoDadosInadimplencia extends javax.swing.JDialog {
 
     private void imprimir() {
         if (this.getDataIncial() != null && this.getDataFinal() != null) {
-            new Relatorios().imprimirRelatorioInadimplencia(condominio, dataInicial, dataFinal, dataCalculoJurosMulta);
+            new Relatorios().imprimirRelatorioInadimplencia(condominio, unidades, dataInicial, dataFinal, dataCalculoJurosMulta, tipo);
         }
     }
 

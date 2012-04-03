@@ -15,6 +15,7 @@ import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
 import java.net.URL;
@@ -141,7 +142,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
 
             } else {
 
-                new Relatorios().imprimirRelatorioInadimplencia(condominio, dataInicial, dataFinal, dataCalculoJurosMulta);
+                new Relatorios().imprimirRelatorioInadimplencia(condominio, null, dataInicial, dataFinal, dataCalculoJurosMulta, TipoRelatorio.INADIMPLENCIA_SINTETICA);
 
             }
         }
