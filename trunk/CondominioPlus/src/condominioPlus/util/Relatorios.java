@@ -90,7 +90,6 @@ public class Relatorios implements Printable {
 
     public JasperReport obterRelatorio(String nome) {
         URL url = getClass().getResource("/condominioPlus/relatorios/" + nome + ".jasper");
-//        System.out.println("URL: " + url.toString());
         JasperReport relatorio = null;
         try {
             relatorio = (JasperReport) JRLoader.loadObject(url);
