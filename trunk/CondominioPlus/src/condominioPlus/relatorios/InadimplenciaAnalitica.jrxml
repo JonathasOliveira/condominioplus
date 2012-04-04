@@ -159,9 +159,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="476" y="51" width="60" height="16" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="466" y="51" width="70" height="16" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true" isItalic="false"/>
+					<font size="10" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalGeral}]]></textFieldExpression>
 			</textField>
@@ -176,6 +176,11 @@
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>
 			</subreport>
+			<textField>
+				<reportElement positionType="Float" x="6" y="51" width="279" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["TOTAL GERAL DA UNIDADE " + $F{unidade}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

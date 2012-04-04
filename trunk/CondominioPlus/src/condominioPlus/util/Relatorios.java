@@ -194,7 +194,7 @@ public class Relatorios implements Printable {
                     if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
                         for (Pagamento pagamento : cobrancaAux.getPagamentos()) {
                             HashMap<String, String> mapa2 = new HashMap();
-                            mapa2.put("descricao", pagamento.getDescricao());
+                            mapa2.put("descricao", pagamento.getDescricao().equals(" ") ? pagamento.getHistorico() : pagamento.getDescricao());
                             mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                             listaPagamentos.add(mapa2);
                         }
