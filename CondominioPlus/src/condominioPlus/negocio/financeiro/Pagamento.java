@@ -115,8 +115,6 @@ public class Pagamento implements Serializable {
         this.contaCorrente = contaCorrente;
     }
 
-    
-    
     public BigDecimal getSaldo() {
         return saldo;
     }
