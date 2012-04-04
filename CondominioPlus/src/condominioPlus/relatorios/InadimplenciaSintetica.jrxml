@@ -23,7 +23,7 @@
 	<title>
 		<band height="126" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="3" width="385" height="105"/>
+				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
@@ -118,6 +118,9 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataCalculo}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 		</band>
 	</title>
 	<detail>
