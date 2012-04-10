@@ -145,6 +145,11 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
         List<Unidade> listaUnidades = new ArrayList<Unidade>();
 
+        BigDecimal somaValorOriginal = new BigDecimal(0);
+        BigDecimal somaJuros = new BigDecimal(0);
+        BigDecimal somaMulta = new BigDecimal(0);
+        BigDecimal somaTotalGeral = new BigDecimal(0);
+
         if (unidades == null) {
             listaUnidades = ordenarUnidades(condominio.getUnidades());
         } else {
@@ -182,6 +187,12 @@ public class Relatorios implements Printable {
                     totalJuros = totalJuros.add(cobrancaAux.getJuros());
                     totalMulta = totalMulta.add(cobrancaAux.getMulta());
                     totalGeral = totalGeral.add(cobrancaAux.getValorTotal());
+                    
+                    somaValorOriginal = somaValorOriginal.add(cobrancaAux.getValorOriginal());
+                    somaJuros = somaJuros.add(cobrancaAux.getJuros());
+                    somaMulta = somaMulta.add(cobrancaAux.getMulta());
+                    somaTotalGeral = somaTotalGeral.add(cobrancaAux.getValorTotal());
+                    
                     mapa.put("documento", cobrancaAux.getNumeroDocumento());
                     mapa.put("vencimento", DataUtil.toString(cobrancaAux.getDataVencimento()));
                     mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(cobrancaAux.getValorOriginal().doubleValue()));
@@ -202,7 +213,6 @@ public class Relatorios implements Printable {
 
                     mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
 
-
                     listaCobrancas.add(mapa);
                 }
             }
@@ -219,12 +229,15 @@ public class Relatorios implements Printable {
                 mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
                 lista.add(mapa2);
             }
-
         }
 
         parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
         parametros.put("condominio", condominio.getRazaoSocial());
         parametros.put("dataCalculo", DataUtil.toString(dataCalculo));
+        parametros.put("somaValorOriginal", PagamentoUtil.formatarMoeda(somaValorOriginal.doubleValue()));
+        parametros.put("somaJuros", PagamentoUtil.formatarMoeda(somaJuros.doubleValue()));
+        parametros.put("somaMulta", PagamentoUtil.formatarMoeda(somaMulta.doubleValue()));
+        parametros.put("somaTotalGeral", PagamentoUtil.formatarMoeda(somaTotalGeral.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
         parametros.put("subrelatorio", caminho.toString());
@@ -232,11 +245,9 @@ public class Relatorios implements Printable {
         if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
             parametros.put("subrelatorio2", caminho.toString());
             imprimir("InadimplenciaAnalitica", parametros, lista, false);
-        } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA){
+        } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA) {
             imprimir("InadimplenciaSintetica", parametros, lista, false);
         }
-
-
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
