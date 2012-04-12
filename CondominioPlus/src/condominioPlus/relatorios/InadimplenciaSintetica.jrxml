@@ -251,7 +251,7 @@
 				<reportElement x="458" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="368" y="8" width="52" height="17"/>
+				<reportElement x="368" y="9" width="52" height="17"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
