@@ -257,6 +257,7 @@ public class Relatorios implements Printable {
         cobranca.setValorTotal(new BigDecimal(0));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
         for (Pagamento pagamento : cobranca.getPagamentos()) {
+            //codigo da conta tarifa bancaria
             if (pagamento.getConta().getCodigo() == 28103) {
                 diferenca.soma(pagamento.getValor());
                 cobranca.setValorTotal(cobranca.getValorTotal().subtract(pagamento.getValor()));
