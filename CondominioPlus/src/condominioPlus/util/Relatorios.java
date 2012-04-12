@@ -251,12 +251,14 @@ public class Relatorios implements Printable {
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
+        Moeda diferenca = new Moeda();
         Moeda juros = new Moeda();
         Moeda multa = new Moeda();
         cobranca.setValorTotal(new BigDecimal(0));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
         for (Pagamento pagamento : cobranca.getPagamentos()) {
             if (pagamento.getConta().getCodigo() == 28103) {
+                diferenca.soma(pagamento.getValor());
                 cobranca.setValorTotal(cobranca.getValorTotal().subtract(pagamento.getValor()));
             }
         }
@@ -272,7 +274,7 @@ public class Relatorios implements Printable {
         }
         cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
-        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta().add(diferenca.bigDecimalValue()))).setScale(2, RoundingMode.UP));
     }
 
     private List<Unidade> ordenarUnidades(List<Unidade> lista) {
