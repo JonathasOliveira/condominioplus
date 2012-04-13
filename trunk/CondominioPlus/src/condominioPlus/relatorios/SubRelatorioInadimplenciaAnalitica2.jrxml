@@ -10,7 +10,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="18" splitType="Stretch">
+		<band height="16" splitType="Stretch">
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="196" y="0" width="55" height="16" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
