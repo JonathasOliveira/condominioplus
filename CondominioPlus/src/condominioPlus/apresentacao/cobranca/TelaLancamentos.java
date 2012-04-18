@@ -907,16 +907,27 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
+        Moeda diferenca = new Moeda();
         Moeda juros = new Moeda();
         Moeda multa = new Moeda();
         cobranca.setValorTotal(new BigDecimal(0));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
+        for (Pagamento pagamento : cobranca.getPagamentos()) {
+            //codigo da conta tarifa bancaria
+            if (pagamento.getConta().getCodigo() == 28103) {
+                diferenca.soma(pagamento.getValor());
+                cobranca.setValorTotal(cobranca.getValorTotal().subtract(pagamento.getValor()));
+            }
+        }
         double diferencaMeses = 0;
         diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
         if (diferencaMeses > 0) {
-            System.out.println("diferenca dias: " + new Double(diferencaMeses).intValue());
+//            System.out.println("diferenca meses: " + new Double(diferencaMeses).intValue());
+            if (diferencaMeses >= 0 && diferencaMeses <= 1){
+                diferencaMeses = 1;
+            }
             juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
-            System.out.println("juros: " + juros);
+//            System.out.println("juros: " + juros);
             juros.multiplica(cobranca.getValorTotal());
             multa.soma(NegocioUtil.getConfiguracao().getPercentualMulta().divide(new BigDecimal(100)));
             multa.multiplica(cobranca.getValorTotal());
@@ -924,7 +935,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
         cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
-        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta())).setScale(2, RoundingMode.UP));
+        cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta().add(diferenca.bigDecimalValue()))).setScale(2, RoundingMode.UP));
         cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
         if (jTabbedPane1.getSelectedIndex() == 1) {
             System.out.println("Dentro do if em calcularJurosMulta.");

@@ -267,6 +267,9 @@ public class Relatorios implements Printable {
         diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
         if (diferencaMeses > 0) {
 //            System.out.println("diferenca meses: " + new Double(diferencaMeses).intValue());
+            if (diferencaMeses >= 0 && diferencaMeses <= 1){
+                diferencaMeses = 1;
+            }
             juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
 //            System.out.println("juros: " + juros);
             juros.multiplica(cobranca.getValorTotal());
