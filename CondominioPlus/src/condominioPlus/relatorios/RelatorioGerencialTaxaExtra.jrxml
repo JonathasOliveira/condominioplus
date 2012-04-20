@@ -16,9 +16,9 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="126" splitType="Stretch">
+		<band height="132" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="3" width="410" height="110"/>
+				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
@@ -79,35 +79,44 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 		</band>
 	</title>
 	<detail>
-		<band height="76" splitType="Stretch">
+		<band height="66" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="6" width="555" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="-1" width="555" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="8" width="76" height="15"/>
+				<reportElement x="6" y="1" width="76" height="15"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Entidade]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="6" y="18" width="544" height="15"/>
+				<reportElement x="6" y="11" width="544" height="15"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="0" y="36" width="555" height="31"/>
+				<reportElement x="0" y="29" width="555" height="31"/>
 				<subreportParameter name="totalOriginal">
 					<subreportParameterExpression><![CDATA[$P{totalOriginal}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioGerencialTaxaExtra.jasper"]]></subreportExpression>
 			</subreport>
+			<rectangle>
+				<reportElement positionType="Float" x="0" y="60" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 		</band>
 	</detail>
 </jasperReport>
