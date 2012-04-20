@@ -32,7 +32,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="126" splitType="Stretch">
+		<band height="132" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="96" width="445" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -88,9 +88,15 @@
 				<text><![CDATA[Folha]]></text>
 			</staticText>
 			<image>
-				<reportElement x="0" y="0" width="413" height="93"/>
+				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 		</band>
 	</title>
 	<pageHeader>
