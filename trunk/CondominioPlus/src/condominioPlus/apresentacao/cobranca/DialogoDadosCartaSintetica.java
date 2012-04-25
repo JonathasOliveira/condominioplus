@@ -54,7 +54,6 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
-
         @Override
         public void configurar() {
             btnOk.addActionListener(this);
@@ -94,7 +93,7 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Relatório Gerencial");
+        setTitle("Carta Sintética");
         setAlwaysOnTop(true);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
