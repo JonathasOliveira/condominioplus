@@ -7,7 +7,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
-    <Property name="title" type="java.lang.String" value="Relat&#xf3;rio Gerencial"/>
+    <Property name="title" type="java.lang.String" value="Carta Sint&#xe9;tica"/>
     <Property name="alwaysOnTop" type="boolean" value="true"/>
   </Properties>
   <SyntheticProperties>
