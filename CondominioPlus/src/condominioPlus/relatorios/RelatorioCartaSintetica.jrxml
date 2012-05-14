@@ -63,7 +63,7 @@
 				<text><![CDATA[Emissão]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="430" y="6" width="120" height="51"/>
+				<reportElement x="430" y="6" width="120" height="57"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="18" isBold="true" isItalic="false"/>
 				</textElement>
