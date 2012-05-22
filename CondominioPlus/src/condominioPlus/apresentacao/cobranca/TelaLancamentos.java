@@ -923,7 +923,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
         if (diferencaMeses > 0) {
 //            System.out.println("diferenca meses: " + new Double(diferencaMeses).intValue());
-            if (diferencaMeses >= 0 && diferencaMeses <= 1){
+            if (diferencaMeses >= 0 && diferencaMeses <= 1) {
                 diferencaMeses = 1;
             }
             juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
@@ -1755,6 +1755,29 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
+    public void imprimirEnvelope() {
+        if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
+        } else {
+            List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+
+            HashMap<String, Object> parametros = new HashMap();
+            parametros.put("condominio", condominio.getRazaoSocial());
+
+            for (Unidade unidade : modeloTabelaCondominos.getObjetosSelecionados()) {
+                HashMap<String, String> mapa = new HashMap();
+                mapa.put("nome", unidade.getCondomino().getNome());
+                mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
+                listaCondominos.add(mapa);
+            }
+
+            if (!listaCondominos.isEmpty()) {
+                new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false);
+            }
+        }
+
+    }
+
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
@@ -1833,6 +1856,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuImprimirCartaSintetica.addActionListener(this);
+            itemMenuImprimirEnvelopeP.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -1974,6 +1998,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia(("Selecione as unidades que deseja para a impressão do relatório."), TelaLancamentos.this);
                 }
+            } else if (origem == itemMenuImprimirEnvelopeP) {
+                imprimirEnvelope();
             }
         }
 
@@ -1984,6 +2010,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     carregarTabelaInadimplentes();
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
+                }
+                if (e.isPopupTrigger()) {
+                    popupMenuCondominos.show(e.getComponent(), e.getX(), e.getY());
                 }
             } else if (e.isPopupTrigger()) {
                 if (e.getSource() == tabelaCobrancas) {
@@ -2086,6 +2115,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuRemoverAcordo = new javax.swing.JMenuItem();
         popupMenuCobrancaBase = new javax.swing.JPopupMenu();
         itemMenuOcultar = new javax.swing.JMenuItem();
+        popupMenuCondominos = new javax.swing.JPopupMenu();
+        itemMenuImprimirEnvelopeP = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2216,6 +2247,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuOcultar.setText("Mudar Altura da Lista");
         popupMenuCobrancaBase.add(itemMenuOcultar);
 
+        itemMenuImprimirEnvelopeP.setText("Imprimir Envelope Pequeno");
+        popupMenuCondominos.add(itemMenuImprimirEnvelopeP);
+
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
 
@@ -2232,7 +2266,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCondominos.setBorder(javax.swing.BorderFactory.createTitledBorder("Condôminos"));
 
-        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -3036,6 +3070,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirEnvelopeP;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
@@ -3097,6 +3132,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JPopupMenu popupMenuAcordo;
     private javax.swing.JPopupMenu popupMenuCobrancaBase;
+    private javax.swing.JPopupMenu popupMenuCondominos;
     private javax.swing.JPopupMenu popupMenuDadosAvulsos;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
     private javax.swing.JPopupMenu popupMenuPagos;
