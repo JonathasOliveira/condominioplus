@@ -1695,7 +1695,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         parametros.put("totalGerado", PagamentoUtil.formatarMoeda(totalGerado.doubleValue()));
 
-        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false);
+        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false, true);
     }
 
     private void imprimirCartaSintetica() {
@@ -1751,7 +1751,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
 
         if (!listaCobrancas.isEmpty()) {
-            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false);
+            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false, true);
         }
     }
 
@@ -1759,23 +1759,30 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
         } else {
-            List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+            DialogoDadosEnvelope dialogo = new DialogoDadosEnvelope(null, true);
+            dialogo.setVisible(true);
 
-            HashMap<String, Object> parametros = new HashMap();
-            parametros.put("condominio", condominio.getRazaoSocial());
+            exibirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento());
+        }
+    }
 
-            for (Unidade unidade : modeloTabelaCondominos.getObjetosSelecionados()) {
-                HashMap<String, String> mapa = new HashMap();
-                mapa.put("nome", unidade.getCondomino().getNome());
-                mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
-                listaCondominos.add(mapa);
-            }
+    public void exibirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento) {
+        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
-            if (!listaCondominos.isEmpty()) {
-                new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false);
-            }
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        for (Unidade unidade : modeloTabelaCondominos.getObjetosSelecionados()) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nome", unidade.getCondomino().getNome());
+            mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
+            mapa.put("dataVencimento", dataVencimento == null ? " " : "VENCIMENTO: " + DataUtil.toString(dataVencimento));
+            listaCondominos.add(mapa);
         }
 
+        if (!listaCondominos.isEmpty()) {
+            new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
+        }
     }
 
     private List listaCampos() {
@@ -1785,7 +1792,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         campos.add(txtHistorico);
 
         return campos;
-
     }
 
     private void pegarConta() {

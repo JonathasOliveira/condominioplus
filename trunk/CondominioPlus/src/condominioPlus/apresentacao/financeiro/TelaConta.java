@@ -178,7 +178,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

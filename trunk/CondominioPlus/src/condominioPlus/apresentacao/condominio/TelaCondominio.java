@@ -150,7 +150,7 @@ public class TelaCondominio extends javax.swing.JInternalFrame implements Notifi
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

@@ -138,7 +138,7 @@ public class TelaDadosRelatorioGerencial extends javax.swing.JInternalFrame {
 
                 parametros.put("subrelatorio", caminho.toString());
 
-                new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false);
+                new Relatorios().imprimir("RelatorioGerencialTaxaExtra", parametros, lista, false, true);
 
             } else {
 
