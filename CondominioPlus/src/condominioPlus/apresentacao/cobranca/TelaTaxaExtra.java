@@ -894,7 +894,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         parametros.put("qtdeInadimplentes", "" + txe.getCobrancasADescartar());
         parametros.put("cobrarComCondominio", txe.isCobrarComCondominio() ? "Sim" : "Não");
 
-        new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false);
+        new Relatorios().imprimir("RelatorioDetalheTaxaExtra", parametros, listaParcelas, false, true);
     }
 
     private void imprimirRelatorioGlobal() {
@@ -940,7 +940,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             parametros.put("condominio", condominio.getRazaoSocial());
             parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
 
-            new Relatorios().imprimir("RelatorioGlobalTaxaExtra", parametros, listaParcelas, false);
+            new Relatorios().imprimir("RelatorioGlobalTaxaExtra", parametros, listaParcelas, false, true);
         }
     }
 

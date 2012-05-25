@@ -153,7 +153,7 @@ public class TelaFuncionario extends javax.swing.JInternalFrame implements Notif
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

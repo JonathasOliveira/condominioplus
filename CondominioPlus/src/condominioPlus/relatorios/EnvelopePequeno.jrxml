@@ -20,72 +20,73 @@
 	<field name="cidade" class="java.lang.String"/>
 	<field name="cep" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
+	<field name="dataVencimento" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
 		<band height="471">
 			<image>
-				<reportElement x="193" y="150" width="421" height="124"/>
+				<reportElement x="43" y="140" width="421" height="124"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement x="409" y="317" width="351" height="73"/>
+				<reportElement x="209" y="307" width="351" height="73"/>
 			</rectangle>
 			<rectangle>
-				<reportElement mode="Opaque" x="419" y="306" width="56" height="20" forecolor="#FFFFFF"/>
+				<reportElement mode="Opaque" x="219" y="296" width="56" height="20" forecolor="#FFFFFF"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="419" y="306" width="56" height="20"/>
+				<reportElement x="219" y="296" width="56" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[DESTINATÁRIO]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="419" y="336" width="326" height="11"/>
+				<reportElement x="219" y="326" width="326" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="572" y="358" width="100" height="11"/>
+				<reportElement x="372" y="348" width="100" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["RIO DE JANEIRO"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="419" y="347" width="326" height="11"/>
+				<reportElement x="219" y="337" width="326" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["AV. ATLÂNTICA, Nº 2.906 APTº 701"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="419" y="369" width="100" height="11"/>
+				<reportElement x="219" y="359" width="100" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["CEP 22070-000"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="419" y="358" width="100" height="11"/>
+				<reportElement x="219" y="348" width="100" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["COPACABANA"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="409" y="392" width="102" height="13"/>
+				<reportElement x="209" y="382" width="102" height="13"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["VENCIMENTO:01/05/2012"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dataVencimento}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="570" y="392" width="185" height="13"/>
+				<reportElement x="370" y="382" width="185" height="13"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>

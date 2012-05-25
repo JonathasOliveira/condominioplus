@@ -55,11 +55,13 @@ public class Relatorios implements Printable {
         classpath = this.getClass();
     }
 
-    public void imprimir(String relatorio, HashMap parametros, List lista, boolean impressaoDireta) {
+    public void imprimir(String relatorio, HashMap parametros, List lista, boolean impressaoDireta, boolean mostrarLogo) {
         try {
 
-            caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
-            parametros.put("logoEmpresa", caminhoImagem.toString());
+            if (mostrarLogo) {
+                caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
+                parametros.put("logoEmpresa", caminhoImagem.toString());
+            }
 
             String minuto = "";
             if (new DateTime().getMinuteOfHour() <= 9) {
@@ -187,12 +189,12 @@ public class Relatorios implements Printable {
                     totalJuros = totalJuros.add(cobrancaAux.getJuros());
                     totalMulta = totalMulta.add(cobrancaAux.getMulta());
                     totalGeral = totalGeral.add(cobrancaAux.getValorTotal());
-                    
+
                     somaValorOriginal = somaValorOriginal.add(cobrancaAux.getValorOriginal());
                     somaJuros = somaJuros.add(cobrancaAux.getJuros());
                     somaMulta = somaMulta.add(cobrancaAux.getMulta());
                     somaTotalGeral = somaTotalGeral.add(cobrancaAux.getValorTotal());
-                    
+
                     mapa.put("documento", cobrancaAux.getNumeroDocumento());
                     mapa.put("vencimento", DataUtil.toString(cobrancaAux.getDataVencimento()));
                     mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(cobrancaAux.getValorOriginal().doubleValue()));
@@ -244,9 +246,9 @@ public class Relatorios implements Printable {
 
         if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
             parametros.put("subrelatorio2", caminho.toString());
-            imprimir("InadimplenciaAnalitica", parametros, lista, false);
+            imprimir("InadimplenciaAnalitica", parametros, lista, false, true);
         } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA) {
-            imprimir("InadimplenciaSintetica", parametros, lista, false);
+            imprimir("InadimplenciaSintetica", parametros, lista, false, true);
         }
     }
 
@@ -267,7 +269,7 @@ public class Relatorios implements Printable {
         diferencaMeses = DataUtil.getDiferencaEmMeses(dataProrrogada, DataUtil.getDateTime(cobranca.getDataVencimento()));
         if (diferencaMeses > 0) {
 //            System.out.println("diferenca meses: " + new Double(diferencaMeses).intValue());
-            if (diferencaMeses >= 0 && diferencaMeses <= 1){
+            if (diferencaMeses >= 0 && diferencaMeses <= 1) {
                 diferencaMeses = 1;
             }
             juros.soma(new Double(diferencaMeses).intValue()).multiplica(NegocioUtil.getConfiguracao().getPercentualJuros().divide(new BigDecimal(100)));
