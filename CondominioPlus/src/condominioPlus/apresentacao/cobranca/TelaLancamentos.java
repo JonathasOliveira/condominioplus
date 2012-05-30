@@ -1761,8 +1761,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         } else {
             DialogoDadosEnvelope dialogo = new DialogoDadosEnvelope(null, true);
             dialogo.setVisible(true);
-
-            exibirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento());
+            if(!dialogo.getCancelar()){
+                exibirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento());
+            }
         }
     }
 

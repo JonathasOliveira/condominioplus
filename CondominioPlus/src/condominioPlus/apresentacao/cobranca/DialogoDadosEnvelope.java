@@ -24,6 +24,7 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
 
     private DateTime dataVencimento;
     private boolean imprimirRemetente;
+    private boolean cancelar;
 
     /** Creates new form DialogoDadosEnvelope */
     public DialogoDadosEnvelope(java.awt.Frame parent, boolean modal) {
@@ -32,14 +33,19 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
         new ControladorEventos();
         this.setLocationRelativeTo(null);
         txtDataVencimento.setValue(DataUtil.getDate(DataUtil.hoje()));
+        cancelar = true;
     }
 
     public DateTime getDataVencimento() {
         return dataVencimento;
     }
-    
-    public boolean getImprimirRemetente(){
+
+    public boolean getImprimirRemetente() {
         return imprimirRemetente;
+    }
+
+    public boolean getCancelar() {
+        return cancelar;
     }
 
     private void salvarDados() {
@@ -55,6 +61,7 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
             imprimirRemetente = false;
         }
 
+        cancelar = false;
         sair();
     }
 
