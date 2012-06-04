@@ -9,6 +9,7 @@
 package condominioPlus.util;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
@@ -319,5 +320,34 @@ public class Relatorios implements Printable {
         Collections.sort(listaCobrancas, c);
 
         return listaCobrancas;
+    }
+
+    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades) {
+        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        for (Unidade unidade : unidades) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nome", unidade.getCondomino().getNome());
+
+            for (Endereco e : unidade.getCondomino().getEnderecos()) {
+                if (e.isPadrao()) {
+                    mapa.put("endereco", e.getLogradouro() + ", " + e.getNumero() + " " + e.getComplemento());
+                    mapa.put("bairro", e.getBairro());
+                    mapa.put("cidade", e.getCidade() + " - " + e.getEstado());
+                    mapa.put("cep", e.getCep());
+                }
+            }
+
+            mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
+            mapa.put("dataVencimento", dataVencimento == null ? " " : "VENCIMENTO: " + DataUtil.toString(dataVencimento));
+            listaCondominos.add(mapa);
+        }
+
+        if (!listaCondominos.isEmpty()) {
+            imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
+        }
     }
 }
