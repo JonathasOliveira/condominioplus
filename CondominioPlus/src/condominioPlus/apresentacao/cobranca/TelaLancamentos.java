@@ -1761,30 +1761,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         } else {
             DialogoDadosEnvelope dialogo = new DialogoDadosEnvelope(null, true);
             dialogo.setVisible(true);
-            if(!dialogo.getCancelar()){
-                exibirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento());
+            if (!dialogo.getCancelar()) {
+                new Relatorios().imprimirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento(), condominio, modeloTabelaCondominos.getObjetosSelecionados());
             }
         }
-    }
-
-    public void exibirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento) {
-        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
-
-        HashMap<String, Object> parametros = new HashMap();
-        parametros.put("condominio", condominio.getRazaoSocial());
-
-        for (Unidade unidade : modeloTabelaCondominos.getObjetosSelecionados()) {
-            HashMap<String, String> mapa = new HashMap();
-            mapa.put("nome", unidade.getCondomino().getNome());
-            mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
-            mapa.put("dataVencimento", dataVencimento == null ? " " : "VENCIMENTO: " + DataUtil.toString(dataVencimento));
-            listaCondominos.add(mapa);
-        }
-
-        if (!listaCondominos.isEmpty()) {
-            new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
-        }
-    }
+    }    
 
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
