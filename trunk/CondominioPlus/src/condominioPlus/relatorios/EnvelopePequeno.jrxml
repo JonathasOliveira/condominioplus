@@ -21,6 +21,7 @@
 	<field name="cep" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
+	<field name="estado" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -55,28 +56,28 @@
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["RIO DE JANEIRO"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="219" y="337" width="326" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["AV. ATLÂNTICA, Nº 2.906 APTº 701"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{endereco}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="219" y="359" width="100" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["CEP 22070-000"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["CEP " + $F{cep}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="219" y="348" width="100" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["COPACABANA"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bairro}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="209" y="382" width="102" height="13"/>
