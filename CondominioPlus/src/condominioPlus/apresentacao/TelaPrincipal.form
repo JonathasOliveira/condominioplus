@@ -186,9 +186,9 @@
                 <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia Sint&#xe9;tica"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioFuncionarios">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemEnvelopeAvulso">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Funcion&#xe1;rios"/>
+                <Property name="text" type="java.lang.String" value="Envelope Avulso"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioProduto">
