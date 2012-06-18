@@ -10,8 +10,11 @@
  */
 package condominioPlus.apresentacao.cobranca;
 
-import condominioPlus.negocio.Condominio;
+import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 
 /**
@@ -19,6 +22,8 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
  * @author eugenia
  */
 public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
+
+    private boolean imprimirRemetente;
 
     /** Creates new form TelaDadosEnvelopeAvulso */
     public TelaDadosEnvelopeAvulso() {
@@ -28,6 +33,38 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
 
     private void sair() {
         dispose();
+    }
+
+    private void salvarDados() {
+        if (chkImprimirRemetente.isSelected()) {
+            imprimirRemetente = true;
+        } else {
+            imprimirRemetente = false;
+        }
+
+        imprimir();
+    }
+
+    private void imprimir() {
+        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+
+        HashMap<String, String> mapa = new HashMap();
+        mapa.put("nome", txtNome.getText());
+
+        mapa.put("endereco", txtRua.getText() + ", " + txtNumero.getText() + " " + txtComplemento.getText());
+        mapa.put("bairro", txtBairro.getText());
+        mapa.put("cidade", txtCidade.getText() + " - " + txtUf.getText());
+        mapa.put("cep", txtCep.getText());
+
+        mapa.put("condominio", " ");
+        mapa.put("dataVencimento", " ");
+        listaCondominos.add(mapa);
+
+        if (!listaCondominos.isEmpty()) {
+            new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
+        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -42,6 +79,7 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
         public void actionPerformed(ActionEvent e) {
             source = e.getSource();
             if (source == btnOk) {
+                salvarDados();
             } else if (source == btnCancelar) {
                 sair();
             }
@@ -62,8 +100,6 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        txtDataVencimento = new net.sf.nachocalendar.components.DateField();
-        chkExibirDataVencimento = new javax.swing.JCheckBox();
         chkImprimirRemetente = new javax.swing.JCheckBox();
         jLabel23 = new javax.swing.JLabel();
         txtRua = new javax.swing.JTextField();
@@ -79,6 +115,8 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
         txtUf = new javax.swing.JTextField();
         jLabel29 = new javax.swing.JLabel();
         txtCep = new javax.swing.JFormattedTextField();
+        jLabel30 = new javax.swing.JLabel();
+        txtNome = new javax.swing.JTextField();
 
         setClosable(true);
         setTitle("Envelopes");
@@ -98,7 +136,7 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                 .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnCancelar)
-                .addContainerGap(162, Short.MAX_VALUE))
+                .addContainerGap(168, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -110,48 +148,42 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        txtDataVencimento.setEnabled(false);
-
-        chkExibirDataVencimento.setText("Exibir data de vencimento?");
-
         chkImprimirRemetente.setText("Imprimir remetente?");
 
         jLabel23.setText("Endereço:");
 
-        txtRua.setEditable(false);
         txtRua.setToolTipText("Digite o Endereço");
         txtRua.setName("logradouro"); // NOI18N
 
         jLabel24.setText("Número:");
 
-        txtNumero.setEditable(false);
         txtNumero.setName("numero"); // NOI18N
 
         jLabel25.setText("Compl.:");
 
-        txtComplemento.setEditable(false);
         txtComplemento.setToolTipText("");
         txtComplemento.setName("complemento"); // NOI18N
 
         jLabel26.setText("Bairro:");
 
-        txtBairro.setEditable(false);
         txtBairro.setName("bairro"); // NOI18N
 
         jLabel27.setText("Cidade:");
 
-        txtCidade.setEditable(false);
         txtCidade.setName("cidade"); // NOI18N
 
         jLabel28.setText("UF:");
 
-        txtUf.setEditable(false);
         txtUf.setName("estado"); // NOI18N
 
         jLabel29.setText("CEP:");
 
-        txtCep.setEditable(false);
         txtCep.setName("cep"); // NOI18N
+
+        jLabel30.setText("Nome:");
+
+        txtNome.setToolTipText("Digite o Endereço");
+        txtNome.setName("logradouro"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -161,14 +193,6 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel23)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtRua, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel24)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -179,7 +203,7 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel26)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtBairro, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE))
+                                .addComponent(txtBairro, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel29)
@@ -187,23 +211,35 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCidade, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(chkImprimirRemetente)
-                                        .addGap(10, 10, 10)
-                                        .addComponent(chkExibirDataVencimento)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addComponent(txtCidade, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE)
+                                    .addComponent(chkImprimirRemetente))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel28)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel23)
+                            .addComponent(jLabel30))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(txtRua, javax.swing.GroupLayout.PREFERRED_SIZE, 319, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel24)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtNumero, javax.swing.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE))
+                            .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(14, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel30)
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel23)
                     .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -226,13 +262,10 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
                     .addComponent(jLabel29)
                     .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkImprimirRemetente)
-                    .addComponent(chkExibirDataVencimento)
-                    .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(chkImprimirRemetente)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -248,8 +281,8 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -257,7 +290,6 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOk;
-    private javax.swing.JCheckBox chkExibirDataVencimento;
     private javax.swing.JCheckBox chkImprimirRemetente;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
@@ -266,13 +298,14 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtBairro;
     private javax.swing.JFormattedTextField txtCep;
     private javax.swing.JTextField txtCidade;
     private javax.swing.JTextField txtComplemento;
-    private net.sf.nachocalendar.components.DateField txtDataVencimento;
+    private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtNumero;
     private javax.swing.JTextField txtRua;
     private javax.swing.JTextField txtUf;

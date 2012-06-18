@@ -34,8 +34,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="jPanel1" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -53,19 +53,10 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel2" alignment="0" max="32767" attributes="1"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="jLabel23" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtRua" min="-2" pref="319" max="-2" attributes="1"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="txtNumero" min="-2" pref="53" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jPanel2" max="32767" attributes="1"/>
                       <Group type="102" alignment="1" attributes="0">
                           <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -76,7 +67,7 @@
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="jLabel26" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="txtBairro" pref="223" max="32767" attributes="1"/>
+                                  <Component id="txtBairro" pref="229" max="32767" attributes="1"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
@@ -86,14 +77,8 @@
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="txtCep" min="-2" pref="139" max="-2" attributes="1"/>
-                                      <Component id="txtCidade" alignment="0" pref="360" max="32767" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="chkImprimirRemetente" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                                          <Component id="chkExibirDataVencimento" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="txtDataVencimento" min="-2" max="-2" attributes="0"/>
-                                      </Group>
+                                      <Component id="txtCidade" alignment="0" pref="366" max="32767" attributes="0"/>
+                                      <Component id="chkImprimirRemetente" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -102,6 +87,23 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="txtUf" min="-2" pref="32" max="-2" attributes="0"/>
                       </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Component id="jLabel23" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel30" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="txtRua" min="-2" pref="319" max="-2" attributes="1"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jLabel24" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="txtNumero" pref="59" max="32767" attributes="0"/>
+                              </Group>
+                              <Component id="txtNome" alignment="0" pref="433" max="32767" attributes="1"/>
+                          </Group>
+                      </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -109,8 +111,13 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace pref="14" max="32767" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel30" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="txtNome" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel23" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtNumero" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -137,14 +144,10 @@
                       <Component id="txtCep" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="chkImprimirRemetente" min="-2" max="-2" attributes="0"/>
-                      <Component id="chkExibirDataVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="txtDataVencimento" alignment="0" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="chkImprimirRemetente" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -160,7 +163,7 @@
                       <Component id="btnOk" min="-2" pref="72" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnCancelar" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="162" max="32767" attributes="0"/>
+                      <EmptySpace pref="168" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -190,16 +193,6 @@
             </Component>
           </SubComponents>
         </Container>
-        <Component class="net.sf.nachocalendar.components.DateField" name="txtDataVencimento">
-          <Properties>
-            <Property name="enabled" type="boolean" value="false"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="chkExibirDataVencimento">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Exibir data de vencimento?"/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JCheckBox" name="chkImprimirRemetente">
           <Properties>
             <Property name="text" type="java.lang.String" value="Imprimir remetente?"/>
@@ -212,7 +205,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtRua">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="toolTipText" type="java.lang.String" value="Digite o Endere&#xe7;o"/>
             <Property name="name" type="java.lang.String" value="logradouro" noResource="true"/>
           </Properties>
@@ -224,7 +216,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtNumero">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="numero" noResource="true"/>
           </Properties>
         </Component>
@@ -235,7 +226,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtComplemento">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="name" type="java.lang.String" value="complemento" noResource="true"/>
           </Properties>
@@ -247,7 +237,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtBairro">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="bairro" noResource="true"/>
           </Properties>
         </Component>
@@ -258,7 +247,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtCidade">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="cidade" noResource="true"/>
           </Properties>
         </Component>
@@ -269,7 +257,6 @@
         </Component>
         <Component class="javax.swing.JTextField" name="txtUf">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="estado" noResource="true"/>
           </Properties>
         </Component>
@@ -280,8 +267,18 @@
         </Component>
         <Component class="javax.swing.JFormattedTextField" name="txtCep">
           <Properties>
-            <Property name="editable" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="cep" noResource="true"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel30">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Nome:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="txtNome">
+          <Properties>
+            <Property name="toolTipText" type="java.lang.String" value="Digite o Endere&#xe7;o"/>
+            <Property name="name" type="java.lang.String" value="logradouro" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>
