@@ -75,7 +75,6 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
         public void configurar() {
             btnOk.addActionListener(this);
             btnCancelar.addActionListener(this);
-            btnCancelar.addActionListener(this);
             chkExibirDataVencimento.addChangeListener(this);
         }
 
