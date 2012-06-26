@@ -63,6 +63,8 @@ public class Relatorios implements Printable {
                 if (caminho == null) {
                     caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
                     parametros.put("logoEmpresa", caminhoImagem.toString());
+                } else {
+                    parametros.put("logoEmpresa", caminho.toString());
                 }
             }
 
