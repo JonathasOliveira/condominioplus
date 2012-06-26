@@ -145,7 +145,7 @@ public class TelaAdvogado extends javax.swing.JInternalFrame implements Notifica
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true, null);
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {

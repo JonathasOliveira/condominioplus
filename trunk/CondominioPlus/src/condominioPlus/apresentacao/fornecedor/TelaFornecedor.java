@@ -135,7 +135,7 @@ public class TelaFornecedor extends javax.swing.JInternalFrame implements Notifi
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true, null);
     }
 
    private class ControladorEventos extends ControladorEventosGenerico {

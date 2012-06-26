@@ -1695,7 +1695,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         parametros.put("totalGerado", PagamentoUtil.formatarMoeda(totalGerado.doubleValue()));
 
-        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false, true);
+        new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false, true, null);
     }
 
     private void imprimirCartaSintetica() {
@@ -1751,7 +1751,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
 
         if (!listaCobrancas.isEmpty()) {
-            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false, true);
+            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false, true, null);
         }
     }
 
