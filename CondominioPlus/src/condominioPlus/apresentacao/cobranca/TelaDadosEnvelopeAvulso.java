@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.cobranca;
 
 import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
 
     private boolean imprimirRemetente;
+    private URL caminhoImagem;
 
     /** Creates new form TelaDadosEnvelopeAvulso */
     public TelaDadosEnvelopeAvulso() {
@@ -63,10 +65,10 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
         listaCondominos.add(mapa);
 
         if (!listaCondominos.isEmpty()) {
-            new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
+            new Relatorios().imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, caminhoImagem);
         }
     }
-
+ 
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override

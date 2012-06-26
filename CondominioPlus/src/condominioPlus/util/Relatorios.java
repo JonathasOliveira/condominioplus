@@ -56,12 +56,14 @@ public class Relatorios implements Printable {
         classpath = this.getClass();
     }
 
-    public void imprimir(String relatorio, HashMap parametros, List lista, boolean impressaoDireta, boolean mostrarLogo) {
+    public void imprimir(String relatorio, HashMap parametros, List lista, boolean impressaoDireta, boolean mostrarLogo, URL caminho) {
         try {
 
             if (mostrarLogo) {
-                caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
-                parametros.put("logoEmpresa", caminhoImagem.toString());
+                if (caminho == null) {
+                    caminhoImagem = getClass().getResource("/condominioPlus/recursos/imagens/logo.jpg");
+                    parametros.put("logoEmpresa", caminhoImagem.toString());
+                }
             }
 
             String minuto = "";
@@ -247,9 +249,9 @@ public class Relatorios implements Printable {
 
         if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
             parametros.put("subrelatorio2", caminho.toString());
-            imprimir("InadimplenciaAnalitica", parametros, lista, false, true);
+            imprimir("InadimplenciaAnalitica", parametros, lista, false, true, null);
         } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA) {
-            imprimir("InadimplenciaSintetica", parametros, lista, false, true);
+            imprimir("InadimplenciaSintetica", parametros, lista, false, true, null);
         }
     }
 
@@ -347,7 +349,7 @@ public class Relatorios implements Printable {
         }
 
         if (!listaCondominos.isEmpty()) {
-            imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente);
+            imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
         }
     }
 }

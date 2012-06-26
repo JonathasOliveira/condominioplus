@@ -48,6 +48,6 @@ public class Relatorio {
             lista.add(objeto);
         }
 
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, false);
+        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, false, null);
     }
 }
