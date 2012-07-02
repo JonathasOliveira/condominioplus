@@ -12,7 +12,9 @@ package condominioPlus.relatorios;
 public enum TipoRelatorio {
 
     INADIMPLENCIA_SINTETICA("Inadimplência Sintética"),
-    INADIMPLENCIA_ANALITICA("Inadimplência Analítica");
+    INADIMPLENCIA_ANALITICA("Inadimplência Analítica"),
+    ASSEMBLEIA_ORDINARIA("Assembleia Ordinária"),
+    ASSEMBLEIA_EXTRAORDINARIA("Assembleia Extraordinária");
 
     TipoRelatorio(String nome) {
         this.nome = nome;

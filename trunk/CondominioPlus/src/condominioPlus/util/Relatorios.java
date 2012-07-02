@@ -330,7 +330,6 @@ public class Relatorios implements Printable {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
-        parametros.put("condominio", condominio.getRazaoSocial());
 
         for (Unidade unidade : unidades) {
             HashMap<String, String> mapa = new HashMap();
@@ -352,6 +351,30 @@ public class Relatorios implements Printable {
 
         if (!listaCondominos.isEmpty()) {
             imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
+        }
+    }
+
+    public void imprimirListaAssembleia(Condominio condominio, List<Unidade> unidades, DateTime data, TipoRelatorio tipo) {
+        List<Unidade> listaUnidades = new ArrayList<Unidade>();
+        listaUnidades = ordenarUnidades(unidades);
+
+        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        for (Unidade unidade : listaUnidades) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nome", unidade.getCondomino().getNome());
+            mapa.put("unidade", unidade.getUnidade());
+            lista.add(mapa);
+        }
+        
+        parametros.put("nomeRelatorio", tipo.toString());
+        parametros.put("data", DataUtil.toString(data));
+
+        if (!lista.isEmpty()) {
+            imprimir("RelatorioPresentesAO", parametros, lista, false, true, null);
         }
     }
 }

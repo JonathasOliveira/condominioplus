@@ -117,6 +117,16 @@
             <Property name="text" type="java.lang.String" value="Imprimir Envelope Pequeno"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuPresentesAO">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Lista Presentes na Assembl&#xe9;ia Ordin&#xe1;ria"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuPresentesAE">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Lista Presentes na Assembl&#xe9;ia Extraordin&#xe1;ria"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuDadosAvulsos">

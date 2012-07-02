@@ -1765,7 +1765,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 new Relatorios().imprimirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento(), condominio, modeloTabelaCondominos.getObjetosSelecionados());
             }
         }
-    }    
+    }
+
+    public void imprimirListaPresentesAssembleia(TipoRelatorio tipo) {
+        DialogoDadosListaAssembleia dialogo = new DialogoDadosListaAssembleia(null, true, tipo);
+        dialogo.setVisible(true);
+        if (!dialogo.getCancelar()) {
+            new Relatorios().imprimirListaAssembleia(condominio, modeloTabelaCondominos.getObjetos(), dialogo.getData(), tipo);
+        }
+    }
 
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
@@ -1845,6 +1853,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuImprimirCartaSintetica.addActionListener(this);
             itemMenuImprimirEnvelopeP.addActionListener(this);
+            itemMenuPresentesAE.addActionListener(this);
+            itemMenuPresentesAO.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -1988,6 +1998,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             } else if (origem == itemMenuImprimirEnvelopeP) {
                 imprimirEnvelope();
+            } else if(origem == itemMenuPresentesAE){
+                imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_EXTRAORDINARIA);
+            } else if (origem == itemMenuPresentesAO){
+                imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_ORDINARIA);
             }
         }
 
@@ -2105,6 +2119,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuOcultar = new javax.swing.JMenuItem();
         popupMenuCondominos = new javax.swing.JPopupMenu();
         itemMenuImprimirEnvelopeP = new javax.swing.JMenuItem();
+        itemMenuPresentesAO = new javax.swing.JMenuItem();
+        itemMenuPresentesAE = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2238,6 +2254,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirEnvelopeP.setText("Imprimir Envelope Pequeno");
         popupMenuCondominos.add(itemMenuImprimirEnvelopeP);
 
+        itemMenuPresentesAO.setText("Imprimir Lista Presentes na Assembléia Ordinária");
+        popupMenuCondominos.add(itemMenuPresentesAO);
+
+        itemMenuPresentesAE.setText("Imprimir Lista Presentes na Assembléia Extraordinária");
+        popupMenuCondominos.add(itemMenuPresentesAE);
+
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
 
@@ -2254,7 +2276,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCondominos.setBorder(javax.swing.BorderFactory.createTitledBorder("Condôminos"));
 
-        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -3065,6 +3087,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;
     private javax.swing.JMenuItem itemMenuOcultar;
     private javax.swing.JMenuItem itemMenuOcultarDados;
+    private javax.swing.JMenuItem itemMenuPresentesAE;
+    private javax.swing.JMenuItem itemMenuPresentesAO;
     private javax.swing.JMenuItem itemMenuRemoverAcordo;
     private javax.swing.JMenuItem itemMenuRemoverItemCobranca;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
