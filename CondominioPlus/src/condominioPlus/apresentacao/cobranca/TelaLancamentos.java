@@ -1774,6 +1774,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             new Relatorios().imprimirListaAssembleia(condominio, modeloTabelaCondominos.getObjetos(), dialogo.getData(), tipo);
         }
     }
+    
+    public void imprimirListaFracoesIdeais(){
+        new Relatorios().imprimirListaFracoesIdeais(condominio, modeloTabelaCondominos.getObjetos());
+    }
 
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
@@ -1855,6 +1859,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirEnvelopeP.addActionListener(this);
             itemMenuPresentesAE.addActionListener(this);
             itemMenuPresentesAO.addActionListener(this);
+            itemMenuRelacaoFracoesIdeais.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -2002,6 +2007,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_EXTRAORDINARIA);
             } else if (origem == itemMenuPresentesAO){
                 imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_ORDINARIA);
+            } else if (origem == itemMenuRelacaoFracoesIdeais){
+                imprimirListaFracoesIdeais();
             }
         }
 
@@ -2121,6 +2128,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirEnvelopeP = new javax.swing.JMenuItem();
         itemMenuPresentesAO = new javax.swing.JMenuItem();
         itemMenuPresentesAE = new javax.swing.JMenuItem();
+        itemMenuRelacaoFracoesIdeais = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2259,6 +2267,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuPresentesAE.setText("Imprimir Lista Presentes na Assembléia Extraordinária");
         popupMenuCondominos.add(itemMenuPresentesAE);
+
+        itemMenuRelacaoFracoesIdeais.setText("Relação Frações Ideais");
+        popupMenuCondominos.add(itemMenuRelacaoFracoesIdeais);
 
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
@@ -3089,6 +3100,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuOcultarDados;
     private javax.swing.JMenuItem itemMenuPresentesAE;
     private javax.swing.JMenuItem itemMenuPresentesAO;
+    private javax.swing.JMenuItem itemMenuRelacaoFracoesIdeais;
     private javax.swing.JMenuItem itemMenuRemoverAcordo;
     private javax.swing.JMenuItem itemMenuRemoverItemCobranca;
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
