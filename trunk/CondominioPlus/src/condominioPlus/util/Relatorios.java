@@ -23,6 +23,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -369,12 +370,42 @@ public class Relatorios implements Printable {
             mapa.put("unidade", unidade.getUnidade());
             lista.add(mapa);
         }
-        
+
         parametros.put("nomeRelatorio", tipo.toString());
         parametros.put("data", DataUtil.toString(data));
 
         if (!lista.isEmpty()) {
             imprimir("RelatorioPresentesAO", parametros, lista, false, true, null);
         }
+    }
+
+    public void imprimirListaFracoesIdeais(Condominio condominio, List<Unidade> unidades) {
+
+        BigDecimal somaFracao = new BigDecimal(0);
+
+        List<Unidade> listaUnidades = new ArrayList<Unidade>();
+        listaUnidades = ordenarUnidades(unidades);
+
+        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        for (Unidade unidade : listaUnidades) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nome", unidade.getCondomino().getNome());
+            mapa.put("unidade", unidade.getUnidade());
+            mapa.put("coeficiente", unidade.getCoeficiente());
+            mapa.put("fracaoIdeal", String.valueOf(unidade.getFracaoIdeal()));
+            somaFracao = somaFracao.add(new BigDecimal(unidade.getFracaoIdeal()));
+            lista.add(mapa);
+        }
+
+        parametros.put("somaFracao", somaFracao.setScale(2).toString());
+
+        if (!lista.isEmpty()) {
+            imprimir("RelatorioRelacaoFracaoIdeal", parametros, lista, false, true, null);
+        }
+
     }
 }
