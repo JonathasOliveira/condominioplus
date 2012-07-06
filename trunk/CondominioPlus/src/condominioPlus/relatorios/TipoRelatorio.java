@@ -14,7 +14,8 @@ public enum TipoRelatorio {
     INADIMPLENCIA_SINTETICA("Inadimplência Sintética"),
     INADIMPLENCIA_ANALITICA("Inadimplência Analítica"),
     ASSEMBLEIA_ORDINARIA("Assembleia Ordinária"),
-    ASSEMBLEIA_EXTRAORDINARIA("Assembleia Extraordinária");
+    ASSEMBLEIA_EXTRAORDINARIA("Assembleia Extraordinária"),
+    ENVELOPE_PEQUENO("Envelope Pequeno");
 
     TipoRelatorio(String nome) {
         this.nome = nome;
