@@ -327,7 +327,7 @@ public class Relatorios implements Printable {
         return listaCobrancas;
     }
 
-    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades) {
+    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, TipoRelatorio tipo) {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
@@ -351,7 +351,9 @@ public class Relatorios implements Printable {
         }
 
         if (!listaCondominos.isEmpty()) {
-            imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
+            if (tipo == TipoRelatorio.ENVELOPE_PEQUENO) {
+                imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
+            }
         }
     }
 
