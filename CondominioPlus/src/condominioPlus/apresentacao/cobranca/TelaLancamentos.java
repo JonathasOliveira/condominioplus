@@ -1860,6 +1860,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuPresentesAE.addActionListener(this);
             itemMenuPresentesAO.addActionListener(this);
             itemMenuRelacaoFracoesIdeais.addActionListener(this);
+            itemMenuImprimirRelacaoProprietarios.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -2009,6 +2010,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_ORDINARIA);
             } else if (origem == itemMenuRelacaoFracoesIdeais){
                 imprimirListaFracoesIdeais();
+            } else if (origem == itemMenuImprimirRelacaoProprietarios){
+                
             }
         }
 
@@ -2129,6 +2132,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuPresentesAO = new javax.swing.JMenuItem();
         itemMenuPresentesAE = new javax.swing.JMenuItem();
         itemMenuRelacaoFracoesIdeais = new javax.swing.JMenuItem();
+        itemMenuImprimirRelacaoProprietarios = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2268,8 +2272,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuPresentesAE.setText("Imprimir Lista Presentes na Assembléia Extraordinária");
         popupMenuCondominos.add(itemMenuPresentesAE);
 
-        itemMenuRelacaoFracoesIdeais.setText("Relação Frações Ideais");
+        itemMenuRelacaoFracoesIdeais.setText("Imprimir Relação Frações Ideais");
         popupMenuCondominos.add(itemMenuRelacaoFracoesIdeais);
+
+        itemMenuImprimirRelacaoProprietarios.setText("Imprimir Relação de Proprietários");
+        popupMenuCondominos.add(itemMenuImprimirRelacaoProprietarios);
 
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
@@ -3094,6 +3101,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirEnvelopeP;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
+    private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietarios;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;
     private javax.swing.JMenuItem itemMenuOcultar;

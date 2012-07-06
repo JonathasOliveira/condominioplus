@@ -129,7 +129,12 @@
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuRelacaoFracoesIdeais">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Rela&#xe7;&#xe3;o Fra&#xe7;&#xf5;es Ideais"/>
+            <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o Fra&#xe7;&#xf5;es Ideais"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirRelacaoProprietarios">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o de Propriet&#xe1;rios"/>
           </Properties>
         </MenuItem>
       </SubComponents>
