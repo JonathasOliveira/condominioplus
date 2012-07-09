@@ -394,7 +394,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 txtCep.setText(e.getCep());
             }
         }
-
+        txtEmail.setText(unidade.getCondomino().getEmail());
         txtAnotacoes.setText(unidade.getCondomino().getAnotacoes());
 
         if (unidade.isHasInquilino()) {
@@ -497,7 +497,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().setFalecido(checkBoxFalecido.isSelected());
         unidade.getCondomino().setCnpj(checkBoxCNPJ.isSelected());
 
-
+        unidade.getCondomino().setEmail(txtEmail.getText());
         unidade.getCondomino().setAnotacoes(txtAnotacoes.getText());
 
         if (unidade.isHasInquilino()) {
@@ -711,6 +711,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarTelefone = new javax.swing.JButton();
         btnEditarTelefone = new javax.swing.JButton();
         btnRemoverTelefone = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
+        txtEmail = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         txtNomeInquilino = new javax.swing.JTextField();
@@ -1019,7 +1021,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tblEndereco);
 
-        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1056,19 +1058,18 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(btnAdicionarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel6Layout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
-                    .addGap(3, 3, 3)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
@@ -1083,13 +1084,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane2.setViewportView(tblTelefone);
 
-        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnEditarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1120,42 +1121,54 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
                 .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel7Layout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
-                    .addGap(3, 3, 3)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
+
+        jLabel13.setText("E-mail:");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(jLabel13)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(175, 175, 175))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6))
         );
 
-        jTabbedPane1.addTab("Endereços  / Telefones", jPanel4);
+        jTabbedPane1.addTab("Csontato", jPanel4);
 
         jLabel6.setText("CPF*:");
 
@@ -1636,6 +1649,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -1696,6 +1710,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtCondominio;
     private javax.swing.JFormattedTextField txtCpf;
     private javax.swing.JFormattedTextField txtCpfInquilino;
+    private javax.swing.JTextField txtEmail;
     private javax.swing.JTextField txtFracaoIdeal;
     private javax.swing.JTextField txtIptu;
     private javax.swing.JTextField txtNome;

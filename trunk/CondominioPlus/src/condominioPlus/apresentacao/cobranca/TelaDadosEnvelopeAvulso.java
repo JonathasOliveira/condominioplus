@@ -65,7 +65,7 @@ public class TelaDadosEnvelopeAvulso extends javax.swing.JInternalFrame {
         HashMap<String, String> mapa = new HashMap();
         mapa.put("nome", txtNome.getText());
 
-        mapa.put("endereco", txtRua.getText() + ", " + txtNumero.getText() + " " + txtComplemento.getText());
+        mapa.put("endereco", txtRua.getText() + ", " + txtNumero.getText() + " - " + txtComplemento.getText());
         mapa.put("bairro", txtBairro.getText());
         mapa.put("cidade", txtCidade.getText() + " - " + txtUf.getText());
         mapa.put("cep", txtCep.getText());

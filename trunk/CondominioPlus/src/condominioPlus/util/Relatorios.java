@@ -11,6 +11,7 @@ package condominioPlus.util;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
+import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.financeiro.Pagamento;
@@ -331,6 +332,9 @@ public class Relatorios implements Printable {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
+        
+        // parametro para o relatório Relacao Proprietarios
+        parametros.put("condominio", condominio.getRazaoSocial());
 
         for (Unidade unidade : unidades) {
             HashMap<String, String> mapa = new HashMap();
@@ -338,12 +342,30 @@ public class Relatorios implements Printable {
 
             for (Endereco e : unidade.getCondomino().getEnderecos()) {
                 if (e.isPadrao()) {
-                    mapa.put("endereco", e.getLogradouro() + ", " + e.getNumero() + " " + e.getComplemento());
+                    mapa.put("endereco", e.getLogradouro() + ", " + e.getNumero() + " - " + e.getComplemento());
                     mapa.put("bairro", e.getBairro());
                     mapa.put("cidade", e.getCidade() + " - " + e.getEstado());
                     mapa.put("cep", e.getCep());
                 }
             }
+
+            // campos para o relatório Relacao Proprietarios
+            String telefone = "";
+            for (Telefone t : unidade.getCondomino().getTelefones()) {
+                if (t.getTipo().equals("Fixo")) {
+                    telefone = t.getNumero();
+                } else if (t.getTipo().equals("Celular")) {
+                    telefone = telefone + " / " + t.getNumero();
+                    mapa.put("telefone", telefone);
+                } else if (t.getTipo().equals("Comercial")) {
+                    mapa.put("telcomercial", t.getNumero());
+                } else if (t.getTipo().equals("Fax")) {
+                    mapa.put("fax", t.getNumero());
+                }
+            }
+            mapa.put("unidade", unidade.getUnidade());
+            mapa.put("email", unidade.getCondomino().getEmail());
+            // campos para o relatório Relacao Proprietarios       
 
             mapa.put("condominio", unidade.getCondominio().getRazaoSocial() + " " + unidade.getUnidade());
             mapa.put("dataVencimento", dataVencimento == null ? " " : "VENCIMENTO: " + DataUtil.toString(dataVencimento));
@@ -353,6 +375,8 @@ public class Relatorios implements Printable {
         if (!listaCondominos.isEmpty()) {
             if (tipo == TipoRelatorio.ENVELOPE_PEQUENO) {
                 imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
+            } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS) {
+                imprimir("RelatorioRelacaoProprietarios", parametros, listaCondominos, false, imprimirRemetente, null);
             }
         }
     }
