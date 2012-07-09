@@ -1778,6 +1778,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     public void imprimirListaFracoesIdeais(){
         new Relatorios().imprimirListaFracoesIdeais(condominio, modeloTabelaCondominos.getObjetos());
     }
+    
+    public void imprimirRelacaoProprietarios(){
+        new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), TipoRelatorio.RELACAO_PROPRIETARIOS);
+    }
 
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
@@ -2011,7 +2015,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuRelacaoFracoesIdeais){
                 imprimirListaFracoesIdeais();
             } else if (origem == itemMenuImprimirRelacaoProprietarios){
-                
+                imprimirRelacaoProprietarios();
             }
         }
 

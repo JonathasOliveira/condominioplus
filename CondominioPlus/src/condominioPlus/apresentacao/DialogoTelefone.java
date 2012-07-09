@@ -54,7 +54,7 @@ public class DialogoTelefone extends javax.swing.JDialog {
     }
 
     private void carregarComboTipo() {
-        cmbTipo.setModel(new ComboModelo<String>(Util.toList(new String[]{"Celular", "Fixo", "Nextel", "Comercial", "Recado"}), false));
+        cmbTipo.setModel(new ComboModelo<String>(Util.toList(new String[]{"Celular", "Fixo", "Nextel", "Comercial", "Recado", "Fax"}), false));
     }
 
     private void salvar() {
