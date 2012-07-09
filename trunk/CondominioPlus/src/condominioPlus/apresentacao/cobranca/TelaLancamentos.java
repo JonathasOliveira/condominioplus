@@ -52,6 +52,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JTable;
+import javax.swing.event.CaretEvent;
 import javax.swing.event.ChangeEvent;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
@@ -138,6 +139,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             @Override
             protected List<Unidade> getCarregarObjetos() {
                 return getUnidades();
+            }
+            
+            @Override
+            protected List<Unidade> getFiltrar(List<Unidade> unidades) {
+                return filtrarListaCondominoPorUnidade(txtFiltro.getText(), unidades);
             }
 
             @Override
@@ -1774,12 +1780,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             new Relatorios().imprimirListaAssembleia(condominio, modeloTabelaCondominos.getObjetos(), dialogo.getData(), tipo);
         }
     }
-    
-    public void imprimirListaFracoesIdeais(){
+
+    public void imprimirListaFracoesIdeais() {
         new Relatorios().imprimirListaFracoesIdeais(condominio, modeloTabelaCondominos.getObjetos());
     }
-    
-    public void imprimirRelacaoProprietarios(){
+
+    public void imprimirRelacaoProprietarios() {
         new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), TipoRelatorio.RELACAO_PROPRIETARIOS);
     }
 
@@ -1835,6 +1841,25 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
         carregarTabelaDadosAvulsos();
     }
+    
+    private List<Unidade> filtrarListaCondominoPorUnidade(String sequencia, List<Unidade> unidades) {
+        ArrayList<Unidade> listaFiltrada = new ArrayList<Unidade>();
+
+        String[] sequencias = sequencia.toUpperCase().split(" ", 0);
+
+        UNIDADES:
+        for (Unidade u : unidades) {
+            for (String s : sequencias) {
+                if (!u.getUnidade().toUpperCase().contains(s)) {
+                    continue UNIDADES;
+                }
+            }
+
+            listaFiltrada.add(u);
+        }
+
+        return listaFiltrada;
+    }
 
     private class ControladorEventos extends ControladorEventosGenerico {
 
@@ -1887,6 +1912,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             txtConta.addFocusListener(this);
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
+            txtFiltro.addCaretListener(this);
         }
 
         @Override
@@ -2008,13 +2034,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             } else if (origem == itemMenuImprimirEnvelopeP) {
                 imprimirEnvelope();
-            } else if(origem == itemMenuPresentesAE){
+            } else if (origem == itemMenuPresentesAE) {
                 imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_EXTRAORDINARIA);
-            } else if (origem == itemMenuPresentesAO){
+            } else if (origem == itemMenuPresentesAO) {
                 imprimirListaPresentesAssembleia(TipoRelatorio.ASSEMBLEIA_ORDINARIA);
-            } else if (origem == itemMenuRelacaoFracoesIdeais){
+            } else if (origem == itemMenuRelacaoFracoesIdeais) {
                 imprimirListaFracoesIdeais();
-            } else if (origem == itemMenuImprimirRelacaoProprietarios){
+            } else if (origem == itemMenuImprimirRelacaoProprietarios) {
                 imprimirRelacaoProprietarios();
             }
         }
@@ -2101,6 +2127,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 exibirPainelDetalheAcordo();
             }
         }
+        
+        @Override
+        public void caretUpdate(CaretEvent e) {
+            if (e.getSource() == txtFiltro) {
+                modeloTabelaCondominos.filtrar();
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -2144,6 +2177,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
+        jLabel15 = new javax.swing.JLabel();
+        txtFiltro = new javax.swing.JTextField();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         painelLancamentos = new javax.swing.JPanel();
         painelBoletos = new javax.swing.JPanel();
@@ -2298,7 +2333,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCondominos.setBorder(javax.swing.BorderFactory.createTitledBorder("Condôminos"));
 
-        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2312,19 +2347,32 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         ));
         jScrollPane4.setViewportView(tabelaCondominos);
 
+        jLabel15.setText("Filtrar por Unidade:");
+
+        txtFiltro.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
         javax.swing.GroupLayout painelCondominosLayout = new javax.swing.GroupLayout(painelCondominos);
         painelCondominos.setLayout(painelCondominosLayout);
         painelCondominosLayout.setHorizontalGroup(
             painelCondominosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelCondominosLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(painelCondominosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(painelCondominosLayout.createSequentialGroup()
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         painelCondominosLayout.setVerticalGroup(
             painelCondominosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCondominosLayout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                .addGroup(painelCondominosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3060,7 +3108,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3076,7 +3124,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 494, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -3122,6 +3170,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
@@ -3187,6 +3236,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private net.sf.nachocalendar.components.DateField txtDataVencimento;
     private net.sf.nachocalendar.components.DateField txtDataVencimentoAvulso;
+    private javax.swing.JTextField txtFiltro;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtMensagem1;
     private javax.swing.JTextField txtMensagem2;
