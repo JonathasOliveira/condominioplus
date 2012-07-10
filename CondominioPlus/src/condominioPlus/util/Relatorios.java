@@ -377,6 +377,10 @@ public class Relatorios implements Printable {
                 imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
             } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS) {
                 imprimir("RelatorioRelacaoProprietarios", parametros, listaCondominos, false, imprimirRemetente, null);
+            } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL) {
+                imprimir("RelatorioRelacaoProprietariosEmail", parametros, listaCondominos, false, imprimirRemetente, null);
+            } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE) {
+                imprimir("RelatorioRelacaoProprietariosUnidade", parametros, listaCondominos, false, imprimirRemetente, null);
             }
         }
     }
