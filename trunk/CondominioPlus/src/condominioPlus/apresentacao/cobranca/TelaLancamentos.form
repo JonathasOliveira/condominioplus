@@ -137,6 +137,16 @@
             <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o de Propriet&#xe1;rios"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirRelacaoProprietariosEmail">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o de Propriet&#xe1;rios - Email"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirRelacaoProprietariosUnidade">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o de Propriet&#xe1;rios - Unidade"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuDadosAvulsos">
@@ -204,7 +214,7 @@
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jTabbedPane1" min="-2" pref="573" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="12" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>

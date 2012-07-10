@@ -1785,8 +1785,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimirListaFracoesIdeais(condominio, modeloTabelaCondominos.getObjetos());
     }
 
-    public void imprimirRelacaoProprietarios() {
-        new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), TipoRelatorio.RELACAO_PROPRIETARIOS);
+    public void imprimirRelacaoProprietarios(TipoRelatorio tipo) {
+        new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), tipo);
     }
 
     private List listaCampos() {
@@ -1890,6 +1890,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuPresentesAO.addActionListener(this);
             itemMenuRelacaoFracoesIdeais.addActionListener(this);
             itemMenuImprimirRelacaoProprietarios.addActionListener(this);
+            itemMenuImprimirRelacaoProprietariosEmail.addActionListener(this);
+            itemMenuImprimirRelacaoProprietariosUnidade.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -2041,7 +2043,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuRelacaoFracoesIdeais) {
                 imprimirListaFracoesIdeais();
             } else if (origem == itemMenuImprimirRelacaoProprietarios) {
-                imprimirRelacaoProprietarios();
+                imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS);
+            } else if (origem == itemMenuImprimirRelacaoProprietariosEmail){
+                imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL);
+            } else if (origem == itemMenuImprimirRelacaoProprietariosUnidade){
+                imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
             }
         }
 
@@ -2170,6 +2176,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuPresentesAE = new javax.swing.JMenuItem();
         itemMenuRelacaoFracoesIdeais = new javax.swing.JMenuItem();
         itemMenuImprimirRelacaoProprietarios = new javax.swing.JMenuItem();
+        itemMenuImprimirRelacaoProprietariosEmail = new javax.swing.JMenuItem();
+        itemMenuImprimirRelacaoProprietariosUnidade = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2317,6 +2325,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirRelacaoProprietarios.setText("Imprimir Relação de Proprietários");
         popupMenuCondominos.add(itemMenuImprimirRelacaoProprietarios);
 
+        itemMenuImprimirRelacaoProprietariosEmail.setText("Imprimir Relação de Proprietários - Email");
+        popupMenuCondominos.add(itemMenuImprimirRelacaoProprietariosEmail);
+
+        itemMenuImprimirRelacaoProprietariosUnidade.setText("Imprimir Relação de Proprietários - Unidade");
+        popupMenuCondominos.add(itemMenuImprimirRelacaoProprietariosUnidade);
+
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
 
@@ -2333,7 +2347,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelCondominos.setBorder(javax.swing.BorderFactory.createTitledBorder("Condôminos"));
 
-        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        tabelaCondominos.setFont(new java.awt.Font("Tahoma", 0, 10));
         tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -3108,7 +3122,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3154,6 +3168,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietarios;
+    private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietariosEmail;
+    private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietariosUnidade;
     private javax.swing.JMenuItem itemMenuLancarNoCaixa;
     private javax.swing.JMenuItem itemMenuLimparDadosAvulsos;
     private javax.swing.JMenuItem itemMenuOcultar;
