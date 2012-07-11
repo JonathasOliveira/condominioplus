@@ -18,7 +18,8 @@ public enum TipoRelatorio {
     ENVELOPE_PEQUENO("Envelope Pequeno"),
     RELACAO_PROPRIETARIOS("Relação de Proprietários"),
     RELACAO_PROPRIETARIOS_UNIDADE("Relação de Proprietários - Unidade"),
-    RELACAO_PROPRIETARIOS_EMAIL("Relação de Proprietários - Email");
+    RELACAO_PROPRIETARIOS_EMAIL("Relação de Proprietários - Email"),
+    RELACAO_POSTAGEM("Relação para Postagem");
 
     TipoRelatorio(String nome) {
         this.nome = nome;
