@@ -1772,6 +1772,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         }
     }
+    
+    public void imprimirRelacaoPostagem(){
+        if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
+        } else {
+            new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetosSelecionados(), TipoRelatorio.RELACAO_POSTAGEM);
+        }
+    }
 
     public void imprimirListaPresentesAssembleia(TipoRelatorio tipo) {
         DialogoDadosListaAssembleia dialogo = new DialogoDadosListaAssembleia(null, true, tipo);
@@ -1862,7 +1870,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
-
         Object origem;
 
         @Override
@@ -1892,6 +1899,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirRelacaoProprietarios.addActionListener(this);
             itemMenuImprimirRelacaoProprietariosEmail.addActionListener(this);
             itemMenuImprimirRelacaoProprietariosUnidade.addActionListener(this);
+            itemMenuImprimirRelacaoPostagem.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -2048,6 +2056,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL);
             } else if (origem == itemMenuImprimirRelacaoProprietariosUnidade){
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
+            } else if (origem == itemMenuImprimirRelacaoPostagem){
+                imprimirRelacaoPostagem();
             }
         }
 
@@ -2178,6 +2188,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirRelacaoProprietarios = new javax.swing.JMenuItem();
         itemMenuImprimirRelacaoProprietariosEmail = new javax.swing.JMenuItem();
         itemMenuImprimirRelacaoProprietariosUnidade = new javax.swing.JMenuItem();
+        itemMenuImprimirRelacaoPostagem = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2330,6 +2341,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuImprimirRelacaoProprietariosUnidade.setText("Imprimir Relação de Proprietários - Unidade");
         popupMenuCondominos.add(itemMenuImprimirRelacaoProprietariosUnidade);
+
+        itemMenuImprimirRelacaoPostagem.setText("Imprimir Relação para Postagem");
+        popupMenuCondominos.add(itemMenuImprimirRelacaoPostagem);
 
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
@@ -3167,6 +3181,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirEnvelopeP;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
+    private javax.swing.JMenuItem itemMenuImprimirRelacaoPostagem;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietarios;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietariosEmail;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietariosUnidade;

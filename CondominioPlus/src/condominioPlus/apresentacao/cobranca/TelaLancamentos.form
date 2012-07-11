@@ -147,6 +147,11 @@
             <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o de Propriet&#xe1;rios - Unidade"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirRelacaoPostagem">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o para Postagem"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuDadosAvulsos">
