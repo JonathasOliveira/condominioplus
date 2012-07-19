@@ -24,7 +24,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -438,6 +437,24 @@ public class Relatorios implements Printable {
         if (!lista.isEmpty()) {
             imprimir("RelatorioRelacaoFracaoIdeal", parametros, lista, false, true, null);
         }
-
+    }
+    
+    public void imprimirCertificadoQuitacao(Unidade u){
+        URL caminhoMoldura = getClass().getResource("/condominioPlus/recursos/imagens/moldura.jpg");
+        
+        HashMap<String, Object> parametros = new HashMap();
+        
+        parametros.put("caminhoMoldura", caminhoMoldura.toString());
+        
+        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+        
+        HashMap<String, String> mapa = new HashMap();        
+        mapa.put("unidade", u.getUnidade());
+        mapa.put("nome", u.getCondomino().getNome());
+        mapa.put("condominio", u.getCondominio().getRazaoSocial());
+        lista.add(mapa);        
+        
+        imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
+       
     }
 }
