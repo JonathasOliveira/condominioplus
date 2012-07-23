@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioDetalheAcordo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1"/>
+	<parameter name="condominio" class="java.lang.String"/>
+	<parameter name="dataEmissao" class="java.lang.String"/>
+	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="periodo" class="java.lang.String"/>
+	<parameter name="subrelatorio" class="java.lang.String"/>
+	<parameter name="dataCalculo" class="java.lang.String"/>
+	<parameter name="subrelatorio2" class="java.lang.String"/>
+	<parameter name="somaValorOriginal" class="java.lang.String"/>
+	<parameter name="somaJuros" class="java.lang.String"/>
+	<parameter name="somaMulta" class="java.lang.String"/>
+	<parameter name="somaTotalGeral" class="java.lang.String"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="unidade" class="java.lang.String"/>
+	<field name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<field name="totalOriginal" class="java.lang.String"/>
+	<field name="totalJuros" class="java.lang.String"/>
+	<field name="totalMulta" class="java.lang.String"/>
+	<field name="totalGeral" class="java.lang.String"/>
+	<field name="listaPagamentos" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="126" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="9" width="385" height="105"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement x="0" y="96" width="419" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="490" y="63" width="65" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="490" y="96" width="64" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="377" y="63" width="110" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField>
+				<reportElement x="6" y="108" width="406" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="496" y="75" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="496" y="65" width="59" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Emissão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="397" y="6" width="153" height="51"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="18" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Inadimplência Analítica]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="496" y="108" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="98" width="76" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Entidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="98" width="59" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Folha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="382" y="65" width="69" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Período]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="382" y="75" width="98" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="422" y="96" width="65" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="428" y="98" width="59" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Cálculos até]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="428" y="108" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataCalculo}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+		</band>
+	</title>
+	<detail>
+		<band height="71" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="3" width="554" height="16" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="6" y="4" width="42" height="16"/>
+				<textElement>
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="4" width="60" height="16"/>
+				<textElement>
+					<font isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Proprietário]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="48" y="4" width="34" height="16"/>
+				<textElement textAlignment="Left">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="156" y="4" width="394" height="16"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="466" y="51" width="70" height="16" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalGeral}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<subreport>
+				<reportElement x="0" y="19" width="554" height="31"/>
+				<subreportParameter name="subrelatorio2">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement positionType="Float" x="6" y="51" width="279" height="16"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["TOTAL GERAL DA UNIDADE " + $F{unidade}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="46">
+			<rectangle>
+				<reportElement x="169" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField>
+				<reportElement positionType="Float" x="177" y="23" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaValorOriginal}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="6" y="9" width="62" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RESUMO:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Original]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="265" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="271" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Juros]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="273" y="23" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaJuros}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="362" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="368" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Multa]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="370" y="22" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMulta}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="458" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="464" y="10" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="466" y="22" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="true" isItalic="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaTotalGeral}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
