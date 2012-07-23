@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioDetalheAcordo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1"/>
+	<parameter name="condominio" class="java.lang.String"/>
+	<parameter name="dataEmissao" class="java.lang.String"/>
+	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="data" class="java.lang.String"/>
+	<parameter name="nomeRelatorio" class="java.lang.String"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="unidade" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="132" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="12" width="362" height="89"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement x="0" y="96" width="473" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="477" y="63" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="477" y="96" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="385" y="63" width="88" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="108" width="461" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="496" y="108" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{data}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="482" y="98" width="70" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Data Assembleia]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="496" y="75" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="98" width="76" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Entidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="482" y="65" width="70" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Folha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="65" width="70" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Emissão]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="413" y="75" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="375" y="15" width="180" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Presentes na]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="375" y="33" width="180" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomeRelatorio}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="18" splitType="Stretch">
+			<staticText>
+				<reportElement x="6" y="0" width="46" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="0" width="82" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Proprietário(a)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="0" width="82" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Assinatura]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="38" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="555" height="38" forecolor="#FFFFFF" backcolor="#CCCCCC">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 1)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="5" width="46" height="20"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="64" y="5" width="271" height="20"/>
+				<textElement>
+					<font isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="344" y="5" width="206" height="28" forecolor="#CCCCCC"/>
+			</rectangle>
+		</band>
+	</detail>
+</jasperReport>

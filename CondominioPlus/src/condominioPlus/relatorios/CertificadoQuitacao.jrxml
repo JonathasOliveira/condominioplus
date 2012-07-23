@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioDetalheAcordo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="0.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1"/>
+	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="caminhoMoldura" class="java.lang.String"/>
+	<field name="nome" class="java.lang.String"/>
+	<field name="unidade" class="java.lang.String"/>
+	<field name="condominio" class="java.lang.String"/>
+	<field name="data" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="802" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="0" width="555" height="394"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{caminhoMoldura}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="84" width="36" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="84" width="271" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="50" y="95" width="205" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="259" y="95" width="105" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{data}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="222" y="57" width="180" height="38"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Certificado de Quitação]]></text>
+			</staticText>
+			<image>
+				<reportElement x="82" y="118" width="362" height="89"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<image>
+				<reportElement x="1" y="408" width="555" height="394"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{caminhoMoldura}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>
