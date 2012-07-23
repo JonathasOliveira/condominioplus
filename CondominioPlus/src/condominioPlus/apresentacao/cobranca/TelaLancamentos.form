@@ -152,6 +152,11 @@
             <Property name="text" type="java.lang.String" value="Imprimir Rela&#xe7;&#xe3;o para Postagem"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirCertificadoQuitacao">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Certificado de Quita&#xe7;&#xe3;o"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuDadosAvulsos">

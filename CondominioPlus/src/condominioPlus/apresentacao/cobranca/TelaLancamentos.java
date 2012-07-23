@@ -1797,6 +1797,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), tipo);
     }
 
+    public void imprimirCertificadoQuitacao(){
+        if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
+        } else {
+            new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado());
+        }
+    }
+    
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
@@ -1900,6 +1908,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirRelacaoProprietariosEmail.addActionListener(this);
             itemMenuImprimirRelacaoProprietariosUnidade.addActionListener(this);
             itemMenuImprimirRelacaoPostagem.addActionListener(this);
+            itemMenuImprimirCertificadoQuitacao.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
@@ -2058,6 +2067,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
             } else if (origem == itemMenuImprimirRelacaoPostagem){
                 imprimirRelacaoPostagem();
+            } else if (origem == itemMenuImprimirCertificadoQuitacao){
+                imprimirCertificadoQuitacao();
             }
         }
 
@@ -2189,6 +2200,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirRelacaoProprietariosEmail = new javax.swing.JMenuItem();
         itemMenuImprimirRelacaoProprietariosUnidade = new javax.swing.JMenuItem();
         itemMenuImprimirRelacaoPostagem = new javax.swing.JMenuItem();
+        itemMenuImprimirCertificadoQuitacao = new javax.swing.JMenuItem();
         popupMenuDadosAvulsos = new javax.swing.JPopupMenu();
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
@@ -2344,6 +2356,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuImprimirRelacaoPostagem.setText("Imprimir Relação para Postagem");
         popupMenuCondominos.add(itemMenuImprimirRelacaoPostagem);
+
+        itemMenuImprimirCertificadoQuitacao.setText("Imprimir Certificado de Quitação");
+        popupMenuCondominos.add(itemMenuImprimirCertificadoQuitacao);
 
         itemMenuOcultarDados.setText("Mudar Altura da Lista");
         popupMenuDadosAvulsos.add(itemMenuOcultarDados);
@@ -3177,6 +3192,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
+    private javax.swing.JMenuItem itemMenuImprimirCertificadoQuitacao;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirEnvelopeP;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
