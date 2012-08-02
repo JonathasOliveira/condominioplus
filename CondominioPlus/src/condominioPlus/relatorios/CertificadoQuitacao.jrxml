@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioDetalheAcordo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="0.5"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
@@ -20,32 +20,32 @@
 				<imageExpression class="java.lang.String"><![CDATA[$P{caminhoMoldura}]]></imageExpression>
 			</image>
 			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="84" width="36" height="10"/>
+				<reportElement x="304" y="163" width="90" height="25"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7" isBold="false"/>
+					<font size="18" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="50" y="84" width="271" height="10"/>
+				<reportElement x="60" y="135" width="422" height="25"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7" isBold="false"/>
+					<font size="18" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="50" y="95" width="205" height="10"/>
+				<reportElement x="113" y="191" width="365" height="25"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="18" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="259" y="95" width="105" height="10"/>
+				<reportElement x="60" y="219" width="422" height="25"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="18" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{data}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["não possui débitos até " + $F{data} + "."]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="45" width="555" height="50"/>
@@ -55,7 +55,7 @@
 				<text><![CDATA[Certificado de Quitação]]></text>
 			</staticText>
 			<image>
-				<reportElement x="82" y="118" width="362" height="89"/>
+				<reportElement x="162" y="269" width="320" height="72"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<image>
@@ -69,6 +69,87 @@
 				</textElement>
 				<text><![CDATA[---------------------------------------------------------------------------------------------]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="60" y="107" width="165" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Certificamos que]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="163" width="235" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[proprietário(a) da unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="191" width="49" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[do(a)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="467" width="555" height="50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="22" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Certificado de Quitação]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="529" width="165" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Certificamos que]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="613" width="49" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[do(a)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="60" y="585" width="235" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[proprietário(a) da unidade]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="304" y="585" width="90" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="113" y="613" width="365" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="557" width="422" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="162" y="691" width="320" height="72"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="60" y="641" width="422" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["não possui débitos até " + $F{data} + "."]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>
