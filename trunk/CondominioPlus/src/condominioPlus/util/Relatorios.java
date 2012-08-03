@@ -8,6 +8,7 @@
  */
 package condominioPlus.util;
 
+import condominioPlus.apresentacao.cobranca.TelaLancamentos;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
@@ -32,6 +33,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
+import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import net.sf.jasperreports.engine.JRException;
@@ -331,7 +333,7 @@ public class Relatorios implements Printable {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
-        
+
         // parametro para o relatório Relacao Proprietarios
         parametros.put("condominio", condominio.getRazaoSocial());
 
@@ -380,7 +382,7 @@ public class Relatorios implements Printable {
                 imprimir("RelatorioRelacaoProprietariosEmail", parametros, listaCondominos, false, imprimirRemetente, null);
             } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE) {
                 imprimir("RelatorioRelacaoProprietariosUnidade", parametros, listaCondominos, false, imprimirRemetente, null);
-            } else if (tipo == TipoRelatorio.RELACAO_POSTAGEM){
+            } else if (tipo == TipoRelatorio.RELACAO_POSTAGEM) {
                 imprimir("RelatorioRelacaoPostagem", parametros, listaCondominos, false, imprimirRemetente, null);
             }
         }
@@ -438,23 +440,23 @@ public class Relatorios implements Printable {
             imprimir("RelatorioRelacaoFracaoIdeal", parametros, lista, false, true, null);
         }
     }
-    
-    public void imprimirCertificadoQuitacao(Unidade u){
+
+    public void imprimirCertificadoQuitacao(Unidade u, DateTime dataFinal) {
         URL caminhoMoldura = getClass().getResource("/condominioPlus/recursos/imagens/moldura.jpg");
-        
+
         HashMap<String, Object> parametros = new HashMap();
-        
+
         parametros.put("caminhoMoldura", caminhoMoldura.toString());
-        
+
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
-        
-        HashMap<String, String> mapa = new HashMap();        
+
+        HashMap<String, String> mapa = new HashMap();
         mapa.put("unidade", u.getUnidade());
         mapa.put("nome", u.getCondomino().getNome());
         mapa.put("condominio", u.getCondominio().getRazaoSocial());
-        lista.add(mapa);        
-        
+        mapa.put("data", DataUtil.toString(dataFinal));
+        lista.add(mapa);
+
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
-       
     }
 }

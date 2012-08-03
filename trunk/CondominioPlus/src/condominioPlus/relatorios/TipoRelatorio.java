@@ -19,7 +19,8 @@ public enum TipoRelatorio {
     RELACAO_PROPRIETARIOS_UNIDADE("Relação de Proprietários - Unidade"),
     RELACAO_PROPRIETARIOS_EMAIL("Relação de Proprietários - Email"),
     RELACAO_POSTAGEM("Relação para Postagem"),
-    CERTIFICADO_QUITACAO("Certificado de Quitação");
+    CERTIFICADO_QUITACAO("Certificado de Quitação"),
+    CARTA_SINTETICA("Carta Sintética");
 
     TipoRelatorio(String nome) {
         this.nome = nome;
