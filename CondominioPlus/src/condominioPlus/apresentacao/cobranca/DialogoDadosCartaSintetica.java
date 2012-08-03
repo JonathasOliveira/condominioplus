@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao.cobranca;
 
+import condominioPlus.relatorios.TipoRelatorio;
 import java.awt.event.ActionEvent;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.util.DataUtil;
@@ -25,11 +26,18 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
     private DateTime dataFinal;
 
     /** Creates new form DialogoDadosCartaSintetica */
-    public DialogoDadosCartaSintetica(java.awt.Frame parent, boolean modal) {
+    public DialogoDadosCartaSintetica(java.awt.Frame parent, boolean modal, TipoRelatorio tipo) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
+        
+        if (tipo == TipoRelatorio.CARTA_SINTETICA){
+            this.setTitle("Imprimir Carta Sintética");
+        } else if (tipo == TipoRelatorio.CERTIFICADO_QUITACAO){
+            this.setTitle("Imprimir Certificado de Quitação");
+        }
+        
         txtDataInicial.setValue(DataUtil.getDate(new DateTime(1970, 1, 1, 0, 0, 0, 0)));
         txtDataInicial.setEnabled(false);
     }

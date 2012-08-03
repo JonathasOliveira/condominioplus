@@ -140,7 +140,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             protected List<Unidade> getCarregarObjetos() {
                 return getUnidades();
             }
-            
+
             @Override
             protected List<Unidade> getFiltrar(List<Unidade> unidades) {
                 return filtrarListaCondominoPorUnidade(txtFiltro.getText(), unidades);
@@ -1705,7 +1705,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirCartaSintetica() {
-        DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true);
+        DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true, TipoRelatorio.CARTA_SINTETICA);
         dialogo.setVisible(true);
 
         if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
@@ -1772,8 +1772,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         }
     }
-    
-    public void imprimirRelacaoPostagem(){
+
+    public void imprimirRelacaoPostagem() {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
         } else {
@@ -1797,14 +1797,31 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), tipo);
     }
 
-    public void imprimirCertificadoQuitacao(){
+    public void imprimirCertificadoQuitacao() {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
-            ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione a unidade desejada.", this);
         } else {
-            new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado());
+            DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true, TipoRelatorio.CERTIFICADO_QUITACAO);
+            dialogo.setVisible(true);
+
+            if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
+                boolean imprimir = true;
+
+                for (Cobranca co : modeloTabelaCondominos.getObjetoSelecionado().getCobrancas()) {
+                    if (co.getDataPagamento() == null && DataUtil.compararData(dialogo.getDataIncial(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dialogo.getDataFinal(), DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
+                        imprimir = false;
+                    }
+                }
+
+                if (imprimir) {
+                    new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado(), dialogo.getDataFinal());
+                } else {
+                    ApresentacaoUtil.exibirAdvertencia("Não é possível imprimir, pois a unidade selecionada possui débito.", this);
+                }
+            }
         }
     }
-    
+
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
@@ -1857,7 +1874,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
         carregarTabelaDadosAvulsos();
     }
-    
+
     private List<Unidade> filtrarListaCondominoPorUnidade(String sequencia, List<Unidade> unidades) {
         ArrayList<Unidade> listaFiltrada = new ArrayList<Unidade>();
 
@@ -1878,6 +1895,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
+
         Object origem;
 
         @Override
@@ -2061,13 +2079,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirListaFracoesIdeais();
             } else if (origem == itemMenuImprimirRelacaoProprietarios) {
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS);
-            } else if (origem == itemMenuImprimirRelacaoProprietariosEmail){
+            } else if (origem == itemMenuImprimirRelacaoProprietariosEmail) {
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL);
-            } else if (origem == itemMenuImprimirRelacaoProprietariosUnidade){
+            } else if (origem == itemMenuImprimirRelacaoProprietariosUnidade) {
                 imprimirRelacaoProprietarios(TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
-            } else if (origem == itemMenuImprimirRelacaoPostagem){
+            } else if (origem == itemMenuImprimirRelacaoPostagem) {
                 imprimirRelacaoPostagem();
-            } else if (origem == itemMenuImprimirCertificadoQuitacao){
+            } else if (origem == itemMenuImprimirCertificadoQuitacao) {
                 imprimirCertificadoQuitacao();
             }
         }
@@ -2154,7 +2172,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 exibirPainelDetalheAcordo();
             }
         }
-        
+
         @Override
         public void caretUpdate(CaretEvent e) {
             if (e.getSource() == txtFiltro) {

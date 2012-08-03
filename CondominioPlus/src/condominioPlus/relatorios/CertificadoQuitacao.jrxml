@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioDetalheAcordo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
-	<property name="ireport.zoom" value="0.5"/>
+	<property name="ireport.zoom" value="0.75"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="48"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="caminhoMoldura" class="java.lang.String"/>
@@ -20,42 +20,42 @@
 				<imageExpression class="java.lang.String"><![CDATA[$P{caminhoMoldura}]]></imageExpression>
 			</image>
 			<textField isBlankWhenNull="true">
-				<reportElement x="304" y="163" width="90" height="25"/>
+				<reportElement x="258" y="139" width="90" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="135" width="422" height="25"/>
+				<reportElement x="59" y="115" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="113" y="191" width="365" height="25"/>
+				<reportElement x="104" y="163" width="365" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="219" width="422" height="25"/>
+				<reportElement x="59" y="187" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["não possui débitos até " + $F{data} + "."]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="45" width="555" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="22" isBold="true"/>
+					<font fontName="Arial" size="24" isBold="true" isItalic="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Certificado de Quitação]]></text>
 			</staticText>
 			<image>
-				<reportElement x="162" y="269" width="320" height="72"/>
+				<reportElement x="88" y="217" width="331" height="87"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<image>
@@ -70,86 +70,198 @@
 				<text><![CDATA[---------------------------------------------------------------------------------------------]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="107" width="165" height="25"/>
+				<reportElement x="59" y="92" width="165" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Certificamos que]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="163" width="235" height="25"/>
+				<reportElement x="59" y="139" width="200" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[proprietário(a) da unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="191" width="49" height="25"/>
+				<reportElement x="59" y="163" width="49" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[do(a)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="467" width="555" height="50"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="22" isBold="true"/>
+					<font fontName="Arial" size="24" isBold="true" isItalic="true" isUnderline="false"/>
 				</textElement>
 				<text><![CDATA[Certificado de Quitação]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="529" width="165" height="25"/>
+				<reportElement x="59" y="514" width="165" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Certificamos que]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="613" width="49" height="25"/>
+				<reportElement x="59" y="585" width="49" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[do(a)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="60" y="585" width="235" height="25"/>
+				<reportElement x="59" y="561" width="200" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[proprietário(a) da unidade]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="304" y="585" width="90" height="25"/>
+				<reportElement x="258" y="561" width="90" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="113" y="613" width="365" height="25"/>
+				<reportElement x="104" y="585" width="365" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="557" width="422" height="25"/>
+				<reportElement x="59" y="537" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="true"/>
+					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
-			<image>
-				<reportElement x="162" y="691" width="320" height="72"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
-			</image>
 			<textField isBlankWhenNull="true">
-				<reportElement x="60" y="641" width="422" height="25"/>
+				<reportElement x="59" y="609" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["não possui débitos até " + $F{data} + "."]]></textFieldExpression>
 			</textField>
+			<image>
+				<reportElement x="88" y="639" width="331" height="87"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="136" y="289" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRC/RJ 088600/0-0]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="299" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRA/RJ 20-59303-1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="308" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CPF 086.799.077-58]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="279" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artur Mureb de Araújo Goes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="289" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRC/RJ 088600/0-0]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="279" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artur Mureb de Araújo Goes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="308" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CPF 086.799.077-58]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="299" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRA/RJ 20-59303-1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="711" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRC/RJ 088600/0-0]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="711" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRC/RJ 088600/0-0]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="701" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artur Mureb de Araújo Goes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="701" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Artur Mureb de Araújo Goes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="730" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CPF 086.799.077-58]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="721" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRA/RJ 20-59303-1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="730" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CPF 086.799.077-58]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="136" y="721" width="136" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CRA/RJ 20-59303-1]]></text>
+			</staticText>
 		</band>
 	</detail>
 </jasperReport>
