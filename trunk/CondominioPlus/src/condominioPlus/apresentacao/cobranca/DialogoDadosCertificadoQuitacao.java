@@ -4,7 +4,7 @@
  */
 
 /*
- * DialogoDadosCartaSintetica.java
+ * DialogoDadosCerticadoQuitacao.java
  *
  * Created on 07/10/2010, 14:33:06
  */
@@ -19,13 +19,14 @@ import org.joda.time.DateTime;
  *
  * @author Administrador
  */
-public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
+public class DialogoDadosCertificadoQuitacao extends javax.swing.JDialog {
 
     private DateTime dataInicial;
     private DateTime dataFinal;
+    private boolean imprimirAssinaturaBreca;
 
-    /** Creates new form DialogoDadosCartaSintetica */
-    public DialogoDadosCartaSintetica(java.awt.Frame parent, boolean modal) {
+    /** Creates new form DialogoDadosCerticadoQuitacao */
+    public DialogoDadosCertificadoQuitacao(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
@@ -43,9 +44,19 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
         return dataFinal;
     }
 
+    public boolean getImprimirAssinaturaBreca() {
+        return imprimirAssinaturaBreca;
+    }
+
     private void salvarDados() {
         dataInicial = DataUtil.getDateTime(txtDataInicial.getValue());
         dataFinal = DataUtil.getDateTime(txtDataFinal.getValue());
+        
+        if (radioAssinaturaBreca.isSelected()){
+            imprimirAssinaturaBreca = true;
+        } else if (radioAssinaturaArtur.isSelected()){
+            imprimirAssinaturaBreca = false;
+        }
 
         sair();
     }
@@ -93,9 +104,12 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
         txtDataFinal = new net.sf.nachocalendar.components.DateField();
         txtDataInicial = new net.sf.nachocalendar.components.DateField();
         jLabel3 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        radioAssinaturaBreca = new javax.swing.JRadioButton();
+        radioAssinaturaArtur = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Imprimir Carta Sintética");
+        setTitle("Imprimir Certificado Quitação");
         setAlwaysOnTop(true);
 
         painelPrincipal.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -133,6 +147,15 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("a");
 
+        jLabel1.setText("Assinatura:");
+
+        buttonGroup1.add(radioAssinaturaBreca);
+        radioAssinaturaBreca.setSelected(true);
+        radioAssinaturaBreca.setText("Breca");
+
+        buttonGroup1.add(radioAssinaturaArtur);
+        radioAssinaturaArtur.setText("Artur");
+
         javax.swing.GroupLayout painelPrincipalLayout = new javax.swing.GroupLayout(painelPrincipal);
         painelPrincipal.setLayout(painelPrincipalLayout);
         painelPrincipalLayout.setHorizontalGroup(
@@ -140,27 +163,40 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
             .addGroup(painelPrincipalLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(painelPrincipalLayout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addGroup(painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(painelPrincipalLayout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(radioAssinaturaBreca)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(radioAssinaturaArtur))
+                            .addGroup(painelPrincipalLayout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         painelPrincipalLayout.setVerticalGroup(
             painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelPrincipalLayout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addGap(19, 19, 19)
                 .addGroup(painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3)
                     .addComponent(jLabel2)
                     .addComponent(txtDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(19, 19, 19)
+                .addGroup(painelPrincipalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(radioAssinaturaBreca)
+                    .addComponent(radioAssinaturaArtur))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -182,7 +218,7 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getAccessibleContext().setAccessibleName("Imprimir Carta Sintética");
+        getAccessibleContext().setAccessibleName("certificadoQuitacao");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -190,10 +226,13 @@ public class DialogoDadosCartaSintetica extends javax.swing.JDialog {
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOk;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel painelPrincipal;
+    private javax.swing.JRadioButton radioAssinaturaArtur;
+    private javax.swing.JRadioButton radioAssinaturaBreca;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     // End of variables declaration//GEN-END:variables

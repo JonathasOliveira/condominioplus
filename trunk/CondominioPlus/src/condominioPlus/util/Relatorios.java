@@ -441,12 +441,24 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirCertificadoQuitacao(Unidade u, DateTime dataFinal) {
+    public void imprimirCertificadoQuitacao(Unidade u, DateTime dataFinal, boolean imprimirAssinaturaBreca) {
         URL caminhoMoldura = getClass().getResource("/condominioPlus/recursos/imagens/moldura.jpg");
 
         HashMap<String, Object> parametros = new HashMap();
 
         parametros.put("caminhoMoldura", caminhoMoldura.toString());
+        
+        if (imprimirAssinaturaBreca){
+            parametros.put("nomeAssinatura", "Carlos Alberto Costa de Araujo Goes");
+            parametros.put("crcAssinatura", "CRC/RJ 428385/0-0");
+            parametros.put("craAssinatura", "CPF 260.412.867-53");
+            parametros.put("cpfAssinatura", "");
+        } else {
+            parametros.put("nomeAssinatura", "Artur Mureb de Araujo Goes");
+            parametros.put("crcAssinatura", "CRC/RJ 088600/0-0");
+            parametros.put("craAssinatura", "CRA/RJ 20-59303-1");
+            parametros.put("cpfAssinatura", "CPF 086.799.077-58");
+        }
 
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 

@@ -1705,7 +1705,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirCartaSintetica() {
-        DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true, TipoRelatorio.CARTA_SINTETICA);
+        DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true);
         dialogo.setVisible(true);
 
         if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
@@ -1801,7 +1801,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Selecione a unidade desejada.", this);
         } else {
-            DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true, TipoRelatorio.CERTIFICADO_QUITACAO);
+            DialogoDadosCertificadoQuitacao dialogo = new DialogoDadosCertificadoQuitacao(null, true);
             dialogo.setVisible(true);
 
             if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
@@ -1814,7 +1814,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
 
                 if (imprimir) {
-                    new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado(), dialogo.getDataFinal());
+                    new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado(), dialogo.getDataFinal(), dialogo.getImprimirAssinaturaBreca());
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Não é possível imprimir, pois a unidade selecionada possui débito.", this);
                 }
