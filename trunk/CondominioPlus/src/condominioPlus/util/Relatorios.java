@@ -8,7 +8,6 @@
  */
 package condominioPlus.util;
 
-import condominioPlus.apresentacao.cobranca.TelaLancamentos;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
@@ -33,7 +32,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
-import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import net.sf.jasperreports.engine.JRException;
@@ -146,6 +144,68 @@ public class Relatorios implements Printable {
                 job.print();
             } catch (PrinterException ex) {
                 ex.printStackTrace();
+            }
+        }
+    }
+
+    public void imprimirCarta(Unidade u, DateTime dataInicial, DateTime dataFinal, TipoRelatorio tipo) {
+        List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", u.getCondominio().getRazaoSocial());
+        parametros.put("nome", u.getCondomino().getNome());
+        parametros.put("unidade", u.getUnidade());
+
+        BigDecimal totalOriginal = new BigDecimal(0);
+        BigDecimal totalJuros = new BigDecimal(0);
+        BigDecimal totalMulta = new BigDecimal(0);
+        BigDecimal totalGeral = new BigDecimal(0);
+
+        for (Cobranca co : u.getCobrancas()) {
+            if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
+                HashMap<String, Object> mapa = new HashMap();
+                totalOriginal = totalOriginal.add(co.getValorOriginal());
+                totalJuros = totalJuros.add(co.getJuros());
+                totalMulta = totalMulta.add(co.getMulta());
+                totalGeral = totalGeral.add(co.getValorTotal());
+                mapa.put("documento", co.getNumeroDocumento());
+                mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
+                mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
+                mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
+                mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
+                mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+
+                List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+
+                if (tipo == TipoRelatorio.CARTA_ANALITICA) {
+                    for (Pagamento pagamento : co.getPagamentos()) {
+                        HashMap<String, String> mapa2 = new HashMap();
+                        mapa2.put("descricao", pagamento.getDescricao().equals(" ") ? pagamento.getHistorico() : pagamento.getDescricao());
+                        mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                        listaPagamentos.add(mapa2);
+                    }
+                }
+
+                mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+
+                listaCobrancas.add(mapa);
+            }
+        }
+
+        parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
+        parametros.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
+        parametros.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
+        parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+
+        if (!listaCobrancas.isEmpty()) {
+            if (tipo == TipoRelatorio.CARTA_SINTETICA) {
+                imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false, true, null);
+            } else if (tipo == TipoRelatorio.CARTA_ANALITICA) {
+                parametros.put("subrelatorio", caminho.toString());
+                imprimir("RelatorioCartaAnalitica", parametros, listaCobrancas, false, true, null);
             }
         }
     }
@@ -447,8 +507,8 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
 
         parametros.put("caminhoMoldura", caminhoMoldura.toString());
-        
-        if (imprimirAssinaturaBreca){
+
+        if (imprimirAssinaturaBreca) {
             parametros.put("nomeAssinatura", "Carlos Alberto Costa de Araujo Goes");
             parametros.put("crcAssinatura", "CRC/RJ 428385/0-0");
             parametros.put("craAssinatura", "CPF 260.412.867-53");
