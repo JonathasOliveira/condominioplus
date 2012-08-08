@@ -1714,8 +1714,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     new Relatorios().imprimirCarta(u, dialogo.getDataIncial(), dialogo.getDataFinal(), tipo);
                 }
             } else {
-                Unidade u = modeloTabelaCondominos.getObjetoSelecionado();
-                new Relatorios().imprimirCarta(u, dialogo.getDataIncial(), dialogo.getDataFinal(), tipo);
+                for (Unidade u : modeloTabelaCondominos.getObjetosSelecionados()) {
+                    new Relatorios().imprimirCarta(u, dialogo.getDataIncial(), dialogo.getDataFinal(), tipo);
+                }
             }
         }
     }
