@@ -1704,60 +1704,19 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         new Relatorios().imprimir("RelatorioDetalheAcordo", parametros, listaCobrancasGeradas, false, true, null);
     }
 
-    private void imprimirCartaSintetica() {
+    private void imprimirCarta(TipoRelatorio tipo) {
         DialogoDadosCartaSintetica dialogo = new DialogoDadosCartaSintetica(null, true);
         dialogo.setVisible(true);
 
         if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
             if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
                 for (Unidade u : condominio.getUnidades()) {
-                    exibirRelatorio(u, dialogo.getDataIncial(), dialogo.getDataFinal());
+                    new Relatorios().imprimirCarta(u, dialogo.getDataIncial(), dialogo.getDataFinal(), tipo);
                 }
             } else {
                 Unidade u = modeloTabelaCondominos.getObjetoSelecionado();
-                exibirRelatorio(u, dialogo.getDataIncial(), dialogo.getDataFinal());
+                new Relatorios().imprimirCarta(u, dialogo.getDataIncial(), dialogo.getDataFinal(), tipo);
             }
-        }
-    }
-
-    private void exibirRelatorio(Unidade u, DateTime dataInicial, DateTime dataFinal) {
-        List<HashMap<String, String>> listaCobrancas = new ArrayList<HashMap<String, String>>();
-
-        HashMap<String, Object> parametros = new HashMap();
-        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
-        parametros.put("condominio", condominio.getRazaoSocial());
-        parametros.put("nome", u.getCondomino().getNome());
-        parametros.put("unidade", u.getUnidade());
-
-        BigDecimal totalOriginal = new BigDecimal(0);
-        BigDecimal totalJuros = new BigDecimal(0);
-        BigDecimal totalMulta = new BigDecimal(0);
-        BigDecimal totalGeral = new BigDecimal(0);
-
-        for (Cobranca co : u.getCobrancas()) {
-            if (co.getDataPagamento() == null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
-                HashMap<String, String> mapa = new HashMap();
-                totalOriginal = totalOriginal.add(co.getValorOriginal());
-                totalJuros = totalJuros.add(co.getJuros());
-                totalMulta = totalMulta.add(co.getMulta());
-                totalGeral = totalGeral.add(co.getValorTotal());
-                mapa.put("documento", co.getNumeroDocumento());
-                mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
-                mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
-                mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
-                mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
-                mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
-                listaCobrancas.add(mapa);
-            }
-        }
-
-        parametros.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
-        parametros.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
-        parametros.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
-        parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
-
-        if (!listaCobrancas.isEmpty()) {
-            new Relatorios().imprimir("RelatorioCartaSintetica", parametros, listaCobrancas, false, true, null);
         }
     }
 
@@ -1918,6 +1877,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuExibirDetalheAcordo.addActionListener(this);
             itemMenuImprimirDetalheAcordo.addActionListener(this);
             itemMenuImprimirCartaSintetica.addActionListener(this);
+            itemMenuImprimirCartaAnalitica.addActionListener(this);
             itemMenuImprimirEnvelopeP.addActionListener(this);
             itemMenuPresentesAE.addActionListener(this);
             itemMenuPresentesAO.addActionListener(this);
@@ -2058,7 +2018,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == btnConta) {
                 pegarConta();
             } else if (origem == itemMenuImprimirCartaSintetica) {
-                imprimirCartaSintetica();
+                imprimirCarta(TipoRelatorio.CARTA_SINTETICA);
+            } else if (origem == itemMenuImprimirCartaAnalitica) {
+                imprimirCarta(TipoRelatorio.CARTA_ANALITICA);
             } else if (origem == itemMenuImprimirInadimplenciaSintetica) {
                 DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, TipoRelatorio.INADIMPLENCIA_SINTETICA, null);
                 dialogo.setVisible(true);
@@ -2198,6 +2160,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirCartaSintetica = new javax.swing.JMenuItem();
+        itemMenuImprimirCartaAnalitica = new javax.swing.JMenuItem();
         itemMenuImprimirInadimplenciaSintetica = new javax.swing.JMenuItem();
         itemMenuImprimirInadimplenciaAnalitica = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
@@ -2328,6 +2291,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuImprimirCartaSintetica.setText("Imprimir Carta Sintética");
         popupMenuInadimplentes.add(itemMenuImprimirCartaSintetica);
+
+        itemMenuImprimirCartaAnalitica.setText("Imprimir Carta Analítica");
+        popupMenuInadimplentes.add(itemMenuImprimirCartaAnalitica);
 
         itemMenuImprimirInadimplenciaSintetica.setText("Inadimplência Sintética");
         popupMenuInadimplentes.add(itemMenuImprimirInadimplenciaSintetica);
@@ -3209,6 +3175,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
+    private javax.swing.JMenuItem itemMenuImprimirCartaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
     private javax.swing.JMenuItem itemMenuImprimirCertificadoQuitacao;
     private javax.swing.JMenuItem itemMenuImprimirDetalheAcordo;

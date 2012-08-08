@@ -43,6 +43,11 @@
             <Property name="text" type="java.lang.String" value="Imprimir Carta Sint&#xe9;tica"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirCartaAnalitica">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Carta Anal&#xed;tica"/>
+          </Properties>
+        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirInadimplenciaSintetica">
           <Properties>
             <Property name="text" type="java.lang.String" value="Inadimpl&#xea;ncia Sint&#xe9;tica"/>
