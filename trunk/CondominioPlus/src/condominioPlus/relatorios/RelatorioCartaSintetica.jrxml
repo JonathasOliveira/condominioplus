@@ -113,68 +113,68 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="139" splitType="Stretch">
+		<band height="126" splitType="Stretch">
 			<rectangle>
-				<reportElement positionType="Float" x="0" y="119" width="555" height="20" forecolor="#FFFFFF" backcolor="#999999"/>
+				<reportElement positionType="Float" x="0" y="106" width="555" height="20" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="262" y="119" width="90" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="262" y="106" width="90" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Juros]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="361" y="119" width="90" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="361" y="106" width="90" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Multa]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="460" y="119" width="90" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="460" y="106" width="90" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="92" y="119" width="69" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="92" y="106" width="69" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Vencimento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="6" y="119" width="76" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="6" y="106" width="76" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="80" width="518" height="30"/>
+				<reportElement x="19" y="71" width="518" height="28"/>
 				<textElement>
-					<font size="11"/>
+					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Caso já tenha(m) sido executado(s) o(s) pagamento(s) do(s) aludido(s) débito(s) solicitamos tornar este aviso sem efeito e encaminhar a(s) cópia(s) xerox, para que possamos averiguar junto ao banco.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="47" width="518" height="17"/>
+				<reportElement x="19" y="45" width="518" height="14"/>
 				<textElement>
-					<font size="11"/>
+					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Ao contabilizar os documentos da entidade em apreço, verificamos o(s) débito(s) abaixo relacionado(s).]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="64" width="518" height="17"/>
+				<reportElement x="19" y="58" width="518" height="14"/>
 				<textElement>
-					<font size="11"/>
+					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Para liquidar o(s) débito(s) V. Sa. deverá entrar em contato com esta administradora.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="171" y="119" width="81" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="171" y="106" width="81" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
@@ -216,42 +216,42 @@
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 0)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="361" y="0" width="69" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{multa}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="460" y="0" width="77" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="262" y="0" width="69" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{juros}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="6" y="0" width="59" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{documento}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="92" y="0" width="69" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{vencimento}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="171" y="0" width="69" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
@@ -261,35 +261,85 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="39">
+		<band height="46">
+			<rectangle>
+				<reportElement x="265" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="458" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="169" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="362" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
 			<textField>
-				<reportElement x="171" y="12" width="69" height="20"/>
+				<reportElement x="177" y="23" width="69" height="20"/>
 				<textElement textAlignment="Right">
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalOriginal}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="262" y="12" width="69" height="20"/>
+				<reportElement x="273" y="23" width="69" height="20"/>
 				<textElement textAlignment="Right">
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalJuros}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="361" y="12" width="69" height="20"/>
+				<reportElement x="370" y="22" width="69" height="20"/>
 				<textElement textAlignment="Right">
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalMulta}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="460" y="12" width="77" height="20"/>
+				<reportElement x="466" y="22" width="77" height="20"/>
 				<textElement textAlignment="Right">
 					<font isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalGeral}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement x="271" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Juros]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Multa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="9" width="62" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RESUMO:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="175" y="9" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Original]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="464" y="10" width="52" height="17"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>
