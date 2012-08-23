@@ -325,9 +325,6 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
         List<Unidade> listaUnidades = new ArrayList<Unidade>();
 
-        BigDecimal somaValorOriginal = new BigDecimal(0);
-        BigDecimal somaJuros = new BigDecimal(0);
-        BigDecimal somaMulta = new BigDecimal(0);
         BigDecimal somaTotalGeral = new BigDecimal(0);
 
         if (unidades == null) {
