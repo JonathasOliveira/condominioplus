@@ -320,6 +320,84 @@ public class Relatorios implements Printable {
         }
     }
 
+    public void imprimirRelatorioPagamentosEfetuados(Condominio condominio, List<Unidade> unidades, DateTime dataInicial, DateTime dataFinal, TipoRelatorio tipo) {
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> parametros = new HashMap();
+        List<Unidade> listaUnidades = new ArrayList<Unidade>();
+
+        BigDecimal somaValorOriginal = new BigDecimal(0);
+        BigDecimal somaJuros = new BigDecimal(0);
+        BigDecimal somaMulta = new BigDecimal(0);
+        BigDecimal somaTotalGeral = new BigDecimal(0);
+
+        if (unidades == null) {
+            listaUnidades = ordenarUnidades(condominio.getUnidades());
+        } else {
+            listaUnidades = ordenarUnidades(unidades);
+        }
+
+        UNIDADES:
+        for (Unidade u : listaUnidades) {
+
+            List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
+
+            List<Cobranca> cobrancas = new ArrayList<Cobranca>();
+            cobrancas = getCobrancas(u);
+
+            for (Cobranca co : cobrancas) {
+                if (co.getDataPagamento() != null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataPagamento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataPagamento())) == 1 && co.isExibir()) {
+                    HashMap<String, Object> mapa = new HashMap();
+
+                    somaTotalGeral = somaTotalGeral.add(co.getValorTotal());
+
+                    mapa.put("documento", co.getNumeroDocumento());
+                    mapa.put("valor", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+                    mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
+                    mapa.put("dataPagamento", DataUtil.toString(co.getDataPagamento()));
+                    mapa.put("valorPago", PagamentoUtil.formatarMoeda(co.getValorPago().doubleValue()));
+
+                    List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+
+                    if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO) {
+                        for (Pagamento pagamento : co.getPagamentos()) {
+                            HashMap<String, String> mapa2 = new HashMap();
+                            mapa2.put("descricao", pagamento.getDescricao().equals(" ") ? pagamento.getHistorico() : pagamento.getDescricao());
+                            mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                            listaPagamentos.add(mapa2);
+                        }
+                    }
+
+                    mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+
+                    listaCobrancas.add(mapa);
+                }
+            }
+            if (listaCobrancas.isEmpty()) {
+                continue UNIDADES;
+            } else {
+                HashMap<String, Object> mapa2 = new HashMap();
+                mapa2.put("unidade", u.getUnidade());
+                mapa2.put("nome", u.getCondomino().getNome());
+                mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
+                lista.add(mapa2);
+            }
+        }
+
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("somaTotalGeral", PagamentoUtil.formatarMoeda(somaTotalGeral.doubleValue()));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO) {
+            parametros.put("subrelatorio2", caminho.toString());
+//            imprimir("InadimplenciaAnalitica", parametros, lista, false, true, null);
+        } else if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO) {
+            imprimir("RelatorioPagamentosEfetuadosSintetico", parametros, lista, false, true, null);
+        }
+    }
+
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
         Moeda diferenca = new Moeda();
         Moeda juros = new Moeda();
