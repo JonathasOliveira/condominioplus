@@ -71,6 +71,18 @@
             <Property name="text" type="java.lang.String" value="Lan&#xe7;ar Cobran&#xe7;a no Caixa"/>
           </Properties>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+        </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirPagosSintetico">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Pagamentos Efetuados - Sint&#xe9;tico"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirPagosAnalitico">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Pagamentos Efetuados - Anal&#xed;tico"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuAcordo">

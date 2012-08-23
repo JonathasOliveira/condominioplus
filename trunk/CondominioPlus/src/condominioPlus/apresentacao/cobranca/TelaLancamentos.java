@@ -1408,7 +1408,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         };
 
         tabelaAcordo.getColumn(modeloTabelaAcordo.getCampo(4)).setCellRenderer(new RenderizadorCelulaADireita());
-
     }
 
     private void atualizarAcordosCondominio(AcordoCobranca a) {
@@ -1646,7 +1645,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirDetalheAcordo(AcordoCobranca ac) {
-
         Moeda totalOriginal = new Moeda();
         Moeda totalGerado = new Moeda();
 
@@ -1782,6 +1780,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
+    private void imprimirPagamentosEfetuados(TipoRelatorio tipo) {
+        if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione a(s) unidade(s) desejada(s).", this);
+        } else {
+            new Relatorios().imprimirRelatorioPagamentosEfetuados(condominio, modeloTabelaCondominos.getObjetosSelecionados(), DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), tipo);
+        }
+    }
+
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
 
@@ -1890,6 +1896,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuImprimirCertificadoQuitacao.addActionListener(this);
             itemMenuImprimirInadimplenciaSintetica.addActionListener(this);
             itemMenuImprimirInadimplenciaAnalitica.addActionListener(this);
+            itemMenuImprimirPagosSintetico.addActionListener(this);
+            itemMenuImprimirPagosAnalitico.addActionListener(this);
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuLimparDadosAvulsos.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
@@ -2050,6 +2058,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirRelacaoPostagem();
             } else if (origem == itemMenuImprimirCertificadoQuitacao) {
                 imprimirCertificadoQuitacao();
+            } else if (origem == itemMenuImprimirPagosSintetico) {
+                imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO);
             }
         }
 
@@ -2166,6 +2176,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuImprimirInadimplenciaAnalitica = new javax.swing.JMenuItem();
         popupMenuPagos = new javax.swing.JPopupMenu();
         itemMenuLancarNoCaixa = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        itemMenuImprimirPagosSintetico = new javax.swing.JMenuItem();
+        itemMenuImprimirPagosAnalitico = new javax.swing.JMenuItem();
         popupMenuAcordo = new javax.swing.JPopupMenu();
         itemMenuExibirDetalheAcordo = new javax.swing.JMenuItem();
         itemMenuImprimirDetalheAcordo = new javax.swing.JMenuItem();
@@ -2304,6 +2317,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuLancarNoCaixa.setText("Lançar Cobrança no Caixa");
         popupMenuPagos.add(itemMenuLancarNoCaixa);
+        popupMenuPagos.add(jSeparator3);
+
+        itemMenuImprimirPagosSintetico.setText("Imprimir Pagamentos Efetuados - Sintético");
+        popupMenuPagos.add(itemMenuImprimirPagosSintetico);
+
+        itemMenuImprimirPagosAnalitico.setText("Imprimir Pagamentos Efetuados - Analítico");
+        popupMenuPagos.add(itemMenuImprimirPagosAnalitico);
 
         itemMenuExibirDetalheAcordo.setText("Exibir Detalhes");
         popupMenuAcordo.add(itemMenuExibirDetalheAcordo);
@@ -3183,6 +3203,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirEnvelopeP;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirInadimplenciaSintetica;
+    private javax.swing.JMenuItem itemMenuImprimirPagosAnalitico;
+    private javax.swing.JMenuItem itemMenuImprimirPagosSintetico;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoPostagem;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietarios;
     private javax.swing.JMenuItem itemMenuImprimirRelacaoProprietariosEmail;
@@ -3237,6 +3259,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelBoletos;
     private javax.swing.JTabbedPane painelCobrancaBase;

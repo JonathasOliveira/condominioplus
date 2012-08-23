@@ -21,7 +21,9 @@ public enum TipoRelatorio {
     RELACAO_POSTAGEM("Relação para Postagem"),
     CERTIFICADO_QUITACAO("Certificado de Quitação"),
     CARTA_SINTETICA("Carta Sintética"),
-    CARTA_ANALITICA("Carta Analítica");
+    CARTA_ANALITICA("Carta Analítica"),
+    PAGAMENTOS_EFETUADOS_SINTETICO("Pagamentos Efetuados Sintético"),
+    PAGAMENTOS_EFETUADOS_ANALITICO("Pagamentos Efetuados Analítico");
 
     TipoRelatorio(String nome) {
         this.nome = nome;
