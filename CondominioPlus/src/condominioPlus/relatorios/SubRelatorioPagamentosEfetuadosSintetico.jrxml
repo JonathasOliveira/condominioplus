@@ -22,35 +22,35 @@
 				<reportElement positionType="Float" x="0" y="0" width="554" height="20" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="10" y="0" width="76" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="35" y="0" width="76" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="107" y="0" width="81" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="132" y="0" width="81" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Valor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="299" y="0" width="84" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="324" y="0" width="84" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Data do Pgto]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="405" y="0" width="90" height="20" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="430" y="0" width="90" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Valor Pago]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="208" y="0" width="69" height="20" forecolor="#FFFFFF"/>
+				<reportElement x="233" y="0" width="69" height="20" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
@@ -66,35 +66,35 @@
 				</reportElement>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="107" y="0" width="63" height="20"/>
+				<reportElement x="132" y="0" width="63" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valor}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="208" y="0" width="69" height="20"/>
+				<reportElement x="233" y="0" width="69" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{vencimento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="405" y="0" width="60" height="20"/>
+				<reportElement positionType="Float" x="430" y="0" width="60" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorPago}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="299" y="0" width="84" height="20"/>
+				<reportElement positionType="Float" x="324" y="0" width="84" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{dataPagamento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="4" y="0" width="75" height="20"/>
+				<reportElement x="29" y="0" width="75" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="false"/>
 				</textElement>
