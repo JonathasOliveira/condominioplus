@@ -2060,6 +2060,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirCertificadoQuitacao();
             } else if (origem == itemMenuImprimirPagosSintetico) {
                 imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO);
+            } else if (origem == itemMenuImprimirPagosAnalitico){
+                imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO);
             }
         }
 
