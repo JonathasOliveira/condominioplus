@@ -388,8 +388,7 @@ public class Relatorios implements Printable {
         parametros.put("subrelatorio", caminho.toString());
 
         if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO) {
-            parametros.put("subrelatorio2", caminho.toString());
-//            imprimir("InadimplenciaAnalitica", parametros, lista, false, true, null);
+            imprimir("RelatorioPagamentosEfetuadosAnalitico", parametros, lista, false, true, null);
         } else if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO) {
             imprimir("RelatorioPagamentosEfetuadosSintetico", parametros, lista, false, true, null);
         }
