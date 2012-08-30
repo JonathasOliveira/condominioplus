@@ -4,7 +4,7 @@
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
-	<parameter name="subrelatorio2" class="java.lang.String"/>
+	<parameter name="subrelatorio" class="java.lang.String"/>
 	<field name="valorOriginal" class="java.lang.String"/>
 	<field name="total" class="java.lang.String"/>
 	<field name="vencimento" class="java.lang.String"/>
@@ -108,12 +108,17 @@
 			</textField>
 			<subreport>
 				<reportElement x="150" y="1" width="251" height="59"/>
-				<subreportParameter name="subrelatorio2">
-					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
+				<subreportParameter name="subrelatorio">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{listaPagamentos}]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio2} + "SubRelatorioInadimplenciaAnalitica2.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica2.jasper"]]></subreportExpression>
 			</subreport>
+			<staticText>
+				<reportElement x="61" y="41" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Teste]]></text>
+			</staticText>
 		</band>
 	</detail>
 </jasperReport>

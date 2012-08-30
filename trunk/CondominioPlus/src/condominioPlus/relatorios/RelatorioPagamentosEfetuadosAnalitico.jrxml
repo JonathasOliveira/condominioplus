@@ -10,7 +10,6 @@
 	<parameter name="periodo" class="java.lang.String"/>
 	<parameter name="subrelatorio" class="java.lang.String"/>
 	<parameter name="dataCalculo" class="java.lang.String"/>
-	<parameter name="subrelatorio2" class="java.lang.String"/>
 	<parameter name="somaValorOriginal" class="java.lang.String"/>
 	<parameter name="somaJuros" class="java.lang.String"/>
 	<parameter name="somaMulta" class="java.lang.String"/>
@@ -66,11 +65,11 @@
 				<text><![CDATA[Emissão]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="397" y="6" width="153" height="51"/>
+				<reportElement x="377" y="6" width="180" height="51"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="18" isBold="true" isItalic="false"/>
+					<font size="16" isBold="true" isItalic="false"/>
 				</textElement>
-				<text><![CDATA[Inadimplência Analítica]]></text>
+				<text><![CDATA[Pagamentos Efetuados (Analítico)]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="496" y="108" width="54" height="15"/>
@@ -174,11 +173,11 @@
 			</rectangle>
 			<subreport>
 				<reportElement x="0" y="19" width="554" height="31"/>
-				<subreportParameter name="subrelatorio2">
-					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
+				<subreportParameter name="subrelatorio">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioPagamentosEfetuadosAnalitico.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
 				<reportElement positionType="Float" x="6" y="51" width="279" height="16"/>
