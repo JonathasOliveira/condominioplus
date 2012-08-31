@@ -325,6 +325,9 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
         List<Unidade> listaUnidades = new ArrayList<Unidade>();
 
+        BigDecimal somaValorOriginal = new BigDecimal(0);
+        BigDecimal somaJuros = new BigDecimal(0);
+        BigDecimal somaMulta = new BigDecimal(0);
         BigDecimal somaTotalGeral = new BigDecimal(0);
 
         if (unidades == null) {
@@ -335,7 +338,7 @@ public class Relatorios implements Printable {
 
         UNIDADES:
         for (Unidade u : listaUnidades) {
-
+            BigDecimal somaGeral = new BigDecimal(0);
             List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
 
             List<Cobranca> cobrancas = new ArrayList<Cobranca>();
@@ -345,10 +348,17 @@ public class Relatorios implements Printable {
                 if (co.getDataPagamento() != null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataPagamento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataPagamento())) == 1 && co.isExibir()) {
                     HashMap<String, Object> mapa = new HashMap();
 
-                    somaTotalGeral = somaTotalGeral.add(co.getValorTotal());
+                    somaGeral = somaGeral.add(co.getValorPago());
+
+                    somaValorOriginal = somaValorOriginal.add(co.getValorTotal());
+                    somaJuros = somaJuros.add(co.getJuros());
+                    somaMulta = somaMulta.add(co.getMulta());
+                    somaTotalGeral = somaTotalGeral.add(co.getValorPago());
 
                     mapa.put("documento", co.getNumeroDocumento());
                     mapa.put("valor", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+                    mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
+                    mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
                     mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
                     mapa.put("dataPagamento", DataUtil.toString(co.getDataPagamento()));
                     mapa.put("valorPago", PagamentoUtil.formatarMoeda(co.getValorPago().doubleValue()));
@@ -375,6 +385,7 @@ public class Relatorios implements Printable {
                 HashMap<String, Object> mapa2 = new HashMap();
                 mapa2.put("unidade", u.getUnidade());
                 mapa2.put("nome", u.getCondomino().getNome());
+                mapa2.put("totalGeral", PagamentoUtil.formatarMoeda(somaGeral.doubleValue()));
                 mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
                 lista.add(mapa2);
             }
@@ -382,6 +393,9 @@ public class Relatorios implements Printable {
 
         parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
         parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("somaValorOriginal", PagamentoUtil.formatarMoeda(somaValorOriginal.doubleValue()));
+        parametros.put("somaJuros", PagamentoUtil.formatarMoeda(somaJuros.doubleValue()));
+        parametros.put("somaMulta", PagamentoUtil.formatarMoeda(somaMulta.doubleValue()));
         parametros.put("somaTotalGeral", PagamentoUtil.formatarMoeda(somaTotalGeral.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
