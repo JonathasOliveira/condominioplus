@@ -116,6 +116,21 @@
 			<rectangle>
 				<reportElement x="0" y="3" width="554" height="13" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
+			<subreport>
+				<reportElement x="0" y="16" width="554" height="31"/>
+				<subreportParameter name="subrelatorio">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioPagamentosEfetuadosAnalitico.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement positionType="Float" x="492" y="4" width="60" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Valores Pagos]]></text>
+			</staticText>
 			<staticText>
 				<reportElement x="6" y="4" width="42" height="12"/>
 				<textElement verticalAlignment="Middle">
@@ -138,7 +153,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="156" y="4" width="394" height="12"/>
+				<reportElement x="156" y="4" width="206" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
@@ -154,14 +169,6 @@
 			<rectangle>
 				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-			<subreport>
-				<reportElement x="0" y="16" width="554" height="31"/>
-				<subreportParameter name="subrelatorio">
-					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
-				</subreportParameter>
-				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
-				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioPagamentosEfetuadosAnalitico.jasper"]]></subreportExpression>
-			</subreport>
 			<textField>
 				<reportElement positionType="FixRelativeToBottom" x="6" y="47" width="279" height="13"/>
 				<textElement verticalAlignment="Middle">
@@ -169,6 +176,13 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["TOTAL GERAL DA UNIDADE " + $F{unidade}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="360" y="3" width="60" height="13" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Valores Originais]]></text>
+			</staticText>
 		</band>
 	</detail>
 	<summary>
