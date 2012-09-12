@@ -407,6 +407,103 @@ public class Relatorios implements Printable {
         }
     }
 
+    public void imprimirCobrancasExistentesAVencer(Condominio condominio, List<Unidade> unidades, TipoRelatorio tipo) {
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+        HashMap<String, Object> parametros = new HashMap();
+        List<Unidade> listaUnidades = new ArrayList<Unidade>();
+
+        BigDecimal somaValorOriginal = new BigDecimal(0);
+        BigDecimal somaJuros = new BigDecimal(0);
+        BigDecimal somaMulta = new BigDecimal(0);
+        BigDecimal somaTotalGeral = new BigDecimal(0);
+
+        if (unidades == null) {
+            listaUnidades = ordenarUnidades(condominio.getUnidades());
+        } else {
+            listaUnidades = ordenarUnidades(unidades);
+        }
+
+        UNIDADES:
+        for (Unidade u : listaUnidades) {
+
+            List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
+
+            BigDecimal totalOriginal = new BigDecimal(0);
+            BigDecimal totalJuros = new BigDecimal(0);
+            BigDecimal totalMulta = new BigDecimal(0);
+            BigDecimal totalGeral = new BigDecimal(0);
+
+            List<Cobranca> cobrancas = new ArrayList<Cobranca>();
+            cobrancas = getCobrancas(u);
+
+            for (Cobranca co : cobrancas) {
+                if (co.getDataPagamento() == null && DataUtil.compararData(DataUtil.hoje(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && co.isExibir()) {
+                    HashMap<String, Object> mapa = new HashMap();
+                    totalOriginal = totalOriginal.add(co.getValorOriginal());
+                    totalJuros = totalJuros.add(co.getJuros());
+                    totalMulta = totalMulta.add(co.getMulta());
+                    totalGeral = totalGeral.add(co.getValorTotal());
+
+                    somaValorOriginal = somaValorOriginal.add(co.getValorOriginal());
+                    somaJuros = somaJuros.add(co.getJuros());
+                    somaMulta = somaMulta.add(co.getMulta());
+                    somaTotalGeral = somaTotalGeral.add(co.getValorTotal());
+
+                    mapa.put("documento", co.getNumeroDocumento());
+                    mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
+                    mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
+                    mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
+                    mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
+                    mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+
+                    List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+
+                    if (tipo == TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_ANALITICO) {
+                        for (Pagamento pagamento : co.getPagamentos()) {
+                            HashMap<String, String> mapa2 = new HashMap();
+                            mapa2.put("descricao", pagamento.getDescricao().equals(" ") ? pagamento.getHistorico() : pagamento.getDescricao());
+                            mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                            listaPagamentos.add(mapa2);
+                        }
+                    }
+
+                    mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+
+                    listaCobrancas.add(mapa);
+                }
+            }
+            if (listaCobrancas.isEmpty()) {
+                continue UNIDADES;
+            } else {
+                HashMap<String, Object> mapa2 = new HashMap();
+                mapa2.put("unidade", u.getUnidade());
+                mapa2.put("nome", u.getCondomino().getNome());
+                mapa2.put("totalOriginal", PagamentoUtil.formatarMoeda(totalOriginal.doubleValue()));
+                mapa2.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
+                mapa2.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
+                mapa2.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+                mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
+                lista.add(mapa2);
+            }
+        }
+
+        parametros.put("periodo", "");
+        parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("somaValorOriginal", PagamentoUtil.formatarMoeda(somaValorOriginal.doubleValue()));
+        parametros.put("somaJuros", PagamentoUtil.formatarMoeda(somaJuros.doubleValue()));
+        parametros.put("somaMulta", PagamentoUtil.formatarMoeda(somaMulta.doubleValue()));
+        parametros.put("somaTotalGeral", PagamentoUtil.formatarMoeda(somaTotalGeral.doubleValue()));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (tipo == TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_ANALITICO) {
+            imprimir("CobrancasAVencerAnalitico", parametros, lista, false, true, null);
+        } else if (tipo == TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_SINTETICO) {
+            imprimir("CobrancasAVencerSintetico", parametros, lista, false, true, null);
+        }
+    }
+
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
         Moeda diferenca = new Moeda();
         Moeda juros = new Moeda();

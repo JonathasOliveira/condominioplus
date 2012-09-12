@@ -1787,6 +1787,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             new Relatorios().imprimirRelatorioPagamentosEfetuados(condominio, modeloTabelaCondominos.getObjetosSelecionados(), DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), tipo);
         }
     }
+    
+    private void imprimirCobrancasAVencer(TipoRelatorio tipo) {
+        if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            new Relatorios().imprimirCobrancasExistentesAVencer(condominio, condominio.getUnidades(), tipo);
+        } else {
+            new Relatorios().imprimirCobrancasExistentesAVencer(condominio, modeloTabelaCondominos.getObjetosSelecionados(), tipo);
+        }
+    }
 
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
@@ -1901,6 +1909,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             itemMenuLancarNoCaixa.addActionListener(this);
             itemMenuLimparDadosAvulsos.addActionListener(this);
             itemMenuRemoverSelecionados.addActionListener(this);
+            itemMenuCobrancasExistentesAVencerAnalitico.addActionListener(this);
+            itemMenuCobrancasExistentesAVencerSintetico.addActionListener(this);
             itemMenuCalcularJurosMulta.addActionListener(this);
             itemMenuOcultar.addActionListener(this);
             itemMenuOcultarDados.addActionListener(this);
@@ -2062,6 +2072,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO);
             } else if (origem == itemMenuImprimirPagosAnalitico){
                 imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO);
+            } else if (origem == itemMenuCobrancasExistentesAVencerSintetico){
+                imprimirCobrancasAVencer(TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_SINTETICO);
+            } else if (origem == itemMenuCobrancasExistentesAVencerAnalitico){
+                imprimirCobrancasAVencer(TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_ANALITICO);
             }
         }
 
@@ -2168,6 +2182,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuBaixaManual = new javax.swing.JMenuItem();
         itemMenuRemoverSelecionados = new javax.swing.JMenuItem();
+        jSeparator4 = new javax.swing.JPopupMenu.Separator();
+        itemMenuCobrancasExistentesAVencerSintetico = new javax.swing.JMenuItem();
+        itemMenuCobrancasExistentesAVencerAnalitico = new javax.swing.JMenuItem();
         popupMenuInadimplentes = new javax.swing.JPopupMenu();
         itemMenuCalcularJurosMulta = new javax.swing.JMenuItem();
         itemMenuBaixaManualInadimplente = new javax.swing.JMenuItem();
@@ -2297,6 +2314,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         itemMenuRemoverSelecionados.setText("Remover Selecionado(s)");
         popupMenu.add(itemMenuRemoverSelecionados);
+        popupMenu.add(jSeparator4);
+
+        itemMenuCobrancasExistentesAVencerSintetico.setText("Imprimir Cobranças Existentes à Vencer - Sintético");
+        popupMenu.add(itemMenuCobrancasExistentesAVencerSintetico);
+
+        itemMenuCobrancasExistentesAVencerAnalitico.setText("Imprimir Cobranças Existentes à Vencer - Analítico");
+        popupMenu.add(itemMenuCobrancasExistentesAVencerAnalitico);
 
         itemMenuCalcularJurosMulta.setText("Calcular Juros/Multa");
         popupMenuInadimplentes.add(itemMenuCalcularJurosMulta);
@@ -3197,6 +3221,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuBaixaManual;
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
+    private javax.swing.JMenuItem itemMenuCobrancasExistentesAVencerAnalitico;
+    private javax.swing.JMenuItem itemMenuCobrancasExistentesAVencerSintetico;
     private javax.swing.JMenuItem itemMenuExibirDetalheAcordo;
     private javax.swing.JMenuItem itemMenuImprimirCartaAnalitica;
     private javax.swing.JMenuItem itemMenuImprimirCartaSintetica;
@@ -3262,6 +3288,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
+    private javax.swing.JPopupMenu.Separator jSeparator4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelBoletos;
     private javax.swing.JTabbedPane painelCobrancaBase;
