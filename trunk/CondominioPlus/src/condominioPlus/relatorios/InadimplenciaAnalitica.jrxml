@@ -10,7 +10,6 @@
 	<parameter name="periodo" class="java.lang.String"/>
 	<parameter name="subrelatorio" class="java.lang.String"/>
 	<parameter name="dataCalculo" class="java.lang.String"/>
-	<parameter name="subrelatorio2" class="java.lang.String"/>
 	<parameter name="somaValorOriginal" class="java.lang.String"/>
 	<parameter name="somaJuros" class="java.lang.String"/>
 	<parameter name="somaMulta" class="java.lang.String"/>
@@ -174,8 +173,8 @@
 			</rectangle>
 			<subreport>
 				<reportElement x="0" y="16" width="554" height="31"/>
-				<subreportParameter name="subrelatorio2">
-					<subreportParameterExpression><![CDATA[$P{subrelatorio2}]]></subreportParameterExpression>
+				<subreportParameter name="subrelatorio">
+					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica.jasper"]]></subreportExpression>

@@ -313,7 +313,6 @@ public class Relatorios implements Printable {
         parametros.put("subrelatorio", caminho.toString());
 
         if (tipo == TipoRelatorio.INADIMPLENCIA_ANALITICA) {
-            parametros.put("subrelatorio2", caminho.toString());
             imprimir("InadimplenciaAnalitica", parametros, lista, false, true, null);
         } else if (tipo == TipoRelatorio.INADIMPLENCIA_SINTETICA) {
             imprimir("InadimplenciaSintetica", parametros, lista, false, true, null);
