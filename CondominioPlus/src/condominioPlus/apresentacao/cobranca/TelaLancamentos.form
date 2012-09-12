@@ -18,6 +18,18 @@
             <Property name="text" type="java.lang.String" value="Remover Selecionado(s)"/>
           </Properties>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
+        </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuCobrancasExistentesAVencerSintetico">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Cobran&#xe7;as Existentes &#xe0; Vencer - Sint&#xe9;tico"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuCobrancasExistentesAVencerAnalitico">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Cobran&#xe7;as Existentes &#xe0; Vencer - Anal&#xed;tico"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPopupMenu" name="popupMenuInadimplentes">
