@@ -438,15 +438,21 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         listaCobrancas = new ArrayList<Cobranca>();
         for (Unidade u : condominio.getUnidades()) {
             for (Cobranca c : u.getCobrancas()) {
-                if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) < 1) {
-                    listaCobrancas.add(c);
+                if (modeloTabelaCondominos.getObjetoSelecionado() == null) {
+                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) < 1) {
+                        listaCobrancas.add(c);
+                    }
+                } else {
+                    if (c.getUnidade().getCodigo() == modeloTabelaCondominos.getObjetoSelecionado().getCodigo() && c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) < 1) {
+                        listaCobrancas.add(c);
+                    }
                 }
             }
         }
+        
+        Comparator c1 = null;
 
-        Comparator c = null;
-
-        c = new Comparator() {
+        c1 = new Comparator() {
 
             public int compare(Object o1, Object o2) {
                 Cobranca e1 = (Cobranca) o1;
@@ -455,7 +461,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        Collections.sort(listaCobrancas, c);
+        Collections.sort(listaCobrancas, c1);
+        
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca co1 = (Cobranca) o1;
+                Cobranca co2 = (Cobranca) o2;
+                return co1.getUnidade().getUnidade().compareTo(co2.getUnidade().getUnidade());
+            }
+        };
+
+        Collections.sort(listaCobrancas, c);        
 
         return listaCobrancas;
     }
@@ -909,7 +928,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
-
     }
 
     private void calcularJurosMulta(Cobranca cobranca, DateTime dataProrrogada) {
@@ -1787,7 +1805,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             new Relatorios().imprimirRelatorioPagamentosEfetuados(condominio, modeloTabelaCondominos.getObjetosSelecionados(), DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), tipo);
         }
     }
-    
+
     private void imprimirCobrancasAVencer(TipoRelatorio tipo) {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             new Relatorios().imprimirCobrancasExistentesAVencer(condominio, condominio.getUnidades(), tipo);
@@ -1971,7 +1989,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 removerItensCobranca(modeloTabelaDadosAvulsos.getObjetosSelecionados());
             } else if (origem == btnLimpar) {
                 limparSelecoesTabelas();
-                if (jTabbedPane1.getSelectedIndex() == 1) {
+                if (jTabbedPane1.getSelectedIndex() == 0) {
+                    carregarTabelaCobranca();
+                } else if (jTabbedPane1.getSelectedIndex() == 1) {
                     carregarTabelaInadimplentes();
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
@@ -2070,11 +2090,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 imprimirCertificadoQuitacao();
             } else if (origem == itemMenuImprimirPagosSintetico) {
                 imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_SINTETICO);
-            } else if (origem == itemMenuImprimirPagosAnalitico){
+            } else if (origem == itemMenuImprimirPagosAnalitico) {
                 imprimirPagamentosEfetuados(TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO);
-            } else if (origem == itemMenuCobrancasExistentesAVencerSintetico){
+            } else if (origem == itemMenuCobrancasExistentesAVencerSintetico) {
                 imprimirCobrancasAVencer(TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_SINTETICO);
-            } else if (origem == itemMenuCobrancasExistentesAVencerAnalitico){
+            } else if (origem == itemMenuCobrancasExistentesAVencerAnalitico) {
                 imprimirCobrancasAVencer(TipoRelatorio.COBRANCAS_EXISTENTES_A_VENCER_ANALITICO);
             }
         }
@@ -2082,7 +2102,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.getSource() == tabelaCondominos) {
-                if (jTabbedPane1.getSelectedIndex() == 1) {
+                if (jTabbedPane1.getSelectedIndex() == 0) {
+                    carregarTabelaCobranca();
+                } else if (jTabbedPane1.getSelectedIndex() == 1) {
                     carregarTabelaInadimplentes();
                 } else if (jTabbedPane1.getSelectedIndex() == 2) {
                     carregarTabelaPagos();
