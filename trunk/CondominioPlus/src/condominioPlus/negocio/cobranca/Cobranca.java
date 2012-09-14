@@ -230,4 +230,26 @@ public class Cobranca implements Serializable {
         this.exibir = exibir;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Cobranca other = (Cobranca) obj;
+        if (this.codigo != other.codigo) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.codigo;
+        return hash;
+    }
+    
 }
