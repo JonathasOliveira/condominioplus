@@ -449,7 +449,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             }
         }
-        
+
         Comparator c1 = null;
 
         c1 = new Comparator() {
@@ -462,7 +462,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         };
 
         Collections.sort(listaCobrancas, c1);
-        
+
         Comparator c = null;
 
         c = new Comparator() {
@@ -474,7 +474,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
 
-        Collections.sort(listaCobrancas, c);        
+        Collections.sort(listaCobrancas, c);
 
         return listaCobrancas;
     }
@@ -1737,6 +1737,16 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         }
     }
 
+    public void imprimirInadimplencia(TipoRelatorio tipo) {
+        if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
+            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, tipo, modeloTabelaCondominos.getObjetosSelecionados());
+            dialogo.setVisible(true);
+        } else {
+            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, tipo, condominio.getUnidades());
+            dialogo.setVisible(true);
+        }
+    }
+
     public void imprimirEnvelope() {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
@@ -2061,15 +2071,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             } else if (origem == itemMenuImprimirCartaAnalitica) {
                 imprimirCarta(TipoRelatorio.CARTA_ANALITICA);
             } else if (origem == itemMenuImprimirInadimplenciaSintetica) {
-                DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, TipoRelatorio.INADIMPLENCIA_SINTETICA, null);
-                dialogo.setVisible(true);
+                imprimirInadimplencia(TipoRelatorio.INADIMPLENCIA_SINTETICA);
             } else if (origem == itemMenuImprimirInadimplenciaAnalitica) {
-                if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
-                    DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, TipoRelatorio.INADIMPLENCIA_ANALITICA, modeloTabelaCondominos.getObjetosSelecionados());
-                    dialogo.setVisible(true);
-                } else {
-                    ApresentacaoUtil.exibirAdvertencia(("Selecione as unidades que deseja para a impressão do relatório."), TelaLancamentos.this);
-                }
+                imprimirInadimplencia(TipoRelatorio.INADIMPLENCIA_ANALITICA);
             } else if (origem == itemMenuImprimirEnvelopeP) {
                 imprimirEnvelope();
             } else if (origem == itemMenuPresentesAE) {
