@@ -1792,15 +1792,19 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
                 boolean imprimir = true;
+                boolean imprimirObservacao = false;
 
                 for (Cobranca co : modeloTabelaCondominos.getObjetoSelecionado().getCobrancas()) {
                     if (co.getDataPagamento() == null && DataUtil.compararData(dialogo.getDataIncial(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dialogo.getDataFinal(), DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
                         imprimir = false;
                     }
+                    if (co.getAcordo() != null){
+                        imprimirObservacao = true;
+                    }
                 }
 
                 if (imprimir) {
-                    new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado(), dialogo.getDataFinal(), dialogo.getImprimirAssinaturaBreca());
+                    new Relatorios().imprimirCertificadoQuitacao(modeloTabelaCondominos.getObjetoSelecionado(), dialogo.getDataFinal(), dialogo.getImprimirAssinaturaBreca(), imprimirObservacao);
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Não é possível imprimir, pois a unidade selecionada possui débito.", this);
                 }
@@ -1810,7 +1814,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void imprimirPagamentosEfetuados(TipoRelatorio tipo) {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
-            ApresentacaoUtil.exibirAdvertencia("Selecione a(s) unidade(s) desejada(s).", this);
+            new Relatorios().imprimirRelatorioPagamentosEfetuados(condominio, condominio.getUnidades(), DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), tipo);
         } else {
             new Relatorios().imprimirRelatorioPagamentosEfetuados(condominio, modeloTabelaCondominos.getObjetosSelecionados(), DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), tipo);
         }

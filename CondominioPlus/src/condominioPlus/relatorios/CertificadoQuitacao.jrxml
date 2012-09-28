@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CertificadoQuitacao" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="16"/>
+	<property name="ireport.y" value="202"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="caminhoMoldura" class="java.lang.String"/>
@@ -10,6 +10,7 @@
 	<parameter name="crcAssinatura" class="java.lang.String"/>
 	<parameter name="craAssinatura" class="java.lang.String"/>
 	<parameter name="cpfAssinatura" class="java.lang.String"/>
+	<parameter name="observacao" class="java.lang.String"/>
 	<field name="nome" class="java.lang.String"/>
 	<field name="unidade" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
@@ -24,28 +25,28 @@
 				<imageExpression class="java.lang.String"><![CDATA[$P{caminhoMoldura}]]></imageExpression>
 			</image>
 			<textField isBlankWhenNull="true">
-				<reportElement x="258" y="139" width="90" height="22"/>
+				<reportElement x="258" y="146" width="90" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="59" y="115" width="422" height="22"/>
+				<reportElement x="59" y="122" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="104" y="163" width="365" height="22"/>
+				<reportElement x="104" y="170" width="365" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="59" y="187" width="422" height="22"/>
+				<reportElement x="59" y="194" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
@@ -74,21 +75,21 @@
 				<text><![CDATA[---------------------------------------------------------------------------------------------]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="92" width="165" height="22"/>
+				<reportElement x="59" y="99" width="165" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Certificamos que]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="139" width="200" height="22"/>
+				<reportElement x="59" y="146" width="200" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[proprietário(a) da unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="163" width="49" height="22"/>
+				<reportElement x="59" y="170" width="49" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
@@ -102,49 +103,49 @@
 				<text><![CDATA[Certificado de Quitação]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="514" width="165" height="22"/>
+				<reportElement x="59" y="521" width="165" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Certificamos que]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="585" width="49" height="22"/>
+				<reportElement x="59" y="592" width="49" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[do(a)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="59" y="561" width="200" height="22"/>
+				<reportElement x="59" y="568" width="200" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[proprietário(a) da unidade]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="258" y="561" width="90" height="22"/>
+				<reportElement x="258" y="568" width="90" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="104" y="585" width="365" height="22"/>
+				<reportElement x="104" y="592" width="365" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="59" y="537" width="422" height="22"/>
+				<reportElement x="59" y="544" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true" isItalic="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="59" y="609" width="422" height="22"/>
+				<reportElement x="59" y="616" width="422" height="22"/>
 				<textElement verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
@@ -209,6 +210,20 @@
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{crcAssinatura}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="0" y="80" width="555" height="20"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="13" isBold="true" isItalic="true" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{observacao}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="0" y="502" width="555" height="20"/>
+				<textElement textAlignment="Center" markup="none">
+					<font size="13" isBold="true" isItalic="true" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{observacao}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
