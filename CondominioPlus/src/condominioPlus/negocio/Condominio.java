@@ -69,7 +69,9 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private boolean removido;
     @Column(name = "sindico_paga")
     private boolean sindicoPaga;
-    private String anotacoes = "";
+//    private String anotacoes = "";
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "condominio")
+    private List<Anotacao> anotacoes = new ArrayList<Anotacao>();
     @Column(name = "responsavel_cheque")
     private String responsavelCheque = "";
     @Column(name = "responsave_cnpj")
@@ -123,9 +125,9 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private List<MensagemBoleto> mensagens = new ArrayList<MensagemBoleto>();
     @Column(precision = 20, scale = 2)
     private BigDecimal desconto = new BigDecimal(0);
-    @Column(name="calcular_multa_proximo_mes")
+    @Column(name = "calcular_multa_proximo_mes")
     private boolean calcularMultaProximoMes;
-    @Column(name="parcelas_acordo")
+    @Column(name = "parcelas_acordo")
     private int numeroMinimoParcelasAcordo;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<TaxaExtra> taxas;
@@ -143,10 +145,6 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setContaBancaria(ContaBancaria contaBancaria) {
         this.contaBancaria = contaBancaria;
-    }
-
-    public String getAnotacoes() {
-        return anotacoes;
     }
 
     public String getInstrumento() {
@@ -179,10 +177,6 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setResponsavelCpf(String responsavelCpf) {
         this.responsavelCpf = responsavelCpf;
-    }
-
-    public void setAnotacoes(String anotacoes) {
-        this.anotacoes = anotacoes;
     }
 
     public boolean isAtivo() {
@@ -263,6 +257,23 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setTelefones(List<Telefone> telefones) {
         this.telefones = telefones;
+    }
+    
+    public List<Anotacao> getAnotacoes() {
+        return anotacoes;
+    }
+
+    public void setAnotacoes(List<Anotacao> anotacoes) {
+        this.anotacoes = anotacoes;
+    }
+    
+    public void adicionarAnotacao(Anotacao anotacao) {
+        anotacao.setCondominio(this);
+        anotacoes.add(anotacao);
+    }
+
+    public void removerAnotacao(Anotacao anotacao) {
+        anotacoes.remove(anotacao);
     }
 
     public List<Unidade> getUnidades() {
@@ -526,7 +537,4 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setContasDeLuz(List<ContaGas> contasDeLuz) {
         this.contasDeLuz = contasDeLuz;
     }
-    
-
-    
 }

@@ -10,10 +10,13 @@
  */
 package condominioPlus.apresentacao.condominio;
 
+import condominioPlus.Main;
+import condominioPlus.apresentacao.DialogoAnotacao;
 import condominioPlus.apresentacao.DialogoConselheiro;
 import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.apresentacao.financeiro.DialogoTaloesCheque;
+import condominioPlus.negocio.Anotacao;
 import condominioPlus.negocio.Banco;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.DadosTalaoCheque;
@@ -28,14 +31,18 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.Identificavel;
+import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
+import logicpoint.usuario.Usuario;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import logicpoint.util.TabelaModelo;
@@ -50,6 +57,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private Condominio condominio;
     private ControladorEventos controlador;
     private ComboModelo<Banco> modelo;
+    private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
+    private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondominio(Condominio condominio) {
@@ -58,6 +67,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         initComponents();
 
         carregarTabelaTelefone();
+        
+        carregarTabelaAnotacoes();
 
         carregarComboInstrumento();
 
@@ -193,6 +204,92 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             return;
         }
         getModeloTelefone().remover(telefone);
+    }
+
+    private void carregarTabelaAnotacoes() {
+        modeloTabelaAnotacoes = new TabelaModelo_2<Anotacao>(tabelaAnotacoes, "Assunto, Data, Texto, Usuario".split(",")) {
+
+            @Override
+            protected List<Anotacao> getCarregarObjetos() {
+                return getAnotacoes();
+            }
+
+            @Override
+            public Object getValor(Anotacao anotacao, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return anotacao.getAssunto();
+                    case 1:
+                        return DataUtil.getDateTime(anotacao.getData());
+                    case 2:
+                        return anotacao.getTexto();
+                    case 3:
+                        return anotacao.getUsuario().getUsuario();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Anotacao> getAnotacoes() {
+        listaAnotacoes = condominio.getAnotacoes();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Anotacao a1 = (Anotacao) o1;
+                Anotacao a2 = (Anotacao) o2;
+                return a1.getData().compareTo(a2.getData());
+            }
+        };
+
+        Collections.sort(listaAnotacoes, c);
+
+        return listaAnotacoes;
+    }
+
+    private void adicionarAnotacao() {
+        Anotacao anotacao = DialogoAnotacao.getAnotacao(new Anotacao(condominio), TelaPrincipal.getInstancia(), true);
+        if (anotacao.getTexto().equals("")) {
+            return;
+        }
+
+        if (Main.getFuncionario().getUsuario().getUsuario().equals("")) {
+            Usuario usuario = new DAO().localizar(Usuario.class, 50452);
+            anotacao.setUsuario(usuario);
+        } else {
+            anotacao.setUsuario(Main.getFuncionario().getUsuario());
+        }
+
+        condominio.adicionarAnotacao(anotacao);
+        carregarTabelaAnotacoes();
+    }
+
+    private void removerAnotacao() {
+        if (modeloTabelaAnotacoes.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaAnotacoes.getLinhasSelecionadas());
+            List<Anotacao> itensRemover = modeloTabelaAnotacoes.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Anotacao a : itensRemover) {
+                    modeloTabelaAnotacoes.remover(a);
+                    for (Anotacao o : condominio.getAnotacoes()) {
+                        if (a.getCodigo() == o.getCodigo()) {
+                            condominio.getAnotacoes().remove(a);
+                        }
+                    }
+                    new DAO().remover(a);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Anotação(ões) removida(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
     }
 
     private void carregarTabelaConselheiros() {
@@ -355,7 +452,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtCpfBanking.setText(condominio.getContaBancaria().getCpfBanking());
         txtLimiteBanking.setText(condominio.getContaBancaria().getValor().toString());
 
-        txtAreaAnotacoes.setText(condominio.getAnotacoes());
+//        txtAreaAnotacoes.setText(condominio.getAnotacoes());
 
         txtNumeroMinimoTaloes.setText(Util.IntegerToString(condominio.getNumeroMinimoTaloes()));
 
@@ -406,7 +503,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         condominio.getContaBancaria().setCpfBanking(txtCpfBanking.getText());
         condominio.getContaBancaria().setValor(new BigDecimal(txtLimiteBanking.getText().replace(",", ".")));
 
-        condominio.setAnotacoes(txtAreaAnotacoes.getText());
+//        condominio.setAnotacoes(txtAreaAnotacoes.getText());
 
         condominio.setNumeroMinimoTaloes(Integer.parseInt(txtNumeroMinimoTaloes.getText()));
 
@@ -433,7 +530,11 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 editarTelefone();
             } else if (e.getSource() == btnRemoverTelefone) {
                 removerTelefone();
-            } else if (e.getSource() == btnAdicionarConselheiro) {
+            } else if (e.getSource() == btnAdicionarAnotacao) {
+                adicionarAnotacao();
+            } else if (e.getSource() == btnRemoverAnotacao) {
+                removerAnotacao();
+            }else if (e.getSource() == btnAdicionarConselheiro) {
                 adicionarConselheiro();
             } else if (e.getSource() == btnRemoverConselheiro) {
                 removerConselheiro();
@@ -475,6 +576,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             btnAdicionarTelefone.addActionListener(this);
             btnEditarTelefone.addActionListener(this);
             btnRemoverTelefone.addActionListener(this);
+            btnAdicionarAnotacao.addActionListener(this);
+            btnRemoverAnotacao.addActionListener(this);
             cmbBanco.addItemListener(this);
             btnAdicionarConselheiro.addActionListener(this);
             btnRemoverConselheiro.addActionListener(this);
@@ -582,8 +685,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         btnAdicionarConselheiro = new javax.swing.JButton();
         btnRemoverConselheiro = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtAreaAnotacoes = new javax.swing.JTextArea();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tabelaAnotacoes = new javax.swing.JTable();
+        btnAdicionarAnotacao = new javax.swing.JButton();
+        btnRemoverAnotacao = new javax.swing.JButton();
         jPanel14 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         txtDataFechamentoCaixa = new net.sf.nachocalendar.components.DateField();
@@ -1220,29 +1325,56 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         abas.addTab("Conselheiros", jPanel6);
 
-        txtAreaAnotacoes.setColumns(20);
-        txtAreaAnotacoes.setRows(5);
-        jScrollPane2.setViewportView(txtAreaAnotacoes);
+        tabelaAnotacoes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane5.setViewportView(tabelaAnotacoes);
+
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
         javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
         jPanel13.setLayout(jPanel13Layout);
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 681, Short.MAX_VALUE)
-            .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel13Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 661, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18))
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 195, Short.MAX_VALUE)
-            .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel13Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)
-                    .addContainerGap()))
+            .addGroup(jPanel13Layout.createSequentialGroup()
+                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel13Layout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel13Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 173, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         abas.addTab("Anotações", jPanel13);
@@ -1434,11 +1566,13 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane abas;
+    private javax.swing.JButton btnAdicionarAnotacao;
     private javax.swing.JButton btnAdicionarConselheiro;
     private javax.swing.JButton btnAdicionarTaloes;
     private javax.swing.JButton btnAdicionarTelefone;
     private javax.swing.JButton btnEditarTaloes;
     private javax.swing.JButton btnEditarTelefone;
+    private javax.swing.JButton btnRemoverAnotacao;
     private javax.swing.JButton btnRemoverConselheiro;
     private javax.swing.JButton btnRemoverTaloes;
     private javax.swing.JButton btnRemoverTelefone;
@@ -1498,16 +1632,16 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblSite;
     private javax.swing.JPanel painelBanco;
+    private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tbTaloes;
     private javax.swing.JTable tblConselheiros;
     private javax.swing.JTable tblTelefone;
     private javax.swing.JTextField txtAgencia;
-    private javax.swing.JTextArea txtAreaAnotacoes;
     private javax.swing.JTextField txtBairro;
     private javax.swing.JFormattedTextField txtCep;
     private javax.swing.JTextField txtCidade;
