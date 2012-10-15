@@ -44,6 +44,8 @@ public class Condomino implements Serializable {
     private List<Endereco> enderecos = new ArrayList<Endereco>();
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "condomino")
     private List<Telefone> telefones = new ArrayList<Telefone>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "condomino")
+    private List<Anotacao> anotacoes = new ArrayList<Anotacao>();
     private String cpf;
     private String rg;
     private String email;
@@ -54,7 +56,6 @@ public class Condomino implements Serializable {
     private boolean conselheiro;
     @Column(name = "tipo_conselheiro")
     private String tipoConselheiro;
-    private String anotacoes;
     private boolean cnpj;
 
     public Condomino() {
@@ -66,14 +67,6 @@ public class Condomino implements Serializable {
 
     public void setCnpj(boolean cnpj) {
         this.cnpj = cnpj;
-    }
-
-    public String getAnotacoes() {
-        return anotacoes;
-    }
-
-    public void setAnotacoes(String anotacoes) {
-        this.anotacoes = anotacoes;
     }
 
     public String getTipoConselheiro() {
@@ -188,10 +181,26 @@ public class Condomino implements Serializable {
     public void removerEndereco(Endereco endereco) {
         enderecos.remove(endereco);
     }
+    
+    public List<Anotacao> getAnotacoes() {
+        return anotacoes;
+    }
+
+    public void setAnotacoes(List<Anotacao> anotacoes) {
+        this.anotacoes = anotacoes;
+    }
+
+    public void adicionarAnotacao(Anotacao anotacao) {
+        anotacao.setCondomino(this);
+        anotacoes.add(anotacao);
+    }
+
+    public void removerAnotacao(Anotacao anotacao) {
+        anotacoes.remove(anotacao);
+    }
 
     @Override
     public String toString() {
         return nome;
     }
 }
-

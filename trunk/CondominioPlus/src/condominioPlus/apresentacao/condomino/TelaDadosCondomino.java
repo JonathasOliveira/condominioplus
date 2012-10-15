@@ -10,16 +10,20 @@
  */
 package condominioPlus.apresentacao.condomino;
 
+import condominioPlus.Main;
+import condominioPlus.apresentacao.DialogoAnotacao;
 import condominioPlus.apresentacao.DialogoEndereco;
 import condominioPlus.apresentacao.DialogoTelefone;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Advogado;
+import condominioPlus.negocio.Anotacao;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NotificacaoJudicial;
 import condominioPlus.negocio.ProcessoJudicial;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.funcionario.Funcionario;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.validadores.ValidadorGenerico;
@@ -31,6 +35,8 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
@@ -41,6 +47,7 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
+import logicpoint.usuario.Usuario;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import logicpoint.util.TabelaModelo;
@@ -57,6 +64,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private List<Unidade> unidades;
     private ComboModelo<Advogado> modelo;
     private TabelaModelo_2 modeloTabela;
+    private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
+    private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondomino(Unidade unidade) {
@@ -64,17 +73,16 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         this.condominio = unidade.getCondominio();
 
         initComponents();
+        controlador = new ControladorEventos();
 
         modificarCamposInquilino(false);
 
         verificarCNPJ();
         carregarTabelaTelefone();
         carregarTabelaEndereco();
+        carregarTabelaAnotacoes();
 
         carregarComboAdvogado();
-
-
-        controlador = new ControladorEventos();
 
         if (this.unidade != null) {
             preencherTela(this.unidade);
@@ -82,23 +90,22 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     }
 
-      public TelaDadosCondomino(Unidade unidade, TabelaModelo_2 modelo) {
+    public TelaDadosCondomino(Unidade unidade, TabelaModelo_2 modelo) {
         this.unidade = unidade;
         this.condominio = unidade.getCondominio();
         this.modeloTabela = modelo;
 
         initComponents();
+        controlador = new ControladorEventos();
 
         modificarCamposInquilino(false);
 
         verificarCNPJ();
         carregarTabelaTelefone();
         carregarTabelaEndereco();
+        carregarTabelaAnotacoes();
 
         carregarComboAdvogado();
-
-
-        controlador = new ControladorEventos();
 
         if (this.unidade != null) {
             preencherTela(this.unidade);
@@ -272,7 +279,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void removerTelefone() {
         Telefone telefone = getModeloTelefone().getObjeto();
         if (telefone == null) {
-             ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione o telefone a ser removido!", this);
             return;
         }
         getModeloTelefone().remover(telefone);
@@ -314,7 +321,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     private void adicionarEndereco() {
         Endereco endereco = DialogoEndereco.getEndereco(new Endereco(unidade.getCondomino()), TelaPrincipal.getInstancia(), true);
-        if (endereco.getLogradouro().equals("")){
+        if (endereco.getLogradouro().equals("")) {
             return;
         }
         getModeloEndereco().adicionar(endereco);
@@ -372,6 +379,92 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     }
 
+    private void carregarTabelaAnotacoes() {
+        modeloTabelaAnotacoes = new TabelaModelo_2<Anotacao>(tabelaAnotacoes, "Assunto, Data, Texto, Usuario".split(",")) {
+
+            @Override
+            protected List<Anotacao> getCarregarObjetos() {
+                return getAnotacoes();
+            }
+
+            @Override
+            public Object getValor(Anotacao anotacao, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return anotacao.getAssunto();
+                    case 1:
+                        return DataUtil.getDateTime(anotacao.getData());
+                    case 2:
+                        return anotacao.getTexto();
+                    case 3:
+                        return anotacao.getUsuario().getUsuario();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Anotacao> getAnotacoes() {
+        listaAnotacoes = unidade.getCondomino().getAnotacoes();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Anotacao a1 = (Anotacao) o1;
+                Anotacao a2 = (Anotacao) o2;
+                return a1.getData().compareTo(a2.getData());
+            }
+        };
+
+        Collections.sort(listaAnotacoes, c);
+
+        return listaAnotacoes;
+    }
+
+    private void adicionarAnotacao() {
+        Anotacao anotacao = DialogoAnotacao.getAnotacao(new Anotacao(unidade.getCondomino()), TelaPrincipal.getInstancia(), true);
+        if (anotacao.getTexto().equals("")) {
+            return;
+        }
+
+        if (Main.getFuncionario().getUsuario().getUsuario().equals("")) {
+            Usuario usuario = new DAO().localizar(Usuario.class, 50452);
+            anotacao.setUsuario(usuario);
+        } else {
+            anotacao.setUsuario(Main.getFuncionario().getUsuario());
+        }
+
+        unidade.getCondomino().adicionarAnotacao(anotacao);
+        carregarTabelaAnotacoes();
+    }
+
+    private void removerAnotacao() {
+        if (modeloTabelaAnotacoes.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaAnotacoes.getLinhasSelecionadas());
+            List<Anotacao> itensRemover = modeloTabelaAnotacoes.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Anotacao a : itensRemover) {
+                    modeloTabelaAnotacoes.remover(a);
+                    for (Anotacao o : unidade.getCondomino().getAnotacoes()) {
+                        if (a.getCodigo() == o.getCodigo()) {
+                            unidade.getCondomino().getAnotacoes().remove(a);
+                        }
+                    }
+                    new DAO().remover(a);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Anotação(ões) removida(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
     private void preencherTela(Unidade unidade) {
 
 
@@ -395,7 +488,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             }
         }
         txtEmail.setText(unidade.getCondomino().getEmail());
-        txtAnotacoes.setText(unidade.getCondomino().getAnotacoes());
+//        txtAnotacoes.setText(unidade.getCondomino().getAnotacoes());
 
         if (unidade.isHasInquilino()) {
             txtNomeInquilino.setText(unidade.getInquilino().getNome());
@@ -424,7 +517,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         checkboxImpressaoCobranca.setSelected(unidade.isBloquearImpressaoCobranca());
 
         if (unidade.getNotificacaoJudicial() != null) {
-           ativarNotificacao(true);
+            ativarNotificacao(true);
             checkboxNotificadoJudicialmente.setSelected(true);
             modelo.setSelectedItem(unidade.getNotificacaoJudicial().getAdvogado());
             dateInicioJudicial.setValue(DataUtil.getDate(unidade.getNotificacaoJudicial().getData_inicio().getTimeInMillis()));
@@ -498,7 +591,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().setCnpj(checkBoxCNPJ.isSelected());
 
         unidade.getCondomino().setEmail(txtEmail.getText());
-        unidade.getCondomino().setAnotacoes(txtAnotacoes.getText());
+//        unidade.getCondomino().setAnotacoes(txtAnotacoes.getText());
 
         if (unidade.isHasInquilino()) {
             txtNomeInquilino.setText(unidade.getInquilino().getNome().trim().toUpperCase());
@@ -610,6 +703,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 editarTelefone();
             } else if (e.getSource() == btnRemoverTelefone) {
                 removerTelefone();
+            } else if (e.getSource() == btnAdicionarAnotacao) {
+                adicionarAnotacao();
+            } else if (e.getSource() == btnRemoverAnotacao) {
+                removerAnotacao();
             } else if (e.getSource() == checkBoxInquilino) {
                 boolean selecionado = checkBoxInquilino.isSelected();
 
@@ -644,6 +741,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             btnAdicionarTelefone.addActionListener(this);
             btnEditarTelefone.addActionListener(this);
             btnRemoverTelefone.addActionListener(this);
+            btnAdicionarAnotacao.addActionListener(this);
+            btnRemoverAnotacao.addActionListener(this);
             checkBoxInquilino.addActionListener(this);
             checkBoxCNPJ.addActionListener(this);
             checkboxNotificadoJudicialmente.addActionListener(this);
@@ -768,8 +867,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         checkboxImpressaoCobranca = new javax.swing.JCheckBox();
         checkboxCartaCobranca = new javax.swing.JCheckBox();
         jPanel14 = new javax.swing.JPanel();
+        btnAdicionarAnotacao = new javax.swing.JButton();
+        btnRemoverAnotacao = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        txtAnotacoes = new javax.swing.JTextArea();
+        tabelaAnotacoes = new javax.swing.JTable();
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -1021,7 +1122,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane1.setViewportView(tblEndereco);
 
-        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1084,13 +1185,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane2.setViewportView(tblTelefone);
 
-        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1168,7 +1269,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addGap(6, 6, 6))
         );
 
-        jTabbedPane1.addTab("Csontato", jPanel4);
+        jTabbedPane1.addTab("Contato", jPanel4);
 
         jLabel6.setText("CPF*:");
 
@@ -1565,24 +1666,53 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Unidade", jPanel8);
 
-        txtAnotacoes.setColumns(20);
-        txtAnotacoes.setRows(5);
-        jScrollPane3.setViewportView(txtAnotacoes);
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        tabelaAnotacoes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane3.setViewportView(tabelaAnotacoes);
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
         jPanel14Layout.setHorizontalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel14Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addGap(48, 48, 48)
+                        .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -1621,10 +1751,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Coeficiente;
+    private javax.swing.JButton btnAdicionarAnotacao;
     private javax.swing.JButton btnAdicionarEndereco;
     private javax.swing.JButton btnAdicionarTelefone;
     private javax.swing.JButton btnEditarEndereco;
     private javax.swing.JButton btnEditarTelefone;
+    private javax.swing.JButton btnRemoverAnotacao;
     private javax.swing.JButton btnRemoverEndereco;
     private javax.swing.JButton btnRemoverTelefone;
     private javax.swing.JButton btnSalvar;
@@ -1694,9 +1826,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCpf;
+    private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tblEndereco;
     private javax.swing.JTable tblTelefone;
-    private javax.swing.JTextArea txtAnotacoes;
     private javax.swing.JTextField txtBairro;
     private javax.swing.JTextField txtBairroInquilino;
     private javax.swing.JTextField txtBloco;
