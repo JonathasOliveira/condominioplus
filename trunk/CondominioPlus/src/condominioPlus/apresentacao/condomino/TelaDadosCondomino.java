@@ -919,6 +919,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         jLabel22.setForeground(new java.awt.Color(255, 51, 51));
         jLabel22.setText("Condomínio:");
 
+        txtCondominio.setBackground(new java.awt.Color(204, 204, 204));
         txtCondominio.setEditable(false);
 
         jLabel4.setText("Unidade*:");
@@ -987,11 +988,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jLabel26.setText("Bairro:");
 
+        txtUf.setBackground(new java.awt.Color(204, 204, 204));
         txtUf.setEditable(false);
         txtUf.setName("estado"); // NOI18N
 
         jLabel28.setText("UF:");
 
+        txtCidade.setBackground(new java.awt.Color(204, 204, 204));
         txtCidade.setEditable(false);
         txtCidade.setName("cidade"); // NOI18N
 
@@ -999,12 +1002,15 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jLabel25.setText("Compl.:");
 
+        txtNumero.setBackground(new java.awt.Color(204, 204, 204));
         txtNumero.setEditable(false);
         txtNumero.setName("numero"); // NOI18N
 
+        txtCep.setBackground(new java.awt.Color(204, 204, 204));
         txtCep.setEditable(false);
         txtCep.setName("cep"); // NOI18N
 
+        txtComplemento.setBackground(new java.awt.Color(204, 204, 204));
         txtComplemento.setEditable(false);
         txtComplemento.setToolTipText("");
         txtComplemento.setName("complemento"); // NOI18N
@@ -1013,17 +1019,20 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jLabel29.setText("CEP:");
 
+        txtBairro.setBackground(new java.awt.Color(204, 204, 204));
         txtBairro.setEditable(false);
         txtBairro.setName("bairro"); // NOI18N
 
         jLabel27.setText("Cidade:");
 
+        txtRua.setBackground(new java.awt.Color(204, 204, 204));
         txtRua.setEditable(false);
         txtRua.setToolTipText("Digite o Endereço");
         txtRua.setName("logradouro"); // NOI18N
 
         jLabel2.setText("Referência:");
 
+        txtReferencia.setBackground(new java.awt.Color(204, 204, 204));
         txtReferencia.setEditable(false);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);

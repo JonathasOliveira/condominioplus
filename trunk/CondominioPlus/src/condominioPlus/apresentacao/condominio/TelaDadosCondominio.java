@@ -742,6 +742,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtRazaoSocial.setToolTipText("Digite a Razão Social");
         txtRazaoSocial.setName("Razão Social"); // NOI18N
 
+        txtSindico.setBackground(new java.awt.Color(204, 204, 204));
         txtSindico.setEditable(false);
         txtSindico.setCaretColor(new java.awt.Color(255, 51, 51));
         txtSindico.setName("sindico"); // NOI18N
@@ -1106,8 +1107,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         painelBanco.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(102, 102, 102)));
 
+        txtNumeroBanco.setBackground(new java.awt.Color(204, 204, 204));
         txtNumeroBanco.setEditable(false);
 
+        txtAgencia.setBackground(new java.awt.Color(204, 204, 204));
         txtAgencia.setEditable(false);
 
         jLabel10.setText("Número do Banco:");
@@ -1351,7 +1354,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jPanel13.setLayout(jPanel13Layout);
         jPanel13Layout.setHorizontalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 681, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel13Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
@@ -1363,7 +1365,6 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         );
         jPanel13Layout.setVerticalGroup(
             jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 195, Short.MAX_VALUE)
             .addGroup(jPanel13Layout.createSequentialGroup()
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel13Layout.createSequentialGroup()

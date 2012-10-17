@@ -350,6 +350,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
 
         jLabel1.setText("Código:");
 
+        txtCodigo.setBackground(new java.awt.Color(204, 204, 204));
         txtCodigo.setEditable(false);
 
         jLabel2.setText("Descrição:");
@@ -439,6 +440,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
         btnConta.setRequestFocusEnabled(false);
         btnConta.setVerifyInputWhenFocusTarget(false);
 
+        txtContaRelacionada.setBackground(new java.awt.Color(204, 204, 204));
         txtContaRelacionada.setEditable(false);
 
         jLabel3.setText("Conta Relacionada:");
@@ -529,7 +531,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jPanel12, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -538,7 +540,7 @@ public class TelaDadosConta extends javax.swing.JInternalFrame {
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);

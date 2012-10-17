@@ -629,33 +629,43 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
 
         jLabel6.setText("Poupança:");
 
+        txtSaldoBanco.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoBanco.setEditable(false);
         txtSaldoBanco.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtChequeACompensar.setBackground(new java.awt.Color(204, 204, 204));
         txtChequeACompensar.setEditable(false);
         txtChequeACompensar.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtSaldo.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldo.setEditable(false);
         txtSaldo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtChequeEspecial.setBackground(new java.awt.Color(204, 204, 204));
         txtChequeEspecial.setEditable(false);
         txtChequeEspecial.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtDisponivel.setBackground(new java.awt.Color(204, 204, 204));
         txtDisponivel.setEditable(false);
         txtDisponivel.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtSaldoPoupanca.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoPoupanca.setEditable(false);
         txtSaldoPoupanca.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtSaldoAplicacao.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoAplicacao.setEditable(false);
         txtSaldoAplicacao.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtSaldoConsignacao.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoConsignacao.setEditable(false);
         txtSaldoConsignacao.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtSaldoEmprestimo.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoEmprestimo.setEditable(false);
         txtSaldoEmprestimo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtRecursosDisponiveis.setBackground(new java.awt.Color(204, 204, 204));
         txtRecursosDisponiveis.setEditable(false);
         txtRecursosDisponiveis.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
@@ -787,7 +797,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Extrato Diário", painelExtratoDiario);
@@ -818,7 +828,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             painelExtratoMensalLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelExtratoMensalLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -850,7 +860,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             painelIdentificadoresLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelIdentificadoresLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -878,7 +888,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addComponent(btnCompensarTodos)
-                .addContainerGap(544, Short.MAX_VALUE))
+                .addContainerGap(546, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -905,7 +915,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -924,7 +934,7 @@ public class TelaExtratoBancario extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
