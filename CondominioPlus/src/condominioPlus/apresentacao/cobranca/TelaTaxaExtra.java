@@ -1444,9 +1444,11 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         jLabel11.setText("Conta:");
 
+        txtCodigoConta.setBackground(new java.awt.Color(204, 204, 204));
         txtCodigoConta.setEditable(false);
         txtCodigoConta.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
+        txtCotas.setBackground(new java.awt.Color(204, 204, 204));
         txtCotas.setEditable(false);
         txtCotas.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 

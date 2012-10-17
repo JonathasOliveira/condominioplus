@@ -166,6 +166,7 @@ public class DialogoConselheiro extends javax.swing.JDialog {
 
         jLabel4.setText("Unidade:");
 
+        txtUnidade.setBackground(new java.awt.Color(204, 204, 204));
         txtUnidade.setEditable(false);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -218,7 +219,7 @@ public class DialogoConselheiro extends javax.swing.JDialog {
                 .addComponent(btnSalvar)
                 .addGap(36, 36, 36)
                 .addComponent(btnCancelar)
-                .addContainerGap(131, Short.MAX_VALUE))
+                .addContainerGap(135, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -609,16 +609,19 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel2.setText("Saldo Anterior");
 
+        txtSaldoAnteriorContaCorrente.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoAnteriorContaCorrente.setEditable(false);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel3.setText("Créditos");
 
+        txtCreditosContaCorrente.setBackground(new java.awt.Color(204, 204, 204));
         txtCreditosContaCorrente.setEditable(false);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel4.setText("Débitos");
 
+        txtDebitosContaCorrente.setBackground(new java.awt.Color(204, 204, 204));
         txtDebitosContaCorrente.setEditable(false);
 
         jLabel5.setBackground(new java.awt.Color(0, 102, 102));
@@ -627,6 +630,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel5.setText("Saldos de Aplicações, Empréstimos e Outros:");
         jLabel5.setOpaque(true);
 
+        txtSaldoPoupanca.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoPoupanca.setEditable(false);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11));
@@ -635,6 +639,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel8.setText("Aplicações");
 
+        txtSaldoAplicacao.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoAplicacao.setEditable(false);
         txtSaldoAplicacao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -645,11 +650,13 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel9.setText("Consignações");
 
+        txtSaldoConsignacao.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoConsignacao.setEditable(false);
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11));
         jLabel10.setText("Empréstimos");
 
+        txtSaldoEmprestimo.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoEmprestimo.setEditable(false);
 
         jLabel11.setBackground(new java.awt.Color(0, 102, 102));
@@ -658,10 +665,13 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel11.setText("Resumo Extrato Bancário");
         jLabel11.setOpaque(true);
 
+        txtSaldoAnteriorExtratoBancario.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoAnteriorExtratoBancario.setEditable(false);
 
+        txtCreditosExtratoBancario.setBackground(new java.awt.Color(204, 204, 204));
         txtCreditosExtratoBancario.setEditable(false);
 
+        txtDebitosExtratoBancario.setBackground(new java.awt.Color(204, 204, 204));
         txtDebitosExtratoBancario.setEditable(false);
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 11));
@@ -679,8 +689,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jLabel15.setText("Saldos Atuais");
         jLabel15.setOpaque(true);
 
+        txtSaldoContaCorrente.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoContaCorrente.setEditable(false);
 
+        txtSaldoExtrato.setBackground(new java.awt.Color(204, 204, 204));
         txtSaldoExtrato.setEditable(false);
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 1, 11));
@@ -810,7 +822,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -843,7 +855,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
