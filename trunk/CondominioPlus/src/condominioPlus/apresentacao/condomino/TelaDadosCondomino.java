@@ -23,10 +23,10 @@ import condominioPlus.negocio.NotificacaoJudicial;
 import condominioPlus.negocio.ProcessoJudicial;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
-import condominioPlus.negocio.funcionario.Funcionario;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.validadores.ValidadorGenerico;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -77,7 +77,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         modificarCamposInquilino(false);
 
-        verificarCNPJ();
         carregarTabelaTelefone();
         carregarTabelaEndereco();
         carregarTabelaAnotacoes();
@@ -85,6 +84,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         carregarComboAdvogado();
 
         if (this.unidade != null) {
+            verificarCNPJ();
             preencherTela(this.unidade);
         }
 
@@ -100,7 +100,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         modificarCamposInquilino(false);
 
-        verificarCNPJ();
         carregarTabelaTelefone();
         carregarTabelaEndereco();
         carregarTabelaAnotacoes();
@@ -108,6 +107,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         carregarComboAdvogado();
 
         if (this.unidade != null) {
+            verificarCNPJ();
             preencherTela(this.unidade);
         }
 
@@ -116,12 +116,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
         campos.add(txtNome);
-        if (!checkBoxCNPJ.isSelected()) {
-            campos.add(txtCpf);
-        } else {
-            txtCpf.setName("CNPJ");
-            campos.add(txtCpf);
-        }
+//        if (!checkBoxCNPJ.isSelected()) {
+        campos.add(txtCpf);
+//        } else {
+//            txtCpf.setName("CNPJ");
+//            campos.add(txtCpf);
+//        }
 
         campos.add(txtUnidade);
         campos.add(txtFracaoIdeal);
@@ -551,16 +551,27 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void verificarCNPJ() {
         if (unidade.getCondomino().isCnpj()) {
             checkBoxCNPJ.setSelected(true);
-            lblCpf.setName("CNPJ*");
+            lblCpf.setText("CNPJ*");
+            txtRg.setEditable(false);
+            txtRg.setBackground(new Color(204, 204, 204));
             try {
                 txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.###.###/####-##")));
+            } catch (java.text.ParseException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            lblCpf.setText("CPF*");
+            txtRg.setEditable(true);
+            txtRg.setBackground(new Color(240, 240, 240));
+            try {
+                txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
             } catch (java.text.ParseException ex) {
                 ex.printStackTrace();
             }
         }
     }
 
-    private void CnpjSelecionado() {
+    private void cnpjSelecionado() {
         if (checkBoxCNPJ.isSelected()) {
             lblCpf.setText("CNPJ*");
             try {
@@ -568,7 +579,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             } catch (java.text.ParseException ex) {
                 ex.printStackTrace();
             }
-
+            txtRg.setEditable(false);
+            txtRg.setBackground(new Color(204, 204, 204));
         } else {
             lblCpf.setText("CPF*");
             try {
@@ -576,8 +588,16 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             } catch (java.text.ParseException ex) {
                 ex.printStackTrace();
             }
+            txtRg.setEditable(true);
+            txtRg.setBackground(new Color(240, 240, 240));
+        }
+    }
 
-
+    private void recuperarOriginal() {
+        if (checkBoxCNPJ.isSelected() && unidade.getCondomino().isCnpj()) {
+            txtCpf.setText(unidade.getCondomino().getCpf());
+        } else if (!checkBoxCNPJ.isSelected() && !unidade.getCondomino().isCnpj()) {
+            txtCpf.setText(unidade.getCondomino().getCpf());
         }
     }
 
@@ -716,7 +736,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                     modificarCamposInquilino(true);
                 }
             } else if (e.getSource() == checkBoxCNPJ) {
-                CnpjSelecionado();
+                txtCpf.setValue(null);
+                txtCpf.grabFocus();
+                cnpjSelecionado();
+                recuperarOriginal();
             } else if (e.getSource() == checkboxNotificadoJudicialmente) {
                 boolean selecionado = checkboxNotificadoJudicialmente.isSelected();
                 ativarNotificacao(selecionado);
@@ -900,10 +923,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         lblCpf.setText("CPF*:");
 
         try {
-            txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
+            txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
+        txtCpf.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         txtCpf.setName("CPF"); // NOI18N
 
         jLabel3.setText("RG:");
