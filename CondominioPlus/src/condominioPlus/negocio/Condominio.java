@@ -9,7 +9,6 @@ import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
 import condominioPlus.negocio.cobranca.agua.ParametrosCalculoAgua;
 import condominioPlus.negocio.cobranca.gas.ContaGas;
-import condominioPlus.negocio.cobranca.luz.ContaLuz;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
 import condominioPlus.negocio.financeiro.AplicacaoFinanceira;
 import condominioPlus.negocio.financeiro.Conciliacao;
@@ -131,6 +130,24 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private int numeroMinimoParcelasAcordo;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<TaxaExtra> taxas;
+    
+    //dados certificacao digital
+    @Column(name = "nome_usuario_certificacao")
+    private String nomeUsuarioCertificacao = "";
+    @Column(name = "cpf_usuario_certificacao")
+    private String cpfUsuarioCertificacao;
+    @Column(name = "identidade_usuario_certificacao")
+    private String identidadeUsuarioCertificacao;
+    @Column(name = "pis_certificacao")
+    private String pisCertificacao;
+    @Column(name = "responsavel_legal")
+    private String responsavelLegal;
+    @Temporal(value = TemporalType.DATE)
+    @Column(name = "data_certificacao")
+    private Calendar dataCertificacao;
+    @Temporal(value = TemporalType.DATE)
+    @Column(name = "prazo_certificacao")
+    private Calendar prazoCertificacao;
 
     public Condominio() {
     }
@@ -537,4 +554,61 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     public void setContasDeLuz(List<ContaGas> contasDeLuz) {
         this.contasDeLuz = contasDeLuz;
     }
+
+    public String getCpfUsuarioCertificacao() {
+        return cpfUsuarioCertificacao;
+    }
+
+    public void setCpfUsuarioCertificacao(String cpfUsuarioCertificacao) {
+        this.cpfUsuarioCertificacao = cpfUsuarioCertificacao;
+    }
+
+    public Calendar getDataCertificacao() {
+        return dataCertificacao;
+    }
+
+    public void setDataCertificacao(Calendar dataCertificacao) {
+        this.dataCertificacao = dataCertificacao;
+    }
+
+    public String getIdentidadeUsuarioCertificacao() {
+        return identidadeUsuarioCertificacao;
+    }
+
+    public void setIdentidadeUsuarioCertificacao(String identidadeUsuarioCertificacao) {
+        this.identidadeUsuarioCertificacao = identidadeUsuarioCertificacao;
+    }
+
+    public String getNomeUsuarioCertificacao() {
+        return nomeUsuarioCertificacao;
+    }
+
+    public void setNomeUsuarioCertificacao(String nomeUsuarioCertificacao) {
+        this.nomeUsuarioCertificacao = nomeUsuarioCertificacao;
+    }
+
+    public String getPisCertificacao() {
+        return pisCertificacao;
+    }
+
+    public void setPisCertificacao(String pisCertificacao) {
+        this.pisCertificacao = pisCertificacao;
+    }
+
+    public Calendar getPrazoCertificacao() {
+        return prazoCertificacao;
+    }
+
+    public void setPrazoCertificacao(Calendar prazoCertificacao) {
+        this.prazoCertificacao = prazoCertificacao;
+    }
+
+    public String getResponsavelLegal() {
+        return responsavelLegal;
+    }
+
+    public void setResponsavelLegal(String responsavelLegal) {
+        this.responsavelLegal = responsavelLegal;
+    }    
+    
 }
