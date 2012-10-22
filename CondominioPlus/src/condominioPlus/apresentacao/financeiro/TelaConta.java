@@ -69,6 +69,9 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
 
             @Override
             protected List<Conta> getFiltrar(List<Conta> contas) {
+                if(radioCodigo.isSelected()){
+                    return filtrarListaPorCodigo(txtNome.getText(), contas);
+                }
                 return filtrarListaPorNome(txtNome.getText(), contas);
             }
 
@@ -160,6 +163,27 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
 
         return listaFiltrada;
     }
+    
+    private List<Conta> filtrarListaPorCodigo(String sequencia, List<Conta> contas) {
+        ArrayList<Conta> listaFiltrada = new ArrayList<Conta>();
+
+        String[] sequencias = sequencia.toUpperCase().split(" ", 0);
+
+        CONTAS:
+        for (Conta c : contas) {
+            for (String s : sequencias) {
+                String codigo = String.valueOf(c.getCodigo());
+                System.out.println(codigo);
+                if (!codigo.toUpperCase().contains(s)) {
+                    continue CONTAS;
+                }
+            }
+
+            listaFiltrada.add(c);
+        }
+
+        return listaFiltrada;
+    }
 
     private List<Conta> carregarContas() {
 
@@ -189,6 +213,8 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             txtNome.addCaretListener(this);
             txtNome.addActionListener(this);
             tabela.addMouseListener(this);
+            radioCodigo.addActionListener(this);
+            radioNome.addActionListener(this);
         }
 
         @Override
@@ -204,6 +230,9 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
                 } else {
                     modelo.editar(new Conta());
                 }
+            }
+            if (source == radioCodigo || source == radioNome){
+                txtNome.grabFocus();
             }
             source = null;
         }
@@ -223,8 +252,8 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabela = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -234,6 +263,8 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         btnImprimir = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         btnRemover = new javax.swing.JButton();
+        radioCodigo = new javax.swing.JRadioButton();
+        radioNome = new javax.swing.JRadioButton();
 
         setClosable(true);
         setMaximizable(true);
@@ -254,65 +285,76 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         ));
         jScrollPane1.setViewportView(tabela);
 
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel1.add(txtNome, gridBagConstraints);
-
         btnAdicionar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionar.setToolTipText("Adicionar");
         btnAdicionar.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionar.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionar.setPreferredSize(new java.awt.Dimension(32, 32));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel1.add(btnAdicionar, gridBagConstraints);
 
         btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditar.setToolTipText("Editar");
         btnEditar.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditar.setMinimumSize(new java.awt.Dimension(32, 32));
         btnEditar.setPreferredSize(new java.awt.Dimension(32, 32));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel1.add(btnEditar, gridBagConstraints);
 
         btnImprimir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
         btnImprimir.setToolTipText("Imprimir");
         btnImprimir.setMaximumSize(new java.awt.Dimension(32, 32));
         btnImprimir.setMinimumSize(new java.awt.Dimension(32, 32));
         btnImprimir.setPreferredSize(new java.awt.Dimension(32, 32));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel1.add(btnImprimir, gridBagConstraints);
 
-        jLabel1.setText("Nome");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 4);
-        jPanel1.add(jLabel1, gridBagConstraints);
+        jLabel1.setText("Pesquisar por:");
 
         btnRemover.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/lixeira.gif"))); // NOI18N
         btnRemover.setToolTipText("Excluir");
         btnRemover.setMaximumSize(new java.awt.Dimension(32, 32));
         btnRemover.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemover.setPreferredSize(new java.awt.Dimension(32, 32));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanel1.add(btnRemover, gridBagConstraints);
+
+        buttonGroup1.add(radioCodigo);
+        radioCodigo.setSelected(true);
+        radioCodigo.setText("Código");
+
+        buttonGroup1.add(radioNome);
+        radioNome.setText("Nome");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioCodigo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioNome)
+                .addGap(2, 2, 2)
+                .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(btnRemover, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(radioCodigo)
+                    .addComponent(radioNome)))
+            .addComponent(btnAdicionar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnEditar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnRemover, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(btnImprimir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -322,7 +364,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 616, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -330,9 +372,9 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
-                .addGap(19, 19, 19))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 374, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -342,9 +384,12 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnRemover;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JRadioButton radioCodigo;
+    private javax.swing.JRadioButton radioNome;
     private javax.swing.JTable tabela;
     private javax.swing.JTextField txtNome;
     // End of variables declaration//GEN-END:variables
