@@ -755,6 +755,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         btnAdicionarAnotacao = new javax.swing.JButton();
         btnRemoverAnotacao = new javax.swing.JButton();
         btnEditarAnotacao = new javax.swing.JButton();
+        btnImprimirAnotacoes = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -1640,21 +1641,27 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
         btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarAnotacao.setToolTipText("Adicionar Anotação");
         btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
         btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
         btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarAnotacao.setToolTipText("Editar Anotação");
         btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnEditarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnImprimirAnotacoes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
+        btnImprimirAnotacoes.setToolTipText("Imprimir Anotação(ões)");
 
         javax.swing.GroupLayout painelAnotacoesLayout = new javax.swing.GroupLayout(painelAnotacoes);
         painelAnotacoes.setLayout(painelAnotacoesLayout);
@@ -1667,23 +1674,25 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(btnImprimirAnotacoes, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(18, 18, 18))
         );
         painelAnotacoesLayout.setVerticalGroup(
             painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelAnotacoesLayout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(painelAnotacoesLayout.createSequentialGroup()
-                        .addGap(31, 31, 31)
                         .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(painelAnotacoesLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)))
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnImprimirAnotacoes))
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1748,6 +1757,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JButton btnEditarAnotacao;
     private javax.swing.JButton btnEditarTaloes;
     private javax.swing.JButton btnEditarTelefone;
+    private javax.swing.JButton btnImprimirAnotacoes;
     private javax.swing.JButton btnRemoverAnotacao;
     private javax.swing.JButton btnRemoverConselheiro;
     private javax.swing.JButton btnRemoverTaloes;
