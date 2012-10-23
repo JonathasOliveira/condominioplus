@@ -440,6 +440,16 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().adicionarAnotacao(anotacao);
         carregarTabelaAnotacoes();
     }
+    
+    private void editarAnotacao() {
+        Anotacao anotacao = modeloTabelaAnotacoes.getObjetoSelecionado();
+        if (anotacao == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editado!", this);
+            return;
+        }
+        DialogoAnotacao.getAnotacao(anotacao, TelaPrincipal.getInstancia(), true);
+        carregarTabelaAnotacoes();
+    }
 
     private void removerAnotacao() {
         if (modeloTabelaAnotacoes.getLinhaSelecionada() > -1) {
@@ -725,7 +735,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 removerTelefone();
             } else if (e.getSource() == btnAdicionarAnotacao) {
                 adicionarAnotacao();
-            } else if (e.getSource() == btnRemoverAnotacao) {
+            } else if (e.getSource() == btnEditarAnotacao) {
+                editarAnotacao();
+            }else if (e.getSource() == btnRemoverAnotacao) {
                 removerAnotacao();
             } else if (e.getSource() == checkBoxInquilino) {
                 boolean selecionado = checkBoxInquilino.isSelected();
@@ -765,6 +777,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             btnEditarTelefone.addActionListener(this);
             btnRemoverTelefone.addActionListener(this);
             btnAdicionarAnotacao.addActionListener(this);
+            btnEditarAnotacao.addActionListener(this);
             btnRemoverAnotacao.addActionListener(this);
             checkBoxInquilino.addActionListener(this);
             checkBoxCNPJ.addActionListener(this);
@@ -894,6 +907,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnRemoverAnotacao = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tabelaAnotacoes = new javax.swing.JTable();
+        btnEditarAnotacao = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -1161,7 +1175,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnEditarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1699,13 +1713,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Unidade", jPanel8);
 
-        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1721,6 +1735,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane3.setViewportView(tabelaAnotacoes);
 
+        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
         jPanel14Layout.setHorizontalGroup(
@@ -1731,22 +1751,24 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel14Layout.createSequentialGroup()
-                        .addGap(48, 48, 48)
-                        .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel14Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)))
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30))
         );
 
         jTabbedPane1.addTab("Anotações", jPanel14);
@@ -1787,6 +1809,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnAdicionarAnotacao;
     private javax.swing.JButton btnAdicionarEndereco;
     private javax.swing.JButton btnAdicionarTelefone;
+    private javax.swing.JButton btnEditarAnotacao;
     private javax.swing.JButton btnEditarEndereco;
     private javax.swing.JButton btnEditarTelefone;
     private javax.swing.JButton btnRemoverAnotacao;

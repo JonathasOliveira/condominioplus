@@ -125,13 +125,13 @@ public class DialogoAnotacao extends javax.swing.JDialog {
 
         jLabel2.setText("Assunto:");
 
-        btnSalvar.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnSalvar.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnSalvar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/ok.GIF"))); // NOI18N
         btnSalvar.setMaximumSize(new java.awt.Dimension(32, 32));
         btnSalvar.setMinimumSize(new java.awt.Dimension(32, 32));
         btnSalvar.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnCancelar.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnCancelar.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnCancelar.setMaximumSize(new java.awt.Dimension(32, 32));
         btnCancelar.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -165,6 +165,7 @@ public class DialogoAnotacao extends javax.swing.JDialog {
         txtData.setName(""); // NOI18N
 
         txtTexto.setColumns(20);
+        txtTexto.setLineWrap(true);
         txtTexto.setRows(5);
         txtTexto.setName("texto"); // NOI18N
         jScrollPane1.setViewportView(txtTexto);
