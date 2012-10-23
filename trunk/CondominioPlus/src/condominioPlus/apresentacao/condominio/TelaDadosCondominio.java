@@ -771,6 +771,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        setClosable(true);
         setTitle("Cadastro de Condomínio");
         setPreferredSize(new java.awt.Dimension(722, 510));
 
@@ -968,7 +969,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
