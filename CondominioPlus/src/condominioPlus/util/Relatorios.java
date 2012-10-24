@@ -8,6 +8,7 @@
  */
 package condominioPlus.util;
 
+import condominioPlus.negocio.Anotacao;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
@@ -703,8 +704,8 @@ public class Relatorios implements Printable {
             parametros.put("craAssinatura", "CRA/RJ 20-59303-1");
             parametros.put("cpfAssinatura", "CPF 086.799.077-58");
         }
-        
-        if(imprimirObservacao){
+
+        if (imprimirObservacao) {
             parametros.put("observacao", "Observação: Certificação negativa com efeito positivo.");
         }
 
@@ -718,5 +719,36 @@ public class Relatorios implements Printable {
         lista.add(mapa);
 
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
+    }
+
+    public void imprimirAnotacoes(Condominio condominio, Unidade unidade, List<Anotacao> anotacoes, TipoRelatorio tipo) {
+//        List<Unidade> listaUnidades = new ArrayList<Unidade>();
+//        listaUnidades = ordenarUnidades(unidades);
+
+        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        
+        if (unidade != null){
+            parametros.put("condominio", condominio.getRazaoSocial() + " - " + unidade.getUnidade() + " " + unidade.getCondomino().getNome());
+        } else {
+            parametros.put("condominio", condominio.getRazaoSocial());
+        }
+
+        for (Anotacao anotacao : anotacoes) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("data", DataUtil.toString(anotacao.getData()));
+            mapa.put("usuario", anotacao.getUsuario().getUsuario());
+            mapa.put("assunto", anotacao.getAssunto());
+            mapa.put("texto", anotacao.getTexto());
+            lista.add(mapa);
+        }
+
+        parametros.put("nomeRelatorio", tipo.toString());
+//        parametros.put("data", DataUtil.toString(data));
+
+        if (!lista.isEmpty()) {
+            imprimir("RelatorioAnotacoes", parametros, lista, false, true, null);
+        }
     }
 }
