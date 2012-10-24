@@ -25,7 +25,9 @@ public enum TipoRelatorio {
     PAGAMENTOS_EFETUADOS_SINTETICO("Pagamentos Efetuados Sintético"),
     PAGAMENTOS_EFETUADOS_ANALITICO("Pagamentos Efetuados Analítico"),
     COBRANCAS_EXISTENTES_A_VENCER_SINTETICO("Cobranças Existentes à Vencer Sintético"),
-    COBRANCAS_EXISTENTES_A_VENCER_ANALITICO("Cobranças Existentes à Vencer Analítico");
+    COBRANCAS_EXISTENTES_A_VENCER_ANALITICO("Cobranças Existentes à Vencer Analítico"),
+    ANOTACOES_CONDOMINO("Anotações em Condômino"),
+    ANOTACOES_CONDOMINIO("Anotações em Condomínio");
 
     TipoRelatorio(String nome) {
         this.nome = nome;

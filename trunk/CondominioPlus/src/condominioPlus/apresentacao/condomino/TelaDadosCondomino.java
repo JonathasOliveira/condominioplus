@@ -25,6 +25,8 @@ import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.relatorios.TipoRelatorio;
+import condominioPlus.util.Relatorios;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Color;
 import java.awt.Font;
@@ -440,7 +442,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().adicionarAnotacao(anotacao);
         carregarTabelaAnotacoes();
     }
-    
+
     private void editarAnotacao() {
         Anotacao anotacao = modeloTabelaAnotacoes.getObjetoSelecionado();
         if (anotacao == null) {
@@ -472,6 +474,18 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             ApresentacaoUtil.exibirInformacao("Anotação(ões) removida(s) com sucesso!", this);
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void imprimirAnotacoes() {
+        if (modeloTabelaAnotacoes.getObjetosSelecionados().isEmpty()) {
+            if (unidade.getCondomino().getAnotacoes().isEmpty()) {
+                ApresentacaoUtil.exibirAdvertencia("Não há registros a serem impressos.", this);
+            } else {
+                new Relatorios().imprimirAnotacoes(condominio, unidade, unidade.getCondomino().getAnotacoes(), TipoRelatorio.ANOTACOES_CONDOMINO);
+            }
+        } else {
+            new Relatorios().imprimirAnotacoes(condominio, unidade, modeloTabelaAnotacoes.getObjetosSelecionados(), TipoRelatorio.ANOTACOES_CONDOMINO);
         }
     }
 
@@ -737,8 +751,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 adicionarAnotacao();
             } else if (e.getSource() == btnEditarAnotacao) {
                 editarAnotacao();
-            }else if (e.getSource() == btnRemoverAnotacao) {
+            } else if (e.getSource() == btnRemoverAnotacao) {
                 removerAnotacao();
+            } else if (e.getSource() == btnImprimirAnotacoes) {
+                imprimirAnotacoes();
             } else if (e.getSource() == checkBoxInquilino) {
                 boolean selecionado = checkBoxInquilino.isSelected();
 
@@ -779,6 +795,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             btnAdicionarAnotacao.addActionListener(this);
             btnEditarAnotacao.addActionListener(this);
             btnRemoverAnotacao.addActionListener(this);
+            btnImprimirAnotacoes.addActionListener(this);
             checkBoxInquilino.addActionListener(this);
             checkBoxCNPJ.addActionListener(this);
             checkboxNotificadoJudicialmente.addActionListener(this);
@@ -1176,7 +1193,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
         btnEditarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
@@ -1714,14 +1731,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Unidade", jPanel8);
 
-        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarAnotacao.setToolTipText("Adicionar Anotação");
         btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -1738,7 +1755,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane3.setViewportView(tabelaAnotacoes);
 
-        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarAnotacao.setToolTipText("Editar Anotação");
         btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -1754,7 +1771,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnImprimirAnotacoes, 0, 0, Short.MAX_VALUE)
