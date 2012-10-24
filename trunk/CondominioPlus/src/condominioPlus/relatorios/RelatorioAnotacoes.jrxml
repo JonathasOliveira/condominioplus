@@ -82,7 +82,7 @@
 			<textField isBlankWhenNull="true">
 				<reportElement x="385" y="6" width="165" height="57"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="16"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomeRelatorio}]]></textFieldExpression>
 			</textField>
