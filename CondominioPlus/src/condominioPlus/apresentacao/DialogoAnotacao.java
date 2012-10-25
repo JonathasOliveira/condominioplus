@@ -6,7 +6,7 @@
 /*
  * DialogoAnotacao.java
  *
- * Created on Oct 11, 20120, 12:14:47 PM
+ * Created on Oct 11, 2012, 12:14:47 PM
  */
 package condominioPlus.apresentacao;
 
