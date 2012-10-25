@@ -8,14 +8,12 @@ package condominioPlus.apresentacao.condomino;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.swing.event.CaretEvent;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
-import condominioPlus.util.Relatorios;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -37,7 +35,7 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
         initComponents();
         this.condominio = condominio;
 
-        if(this.condominio != null){
+        if (this.condominio != null) {
             this.setTitle("Condôminos do Condomínio " + condominio.getRazaoSocial());
         }
 
@@ -61,7 +59,7 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
 
             @Override
             public void editar(Unidade unidade) {
-              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade, modelo));
+                TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade, modelo));
             }
 
             @Override
@@ -134,21 +132,11 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
     }
 
     private void imprimir() {
-
-        HashMap parametrosRelatorio = new HashMap();
-
-        List<HashMap> lista = new ArrayList<HashMap>();
-        for (Unidade c : modelo.getObjetos()) {
-            HashMap<String, String> objeto = new HashMap<String, String>();
-            objeto.put("nome", c.getCondomino().getNome());
-            objeto.put("cpf", c.getCondomino().getCpf());
-            lista.add(objeto);
-        }
-
-        new Relatorios().imprimir("RelatorioFuncionarios", parametrosRelatorio, lista, false, true, null);
+        DialogoImpressaoCondomino dialogo = new DialogoImpressaoCondomino(condominio, TelaPrincipal.getInstancia(), false);
+        dialogo.setVisible(true);
     }
 
-   private class ControladorEventos extends ControladorEventosGenerico {
+    private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
         public void configurar() {
