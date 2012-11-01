@@ -13,6 +13,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 /**
@@ -36,6 +37,8 @@ public class Endereco implements Serializable {
     private boolean padrao;
     @OneToOne
     private Condomino condomino;
+    @ManyToOne
+    private Inquilino inquilino;
 
     @Override
     public String toString() {
@@ -43,6 +46,10 @@ public class Endereco implements Serializable {
     }
     public Endereco(Condomino condomino){
         this.condomino = condomino;
+    }
+    
+    public Endereco(Inquilino inquilino){
+        this.inquilino = inquilino;
     }
 
     public Endereco(){
@@ -94,6 +101,14 @@ public class Endereco implements Serializable {
 
     public void setCondomino(Condomino condomino) {
         this.condomino = condomino;
+    }
+    
+    public Inquilino getInquilino() {
+        return inquilino;
+    }
+
+    public void setInquilino(Inquilino inquilino) {
+        this.inquilino = inquilino;
     }
 
     public boolean isPadrao() {

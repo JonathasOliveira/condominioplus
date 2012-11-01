@@ -6,32 +6,38 @@
 package condominioPlus.negocio;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 /**
  *
  * @author Administrador
  */
 @Entity
+@NamedQuery(name = "InquilinoPorUnidade", query = "SELECT i FROM Inquilino i WHERE i.codigoUnidade = ?1")
 public class Inquilino implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int codigo;
     private String nome;
-    @OneToOne(cascade = CascadeType.ALL)
-    private Endereco endereco = new Endereco();
     @OneToMany(cascade = CascadeType.ALL, mappedBy="inquilino")
-    private List<Telefone> telefones;
+    private List<Endereco> enderecos = new ArrayList<Endereco>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="inquilino")
+    private List<Telefone> telefones  = new ArrayList<Telefone>();
     private String cpf;
     private String rg;
     private String email;
+    //campo para listar historico de inquilinos
+    @Column(name = "codigo_unidade")
+    private int codigoUnidade;
 
     public int getCodigo() {
         return codigo;
@@ -57,14 +63,14 @@ public class Inquilino implements Serializable {
         this.email = email;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public int getCodigoUnidade() {
+        return codigoUnidade;
     }
 
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
+    public void setCodigoUnidade(int codigoUnidade) {
+        this.codigoUnidade = codigoUnidade;
     }
-
+   
     public String getNome() {
         return nome;
     }
@@ -80,6 +86,22 @@ public class Inquilino implements Serializable {
     public void setRg(String rg) {
         this.rg = rg;
     }
+    
+    public List<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
+    }
+    
+    public void adicionarEndereco(Endereco endereco) {
+        enderecos.add(endereco);
+    }
+
+    public void removerEndereco(Endereco endereco) {
+        enderecos.remove(endereco);
+    }
 
     public List<Telefone> getTelefones() {
         return telefones;
@@ -87,6 +109,15 @@ public class Inquilino implements Serializable {
 
     public void setTelefones(List<Telefone> telefones) {
         this.telefones = telefones;
+    }
+    
+    public void adicionarTelefone(Telefone telefone) {
+        telefone.setInquilino(this);
+        telefones.add(telefone);
+    }
+
+    public void removerTelefone(Telefone telefone) {
+        telefones.remove(telefone);
     }
 
 }

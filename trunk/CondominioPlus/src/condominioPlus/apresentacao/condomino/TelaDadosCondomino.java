@@ -19,6 +19,7 @@ import condominioPlus.negocio.Advogado;
 import condominioPlus.negocio.Anotacao;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
+import condominioPlus.negocio.Inquilino;
 import condominioPlus.negocio.NotificacaoJudicial;
 import condominioPlus.negocio.ProcessoJudicial;
 import condominioPlus.negocio.Telefone;
@@ -67,7 +68,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private ComboModelo<Advogado> modelo;
     private TabelaModelo_2 modeloTabela;
     private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
+    private TabelaModelo_2<Endereco> modeloTabelaEnderecoInquilino;
+    private TabelaModelo_2<Telefone> modeloTabelaTelefone;
+    private TabelaModelo_2<Inquilino> modeloTabelaHistoricoInquilino;
     private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
+    private List<Endereco> listaEnderecoInquilino = new ArrayList<Endereco>();
+    private List<Telefone> listaTelefoneInquilino = new ArrayList<Telefone>();
+    private List<Inquilino> listaInquilinosAntigos = new ArrayList<Inquilino>();
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondomino(Unidade unidade) {
@@ -100,11 +107,17 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         initComponents();
         controlador = new ControladorEventos();
 
-        modificarCamposInquilino(false);
+        boolean inquilino = false;
+        if (unidade.getInquilino() != null) {
+            inquilino = true;
+        }
+
+        modificarCamposInquilino(inquilino);
 
         carregarTabelaTelefone();
         carregarTabelaEndereco();
         carregarTabelaAnotacoes();
+        carregarTabelaHistoricoInquilino();
 
         carregarComboAdvogado();
 
@@ -166,6 +179,19 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         return value;
     }
 
+    private boolean verificarEnderecoPadraoInquilino() {
+        boolean value = false;
+        for (Endereco e : unidade.getInquilino().getEnderecos()) {
+            if (e.isPadrao()) {
+                value = true;
+            }
+        }
+        if (!value) {
+            ApresentacaoUtil.exibirInformacao("Deve-se marcar um endereço do inquilino como padrão!", this);
+        }
+        return value;
+    }
+
     private void carregarComboAdvogado() {
         cmbAdvogado1.setModel(new ComboModelo<Advogado>(new DAO().listar(Advogado.class)));
         modelo = new ComboModelo<Advogado>(new DAO().listar(Advogado.class));
@@ -184,6 +210,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             verificarSindico();
             if (!verificarEnderecoPadrao()) {
                 return;
+            }
+
+            if (unidade.getInquilino() != null) {
+                if (!verificarEnderecoPadraoInquilino()) {
+                    return;
+                }
             }
 
             if (!validador.validarDatas(DataUtil.getCalendar(dateInicioJudicial.getValue()), DataUtil.getCalendar(dateFimJudicial.getValue()))) {
@@ -446,7 +478,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private void editarAnotacao() {
         Anotacao anotacao = modeloTabelaAnotacoes.getObjetoSelecionado();
         if (anotacao == null) {
-            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editado!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editada!", this);
             return;
         }
         DialogoAnotacao.getAnotacao(anotacao, TelaPrincipal.getInstancia(), true);
@@ -489,8 +521,212 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         }
     }
 
-    private void preencherTela(Unidade unidade) {
+    private void carregarTabelaTelefoneInquilino() {
+        modeloTabelaTelefone = new TabelaModelo_2<Telefone>(tblTelefoneInquilino, "Tipo, Número".split(",")) {
 
+            @Override
+            protected List<Telefone> getCarregarObjetos() {
+                return getTelefoneInquilino();
+            }
+
+            @Override
+            public Object getValor(Telefone telefone, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return telefone.getTipo();
+                    case 1:
+                        return telefone.getNumero();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Telefone> getTelefoneInquilino() {
+        listaTelefoneInquilino = unidade.getInquilino().getTelefones();
+        return listaTelefoneInquilino;
+    }
+
+    private void adicionarTelefoneInquilino() {
+        Telefone telefone = DialogoTelefone.getTelefone(new Telefone(unidade.getInquilino()), TelaPrincipal.getInstancia(), true);
+        if (telefone.getNumero().equals("")) {
+            return;
+        }
+        if (unidade.getInquilino() == null) {
+            unidade.setInquilino(new Inquilino());
+        }
+        unidade.getInquilino().adicionarTelefone(telefone);
+        carregarTabelaTelefoneInquilino();
+    }
+
+    private void editarTelefoneInquilino() {
+        Telefone telefone = modeloTabelaTelefone.getObjetoSelecionado();
+        if (telefone == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o registro a ser editado!", this);
+            return;
+        }
+        DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
+        carregarTabelaTelefoneInquilino();
+    }
+
+    private void removerTelefoneInquilino() {
+        if (modeloTabelaTelefone.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaTelefone.getLinhasSelecionadas());
+            List<Telefone> itensRemover = modeloTabelaTelefone.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Telefone t : itensRemover) {
+                    modeloTabelaTelefone.remover(t);
+                    for (Telefone o : unidade.getInquilino().getTelefones()) {
+                        if (t.getCodigo() == o.getCodigo()) {
+                            unidade.getInquilino().getTelefones().remove(t);
+                        }
+                    }
+                    new DAO().remover(t);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Registro(s) removido(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void carregarTabelaEnderecoInquilino() {
+        modeloTabelaEnderecoInquilino = new TabelaModelo_2<Endereco>(tblEnderecoInquilino, "Rua, Número, Bairro".split(",")) {
+
+            @Override
+            protected List<Endereco> getCarregarObjetos() {
+                return getEnderecoInquilino();
+            }
+
+            @Override
+            public Object getValor(Endereco endereco, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return endereco.getLogradouro();
+                    case 1:
+                        return endereco.getNumero();
+                    case 2:
+                        return endereco.getBairro();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Endereco> getEnderecoInquilino() {
+        listaEnderecoInquilino = unidade.getInquilino().getEnderecos();
+        return listaEnderecoInquilino;
+    }
+
+    private void adicionarEnderecoInquilino() {
+        Endereco endereco = DialogoEndereco.getEndereco(new Endereco(unidade.getInquilino()), TelaPrincipal.getInstancia(), true);
+        if (endereco.getLogradouro().equals("")) {
+            return;
+        }
+        if (unidade.getInquilino() == null) {
+            unidade.setInquilino(new Inquilino());
+        }
+        unidade.getInquilino().adicionarEndereco(endereco);
+        carregarTabelaEnderecoInquilino();
+    }
+
+    private void editarEnderecoInquilino() {
+        Endereco endereco = modeloTabelaEnderecoInquilino.getObjetoSelecionado();
+        if (endereco == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione o registro a ser editado!", this);
+            return;
+        }
+        DialogoEndereco.getEndereco(endereco, TelaPrincipal.getInstancia(), true);
+        carregarTabelaEnderecoInquilino();
+    }
+
+    private void removerEnderecoInquilino() {
+        if (modeloTabelaEnderecoInquilino.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaEnderecoInquilino.getLinhasSelecionadas());
+            List<Endereco> itensRemover = modeloTabelaEnderecoInquilino.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Endereco e : itensRemover) {
+                    modeloTabelaEnderecoInquilino.remover(e);
+                    for (Endereco o : unidade.getInquilino().getEnderecos()) {
+                        if (e.getId() == o.getId()) {
+                            unidade.getInquilino().getEnderecos().remove(e);
+                        }
+                    }
+                    new DAO().remover(e);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Registro(s) removido(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void carregarTabelaHistoricoInquilino() {
+        modeloTabelaHistoricoInquilino = new TabelaModelo_2<Inquilino>(tabelaHistoricoInquilino, "Nome, CPF, RG".split(",")) {
+
+            @Override
+            protected List<Inquilino> getCarregarObjetos() {
+                return getHistoricoInquilino();
+            }
+
+            @Override
+            public Object getValor(Inquilino inquilino, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return inquilino.getNome();
+                    case 1:
+                        return inquilino.getCpf();
+                    case 2:
+                        return inquilino.getRg();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Inquilino> getHistoricoInquilino() {
+        listaInquilinosAntigos = new DAO().listar(Inquilino.class, "InquilinoPorUnidade", unidade.getCodigo());
+        return listaInquilinosAntigos;
+    }
+
+//    private void editarTelefoneInquilino() {
+//        Telefone telefone = modeloTabelaTelefone.getObjetoSelecionado();
+//        if (telefone == null) {
+//            ApresentacaoUtil.exibirAdvertencia("Selecione o registro a ser editado!", this);
+//            return;
+//        }
+//        DialogoTelefone.getTelefone(telefone, TelaPrincipal.getInstancia(), true);
+//        carregarTabelaTelefoneInquilino();
+//    }
+    private void removerInquilinoHistorico() {
+        if (modeloTabelaHistoricoInquilino.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaHistoricoInquilino.getLinhasSelecionadas());
+            List<Inquilino> itensRemover = modeloTabelaHistoricoInquilino.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Inquilino i : itensRemover) {
+                    modeloTabelaHistoricoInquilino.remover(i);
+                    new DAO().remover(i);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Registro(s) removido(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void preencherTela(Unidade unidade) {
 
         txtCondominio.setText(unidade.getCondominio().getRazaoSocial());
         txtNome.setText(unidade.getCondomino().getNome());
@@ -514,18 +750,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         txtEmail.setText(unidade.getCondomino().getEmail());
 //        txtAnotacoes.setText(unidade.getCondomino().getAnotacoes());
 
-        if (unidade.isHasInquilino()) {
+        if (unidade.getInquilino() != null) {
+            checkBoxInquilino.setSelected(true);
             txtNomeInquilino.setText(unidade.getInquilino().getNome());
             txtCpfInquilino.setText(unidade.getInquilino().getCpf());
             txtRgInquilino.setText(unidade.getInquilino().getRg());
-            txtRuaInquilino.setText(unidade.getInquilino().getEndereco().getLogradouro());
-            txtNumeroInquilino.setText(unidade.getInquilino().getEndereco().getNumero());
-            txtComplementoInquilino.setText(unidade.getInquilino().getEndereco().getComplemento());
-            txtReferenciaInquilino.setText(unidade.getInquilino().getEndereco().getReferencia());
-            txtBairroInquilino.setText(unidade.getInquilino().getEndereco().getBairro());
-            txtCidadeInquilino.setText(unidade.getInquilino().getEndereco().getCidade());
-            txtUfInquilino.setText(unidade.getInquilino().getEndereco().getEstado());
-            txtCepInquilino.setText((unidade.getInquilino().getEndereco().getCep()));
+            carregarTabelaTelefoneInquilino();
+            carregarTabelaEnderecoInquilino();
         }
 
         txtFracaoIdeal.setText(String.valueOf(unidade.getFracaoIdeal()));
@@ -556,7 +787,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtNumeroProcesso.setText(unidade.getProcessoJudicial().getNumero_processo());
 
         }
-
 
         //processos com datas
     }
@@ -637,18 +867,20 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().setEmail(txtEmail.getText());
 //        unidade.getCondomino().setAnotacoes(txtAnotacoes.getText());
 
-        if (unidade.isHasInquilino()) {
-            txtNomeInquilino.setText(unidade.getInquilino().getNome().trim().toUpperCase());
-            txtCpfInquilino.setText(unidade.getInquilino().getCpf());
-            txtRgInquilino.setText(unidade.getInquilino().getRg());
-            txtRuaInquilino.setText(unidade.getInquilino().getEndereco().getLogradouro().trim().toUpperCase());
-            txtNumeroInquilino.setText(unidade.getInquilino().getEndereco().getNumero().trim().toUpperCase());
-            txtComplementoInquilino.setText(unidade.getInquilino().getEndereco().getComplemento().trim().toUpperCase());
-            txtReferenciaInquilino.setText(unidade.getInquilino().getEndereco().getReferencia().trim().toUpperCase());
-            txtBairroInquilino.setText(unidade.getInquilino().getEndereco().getBairro().trim().toUpperCase());
-            txtCidadeInquilino.setText(unidade.getInquilino().getEndereco().getCidade().trim().toUpperCase());
-            txtUfInquilino.setText(unidade.getInquilino().getEndereco().getEstado().trim().toUpperCase());
-            txtCepInquilino.setText((unidade.getInquilino().getEndereco().getCep()));
+        if (checkBoxInquilino.isSelected()) {
+            if (unidade.getInquilino() == null) {
+                unidade.setInquilino(new Inquilino());
+            }
+            unidade.getInquilino().setNome(txtNomeInquilino.getText());
+            unidade.getInquilino().setCpf(txtCpfInquilino.getText());
+            unidade.getInquilino().setRg(txtRgInquilino.getText());
+        } else {
+            if (unidade.getInquilino() != null) {
+                Inquilino inquilino = unidade.getInquilino();
+                inquilino.setCodigoUnidade(unidade.getCodigo());
+                new DAO().salvar(inquilino);
+                unidade.setInquilino(null);
+            }
         }
 
         unidade.setFracaoIdeal(Double.parseDouble(txtFracaoIdeal.getText()));
@@ -717,14 +949,49 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         txtNomeInquilino.setEnabled(valor);
         txtCpfInquilino.setEnabled(valor);
         txtRgInquilino.setEnabled(valor);
-        txtRuaInquilino.setEnabled(valor);
-        txtNumeroInquilino.setEnabled(valor);
-        txtComplementoInquilino.setEnabled(valor);
-        txtReferenciaInquilino.setEnabled(valor);
-        txtBairroInquilino.setEnabled(valor);
-        txtCidadeInquilino.setEnabled(valor);
-        txtUfInquilino.setEnabled(valor);
-        txtCepInquilino.setEnabled(valor);
+        tblEnderecoInquilino.setEnabled(valor);
+        btnAdicionarEnderecoInquilino.setEnabled(valor);
+        btnEditarEnderecoInquilino.setEnabled(valor);
+        btnRemoverEnderecoInquilino.setEnabled(valor);
+        tblTelefoneInquilino.setEnabled(valor);
+        btnAdicionarTelefoneInquilino.setEnabled(valor);
+        btnEditarTelefoneInquilino.setEnabled(valor);
+        btnRemoverTelefoneInquilino.setEnabled(valor);
+//        txtRuaInquilino.setEnabled(valor);
+//        txtNumeroInquilino.setEnabled(valor);
+//        txtComplementoInquilino.setEnabled(valor);
+//        txtReferenciaInquilino.setEnabled(valor);
+//        txtBairroInquilino.setEnabled(valor);
+//        txtCidadeInquilino.setEnabled(valor);
+//        txtUfInquilino.setEnabled(valor);
+//        txtCepInquilino.setEnabled(valor);
+        if (valor == false) {
+            Color color = new Color(204, 204, 204);
+            txtNomeInquilino.setBackground(color);
+            txtCpfInquilino.setBackground(color);
+            txtRgInquilino.setBackground(color);
+//            txtRuaInquilino.setBackground(color);
+//            txtNumeroInquilino.setBackground(color);
+//            txtComplementoInquilino.setBackground(color);
+//            txtReferenciaInquilino.setBackground(color);
+//            txtBairroInquilino.setBackground(color);
+//            txtCidadeInquilino.setBackground(color);
+//            txtUfInquilino.setBackground(color);
+//            txtCepInquilino.setBackground(color);
+        } else {
+            Color color = new Color(240, 240, 240);
+            txtNomeInquilino.setBackground(color);
+            txtCpfInquilino.setBackground(color);
+            txtRgInquilino.setBackground(color);
+//            txtRuaInquilino.setBackground(color);
+//            txtNumeroInquilino.setBackground(color);
+//            txtComplementoInquilino.setBackground(color);
+//            txtReferenciaInquilino.setBackground(color);
+//            txtBairroInquilino.setBackground(color);
+//            txtCidadeInquilino.setBackground(color);
+//            txtUfInquilino.setBackground(color);
+//            txtCepInquilino.setBackground(color);
+        }
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -757,12 +1024,25 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 imprimirAnotacoes();
             } else if (e.getSource() == checkBoxInquilino) {
                 boolean selecionado = checkBoxInquilino.isSelected();
-
                 if (!selecionado) {
                     modificarCamposInquilino(false);
                 } else {
                     modificarCamposInquilino(true);
                 }
+            } else if (e.getSource() == btnAdicionarEnderecoInquilino) {
+                adicionarEnderecoInquilino();
+            } else if (e.getSource() == btnEditarEnderecoInquilino) {
+                editarEnderecoInquilino();
+            } else if (e.getSource() == btnRemoverTelefoneInquilino) {
+                removerEnderecoInquilino();
+            } else if (e.getSource() == btnAdicionarTelefoneInquilino) {
+                adicionarTelefoneInquilino();
+            } else if (e.getSource() == btnEditarTelefoneInquilino) {
+                editarTelefoneInquilino();
+            } else if (e.getSource() == btnRemoverTelefoneInquilino) {
+                removerTelefoneInquilino();
+            } else if (e.getSource() == btnRemoverInquilino) {
+                removerInquilinoHistorico();
             } else if (e.getSource() == checkBoxCNPJ) {
                 txtCpf.setValue(null);
                 txtCpf.grabFocus();
@@ -797,6 +1077,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             btnRemoverAnotacao.addActionListener(this);
             btnImprimirAnotacoes.addActionListener(this);
             checkBoxInquilino.addActionListener(this);
+            btnAdicionarEnderecoInquilino.addActionListener(this);
+            btnEditarEnderecoInquilino.addActionListener(this);
+            btnRemoverEnderecoInquilino.addActionListener(this);
+            btnAdicionarTelefoneInquilino.addActionListener(this);
+            btnEditarTelefoneInquilino.addActionListener(this);
+            btnRemoverTelefoneInquilino.addActionListener(this);
+            btnRemoverInquilino.addActionListener(this);
             checkBoxCNPJ.addActionListener(this);
             checkboxNotificadoJudicialmente.addActionListener(this);
             checkBoxProcessoJuridico.addActionListener(this);
@@ -850,14 +1137,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
+        painelContato = new javax.swing.JPanel();
+        painelEnderecoInquilino = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblEndereco = new javax.swing.JTable();
         btnAdicionarEndereco = new javax.swing.JButton();
         btnEditarEndereco = new javax.swing.JButton();
         btnRemoverEndereco = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
+        painelTelefoneInquilino = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTelefone = new javax.swing.JTable();
         btnAdicionarTelefone = new javax.swing.JButton();
@@ -865,31 +1152,28 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnRemoverTelefone = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
-        jPanel5 = new javax.swing.JPanel();
+        painelInquilino = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         txtNomeInquilino = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         txtCpfInquilino = new javax.swing.JFormattedTextField();
         txtRgInquilino = new javax.swing.JFormattedTextField();
         jLabel21 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
-        txtNumeroInquilino = new javax.swing.JTextField();
-        jLabel33 = new javax.swing.JLabel();
-        txtCepInquilino = new javax.swing.JFormattedTextField();
-        txtComplementoInquilino = new javax.swing.JTextField();
-        jLabel34 = new javax.swing.JLabel();
-        jLabel35 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        txtBairroInquilino = new javax.swing.JTextField();
-        jLabel31 = new javax.swing.JLabel();
-        txtReferenciaInquilino = new javax.swing.JTextField();
-        jLabel36 = new javax.swing.JLabel();
-        txtCidadeInquilino = new javax.swing.JTextField();
-        txtRuaInquilino = new javax.swing.JTextField();
-        jLabel30 = new javax.swing.JLabel();
-        txtUfInquilino = new javax.swing.JTextField();
         checkBoxInquilino = new javax.swing.JCheckBox();
         jPanel8 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tblEnderecoInquilino = new javax.swing.JTable();
+        btnAdicionarEnderecoInquilino = new javax.swing.JButton();
+        btnEditarEnderecoInquilino = new javax.swing.JButton();
+        btnRemoverEnderecoInquilino = new javax.swing.JButton();
+        jPanel14 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tblTelefoneInquilino = new javax.swing.JTable();
+        btnAdicionarTelefoneInquilino = new javax.swing.JButton();
+        btnEditarTelefoneInquilino = new javax.swing.JButton();
+        btnRemoverTelefoneInquilino = new javax.swing.JButton();
+        painelCorrespondencia = new javax.swing.JPanel();
+        painelUnidade = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
@@ -919,13 +1203,17 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         checkboxImpressaoCertificado = new javax.swing.JCheckBox();
         checkboxImpressaoCobranca = new javax.swing.JCheckBox();
         checkboxCartaCobranca = new javax.swing.JCheckBox();
-        jPanel14 = new javax.swing.JPanel();
+        painelAnotacoes = new javax.swing.JPanel();
         btnAdicionarAnotacao = new javax.swing.JButton();
         btnRemoverAnotacao = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         tabelaAnotacoes = new javax.swing.JTable();
         btnEditarAnotacao = new javax.swing.JButton();
         btnImprimirAnotacoes = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        tabelaHistoricoInquilino = new javax.swing.JTable();
+        btnRemoverInquilino = new javax.swing.JButton();
 
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
@@ -1175,7 +1463,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(11, 18, 11, 268);
         jPanel12.add(btnVoltar, gridBagConstraints);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereços"));
+        painelEnderecoInquilino.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereços"));
 
         tblEndereco.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1205,40 +1493,40 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnRemoverEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemoverEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelEnderecoInquilinoLayout = new javax.swing.GroupLayout(painelEnderecoInquilino);
+        painelEnderecoInquilino.setLayout(painelEnderecoInquilinoLayout);
+        painelEnderecoInquilinoLayout.setHorizontalGroup(
+            painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelEnderecoInquilinoLayout.createSequentialGroup()
                 .addContainerGap(251, Short.MAX_VALUE)
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRemoverEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
-            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel6Layout.createSequentialGroup()
+            .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelEnderecoInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(57, Short.MAX_VALUE)))
         );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
+        painelEnderecoInquilinoLayout.setVerticalGroup(
+            painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelEnderecoInquilinoLayout.createSequentialGroup()
                 .addComponent(btnAdicionarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel6Layout.createSequentialGroup()
+            .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelEnderecoInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
+        painelTelefoneInquilino.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
 
         tblTelefone.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1268,34 +1556,34 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnRemoverTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemoverTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelTelefoneInquilinoLayout = new javax.swing.GroupLayout(painelTelefoneInquilino);
+        painelTelefoneInquilino.setLayout(painelTelefoneInquilinoLayout);
+        painelTelefoneInquilinoLayout.setHorizontalGroup(
+            painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelTelefoneInquilinoLayout.createSequentialGroup()
                 .addContainerGap(217, Short.MAX_VALUE)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRemoverTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
-            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel7Layout.createSequentialGroup()
+            .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelTelefoneInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(54, Short.MAX_VALUE)))
         );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
+        painelTelefoneInquilinoLayout.setVerticalGroup(
+            painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelTelefoneInquilinoLayout.createSequentialGroup()
                 .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel7Layout.createSequentialGroup()
+            .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelTelefoneInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
                     .addContainerGap()))
@@ -1303,38 +1591,38 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jLabel13.setText("E-mail:");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelContatoLayout = new javax.swing.GroupLayout(painelContato);
+        painelContato.setLayout(painelContatoLayout);
+        painelContatoLayout.setHorizontalGroup(
+            painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelContatoLayout.createSequentialGroup()
+                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelContatoLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(painelEnderecoInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(painelTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelContatoLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)))
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        painelContatoLayout.setVerticalGroup(
+            painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelContatoLayout.createSequentialGroup()
+                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(painelTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(6, 6, 6))
         );
 
-        jTabbedPane1.addTab("Contato", jPanel4);
+        jTabbedPane1.addTab("Contato", painelContato);
 
         jLabel6.setText("CPF*:");
 
@@ -1355,139 +1643,195 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
 
-        jLabel21.setText("Inquilino:");
+        jLabel21.setText("Nome:");
         jLabel21.setToolTipText("Campo Obrigatório");
-
-        jLabel32.setText("Número:");
-
-        txtNumeroInquilino.setName("numero"); // NOI18N
-
-        jLabel33.setText("Compl.:");
-
-        txtCepInquilino.setName("cep"); // NOI18N
-
-        txtComplementoInquilino.setToolTipText("");
-        txtComplementoInquilino.setName("complemento"); // NOI18N
-
-        jLabel34.setText("Endereço:");
-
-        jLabel35.setText("CEP:");
-
-        jLabel5.setText("Referência:");
-
-        txtBairroInquilino.setName("bairro"); // NOI18N
-
-        jLabel31.setText("UF:");
-
-        jLabel36.setText("Cidade:");
-
-        txtCidadeInquilino.setName("cidade"); // NOI18N
-
-        txtRuaInquilino.setToolTipText("Digite o Endereço");
-        txtRuaInquilino.setName("logradouro"); // NOI18N
-
-        jLabel30.setText("Bairro:");
-
-        txtUfInquilino.setName("estado"); // NOI18N
 
         checkBoxInquilino.setText("Tem inquilino?");
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(checkBoxInquilino)
-                        .addContainerGap())
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addComponent(jLabel21)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(8, 8, 8))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel34)
-                                    .addComponent(jLabel33)
-                                    .addComponent(jLabel36))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(txtCidadeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(26, 26, 26)
-                                        .addComponent(jLabel31)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtUfInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE))
-                                    .addGroup(jPanel5Layout.createSequentialGroup()
-                                        .addComponent(txtComplementoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(9, 9, 9)
-                                        .addComponent(jLabel5)
-                                        .addGap(1, 1, 1)
-                                        .addComponent(txtReferenciaInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))
-                                    .addComponent(txtRuaInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel30)
-                                    .addComponent(jLabel32)
-                                    .addComponent(jLabel35))
-                                .addGap(10, 10, 10)
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtNumeroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCepInquilino)
-                                    .addComponent(txtBairroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(22, 22, 22))))
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereços"));
+
+        tblEnderecoInquilino.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tblEnderecoInquilino);
+
+        btnAdicionarEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnEditarEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addContainerGap(248, Short.MAX_VALUE)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEditarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAdicionarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGap(3, 3, 3)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(54, Short.MAX_VALUE)))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(checkBoxInquilino)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel21)
-                    .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel7)
-                    .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel34)
-                    .addComponent(txtRuaInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNumeroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel32))
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addComponent(btnAdicionarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel33)
-                    .addComponent(txtComplementoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5)
-                    .addComponent(txtReferenciaInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtBairroInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel30))
+                .addComponent(btnEditarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel36)
-                    .addComponent(txtCidadeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtCepInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel35)
-                    .addComponent(jLabel31)
-                    .addComponent(txtUfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addComponent(btnRemoverEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGap(3, 3, 3)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
 
-        jTabbedPane1.addTab("Inquilino", jPanel5);
+        jPanel14.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
+
+        tblTelefoneInquilino.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane5.setViewportView(tblTelefoneInquilino);
+
+        btnAdicionarTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnEditarTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
+        jPanel14.setLayout(jPanel14Layout);
+        jPanel14Layout.setHorizontalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
+                .addContainerGap(217, Short.MAX_VALUE)
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnEditarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnAdicionarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnRemoverTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+            .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel14Layout.createSequentialGroup()
+                    .addGap(3, 3, 3)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(54, Short.MAX_VALUE)))
+        );
+        jPanel14Layout.setVerticalGroup(
+            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel14Layout.createSequentialGroup()
+                .addComponent(btnAdicionarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEditarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRemoverTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel14Layout.createSequentialGroup()
+                    .addGap(3, 3, 3)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        javax.swing.GroupLayout painelInquilinoLayout = new javax.swing.GroupLayout(painelInquilino);
+        painelInquilino.setLayout(painelInquilinoLayout);
+        painelInquilinoLayout.setHorizontalGroup(
+            painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelInquilinoLayout.createSequentialGroup()
+                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelInquilinoLayout.createSequentialGroup()
+                        .addComponent(checkBoxInquilino)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel21)
+                        .addGap(2, 2, 2)
+                        .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(painelInquilinoLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(9, 9, 9)
+                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        painelInquilinoLayout.setVerticalGroup(
+            painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelInquilinoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(checkBoxInquilino)
+                    .addComponent(jLabel21)
+                    .addComponent(jLabel7)
+                    .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Inquilino", painelInquilino);
+
+        javax.swing.GroupLayout painelCorrespondenciaLayout = new javax.swing.GroupLayout(painelCorrespondencia);
+        painelCorrespondencia.setLayout(painelCorrespondenciaLayout);
+        painelCorrespondenciaLayout.setHorizontalGroup(
+            painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 602, Short.MAX_VALUE)
+        );
+        painelCorrespondenciaLayout.setVerticalGroup(
+            painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 178, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Correspondência", painelCorrespondencia);
 
         jPanel9.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(102, 102, 102), 1, true));
 
@@ -1671,65 +2015,65 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         checkboxCartaCobranca.setText("Bloquear Carta Cobrança");
 
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelUnidadeLayout = new javax.swing.GroupLayout(painelUnidade);
+        painelUnidade.setLayout(painelUnidadeLayout);
+        painelUnidadeLayout.setHorizontalGroup(
+            painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelUnidadeLayout.createSequentialGroup()
                 .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel8Layout.createSequentialGroup()
+                .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelUnidadeLayout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
                         .addGap(30, 30, 30)
                         .addComponent(checkboxAtivo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(checkBoxSindico)
                         .addGap(29, 29, 29)))
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
                         .addComponent(jPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap(19, Short.MAX_VALUE))
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
                         .addComponent(checkboxImpressaoCertificado)
                         .addContainerGap())
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
                         .addComponent(checkboxCartaCobranca)
                         .addContainerGap())
-                    .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
                         .addComponent(checkboxImpressaoCobranca)
                         .addContainerGap())))
         );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
+        painelUnidadeLayout.setVerticalGroup(
+            painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelUnidadeLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel8Layout.createSequentialGroup()
+                    .addGroup(painelUnidadeLayout.createSequentialGroup()
+                        .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelUnidadeLayout.createSequentialGroup()
                                 .addComponent(jPanel13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
                                 .addComponent(checkboxImpressaoCertificado))
                             .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(painelUnidadeLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(checkboxCartaCobranca)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(checkboxImpressaoCobranca))
-                            .addGroup(jPanel8Layout.createSequentialGroup()
+                            .addGroup(painelUnidadeLayout.createSequentialGroup()
                                 .addGap(14, 14, 14)
-                                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addGroup(painelUnidadeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(checkBoxSindico)
                                     .addComponent(checkboxAtivo))))
                         .addGap(16, 16, 16))))
         );
 
-        jTabbedPane1.addTab("Unidade", jPanel8);
+        jTabbedPane1.addTab("Unidade", painelUnidade);
 
         btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
@@ -1738,7 +2082,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -1765,27 +2109,27 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnImprimirAnotacoes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
         btnImprimirAnotacoes.setToolTipText("Imprimir Anotação(ões)");
 
-        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
-        jPanel14.setLayout(jPanel14Layout);
-        jPanel14Layout.setHorizontalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
+        javax.swing.GroupLayout painelAnotacoesLayout = new javax.swing.GroupLayout(painelAnotacoes);
+        painelAnotacoes.setLayout(painelAnotacoesLayout);
+        painelAnotacoesLayout.setHorizontalGroup(
+            painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelAnotacoesLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnImprimirAnotacoes, 0, 0, Short.MAX_VALUE)
                     .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18))
         );
-        jPanel14Layout.setVerticalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel14Layout.createSequentialGroup()
+        painelAnotacoesLayout.setVerticalGroup(
+            painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelAnotacoesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel14Layout.createSequentialGroup()
+                .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelAnotacoesLayout.createSequentialGroup()
                         .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1797,7 +2141,50 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addContainerGap())
         );
 
-        jTabbedPane1.addTab("Anotações", jPanel14);
+        jTabbedPane1.addTab("Anotações", painelAnotacoes);
+
+        tabelaHistoricoInquilino.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane6.setViewportView(tabelaHistoricoInquilino);
+
+        btnRemoverInquilino.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverInquilino.setToolTipText("Remover Registro");
+        btnRemoverInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 532, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(10, 10, 10)
+                .addComponent(btnRemoverInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(btnRemoverInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(72, 72, 72))))
+        );
+
+        jTabbedPane1.addTab("Histórico", jPanel4);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1835,14 +2222,21 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JLabel Coeficiente;
     private javax.swing.JButton btnAdicionarAnotacao;
     private javax.swing.JButton btnAdicionarEndereco;
+    private javax.swing.JButton btnAdicionarEnderecoInquilino;
     private javax.swing.JButton btnAdicionarTelefone;
+    private javax.swing.JButton btnAdicionarTelefoneInquilino;
     private javax.swing.JButton btnEditarAnotacao;
     private javax.swing.JButton btnEditarEndereco;
+    private javax.swing.JButton btnEditarEnderecoInquilino;
     private javax.swing.JButton btnEditarTelefone;
+    private javax.swing.JButton btnEditarTelefoneInquilino;
     private javax.swing.JButton btnImprimirAnotacoes;
     private javax.swing.JButton btnRemoverAnotacao;
     private javax.swing.JButton btnRemoverEndereco;
+    private javax.swing.JButton btnRemoverEnderecoInquilino;
+    private javax.swing.JButton btnRemoverInquilino;
     private javax.swing.JButton btnRemoverTelefone;
+    private javax.swing.JButton btnRemoverTelefoneInquilino;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JButton btnTeste;
     private javax.swing.JButton btnVoltar;
@@ -1878,15 +2272,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
-    private javax.swing.JLabel jLabel33;
-    private javax.swing.JLabel jLabel34;
-    private javax.swing.JLabel jLabel35;
-    private javax.swing.JLabel jLabel36;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -1900,29 +2286,35 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCpf;
+    private javax.swing.JPanel painelAnotacoes;
+    private javax.swing.JPanel painelContato;
+    private javax.swing.JPanel painelCorrespondencia;
+    private javax.swing.JPanel painelEnderecoInquilino;
+    private javax.swing.JPanel painelInquilino;
+    private javax.swing.JPanel painelTelefoneInquilino;
+    private javax.swing.JPanel painelUnidade;
     private javax.swing.JTable tabelaAnotacoes;
+    private javax.swing.JTable tabelaHistoricoInquilino;
     private javax.swing.JTable tblEndereco;
+    private javax.swing.JTable tblEnderecoInquilino;
     private javax.swing.JTable tblTelefone;
+    private javax.swing.JTable tblTelefoneInquilino;
     private javax.swing.JTextField txtBairro;
-    private javax.swing.JTextField txtBairroInquilino;
     private javax.swing.JTextField txtBloco;
     private javax.swing.JFormattedTextField txtCep;
-    private javax.swing.JFormattedTextField txtCepInquilino;
     private javax.swing.JTextField txtCidade;
-    private javax.swing.JTextField txtCidadeInquilino;
     private javax.swing.JTextField txtCoeficiente;
     private javax.swing.JTextField txtComplemento;
-    private javax.swing.JTextField txtComplementoInquilino;
     private javax.swing.JTextField txtCondominio;
     private javax.swing.JFormattedTextField txtCpf;
     private javax.swing.JFormattedTextField txtCpfInquilino;
@@ -1932,16 +2324,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtNome;
     private javax.swing.JTextField txtNomeInquilino;
     private javax.swing.JTextField txtNumero;
-    private javax.swing.JTextField txtNumeroInquilino;
     private javax.swing.JTextField txtNumeroProcesso;
     private javax.swing.JTextField txtReferencia;
-    private javax.swing.JTextField txtReferenciaInquilino;
     private javax.swing.JFormattedTextField txtRg;
     private javax.swing.JFormattedTextField txtRgInquilino;
     private javax.swing.JTextField txtRua;
-    private javax.swing.JTextField txtRuaInquilino;
     private javax.swing.JTextField txtUf;
-    private javax.swing.JTextField txtUfInquilino;
     private javax.swing.JTextField txtUnidade;
     private javax.swing.JTextField txtValorPrincipal;
     // End of variables declaration//GEN-END:variables

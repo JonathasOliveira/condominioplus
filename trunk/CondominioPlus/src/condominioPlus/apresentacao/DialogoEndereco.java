@@ -12,6 +12,7 @@ package condominioPlus.apresentacao;
 
 import condominioPlus.negocio.Condomino;
 import condominioPlus.negocio.Endereco;
+import condominioPlus.negocio.Inquilino;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -32,12 +33,14 @@ public class DialogoEndereco extends javax.swing.JDialog {
     private Endereco endereco;
     private ControladorDeEventos controlador;
     private Condomino condomino;
+    private Inquilino inquilino;
 
     /** Creates new form DialogoTelefone */
     public DialogoEndereco(Endereco endereco, java.awt.Frame pai, boolean modal) {
         super(pai, modal);
         this.endereco = endereco;
         this.condomino = endereco.getCondomino();
+        this.inquilino = endereco.getInquilino();
 
         initComponents();
         controlador = new ControladorDeEventos();
@@ -63,10 +66,17 @@ public class DialogoEndereco extends javax.swing.JDialog {
         return campos;
     }
 
-
     private void verificarEnderecoPadrao() {
         if (checkBoxPadrao.isSelected()) {
-            for (Endereco e : condomino.getEnderecos()) {
+            
+            List<Endereco> listaEnderecos = new ArrayList<Endereco>();
+            if (condomino != null){
+                listaEnderecos = condomino.getEnderecos();
+            } else if (inquilino != null){
+                listaEnderecos = inquilino.getEnderecos();
+            }
+            
+            for (Endereco e : listaEnderecos) {
                 if (e.isPadrao() && !e.equals(endereco)) {
                     if (ApresentacaoUtil.perguntar("O endereço padrão é: " + e + " deseja substituir?", this)) {
                         e.setPadrao(false);
