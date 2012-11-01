@@ -211,18 +211,18 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             if (!verificarEnderecoPadrao()) {
                 return;
             }
-
-            if (unidade.getInquilino() != null) {
-                if (!verificarEnderecoPadraoInquilino()) {
-                    return;
-                }
-            }
-
+            
             if (!validador.validarDatas(DataUtil.getCalendar(dateInicioJudicial.getValue()), DataUtil.getCalendar(dateFimJudicial.getValue()))) {
                 return;
             }
 
             preencherObjeto();
+            
+            if (unidade.getInquilino() != null) {
+                if (!verificarEnderecoPadraoInquilino()) {
+                    return;
+                }
+            }
 
             TipoAcesso tipo = null;
             if (unidade.getCodigo() == 0) {
