@@ -35,6 +35,7 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -993,6 +994,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 //            txtCepInquilino.setBackground(color);
         }
     }
+    
+    private void exibirDetalheInquilino(){
+        DialogoDetalheInquilino dialogo = new DialogoDetalheInquilino(modeloTabelaHistoricoInquilino.getObjetoSelecionado(), null, true);
+        dialogo.setVisible(true);
+    }
 
     private class ControladorEventos extends ControladorEventosGenerico {
 
@@ -1056,6 +1062,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 ativarProcessoJuridico(selecionado);
             } else if (e.getSource() == btnTeste) {
                 teste();
+            } else if (e.getSource() == itemMenuDetalhe){
+                exibirDetalheInquilino();
             }
         }
 
@@ -1088,6 +1096,17 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             checkboxNotificadoJudicialmente.addActionListener(this);
             checkBoxProcessoJuridico.addActionListener(this);
             btnTeste.addActionListener(this);
+            itemMenuDetalhe.addActionListener(this);
+            tabelaHistoricoInquilino.addMouseListener(this);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+             if (e.isPopupTrigger()) {
+                if (e.getSource() == tabelaHistoricoInquilino) {
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                } 
+            }
         }
     }
 
@@ -1102,6 +1121,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel11 = new javax.swing.JPanel();
+        popupMenu = new javax.swing.JPopupMenu();
+        itemMenuDetalhe = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -1225,6 +1246,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
         );
+
+        itemMenuDetalhe.setText("Exibir Detalhes");
+        popupMenu.add(itemMenuDetalhe);
 
         setClosable(true);
         setTitle("Cadastro de Condômino");
@@ -1619,7 +1643,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6))
+                .addGap(22, 22, 22))
         );
 
         jTabbedPane1.addTab("Contato", painelContato);
@@ -2082,7 +2106,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -2153,7 +2177,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         ));
         jScrollPane6.setViewportView(tabelaHistoricoInquilino);
 
-        btnRemoverInquilino.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverInquilino.setToolTipText("Remover Registro");
         btnRemoverInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -2255,6 +2279,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private net.sf.nachocalendar.components.DateField dateFimJudicial;
     private net.sf.nachocalendar.components.DateField dateInicioJudicial;
     private net.sf.nachocalendar.components.DateField dateProcessoJuridico;
+    private javax.swing.JMenuItem itemMenuDetalhe;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -2303,6 +2328,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JPanel painelInquilino;
     private javax.swing.JPanel painelTelefoneInquilino;
     private javax.swing.JPanel painelUnidade;
+    private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tabelaHistoricoInquilino;
     private javax.swing.JTable tblEndereco;
