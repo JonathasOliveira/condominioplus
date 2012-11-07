@@ -10,8 +10,15 @@
  */
 package condominioPlus.apresentacao.condomino;
 
+import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.Inquilino;
+import condominioPlus.negocio.Telefone;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.apresentacao.TabelaModelo_2;
 
 /**
  *
@@ -20,39 +27,122 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 public class DialogoDetalheInquilino extends javax.swing.JDialog {
 
     private ControladorDeEventos controlador;
-    private Inquilino inquilno;
+    private Inquilino inquilino;
+    private TabelaModelo_2<Endereco> modeloTabelaEnderecoInquilino;
+    private TabelaModelo_2<Telefone> modeloTabelaTelefone;
+    private List<Endereco> listaEnderecoInquilino = new ArrayList<Endereco>();
+    private List<Telefone> listaTelefoneInquilino = new ArrayList<Telefone>();
 
     /** Creates new form DialogoDetalheInquilino */
     public DialogoDetalheInquilino(Inquilino inquilino, java.awt.Frame parent, boolean modal) {
         super(parent, modal);
 
-        this.inquilno = inquilino;
-       
+        this.inquilino = inquilino;
+
         initComponents();
         controlador = new ControladorDeEventos();
         controlador.preencher(inquilino);
         this.setLocationRelativeTo(null);
+
+        carregarTabelaEnderecoInquilino();
+        carregarTabelaTelefoneInquilino();
+    }
+
+    private void carregarTabelaEnderecoInquilino() {
+        modeloTabelaEnderecoInquilino = new TabelaModelo_2<Endereco>(tblEnderecoInquilino, "Rua, Número, Bairro".split(",")) {
+
+            @Override
+            protected List<Endereco> getCarregarObjetos() {
+                return getEnderecoInquilino();
+            }
+
+            @Override
+            public Object getValor(Endereco endereco, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return endereco.getLogradouro();
+                    case 1:
+                        return endereco.getNumero();
+                    case 2:
+                        return endereco.getBairro();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Endereco> getEnderecoInquilino() {
+        listaEnderecoInquilino = inquilino.getEnderecos();
+        return listaEnderecoInquilino;
+    }
+
+    private void preencherCamposEndereco(Endereco endereco) {
+        checkBoxPadrao.setSelected(endereco.isPadrao());
+        txtRua.setText(endereco.getLogradouro());
+        txtNumero.setText(endereco.getNumero());
+        txtComplemento.setText(endereco.getComplemento());
+        txtReferencia.setText(endereco.getReferencia());
+        txtBairro.setText(endereco.getBairro());
+        txtCidade.setText(endereco.getCidade());
+        txtUf.setText(endereco.getEstado());
+        txtCep.setText(endereco.getCep());
     }
     
+    private void carregarTabelaTelefoneInquilino() {
+        modeloTabelaTelefone = new TabelaModelo_2<Telefone>(tblTelefoneInquilino, "Tipo, Número".split(",")) {
+
+            @Override
+            protected List<Telefone> getCarregarObjetos() {
+                return getTelefoneInquilino();
+            }
+
+            @Override
+            public Object getValor(Telefone telefone, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return telefone.getTipo();
+                    case 1:
+                        return telefone.getNumero();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Telefone> getTelefoneInquilino() {
+        listaTelefoneInquilino = inquilino.getTelefones();
+        return listaTelefoneInquilino;
+    }
+
     private class ControladorDeEventos extends ControladorEventosGenerico {
+
+        Object origem;
 
         @Override
         public void configurar() {
             put(Inquilino.class, DialogoDetalheInquilino.this);
 
-//            btnSalvar.addActionListener(this);
-//            btnCancelar.addActionListener(this);
+            tblEnderecoInquilino.addMouseListener(this);
+            tblEnderecoInquilino.addKeyListener(this);
         }
 
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            source = e.getSource();
-//            if (source == btnSalvar) {
-//                salvar();
-//            } else if (source == btnCancelar) {
-//                cancelar();
-//            }
-//        }
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            origem = e.getSource();
+            if (origem == tblEnderecoInquilino && e.getClickCount() == 1) {
+                preencherCamposEndereco(modeloTabelaEnderecoInquilino.getObjetoSelecionado());
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            origem = e.getSource();
+            if ((origem == tblEnderecoInquilino) && (e.getKeyCode() == KeyEvent.VK_DOWN || e.getKeyCode() == KeyEvent.VK_UP)) {
+                preencherCamposEndereco(modeloTabelaEnderecoInquilino.getObjetoSelecionado());
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -131,6 +221,7 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
 
             }
         ));
+        tblEnderecoInquilino.setName("null"); // NOI18N
         jScrollPane4.setViewportView(tblEnderecoInquilino);
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
@@ -145,7 +236,7 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -174,7 +265,7 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
-                .addGap(3, 3, 3))
+                .addGap(11, 11, 11))
         );
 
         jLabel1.setText("Endereço Selecionado:");
@@ -238,67 +329,68 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel21)
-                        .addGap(2, 2, 2)
-                        .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(checkBoxPadrao))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel23)
-                            .addComponent(jLabel25))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(9, 9, 9)
-                                .addComponent(jLabel2)
-                                .addGap(1, 1, 1)
-                                .addComponent(txtReferencia, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtRua, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(8, 8, 8)
-                                .addComponent(jLabel24)
+                                .addComponent(jLabel21)
+                                .addGap(2, 2, 2)
+                                .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel6)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(12, 12, 12)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(checkBoxPadrao))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel23)
+                                    .addComponent(jLabel25))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtComplemento, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(9, 9, 9)
+                                        .addComponent(jLabel2)
+                                        .addGap(1, 1, 1)
+                                        .addComponent(txtReferencia, javax.swing.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txtRua, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabel24)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(txtNumero, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(37, 37, 37)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel29)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel26)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel27)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel28)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel29)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel26)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(txtBairro, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel27)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCidade, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel28)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtUf, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -313,7 +405,7 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
                     .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel14, 0, 132, Short.MAX_VALUE)
+                    .addComponent(jPanel14, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -343,7 +435,7 @@ public class DialogoDetalheInquilino extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel29)
                     .addComponent(txtCep, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
