@@ -25,6 +25,7 @@ import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComboBox;
@@ -138,7 +139,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             }
         }
 
-        if(novaLista.isEmpty()){
+        if (novaLista.isEmpty()) {
             novaLista.add(pagamento);
         }
         return novaLista;
@@ -179,11 +180,18 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
     }
 
     private void preencherObjeto() {
+        BigDecimal valor = new BigDecimal(txtValor.getText().replace(',', '.'));
         pagamento.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
-        pagamento.setValor(new BigDecimal(txtValor.getText().replace(',', '.')).negate());
         pagamento.setFornecedor(modelo.getSelectedItem());
         pagamento.setConta(conta);
+        if(pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0))== -1){
+            pagamento.setValor(valor.negate());
+        } else if(!pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0))== 1){
+            pagamento.setValor(valor.negate());
+        } else {
+            pagamento.setValor(valor);
+        }
         selecionaFormaPagamento(pagamento);
 
     }
@@ -436,7 +444,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Editar Conta a Pagar");
+        setTitle("Editar Pagamento");
         setModal(true);
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
