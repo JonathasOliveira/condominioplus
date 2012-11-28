@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao.cobranca;
 
+import condominioPlus.relatorios.TipoRelatorio;
 import java.awt.event.ActionEvent;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.util.DataUtil;
@@ -23,16 +24,20 @@ public class DialogoDadosRelatorioGerencial extends javax.swing.JDialog {
 
     private DateTime dataInicial;
     private DateTime dataFinal;
+    private TipoRelatorio tipo;
 
     /** Creates new form DialogoDadosRelatorioGerencial */
-    public DialogoDadosRelatorioGerencial(java.awt.Frame parent, boolean modal) {
+    public DialogoDadosRelatorioGerencial(java.awt.Frame parent, boolean modal, TipoRelatorio tipo) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
+        this.tipo = tipo;
+        
+        this.setTitle(tipo.toString());
     }
 
-    public DateTime getDataIncial() {
+    public DateTime getDataInicial() {
         return dataInicial;
     }
 

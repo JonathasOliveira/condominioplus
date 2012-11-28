@@ -23,6 +23,7 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.util.Relatorios;
@@ -899,10 +900,10 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     private void imprimirRelatorioGlobal() {
 
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true);
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, TipoRelatorio.TAXA_EXTRA_GERENCIAL);
         dialogo.setVisible(true);
 
-        if (dialogo.getDataIncial() != null && dialogo.getDataFinal() != null) {
+        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
 
             List<HashMap<String, String>> listaParcelas = new ArrayList<HashMap<String, String>>();
 
@@ -911,7 +912,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 Moeda totalArrecadado = new Moeda();
                 Moeda totalInadimplencia = new Moeda();
                 for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
-                    if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataIncial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataFinal()) == -1) {
+                    if (DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataInicial()) == 1 && DataUtil.compararData(DataUtil.getDateTime(parcela.getDataVencimento()), dialogo.getDataFinal()) == -1) {
                         Moeda valorAArrecadar = new Moeda(parcela.getValor());
                         totalAArrecadar.soma(parcela.getValor());
                         Moeda valorArrecadado = new Moeda();
@@ -938,7 +939,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
             HashMap<String, Object> parametros = new HashMap();
             parametros.put("condominio", condominio.getRazaoSocial());
-            parametros.put("periodo", DataUtil.toString(dialogo.getDataIncial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
+            parametros.put("periodo", DataUtil.toString(dialogo.getDataInicial()) + " a " + DataUtil.toString(dialogo.getDataFinal()));
 
             new Relatorios().imprimir("RelatorioGlobalTaxaExtra", parametros, listaParcelas, false, true, null);
         }
