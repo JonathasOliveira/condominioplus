@@ -27,7 +27,9 @@ public enum TipoRelatorio {
     COBRANCAS_EXISTENTES_A_VENCER_SINTETICO("Cobranças Existentes à Vencer Sintético"),
     COBRANCAS_EXISTENTES_A_VENCER_ANALITICO("Cobranças Existentes à Vencer Analítico"),
     ANOTACOES_CONDOMINO("Anotações em Condômino"),
-    ANOTACOES_CONDOMINIO("Anotações em Condomínio");
+    ANOTACOES_CONDOMINIO("Anotações em Condomínio"),
+    TAXA_EXTRA_GERENCIAL("Taxa Extra - Gerencial"),
+    EXTRATO_CONTA_CORRENTE("Extrato Conta Corrente");
 
     TipoRelatorio(String nome) {
         this.nome = nome;

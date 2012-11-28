@@ -10,6 +10,7 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import condominioPlus.apresentacao.cobranca.DialogoDadosRelatorioGerencial;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.DadosBoleto;
@@ -22,8 +23,10 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ComparadorPagamentoCodigo;
 import condominioPlus.util.ComparatorPagamento;
+import condominioPlus.util.Relatorios;
 import condominioPlus.util.RenderizadorCelulaCor;
 import condominioPlus.util.RenderizadorCelulaCorData;
 import java.awt.event.ActionEvent;
@@ -35,6 +38,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -57,6 +61,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private TabelaModelo_2 modeloTabela;
     private List<Pagamento> pagamentos;
     private RenderizadorCelulaCor renderizadorCelulaCor;
+    private DateTime dataInicial;
+    private DateTime dataFinal;
 
     /** Creates new form TelaContaCorrente */
     public TelaContaCorrente(Condominio condominio) {
@@ -84,6 +90,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         carregarTabela();
 
         carregarComboFiltro();
+
+        verificarListaVisualizacao();
 
         if (condominio != null) {
             this.setTitle("Conta Corrente - " + condominio.getRazaoSocial());
@@ -213,7 +221,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     private List<Pagamento> getPagamentos() {
-        pagamentos = new DAO().listar("PagamentosContaCorrente", condominio.getContaCorrente());
+        if (dataInicial != null && dataFinal != null) {
+            pagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
+        } else if (dataInicial == null && dataFinal == null) {
+            pagamentos = new DAO().listar("PagamentosContaCorrente", condominio.getContaCorrente());
+        }
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
         Collections.sort(pagamentos, comCod);
         ComparatorPagamento comparator = new ComparatorPagamento();
@@ -451,6 +463,36 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         }
     }
 
+    public void imprimirExtrato() {
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, TipoRelatorio.EXTRATO_CONTA_CORRENTE);
+        dialogo.setVisible(true);
+
+        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
+            List<Pagamento> listaPagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()));
+
+            ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+            Collections.sort(listaPagamentos, comCod);
+            ComparatorPagamento comparator = new ComparatorPagamento();
+            Collections.sort(listaPagamentos, comparator);
+
+            new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+        }
+    }
+
+    public void verificarListaVisualizacao() {
+        if (radioTodos.isSelected()) {
+            txtDataInicial.setEnabled(false);
+            txtDataFinal.setEnabled(false);
+            dataInicial = null;
+            dataFinal = null;
+        } else if (radioPeriodo.isSelected()) {
+            txtDataInicial.setEnabled(true);
+            txtDataFinal.setEnabled(true);
+            dataInicial = DataUtil.getDateTime(txtDataInicial.getValue());
+            dataFinal = DataUtil.getDateTime(txtDataFinal.getValue());
+        }
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -459,10 +501,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private class ControladorEventos extends ControladorEventosGenerico {
 
         int contador;
+        Object origem;
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Object origem = e.getSource();
+            origem = e.getSource();
             if (origem == itemMenuApagarSelecionados) {
                 apagarItensSelecionados();
 
@@ -470,6 +513,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 preencherTelaComSaldos();
             } else if (origem == itemMenuEditarPagamento) {
                 editarPagamento();
+            } else if (origem == radioPeriodo || origem == radioTodos) {
+                if (origem == radioPeriodo) {
+                    txtDataInicial.setValue(DataUtil.getDate(DataUtil.getPrimeiroDiaMes()));
+                    txtDataFinal.setValue(DataUtil.getDate(DataUtil.getUltimoDiaMes()));
+                }
+                verificarListaVisualizacao();
+                carregarTabela();
+            } else if (origem == itemMenuImprimirExtrato) {
+                imprimirExtrato();
             }
         }
 
@@ -490,12 +542,27 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             itemMenuApagarSelecionados.addActionListener(this);
             btnVisualizarSaldos.addActionListener(this);
             itemMenuEditarPagamento.addActionListener(this);
+            radioPeriodo.addActionListener(this);
+            radioTodos.addActionListener(this);
+            txtDataInicial.addChangeListener(this);
+            txtDataFinal.addChangeListener(this);
+            itemMenuImprimirExtrato.addActionListener(this);
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 popupMenu.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            origem = e.getSource();
+            if (e.getSource() == txtDataInicial || e.getSource() == txtDataFinal) {
+                ApresentacaoUtil.verificarDatas(e.getSource(), txtDataInicial, txtDataFinal, this);
+                verificarListaVisualizacao();
+                carregarTabela();
             }
         }
     }
@@ -507,13 +574,20 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuApagarSelecionados = new javax.swing.JMenuItem();
         itemMenuEditarPagamento = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        itemMenuImprimirExtrato = new javax.swing.JMenuItem();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         cbFiltros = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
         btnVisualizarSaldos = new javax.swing.JToggleButton();
+        radioTodos = new javax.swing.JRadioButton();
+        radioPeriodo = new javax.swing.JRadioButton();
+        txtDataInicial = new net.sf.nachocalendar.components.DateField();
+        jLabel18 = new javax.swing.JLabel();
+        txtDataFinal = new net.sf.nachocalendar.components.DateField();
         painelSaldos = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -549,9 +623,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuEditarPagamento.setText("Editar Pagamento Selecionado");
         popupMenu.add(itemMenuEditarPagamento);
+        popupMenu.add(jSeparator1);
 
-        jMenuItem3.setText("jMenuItem3");
-        popupMenu.add(jMenuItem3);
+        itemMenuImprimirExtrato.setText("Imprimir Extrato Conta Corrente");
+        popupMenu.add(itemMenuImprimirExtrato);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -573,6 +648,16 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         btnVisualizarSaldos.setText("Visualizar Saldos");
         btnVisualizarSaldos.setToolTipText("Visualizar Saldos");
 
+        buttonGroup1.add(radioTodos);
+        radioTodos.setSelected(true);
+        radioTodos.setText("Mostrar Todos");
+
+        buttonGroup1.add(radioPeriodo);
+        radioPeriodo.setText("Período");
+
+        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel18.setText("a");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -580,7 +665,17 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnVisualizarSaldos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 483, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
+                .addComponent(radioTodos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioPeriodo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(85, 85, 85)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -590,10 +685,18 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnVisualizarSaldos))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtDataFinal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(radioTodos)
+                        .addComponent(radioPeriodo))
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel18)
+                        .addComponent(txtDataInicial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel6)
+                        .addComponent(cbFiltros, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnVisualizarSaldos)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -822,7 +925,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -845,7 +948,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(painelSaldos, javax.swing.GroupLayout.Alignment.LEADING, 0, 841, Short.MAX_VALUE)
+                    .addComponent(painelSaldos, javax.swing.GroupLayout.Alignment.LEADING, 0, 843, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 841, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -855,7 +958,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -869,9 +972,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtSaldoAplicacaoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnVisualizarSaldos;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox cbFiltros;
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
     private javax.swing.JMenuItem itemMenuEditarPagamento;
+    private javax.swing.JMenuItem itemMenuImprimirExtrato;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -881,6 +986,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -889,14 +995,18 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPanel painelSaldos;
     private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JRadioButton radioPeriodo;
+    private javax.swing.JRadioButton radioTodos;
     private javax.swing.JTable tabelaContaCorrente;
     private javax.swing.JTextField txtCreditosContaCorrente;
     private javax.swing.JTextField txtCreditosExtratoBancario;
+    private net.sf.nachocalendar.components.DateField txtDataFinal;
+    private net.sf.nachocalendar.components.DateField txtDataInicial;
     private javax.swing.JTextField txtDebitosContaCorrente;
     private javax.swing.JTextField txtDebitosExtratoBancario;
     private javax.swing.JTextField txtSaldoAnteriorContaCorrente;
@@ -909,4 +1019,3 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtSaldoPoupanca;
     // End of variables declaration//GEN-END:variables
 }
-

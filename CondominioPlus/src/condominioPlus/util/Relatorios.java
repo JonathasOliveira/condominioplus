@@ -15,6 +15,10 @@ import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
+import condominioPlus.negocio.financeiro.DadosBoleto;
+import condominioPlus.negocio.financeiro.DadosCheque;
+import condominioPlus.negocio.financeiro.DadosDOC;
+import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.relatorios.TipoRelatorio;
@@ -728,8 +732,8 @@ public class Relatorios implements Printable {
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
-        
-        if (unidade != null){
+
+        if (unidade != null) {
             parametros.put("condominio", condominio.getRazaoSocial() + " - " + unidade.getUnidade() + " " + unidade.getCondomino().getNome());
         } else {
             parametros.put("condominio", condominio.getRazaoSocial());
@@ -749,6 +753,61 @@ public class Relatorios implements Printable {
 
         if (!lista.isEmpty()) {
             imprimir("RelatorioAnotacoes", parametros, lista, false, true, null);
+        }
+    }
+
+    public void imprimirExtratoContaCorrente(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos) {
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        BigDecimal saldoAnterior = new BigDecimal(0);
+        BigDecimal creditos = new BigDecimal(0);
+        BigDecimal debitos = new BigDecimal(0);
+        BigDecimal saldoAtual = new BigDecimal(0);
+
+        for (Pagamento p : pagamentos) {
+            HashMap<String, Object> mapa = new HashMap();
+            
+            mapa.put("data", DataUtil.toString(p.getDataPagamento()));
+            mapa.put("documento", getFormaPagamento(p));
+            mapa.put("codigoConta", p.getConta().getCodigo() + "");
+            mapa.put("historico", p.getHistorico());
+            mapa.put("valor", PagamentoUtil.formatarMoeda(p.getValor().doubleValue()));
+            mapa.put("saldo", PagamentoUtil.formatarMoeda(p.getSaldo().doubleValue()));
+            
+            if (p.getValor().compareTo(new BigDecimal(0))== -1){
+                debitos = debitos.add(p.getValor());
+            } else {
+                creditos = creditos.add(p.getValor());
+            }
+            
+            saldoAtual = p.getSaldo();
+
+            lista.add(mapa);
+        }
+        
+        saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);        
+
+        parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
+        parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
+        parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
+        parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
+
+        if (!lista.isEmpty()) {
+            imprimir("RelatorioExtratoContaCorrente", parametros, lista, false, true, null);
+        }
+    }
+    
+    private String getFormaPagamento(Pagamento p) {
+        if (p.getForma() == FormaPagamento.BOLETO) {
+            return ((DadosBoleto) p.getDadosPagamento()).getNumeroBoleto();
+        } else if (p.getForma() == FormaPagamento.CHEQUE) {
+            return String.valueOf(((DadosCheque) p.getDadosPagamento()).getNumero());
+        } else {
+            return String.valueOf(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento());
         }
     }
 }
