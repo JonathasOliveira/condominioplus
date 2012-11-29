@@ -515,8 +515,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 editarPagamento();
             } else if (origem == radioPeriodo || origem == radioTodos) {
                 if (origem == radioPeriodo) {
-                    txtDataInicial.setValue(DataUtil.getDate(DataUtil.getPrimeiroDiaMes()));
-                    txtDataFinal.setValue(DataUtil.getDate(DataUtil.getUltimoDiaMes()));
+                    Calendar dat1 = Calendar.getInstance();
+                    dat1.setTime(DataUtil.getDate(DataUtil.hoje()));
+                    dat1.add(Calendar.MONTH, -1);                 
+                    txtDataInicial.setValue(DataUtil.getDate(DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(dat1))));
+                    txtDataFinal.setValue(DataUtil.getDate(DataUtil.getUltimoDiaMes(DataUtil.getDateTime(dat1))));
                 }
                 verificarListaVisualizacao();
                 carregarTabela();
