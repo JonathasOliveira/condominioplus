@@ -353,7 +353,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         Calendar dtaInicial = pegarUltimoDiaUtilDoMes(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         List<ExtratoBancario> listaExtratoMensal = new DAO().listar("ExtratosPorDia", condominio, dtaInicial);
 
-        Moeda saldo = new Moeda(listaExtratoMensal.get(listaExtratoMensal.size() - 1).getValor());
+        Moeda saldo = new Moeda(0); 
+        if (listaExtratoMensal.size() >= 1){
+            saldo = new Moeda(listaExtratoMensal.get(listaExtratoMensal.size() - 1).getValor());
+        }
         return saldo;
     }
 
