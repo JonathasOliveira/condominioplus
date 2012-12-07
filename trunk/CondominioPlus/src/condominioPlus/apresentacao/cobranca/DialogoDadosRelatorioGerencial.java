@@ -27,12 +27,17 @@ public class DialogoDadosRelatorioGerencial extends javax.swing.JDialog {
     private TipoRelatorio tipo;
 
     /** Creates new form DialogoDadosRelatorioGerencial */
-    public DialogoDadosRelatorioGerencial(java.awt.Frame parent, boolean modal, TipoRelatorio tipo) {
+    public DialogoDadosRelatorioGerencial(java.awt.Frame parent, boolean modal, DateTime dataInicial, DateTime dataFinal, TipoRelatorio tipo) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
         this.tipo = tipo;
+        
+        if (dataInicial != null && dataFinal != null){
+            txtDataInicial.setValue(DataUtil.getDate(dataInicial));
+            txtDataFinal.setValue(DataUtil.getDate(dataFinal));
+        }
         
         this.setTitle(tipo.toString());
     }

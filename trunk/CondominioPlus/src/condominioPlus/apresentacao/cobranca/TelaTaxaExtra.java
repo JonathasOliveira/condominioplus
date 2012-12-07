@@ -900,7 +900,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
     private void imprimirRelatorioGlobal() {
 
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, TipoRelatorio.TAXA_EXTRA_GERENCIAL);
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, DataUtil.getPrimeiroDiaMes(), DataUtil.getUltimoDiaMes(), TipoRelatorio.TAXA_EXTRA_GERENCIAL);
         dialogo.setVisible(true);
 
         if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {

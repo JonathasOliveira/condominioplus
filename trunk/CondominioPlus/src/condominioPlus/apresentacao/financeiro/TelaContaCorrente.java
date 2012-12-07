@@ -467,7 +467,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtrato() {
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, TipoRelatorio.EXTRATO_CONTA_CORRENTE);
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, TipoRelatorio.EXTRATO_CONTA_CORRENTE);
         dialogo.setVisible(true);
 
         if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
