@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioRelacaoProprietarios" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
-	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
@@ -95,130 +95,130 @@
 	<pageHeader>
 		<band height="13" splitType="Stretch">
 			<staticText>
-				<reportElement x="6" y="0" width="46" height="13"/>
+				<reportElement x="6" y="0" width="46" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="64" y="0" width="82" height="13"/>
+				<reportElement x="64" y="0" width="82" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Proprietário(a)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="0" width="171" height="13"/>
+				<reportElement x="347" y="0" width="171" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Telefone Residencial/Comercial]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="64" splitType="Stretch">
+		<band height="58" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="555" height="64" forecolor="#FFFFFF" backcolor="#CCCCCC">
+				<reportElement x="0" y="0" width="555" height="58" forecolor="#FFFFFF" backcolor="#CCCCCC">
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 1)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="3" width="46" height="13"/>
+				<reportElement x="6" y="3" width="46" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="64" y="3" width="271" height="13"/>
+				<reportElement x="64" y="3" width="271" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="18" width="165" height="13"/>
+				<reportElement x="383" y="16" width="165" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{telcomercial}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="3" width="165" height="13"/>
+				<reportElement x="383" y="3" width="165" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{telefone}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="64" y="18" width="271" height="13"/>
+				<reportElement x="64" y="16" width="271" height="12"/>
 				<textElement>
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{endereco}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="64" y="33" width="115" height="13"/>
+				<reportElement x="64" y="29" width="115" height="12"/>
 				<textElement>
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{bairro}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="64" y="48" width="100" height="13"/>
+				<reportElement x="64" y="42" width="100" height="12"/>
 				<textElement>
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cep}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="33" width="165" height="13"/>
+				<reportElement x="383" y="29" width="165" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{fax}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="48" width="165" height="13"/>
+				<reportElement x="383" y="42" width="165" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{email}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="347" y="3" width="38" height="13"/>
+				<reportElement x="347" y="3" width="38" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Res/Cel:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="18" width="38" height="13"/>
+				<reportElement x="347" y="16" width="38" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Com:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="33" width="38" height="13"/>
+				<reportElement x="347" y="29" width="38" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Fax:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="48" width="38" height="13"/>
+				<reportElement x="347" y="42" width="38" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Email:]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="182" y="33" width="153" height="13"/>
+				<reportElement x="182" y="29" width="153" height="12"/>
 				<textElement>
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cidade}]]></textFieldExpression>
 			</textField>

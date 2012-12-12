@@ -90,26 +90,26 @@ Todos os Condomínios]]></text>
 		</band>
 	</title>
 	<detail>
-		<band height="66" splitType="Stretch">
+		<band height="50" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="-1" width="555" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="0" width="555" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="1" width="76" height="15"/>
+				<reportElement x="6" y="0" width="76" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Entidade]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="6" y="11" width="544" height="15"/>
+				<reportElement x="6" y="10" width="544" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="0" y="29" width="555" height="31"/>
+				<reportElement x="0" y="24" width="555" height="25"/>
 				<subreportParameter name="totalOriginal">
 					<subreportParameterExpression><![CDATA[$P{totalOriginal}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -118,4 +118,11 @@ Todos os Condomínios]]></text>
 			</subreport>
 		</band>
 	</detail>
+	<summary>
+		<band height="5">
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+		</band>
+	</summary>
 </jasperReport>
