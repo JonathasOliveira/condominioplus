@@ -10,18 +10,18 @@
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="16" splitType="Stretch">
+		<band height="12" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="196" y="0" width="55" height="16" forecolor="#000000"/>
+				<reportElement positionType="Float" x="196" y="0" width="55" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valor}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="192" height="16" forecolor="#000000"/>
+				<reportElement x="0" y="0" width="192" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{descricao}]]></textFieldExpression>
 			</textField>

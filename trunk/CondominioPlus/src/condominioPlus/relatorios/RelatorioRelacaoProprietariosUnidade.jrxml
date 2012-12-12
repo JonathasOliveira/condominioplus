@@ -85,41 +85,41 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="13" splitType="Stretch">
+		<band height="12" splitType="Stretch">
 			<staticText>
-				<reportElement x="6" y="0" width="46" height="13"/>
+				<reportElement x="6" y="0" width="46" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="64" y="0" width="82" height="13"/>
+				<reportElement x="64" y="0" width="82" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Proprietário(a)]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="17" splitType="Stretch">
+		<band height="12" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="555" height="17" forecolor="#FFFFFF" backcolor="#CCCCCC">
+				<reportElement x="0" y="0" width="555" height="12" forecolor="#FFFFFF" backcolor="#CCCCCC">
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 1)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="3" width="46" height="13"/>
+				<reportElement x="6" y="0" width="46" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="64" y="3" width="486" height="13"/>
+				<reportElement x="64" y="0" width="486" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
