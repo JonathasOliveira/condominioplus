@@ -74,7 +74,7 @@
 				</reportElement>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="167" y="0" width="71" height="12"/>
+				<reportElement x="169" y="0" width="61" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
