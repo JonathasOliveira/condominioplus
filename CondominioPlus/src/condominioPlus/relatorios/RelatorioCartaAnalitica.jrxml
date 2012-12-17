@@ -117,57 +117,61 @@
 	<pageHeader>
 		<band height="119" splitType="Stretch">
 			<staticText>
-				<reportElement x="19" y="71" width="518" height="28"/>
+				<reportElement x="19" y="54" width="497" height="24"/>
 				<textElement>
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Caso já tenha(m) sido executado(s) o(s) pagamento(s) do(s) aludido(s) débito(s) solicitamos tornar este aviso sem efeito e encaminhar a(s) cópia(s) xerox, para que possamos averiguar junto ao banco.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="45" width="518" height="14"/>
+				<reportElement x="19" y="32" width="518" height="12"/>
 				<textElement>
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Ao contabilizar os documentos da entidade em apreço, verificamos o(s) débito(s) abaixo relacionado(s).]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="58" width="518" height="14"/>
+				<reportElement x="19" y="43" width="518" height="12"/>
 				<textElement>
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Para liquidar o(s) débito(s) V. Sa. deverá entrar em contato com esta administradora.]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="0" y="0" width="554" height="36" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="0" width="554" height="24" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="0" width="46" height="16"/>
-				<textElement/>
+				<reportElement x="6" y="0" width="39" height="12"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="64" y="0" width="82" height="16"/>
-				<textElement/>
+				<reportElement x="53" y="0" width="82" height="12"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
 				<text><![CDATA[Proprietário]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="6" y="16" width="46" height="20"/>
+				<reportElement x="6" y="11" width="39" height="12"/>
 				<textElement>
-					<font isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="64" y="16" width="453" height="20"/>
+				<reportElement x="53" y="11" width="453" height="12"/>
 				<textElement>
-					<font isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{nome}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="6" y="107" width="544" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[DESCRIÇÃO ANALÍTICA DO(S) DÉBITO(S)]]></text>
 			</staticText>

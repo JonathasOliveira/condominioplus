@@ -25,39 +25,39 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="122" splitType="Stretch">
+		<band height="116" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement x="0" y="97" width="419" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="91" width="419" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="490" y="63" width="65" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="490" y="63" width="65" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="490" y="97" width="64" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="490" y="91" width="64" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="377" y="63" width="110" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="377" y="63" width="110" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<textField>
-				<reportElement x="6" y="108" width="406" height="12"/>
+				<reportElement x="6" y="102" width="406" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="496" y="75" width="54" height="15"/>
+				<reportElement x="496" y="75" width="54" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="496" y="65" width="59" height="15"/>
+				<reportElement x="496" y="65" width="59" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
@@ -71,52 +71,52 @@
 				<text><![CDATA[Inadimplência Sintética]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="496" y="108" width="54" height="12"/>
+				<reportElement x="496" y="102" width="54" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="98" width="76" height="12"/>
+				<reportElement x="6" y="92" width="76" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Entidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="496" y="98" width="59" height="12"/>
+				<reportElement x="496" y="92" width="41" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Folha]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="382" y="65" width="69" height="15"/>
+				<reportElement x="382" y="65" width="69" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Período]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="382" y="75" width="98" height="15"/>
+				<reportElement x="382" y="75" width="98" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodo}]]></textFieldExpression>
 			</textField>
 			<rectangle>
-				<reportElement x="422" y="97" width="65" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="422" y="91" width="65" height="25" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="428" y="98" width="59" height="12"/>
+				<reportElement x="428" y="92" width="48" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Cálculos até]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="428" y="108" width="54" height="12"/>
+				<reportElement x="428" y="102" width="54" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
