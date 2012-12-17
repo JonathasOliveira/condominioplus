@@ -153,21 +153,21 @@
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="51" width="497" height="24"/>
+				<reportElement x="19" y="54" width="497" height="24"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Caso já tenha(m) sido executado(s) o(s) pagamento(s) do(s) aludido(s) débito(s) solicitamos tornar este aviso sem efeito e encaminhar a(s) cópia(s) xerox, para que possamos averiguar junto ao banco.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="29" width="518" height="12"/>
+				<reportElement x="19" y="32" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Ao contabilizar os documentos da entidade em apreço, verificamos o(s) débito(s) abaixo relacionado(s).]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="40" width="518" height="12"/>
+				<reportElement x="19" y="43" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
