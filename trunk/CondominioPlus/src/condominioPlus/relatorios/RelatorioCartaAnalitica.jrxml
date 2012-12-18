@@ -115,7 +115,7 @@
 		</band>
 	</title>
 	<pageHeader>
-		<band height="119" splitType="Stretch">
+		<band height="96" splitType="Stretch">
 			<staticText>
 				<reportElement x="19" y="54" width="497" height="24"/>
 				<textElement>
@@ -169,65 +169,65 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{nome}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="107" width="544" height="12"/>
+				<reportElement x="6" y="83" width="544" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[DESCRIÇÃO ANALÍTICA DO(S) DÉBITO(S)]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="62" splitType="Stretch">
+		<band height="46" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="554" height="62" forecolor="#FFFFFF" backcolor="#CCCCCC">
+				<reportElement x="0" y="0" width="554" height="46" forecolor="#FFFFFF" backcolor="#CCCCCC">
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 1)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
 			<staticText>
-				<reportElement x="17" y="1" width="51" height="16" forecolor="#000000"/>
+				<reportElement x="15" y="0" width="44" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Documento  ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="476" y="1" width="60" height="16" forecolor="#000000"/>
+				<reportElement x="487" y="0" width="50" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorOriginal}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="68" y="16" width="65" height="16" forecolor="#000000"/>
+				<reportElement x="59" y="11" width="60" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{vencimento}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="419" y="31" width="58" height="16" forecolor="#000000"/>
+				<reportElement positionType="Float" x="430" y="22" width="58" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Multa  ]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="476" y="16" width="60" height="16" forecolor="#000000"/>
+				<reportElement positionType="Float" x="487" y="11" width="50" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{juros}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="419" y="16" width="58" height="16" forecolor="#000000"/>
+				<reportElement positionType="Float" x="430" y="11" width="58" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Juros  ]]></text>
 			</staticText>
 			<subreport>
-				<reportElement x="150" y="1" width="251" height="59"/>
+				<reportElement x="134" y="0" width="281" height="45"/>
 				<subreportParameter name="subrelatorio2">
 					<subreportParameterExpression><![CDATA[$P{subrelatorio}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -235,123 +235,123 @@
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioInadimplenciaAnalitica2.jasper"]]></subreportExpression>
 			</subreport>
 			<staticText>
-				<reportElement x="17" y="16" width="51" height="16" forecolor="#000000"/>
+				<reportElement x="15" y="11" width="44" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Vencimento  ]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="476" y="46" width="60" height="14" forecolor="#000000"/>
+				<reportElement positionType="Float" x="487" y="33" width="50" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="476" y="31" width="60" height="16" forecolor="#000000"/>
+				<reportElement positionType="Float" x="487" y="22" width="50" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{multa}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="68" y="1" width="65" height="16" forecolor="#000000"/>
+				<reportElement x="59" y="0" width="60" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{documento}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="419" y="1" width="58" height="16" forecolor="#000000"/>
+				<reportElement x="430" y="0" width="58" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Total Original  ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="419" y="46" width="58" height="14" forecolor="#000000"/>
+				<reportElement positionType="Float" x="430" y="33" width="58" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Total  ]]></text>
 			</staticText>
 		</band>
 	</detail>
 	<summary>
-		<band height="46">
+		<band height="37">
 			<rectangle>
-				<reportElement x="169" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="169" y="9" width="84" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="458" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="458" y="9" width="84" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="265" y="10" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="265" y="9" width="84" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="362" y="9" width="84" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="362" y="9" width="84" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<textField>
-				<reportElement positionType="Float" x="177" y="23" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="177" y="20" width="69" height="12" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right">
-					<font size="10" isBold="true" isItalic="false"/>
+					<font size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalOriginal}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="368" y="9" width="52" height="17"/>
+				<reportElement x="368" y="9" width="52" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Multa]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="273" y="23" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="273" y="20" width="69" height="12" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right">
-					<font size="10" isBold="true" isItalic="false"/>
+					<font size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalJuros}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="271" y="9" width="52" height="17"/>
+				<reportElement x="271" y="9" width="52" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Juros]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="6" y="9" width="62" height="17"/>
+				<reportElement x="6" y="9" width="62" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[RESUMO:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="175" y="9" width="52" height="17"/>
+				<reportElement x="175" y="9" width="52" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="8"/>
+					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Total Original]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="370" y="22" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="370" y="20" width="69" height="12" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right">
-					<font size="10" isBold="true" isItalic="false"/>
+					<font size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalMulta}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="466" y="22" width="71" height="17" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="Float" x="466" y="20" width="71" height="12" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right">
-					<font size="10" isBold="true" isItalic="false"/>
+					<font size="8" isBold="true" isItalic="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalGeral}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="464" y="10" width="52" height="17"/>
+				<reportElement x="464" y="9" width="52" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[TOTAL]]></text>
 			</staticText>

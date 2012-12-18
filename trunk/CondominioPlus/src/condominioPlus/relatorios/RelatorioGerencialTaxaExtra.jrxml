@@ -90,7 +90,7 @@ Todos os Condomínios]]></text>
 		</band>
 	</title>
 	<detail>
-		<band height="50" splitType="Stretch">
+		<band height="36" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="0" width="555" height="24" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -109,7 +109,7 @@ Todos os Condomínios]]></text>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="0" y="24" width="555" height="25"/>
+				<reportElement x="0" y="24" width="555" height="12"/>
 				<subreportParameter name="totalOriginal">
 					<subreportParameterExpression><![CDATA[$P{totalOriginal}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -119,7 +119,7 @@ Todos os Condomínios]]></text>
 		</band>
 	</detail>
 	<summary>
-		<band height="5">
+		<band height="19">
 			<rectangle>
 				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>

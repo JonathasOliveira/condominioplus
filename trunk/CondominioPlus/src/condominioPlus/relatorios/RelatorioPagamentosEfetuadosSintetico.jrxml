@@ -104,7 +104,7 @@
 		</band>
 	</title>
 	<detail>
-		<band height="60" splitType="Stretch">
+		<band height="39" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="3" width="554" height="13" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -137,19 +137,19 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement x="0" y="16" width="554" height="31"/>
+				<reportElement x="0" y="16" width="554" height="12"/>
 				<dataSourceExpression><![CDATA[$F{lista}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioPagamentosEfetuadosSintetico.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement positionType="FixRelativeToBottom" x="23" y="47" width="279" height="12"/>
+				<reportElement positionType="FixRelativeToBottom" x="23" y="27" width="279" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["TOTAL GERAL DA UNIDADE " + $F{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="FixRelativeToBottom" x="480" y="47" width="60" height="12" isRemoveLineWhenBlank="true"/>
+				<reportElement positionType="FixRelativeToBottom" x="480" y="27" width="60" height="12" isRemoveLineWhenBlank="true"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true" isItalic="false"/>
 				</textElement>
