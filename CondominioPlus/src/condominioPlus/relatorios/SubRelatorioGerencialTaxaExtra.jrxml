@@ -22,28 +22,28 @@
 				<reportElement positionType="Float" x="0" y="0" width="555" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="262" y="0" width="90" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="271" y="0" width="90" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[A Arrecadar]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="361" y="0" width="90" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="370" y="0" width="90" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Arrecadado]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="460" y="0" width="90" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="469" y="0" width="80" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Inadimplência]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="92" y="0" width="162" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="92" y="0" width="172" height="12" forecolor="#FFFFFF"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
@@ -66,35 +66,35 @@
 				</reportElement>
 			</rectangle>
 			<textField>
-				<reportElement positionType="Float" x="361" y="0" width="69" height="12"/>
+				<reportElement positionType="Float" x="370" y="0" width="58" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalArrecadado}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="460" y="0" width="77" height="12"/>
+				<reportElement positionType="Float" x="469" y="0" width="58" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalInadimplencia}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="262" y="0" width="69" height="12"/>
+				<reportElement positionType="Float" x="271" y="0" width="58" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalAArrecadar}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="6" y="0" width="59" height="12"/>
+				<reportElement x="6" y="0" width="51" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{conta}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="92" y="0" width="162" height="12"/>
+				<reportElement x="92" y="0" width="172" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
