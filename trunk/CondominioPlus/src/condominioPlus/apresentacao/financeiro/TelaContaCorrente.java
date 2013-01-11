@@ -353,8 +353,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         Calendar dtaInicial = pegarUltimoDiaUtilDoMes(DataUtil.getCalendar(new DateTime(DataUtil.getPrimeiroDiaMes()).minusDays(1)));
         List<ExtratoBancario> listaExtratoMensal = new DAO().listar("ExtratosPorDia", condominio, dtaInicial);
 
-        Moeda saldo = new Moeda(0); 
-        if (listaExtratoMensal.size() >= 1){
+        Moeda saldo = new Moeda(0);
+        if (listaExtratoMensal.size() >= 1) {
             saldo = new Moeda(listaExtratoMensal.get(listaExtratoMensal.size() - 1).getValor());
         }
         return saldo;
@@ -466,7 +466,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         }
     }
 
-    public void imprimirExtrato() {
+    public void imprimirExtrato(TipoRelatorio tipo) {
         DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, TipoRelatorio.EXTRATO_CONTA_CORRENTE);
         dialogo.setVisible(true);
 
@@ -478,7 +478,12 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             ComparatorPagamento comparator = new ComparatorPagamento();
             Collections.sort(listaPagamentos, comparator);
 
-            new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+            if (tipo == TipoRelatorio.EXTRATO_CONTA_CORRENTE) {
+                new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+            } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
+                new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+            }
+
         }
     }
 
@@ -520,14 +525,16 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 if (origem == radioPeriodo) {
                     Calendar dat1 = Calendar.getInstance();
                     dat1.setTime(DataUtil.getDate(DataUtil.hoje()));
-                    dat1.add(Calendar.MONTH, -1);                 
+                    dat1.add(Calendar.MONTH, -1);
                     txtDataInicial.setValue(DataUtil.getDate(DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(dat1))));
                     txtDataFinal.setValue(DataUtil.getDate(DataUtil.getUltimoDiaMes(DataUtil.getDateTime(dat1))));
                 }
                 verificarListaVisualizacao();
                 carregarTabela();
             } else if (origem == itemMenuImprimirExtrato) {
-                imprimirExtrato();
+                imprimirExtrato(TipoRelatorio.EXTRATO_CONTA_CORRENTE);
+            } else if (origem == itemMenuImprimirExtratoConferencia) {
+                imprimirExtrato(TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE);
             }
         }
 
@@ -553,6 +560,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
             itemMenuImprimirExtrato.addActionListener(this);
+            itemMenuImprimirExtratoConferencia.addActionListener(this);
         }
 
         @Override
@@ -582,6 +590,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuEditarPagamento = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirExtrato = new javax.swing.JMenuItem();
+        itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
@@ -633,6 +642,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuImprimirExtrato.setText("Imprimir Extrato Conta Corrente");
         popupMenu.add(itemMenuImprimirExtrato);
+
+        itemMenuImprimirExtratoConferencia.setText("Imprimir Extrato Conferência Conta Corrente");
+        popupMenu.add(itemMenuImprimirExtratoConferencia);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -931,7 +943,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -964,7 +976,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -983,6 +995,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
     private javax.swing.JMenuItem itemMenuEditarPagamento;
     private javax.swing.JMenuItem itemMenuImprimirExtrato;
+    private javax.swing.JMenuItem itemMenuImprimirExtratoConferencia;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
