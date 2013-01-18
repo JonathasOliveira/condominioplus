@@ -815,6 +815,9 @@ public class Relatorios implements Printable {
         BigDecimal debitos = new BigDecimal(0);
         BigDecimal saldoAtual = new BigDecimal(0);
 
+        //campo para calcular o saldo de cada pagamento e mostrar no relatorio
+        BigDecimal saldoAuxiliar = new BigDecimal(0);
+        
         for (Pagamento p : pagamentos) {
             boolean continuar = true;
             String formaPagamento = getFormaPagamento(p);
@@ -849,28 +852,34 @@ public class Relatorios implements Printable {
 
             saldoAtual = p.getSaldo();
         }
+        
+        saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
+        saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
 
         for (PagamentoAuxiliar p : pagamentosAuxiliares) {
             HashMap<String, Object> mapa = new HashMap();
-            List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+            List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();            
+            BigDecimal soma = new BigDecimal(0);
 
             for (Pagamento pagamento : p.getListaPagamentos()) {
+                saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
                 mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                mapa2.put("saldo", PagamentoUtil.formatarMoeda(pagamento.getSaldo().doubleValue()));
+                mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
                 listaPagamentos.add(mapa2);
+                soma = soma.add(pagamento.getValor());
             }
 
             mapa.put("documento", p.getFormaPagamento());
+            mapa.put("soma", PagamentoUtil.formatarMoeda(soma.doubleValue()));
             mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
 
             lista.add(mapa);
         }
-        saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
-
+        
         parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
