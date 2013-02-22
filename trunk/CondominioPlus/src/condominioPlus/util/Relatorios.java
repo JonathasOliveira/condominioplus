@@ -1026,7 +1026,6 @@ public class Relatorios implements Printable {
         Comparator c = null;
 
         c = new Comparator() {
-
             public int compare(Object o1, Object o2) {
                 PagamentoAuxiliar p1 = (PagamentoAuxiliar) o1;
                 PagamentoAuxiliar p2 = (PagamentoAuxiliar) o2;
