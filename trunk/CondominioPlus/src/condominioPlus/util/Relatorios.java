@@ -817,7 +817,7 @@ public class Relatorios implements Printable {
 
         //campo para calcular o saldo de cada pagamento e mostrar no relatorio
         BigDecimal saldoAuxiliar = new BigDecimal(0);
-        
+
         for (Pagamento p : pagamentos) {
             boolean continuar = true;
             String formaPagamento = getFormaPagamento(p);
@@ -852,13 +852,13 @@ public class Relatorios implements Printable {
 
             saldoAtual = p.getSaldo();
         }
-        
+
         saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
         saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
 
         for (PagamentoAuxiliar p : pagamentosAuxiliares) {
             HashMap<String, Object> mapa = new HashMap();
-            List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();            
+            List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
             BigDecimal soma = new BigDecimal(0);
 
             for (Pagamento pagamento : p.getListaPagamentos()) {
@@ -879,7 +879,7 @@ public class Relatorios implements Printable {
 
             lista.add(mapa);
         }
-        
+
         parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
@@ -901,5 +901,170 @@ public class Relatorios implements Printable {
         } else {
             return String.valueOf(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento());
         }
+    }
+
+    public void imprimirBalanceteSintetico(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
+        List<PagamentoAuxiliar> pagamentosAuxiliaresDebito = new ArrayList<PagamentoAuxiliar>();
+        List<PagamentoAuxiliar> pagamentosAuxiliaresCredito = new ArrayList<PagamentoAuxiliar>();
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        BigDecimal saldoAnterior = new BigDecimal(0);
+        BigDecimal creditos = new BigDecimal(0);
+        BigDecimal debitos = new BigDecimal(0);
+        BigDecimal saldoAtual = new BigDecimal(0);
+
+        //campo para calcular o saldo de cada pagamento e mostrar no relatorio
+//        BigDecimal saldoAuxiliar = new BigDecimal(0);
+
+        for (Pagamento p : pagamentos) {
+            boolean continuar = true;
+            int codigoConta = p.getConta().getCodigo();
+            PagamentoAuxiliar pa = null;
+
+            if (p.getConta().isCredito()) {
+                if (pagamentosAuxiliaresCredito.isEmpty()) {
+                    pa = new PagamentoAuxiliar();
+                    pa.setCodigoConta(codigoConta);
+                    pa.setNomeConta(p.getConta().getNome());
+                    pa.adicionarPagamento(p);
+                } else {
+                    for (PagamentoAuxiliar p1 : pagamentosAuxiliaresCredito) {
+                        if (p1.getCodigoConta() == codigoConta) {
+                            p1.adicionarPagamento(p);
+                            continuar = false;
+                        } else {
+                            pa = new PagamentoAuxiliar();
+                            pa.setCodigoConta(codigoConta);
+                            pa.setNomeConta(p.getConta().getNome());
+                            pa.adicionarPagamento(p);
+                        }
+                    }
+                }
+
+                if (pa != null && continuar == true) {
+                    pagamentosAuxiliaresCredito.add(pa);
+                }
+            } else {
+                if (pagamentosAuxiliaresDebito.isEmpty()) {
+                    pa = new PagamentoAuxiliar();
+                    pa.setCodigoConta(codigoConta);
+                    pa.setNomeConta(p.getConta().getNome());
+                    pa.adicionarPagamento(p);
+                } else {
+                    for (PagamentoAuxiliar p1 : pagamentosAuxiliaresDebito) {
+                        if (p1.getCodigoConta() == codigoConta) {
+                            p1.adicionarPagamento(p);
+                            continuar = false;
+                        } else {
+                            pa = new PagamentoAuxiliar();
+                            pa.setCodigoConta(codigoConta);
+                            pa.setNomeConta(p.getConta().getNome());
+                            pa.adicionarPagamento(p);
+                        }
+                    }
+                }
+
+                if (pa != null && continuar == true) {
+                    pagamentosAuxiliaresDebito.add(pa);
+                }
+            }
+
+            if (p.getConta().isCredito()) {
+                creditos = creditos.add(p.getValor());
+            } else {
+                debitos = debitos.add(p.getValor());
+            }
+
+            saldoAtual = p.getSaldo();
+        }
+
+        saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
+//        saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
+
+        HashMap<String, Object> mapa = new HashMap();
+        List<HashMap<String, Object>> listaCredito = new ArrayList<HashMap<String, Object>>();
+        List<HashMap<String, Object>> listaDebito = new ArrayList<HashMap<String, Object>>();
+
+        //preenchendo as listas para visualização do relatório//
+        for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresCredito)) {
+            listaCredito.add(preencherListaBalanceteSintetico(p, tipo));
+        }
+        for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresDebito)) {
+            listaDebito.add(preencherListaBalanceteSintetico(p, tipo));
+        }
+
+        mapa.put("listaCredito", new JRBeanCollectionDataSource(listaCredito));
+        mapa.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
+        mapa.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
+        mapa.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
+        lista.add(mapa);
+
+        parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
+        parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
+        parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
+        parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!lista.isEmpty()) {
+            if (tipo == TipoRelatorio.BALANCETE_SINTETICO) {
+                imprimir("BalanceteSintetico", parametros, lista, false, true, null);
+            } else if (tipo == TipoRelatorio.BALANCETE_ANALITICO) {
+                imprimir("BalanceteAnalitico", parametros, lista, false, true, null);
+            }
+        }
+    }
+    
+    private List<PagamentoAuxiliar> ordenarPagamentosPorConta(List<PagamentoAuxiliar> lista) {
+        List<PagamentoAuxiliar> listaPagamentos = lista;
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                PagamentoAuxiliar p1 = (PagamentoAuxiliar) o1;
+                PagamentoAuxiliar p2 = (PagamentoAuxiliar) o2;
+                return Integer.valueOf(p1.getCodigoConta()).compareTo(Integer.valueOf(p2.getCodigoConta()));
+            }
+        };
+
+        Collections.sort(listaPagamentos, c);
+
+        return listaPagamentos;
+    }
+
+    private HashMap<String, Object> preencherListaBalanceteSintetico(PagamentoAuxiliar p, TipoRelatorio tipo) {
+        HashMap<String, Object> mapa = new HashMap();
+        List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+
+        BigDecimal soma = new BigDecimal(0);
+
+        for (Pagamento pagamento : p.getListaPagamentos()) {
+
+            if (tipo == TipoRelatorio.BALANCETE_ANALITICO) {
+                HashMap<String, String> mapa2 = new HashMap();
+                mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
+                mapa2.put("documento", getFormaPagamento(pagamento));
+                mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                listaPagamentos.add(mapa2);
+            }
+
+//                saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());              
+            soma = soma.add(pagamento.getValor());
+        }
+
+        mapa.put("codigoConta", p.getCodigoConta() + "");
+        mapa.put("nomeConta", p.getNomeConta().toUpperCase());
+        mapa.put("somaConta", PagamentoUtil.formatarMoeda(soma.doubleValue()));
+        mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+
+        return mapa;
     }
 }

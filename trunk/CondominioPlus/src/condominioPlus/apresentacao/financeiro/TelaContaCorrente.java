@@ -467,7 +467,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtrato(TipoRelatorio tipo) {
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, TipoRelatorio.EXTRATO_CONTA_CORRENTE);
+        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
         dialogo.setVisible(true);
 
         if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
@@ -482,8 +482,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
             } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
                 new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+            } else if (tipo == TipoRelatorio.BALANCETE_SINTETICO || tipo == TipoRelatorio.BALANCETE_ANALITICO){
+                new Relatorios().imprimirBalanceteSintetico(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
             }
-
         }
     }
 
@@ -535,6 +536,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 imprimirExtrato(TipoRelatorio.EXTRATO_CONTA_CORRENTE);
             } else if (origem == itemMenuImprimirExtratoConferencia) {
                 imprimirExtrato(TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE);
+            } else if (origem == itemMenuImprimirBalanceteAnalitico){
+                imprimirExtrato(TipoRelatorio.BALANCETE_ANALITICO);
+            } else if (origem == itemMenuImprimirBalanceteSintetico){
+                imprimirExtrato(TipoRelatorio.BALANCETE_SINTETICO);
             }
         }
 
@@ -561,6 +566,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             txtDataFinal.addChangeListener(this);
             itemMenuImprimirExtrato.addActionListener(this);
             itemMenuImprimirExtratoConferencia.addActionListener(this);
+            itemMenuImprimirBalanceteSintetico.addActionListener(this);
+            itemMenuImprimirBalanceteAnalitico.addActionListener(this);
         }
 
         @Override
@@ -591,6 +598,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirExtrato = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
+        itemMenuImprimirBalanceteSintetico = new javax.swing.JMenuItem();
+        itemMenuImprimirBalanceteAnalitico = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
@@ -645,6 +654,12 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuImprimirExtratoConferencia.setText("Imprimir Extrato Conferência Conta Corrente");
         popupMenu.add(itemMenuImprimirExtratoConferencia);
+
+        itemMenuImprimirBalanceteSintetico.setText("Imprimir Balancete Sintético");
+        popupMenu.add(itemMenuImprimirBalanceteSintetico);
+
+        itemMenuImprimirBalanceteAnalitico.setText("Imprimir Balancete Analítico");
+        popupMenu.add(itemMenuImprimirBalanceteAnalitico);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -943,7 +958,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -976,7 +991,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -994,6 +1009,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JComboBox cbFiltros;
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
     private javax.swing.JMenuItem itemMenuEditarPagamento;
+    private javax.swing.JMenuItem itemMenuImprimirBalanceteAnalitico;
+    private javax.swing.JMenuItem itemMenuImprimirBalanceteSintetico;
     private javax.swing.JMenuItem itemMenuImprimirExtrato;
     private javax.swing.JMenuItem itemMenuImprimirExtratoConferencia;
     private javax.swing.JLabel jLabel1;
