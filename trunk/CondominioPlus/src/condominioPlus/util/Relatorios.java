@@ -903,7 +903,7 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirBalanceteSintetico(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
+    public void imprimirBalancete(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
         List<PagamentoAuxiliar> pagamentosAuxiliaresDebito = new ArrayList<PagamentoAuxiliar>();
         List<PagamentoAuxiliar> pagamentosAuxiliaresCredito = new ArrayList<PagamentoAuxiliar>();
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
@@ -916,7 +916,7 @@ public class Relatorios implements Printable {
         BigDecimal creditos = new BigDecimal(0);
         BigDecimal debitos = new BigDecimal(0);
         BigDecimal saldoAtual = new BigDecimal(0);
-
+        
         //campo para calcular o saldo de cada pagamento e mostrar no relatorio
 //        BigDecimal saldoAuxiliar = new BigDecimal(0);
 
@@ -991,10 +991,10 @@ public class Relatorios implements Printable {
 
         //preenchendo as listas para visualização do relatório//
         for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresCredito)) {
-            listaCredito.add(preencherListaBalanceteSintetico(p, tipo));
+            listaCredito.add(preencherListaBalancete(p, tipo));
         }
         for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresDebito)) {
-            listaDebito.add(preencherListaBalanceteSintetico(p, tipo));
+            listaDebito.add(preencherListaBalancete(p, tipo));
         }
 
         mapa.put("listaCredito", new JRBeanCollectionDataSource(listaCredito));
@@ -1002,11 +1002,20 @@ public class Relatorios implements Printable {
         mapa.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         mapa.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
         lista.add(mapa);
+        
+        BigDecimal totalSubRecursos = new BigDecimal(0);
+        totalSubRecursos = totalSubRecursos.add(saldoAtual).add(condominio.getPoupanca().getSaldo()).add(condominio.getAplicacao().getSaldo()).add(condominio.getEmprestimo().getSaldo()).add(condominio.getConsignacao().getSaldo());
 
         parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
         parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
+        parametros.put("poupanca", PagamentoUtil.formatarMoeda(condominio.getPoupanca().getSaldo().doubleValue()));
+        parametros.put("aplicacoes", PagamentoUtil.formatarMoeda(condominio.getAplicacao().getSaldo().doubleValue()));
+        parametros.put("emprestimos", PagamentoUtil.formatarMoeda(condominio.getEmprestimo().getSaldo().doubleValue()));
+        parametros.put("consignacoes", PagamentoUtil.formatarMoeda(condominio.getConsignacao().getSaldo().doubleValue()));
+        
+        parametros.put("totalSubRecursos", PagamentoUtil.formatarMoeda(totalSubRecursos.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
         parametros.put("subrelatorio", caminho.toString());
@@ -1038,7 +1047,7 @@ public class Relatorios implements Printable {
         return listaPagamentos;
     }
 
-    private HashMap<String, Object> preencherListaBalanceteSintetico(PagamentoAuxiliar p, TipoRelatorio tipo) {
+    private HashMap<String, Object> preencherListaBalancete(PagamentoAuxiliar p, TipoRelatorio tipo) {
         HashMap<String, Object> mapa = new HashMap();
         List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
 
@@ -1054,8 +1063,7 @@ public class Relatorios implements Printable {
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 listaPagamentos.add(mapa2);
             }
-
-//                saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());              
+              
             soma = soma.add(pagamento.getValor());
         }
 
