@@ -483,7 +483,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
                 new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
             } else if (tipo == TipoRelatorio.BALANCETE_SINTETICO || tipo == TipoRelatorio.BALANCETE_ANALITICO){
-                new Relatorios().imprimirBalanceteSintetico(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
+                new Relatorios().imprimirBalancete(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
             }
         }
     }

@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,8 +151,9 @@ public class TelaPoupanca extends javax.swing.JInternalFrame {
             for (Pagamento p : getPagamentos()) {
                 p.setSaldo(p.getValor());
                 condominio.getPoupanca().setSaldo(p.getValor());
-
             }
+        } else if (condominio.getAplicacao().getPagamentos().isEmpty()) {
+            condominio.getAplicacao().setSaldo(new BigDecimal(0));
         }
     }
 

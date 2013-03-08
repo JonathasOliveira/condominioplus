@@ -150,8 +150,9 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
             for (Pagamento p : getPagamentos()) {
                 p.setSaldo(p.getValor());
                 condominio.getConsignacao().setSaldo(p.getValor());
-
             }
+        } else if (condominio.getConsignacao().getPagamentos().isEmpty()) {
+            condominio.getConsignacao().setSaldo(new BigDecimal(0));
         }
     }
 

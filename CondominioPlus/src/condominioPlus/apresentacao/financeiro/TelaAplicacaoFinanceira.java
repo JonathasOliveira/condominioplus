@@ -152,8 +152,9 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             for (Pagamento p : getPagamentos()) {
                 p.setSaldo(p.getValor());
                 condominio.getAplicacao().setSaldo(p.getValor());
-
             }
+        } else if (condominio.getPoupanca().getPagamentos().isEmpty()) {
+            condominio.getPoupanca().setSaldo(new BigDecimal(0));
         }
     }
 
