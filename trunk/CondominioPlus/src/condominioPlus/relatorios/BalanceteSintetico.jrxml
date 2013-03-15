@@ -399,8 +399,7 @@ Sub Recursos]]></text>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Pagamentos
-Não Efetuados]]></text>
+				<text><![CDATA[Contas a Pagar]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement x="460" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>

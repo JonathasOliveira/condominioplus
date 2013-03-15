@@ -17,7 +17,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="44" splitType="Stretch">
+		<band height="40" splitType="Stretch">
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="FixRelativeToBottom" x="505" y="25" width="47" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">

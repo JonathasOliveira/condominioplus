@@ -30,6 +30,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
+import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import net.sf.jasperreports.engine.JRException;
@@ -1001,11 +1003,24 @@ public class Relatorios implements Printable {
         mapa.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
         mapa.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         mapa.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
-        lista.add(mapa);
-        
+        lista.add(mapa);       
+                
         BigDecimal totalSubRecursos = new BigDecimal(0);
         totalSubRecursos = totalSubRecursos.add(saldoAtual).add(condominio.getPoupanca().getSaldo()).add(condominio.getAplicacao().getSaldo()).add(condominio.getEmprestimo().getSaldo()).add(condominio.getConsignacao().getSaldo());
 
+        List<Pagamento> contasAPagar = new DAO().listar("PagamentosContaPagar", condominio.getContaPagar());
+        BigDecimal somaValorContasAPagar = new BigDecimal(0);
+        PAGAMENTOS:
+        for (Pagamento p : contasAPagar){
+            if (p.getConta().getNomeVinculo().equals("EM")){
+                continue PAGAMENTOS;
+            }
+            somaValorContasAPagar = somaValorContasAPagar.add(p.getValor());
+        }    
+        
+        BigDecimal deficitSuperavit = new BigDecimal(0);
+        deficitSuperavit = deficitSuperavit.add(totalSubRecursos).add(somaValorContasAPagar);
+        
         parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
@@ -1014,6 +1029,8 @@ public class Relatorios implements Printable {
         parametros.put("aplicacoes", PagamentoUtil.formatarMoeda(condominio.getAplicacao().getSaldo().doubleValue()));
         parametros.put("emprestimos", PagamentoUtil.formatarMoeda(condominio.getEmprestimo().getSaldo().doubleValue()));
         parametros.put("consignacoes", PagamentoUtil.formatarMoeda(condominio.getConsignacao().getSaldo().doubleValue()));
+        parametros.put("pagamentosNaoEfetuados", PagamentoUtil.formatarMoeda(somaValorContasAPagar.doubleValue()));
+        parametros.put("deficitSuperavit", PagamentoUtil.formatarMoeda(deficitSuperavit.doubleValue()));
         
         parametros.put("totalSubRecursos", PagamentoUtil.formatarMoeda(totalSubRecursos.doubleValue()));
 
