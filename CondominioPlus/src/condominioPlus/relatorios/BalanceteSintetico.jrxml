@@ -68,11 +68,11 @@
 				<text><![CDATA[Emissão]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="377" y="6" width="173" height="57"/>
+				<reportElement x="418" y="6" width="132" height="57"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="13" isBold="true" isItalic="false"/>
 				</textElement>
-				<text><![CDATA[Balancete Sintético]]></text>
+				<text><![CDATA[Balancete Sintético da Conta Corrente]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="496" y="108" width="54" height="15"/>
