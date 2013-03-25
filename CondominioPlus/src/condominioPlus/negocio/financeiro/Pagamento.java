@@ -30,6 +30,7 @@ import logicpoint.persistencia.DAO;
 @Entity
 @NamedQueries(value = {
     @NamedQuery(name = "PagamentosContaCorrente", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true order by c.dataPagamento"),
+    @NamedQuery(name = "PagamentosContaCorrentePorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true and c.dataPagamento >= ?2 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosConciliacao", query = "SELECT c FROM Pagamento c WHERE c.conciliacao = ?1 and c.pago = false order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosDoDia", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.pago =  true order by c.dataPagamento"),
