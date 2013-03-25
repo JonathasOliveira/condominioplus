@@ -487,6 +487,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             }
         }
     }
+    
+    public void imprimirRecibo(){
+        new Relatorios().imprimirRecibo(condominio, (Pagamento)modeloTabela.getObjetoSelecionado());
+    }
 
     public void verificarListaVisualizacao() {
         if (radioTodos.isSelected()) {
@@ -540,6 +544,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 imprimirExtrato(TipoRelatorio.BALANCETE_ANALITICO);
             } else if (origem == itemMenuImprimirBalanceteSintetico){
                 imprimirExtrato(TipoRelatorio.BALANCETE_SINTETICO);
+            } else if (origem == itemMenuImprimirRecibo){
+                imprimirRecibo();
             }
         }
 
@@ -568,6 +574,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             itemMenuImprimirExtratoConferencia.addActionListener(this);
             itemMenuImprimirBalanceteSintetico.addActionListener(this);
             itemMenuImprimirBalanceteAnalitico.addActionListener(this);
+            itemMenuImprimirRecibo.addActionListener(this);
         }
 
         @Override
@@ -600,6 +607,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
         itemMenuImprimirBalanceteSintetico = new javax.swing.JMenuItem();
         itemMenuImprimirBalanceteAnalitico = new javax.swing.JMenuItem();
+        itemMenuImprimirRecibo = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
@@ -660,6 +668,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuImprimirBalanceteAnalitico.setText("Imprimir Balancete Analítico");
         popupMenu.add(itemMenuImprimirBalanceteAnalitico);
+
+        itemMenuImprimirRecibo.setText("Imprimir 2ª Via Recibo");
+        popupMenu.add(itemMenuImprimirRecibo);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -958,7 +969,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -991,7 +1002,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1013,6 +1024,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirBalanceteSintetico;
     private javax.swing.JMenuItem itemMenuImprimirExtrato;
     private javax.swing.JMenuItem itemMenuImprimirExtratoConferencia;
+    private javax.swing.JMenuItem itemMenuImprimirRecibo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

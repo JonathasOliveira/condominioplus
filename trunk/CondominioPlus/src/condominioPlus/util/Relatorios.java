@@ -918,7 +918,7 @@ public class Relatorios implements Printable {
         BigDecimal creditos = new BigDecimal(0);
         BigDecimal debitos = new BigDecimal(0);
         BigDecimal saldoAtual = new BigDecimal(0);
-        
+
         //campo para calcular o saldo de cada pagamento e mostrar no relatorio
 //        BigDecimal saldoAuxiliar = new BigDecimal(0);
 
@@ -1003,24 +1003,24 @@ public class Relatorios implements Printable {
         mapa.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
         mapa.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         mapa.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
-        lista.add(mapa);       
-                
+        lista.add(mapa);
+
         BigDecimal totalSubRecursos = new BigDecimal(0);
         totalSubRecursos = totalSubRecursos.add(saldoAtual).add(condominio.getPoupanca().getSaldo()).add(condominio.getAplicacao().getSaldo()).add(condominio.getEmprestimo().getSaldo()).add(condominio.getConsignacao().getSaldo());
 
         List<Pagamento> contasAPagar = new DAO().listar("PagamentosContaPagar", condominio.getContaPagar());
         BigDecimal somaValorContasAPagar = new BigDecimal(0);
         PAGAMENTOS:
-        for (Pagamento p : contasAPagar){
-            if (p.getConta().getNomeVinculo().equals("EM")){
+        for (Pagamento p : contasAPagar) {
+            if (p.getConta().getNomeVinculo().equals("EM")) {
                 continue PAGAMENTOS;
             }
             somaValorContasAPagar = somaValorContasAPagar.add(p.getValor());
-        }    
-        
+        }
+
         BigDecimal deficitSuperavit = new BigDecimal(0);
         deficitSuperavit = deficitSuperavit.add(totalSubRecursos).add(somaValorContasAPagar);
-        
+
         parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
@@ -1031,7 +1031,7 @@ public class Relatorios implements Printable {
         parametros.put("consignacoes", PagamentoUtil.formatarMoeda(condominio.getConsignacao().getSaldo().doubleValue()));
         parametros.put("pagamentosNaoEfetuados", PagamentoUtil.formatarMoeda(somaValorContasAPagar.doubleValue()));
         parametros.put("deficitSuperavit", PagamentoUtil.formatarMoeda(deficitSuperavit.doubleValue()));
-        
+
         parametros.put("totalSubRecursos", PagamentoUtil.formatarMoeda(totalSubRecursos.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
@@ -1045,13 +1045,14 @@ public class Relatorios implements Printable {
             }
         }
     }
-    
+
     private List<PagamentoAuxiliar> ordenarPagamentosPorConta(List<PagamentoAuxiliar> lista) {
         List<PagamentoAuxiliar> listaPagamentos = lista;
 
         Comparator c = null;
 
         c = new Comparator() {
+
             public int compare(Object o1, Object o2) {
                 PagamentoAuxiliar p1 = (PagamentoAuxiliar) o1;
                 PagamentoAuxiliar p2 = (PagamentoAuxiliar) o2;
@@ -1080,7 +1081,7 @@ public class Relatorios implements Printable {
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 listaPagamentos.add(mapa2);
             }
-              
+
             soma = soma.add(pagamento.getValor());
         }
 
@@ -1090,5 +1091,50 @@ public class Relatorios implements Printable {
         mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
 
         return mapa;
+    }
+
+    public void imprimirRecibo(Condominio condominio, Pagamento p) {
+        HashMap<String, Object> parametros = new HashMap();
+        List<Pagamento> pagamentos = new ArrayList<Pagamento>();
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+
+        PagamentoAuxiliar pa = new PagamentoAuxiliar();
+        pa.setFormaPagamento(getFormaPagamento(p));
+
+        pagamentos = new DAO().listar(Pagamento.class, "PagamentosContaCorrentePorNumeroDocumento", condominio.getContaCorrente(), p.getDataPagamento());
+
+        List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+        BigDecimal soma = new BigDecimal(0);
+
+        for (Pagamento pagamento : pagamentos) {
+            if (pa.getFormaPagamento().equalsIgnoreCase(getFormaPagamento(pagamento))) {
+                HashMap<String, String> mapa2 = new HashMap();
+                mapa2.put("descricao", pagamento.getHistorico());
+                mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                listaPagamentos.add(mapa2);
+
+                soma = soma.add(pagamento.getValor());
+            }
+        }
+
+        parametros.put("soma", PagamentoUtil.formatarMoeda(soma.doubleValue()));
+
+        HashMap<String, Object> mapa = new HashMap();
+        mapa.put("data", DataUtil.toString(p.getDataPagamento()));
+        mapa.put("numeroDocumento", pa.getFormaPagamento());
+        mapa.put("condominio", condominio.getRazaoSocial());
+        mapa.put("endereco", condominio.getEndereco().getLogradouro());
+        mapa.put("cnpj", condominio.getCnpj());
+        mapa.put("inscricaoEstadual", "");
+        mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+        lista.add(mapa);
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!lista.isEmpty()) {
+            imprimir("Recibo", parametros, lista, false, true, null);
+        }
+
     }
 }
