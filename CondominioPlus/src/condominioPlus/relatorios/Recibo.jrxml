@@ -13,11 +13,12 @@
 	<field name="cnpj" class="java.lang.String"/>
 	<field name="inscricaoEstadual" class="java.lang.String"/>
 	<field name="listaPagamentos" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<field name="emissor" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="802" splitType="Stretch">
+		<band height="323" splitType="Stretch">
 			<rectangle>
 				<reportElement x="34" y="0" width="489" height="200"/>
 			</rectangle>
@@ -145,6 +146,23 @@
 				<dataSourceExpression><![CDATA[$F{listaPagamentos}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioRecibo.jasper"]]></subreportExpression>
 			</subreport>
+			<textField>
+				<reportElement positionType="FixRelativeToBottom" x="106" y="282" width="300" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{emissor}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="35" y="269" width="65" height="20"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Emissor: ]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="106" y="282" width="300" height="1"/>
+			</line>
 		</band>
 	</detail>
 </jasperReport>
