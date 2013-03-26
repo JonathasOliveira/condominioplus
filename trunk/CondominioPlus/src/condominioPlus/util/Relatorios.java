@@ -1126,6 +1126,7 @@ public class Relatorios implements Printable {
         mapa.put("endereco", condominio.getEndereco().getLogradouro());
         mapa.put("cnpj", condominio.getCnpj());
         mapa.put("inscricaoEstadual", "");
+        mapa.put("emissor", p.getFornecedor() == null ? "" : p.getFornecedor().getNome());
         mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
         lista.add(mapa);
 
