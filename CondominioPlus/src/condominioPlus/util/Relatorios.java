@@ -804,7 +804,7 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirExtratoConferenciaContaCorrente(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos) {
+    public void imprimirExtratoConferenciaContaCorrente(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
         List<PagamentoAuxiliar> pagamentosAuxiliares = new ArrayList<PagamentoAuxiliar>();
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
@@ -891,6 +891,7 @@ public class Relatorios implements Printable {
         parametros.put("subrelatorio", caminho.toString());
 
         if (!lista.isEmpty()) {
+            parametros.put("titulo", tipo.toString());
             imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
         }
     }
@@ -1136,6 +1137,48 @@ public class Relatorios implements Printable {
         if (!lista.isEmpty()) {
             imprimir("Recibo", parametros, lista, false, true, null);
         }
+    }
 
+    public void imprimirExtratoContaIndividual(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos) {
+        HashMap<String, Object> parametros = new HashMap();
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+
+        Pagamento p = new Pagamento();
+        p = pagamentos.get(0);
+        PagamentoAuxiliar pa = new PagamentoAuxiliar();
+        pa.setFormaPagamento(getFormaPagamento(p));
+        pa.setNomeConta(p.getConta().getNome());
+        pa.setCodigoConta(p.getConta().getCodigo());
+
+        List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+        BigDecimal soma = new BigDecimal(0);
+
+        for (Pagamento pagamento : pagamentos) {
+            HashMap<String, String> mapa2 = new HashMap();
+            mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
+            mapa2.put("documento", getFormaPagamento(pagamento));
+            mapa2.put("historico", pagamento.getHistorico());
+            mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+            listaPagamentos.add(mapa2);
+
+            soma = soma.add(pagamento.getValor());
+        }
+
+        HashMap<String, Object> mapa = new HashMap();
+        mapa.put("codigoConta", pa.getCodigoConta() + "");
+        mapa.put("nomeConta", pa.getNomeConta());
+        mapa.put("somaConta", PagamentoUtil.formatarMoeda(soma.doubleValue()));
+        mapa.put("listaPagamentos", new JRBeanCollectionDataSource(listaPagamentos));
+        lista.add(mapa);
+
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+        parametros.put("condominio", condominio.getRazaoSocial());
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!lista.isEmpty()) {
+            imprimir("RelatorioExtratoContaIndividual", parametros, lista, false, true, null);
+        }
     }
 }

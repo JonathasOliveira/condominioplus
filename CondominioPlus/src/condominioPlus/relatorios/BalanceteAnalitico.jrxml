@@ -188,70 +188,46 @@
 			<rectangle>
 				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-			<staticText>
-				<reportElement x="6" y="6" width="543" height="15"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[RESULTADO DOS SALDOS]]></text>
-			</staticText>
 			<rectangle>
-				<reportElement x="10" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="100" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
-			<staticText>
-				<reportElement x="15" y="24" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Saldo Anterior
-Conta Corrente]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="15" y="40" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{saldoAnterior}]]></textFieldExpression>
-			</textField>
+			<rectangle>
+				<reportElement x="370" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="370" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
 			<rectangle>
 				<reportElement x="100" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
-			<staticText>
-				<reportElement x="105" y="24" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Créditos em
-Conta Corrente]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="105" y="40" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{creditos}]]></textFieldExpression>
-			</textField>
-			<rectangle>
-				<reportElement x="190" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
-			<textField isBlankWhenNull="true">
-				<reportElement x="195" y="40" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{debitos}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="195" y="24" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Débitos em
-Conta Corrente]]></text>
-			</staticText>
 			<rectangle>
 				<reportElement x="280" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
+			<rectangle>
+				<reportElement x="190" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="10" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="10" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="190" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="280" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="460" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="375" y="76" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{pagamentosNaoEfetuados}]]></textFieldExpression>
+			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="285" y="40" width="72" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -267,26 +243,28 @@ Conta Corrente]]></text>
 				<text><![CDATA[Saldo Atual
 Conta Corrente]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="370" y="22" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
-			<textField isBlankWhenNull="true">
-				<reportElement x="375" y="40" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{poupanca}]]></textFieldExpression>
-			</textField>
 			<staticText>
-				<reportElement x="375" y="24" width="43" height="16"/>
+				<reportElement x="105" y="24" width="43" height="16"/>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Poupança]]></text>
+				<text><![CDATA[Créditos em
+Conta Corrente]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="10" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
+			<staticText>
+				<reportElement x="105" y="60" width="43" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Empréstimos]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="195" y="76" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{consignacoes}]]></textFieldExpression>
+			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="15" y="76" width="72" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -295,55 +273,67 @@ Conta Corrente]]></text>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{aplicacoes}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="15" y="60" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Aplicações]]></text>
-			</staticText>
-			<rectangle>
-				<reportElement x="100" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
-			<textField isBlankWhenNull="true">
-				<reportElement x="105" y="76" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{emprestimos}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="105" y="60" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Empréstimos]]></text>
-			</staticText>
-			<rectangle>
-				<reportElement x="190" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
-			<textField isBlankWhenNull="true">
-				<reportElement x="195" y="76" width="72" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{consignacoes}]]></textFieldExpression>
-			</textField>
-			<staticText>
 				<reportElement x="195" y="60" width="43" height="16"/>
 				<textElement>
 					<font size="6"/>
 				</textElement>
 				<text><![CDATA[Consignações]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="280" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
 			<textField isBlankWhenNull="true">
 				<reportElement x="285" y="76" width="72" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalSubRecursos}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="375" y="60" width="43" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Contas a Pagar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="465" y="60" width="52" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Déficit/Superávit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="60" width="43" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Aplicações]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="76" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{deficitSuperavit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="6" width="543" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RESULTADO DOS SALDOS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="24" width="43" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Poupança]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="375" y="40" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{poupanca}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="285" y="60" width="43" height="16"/>
@@ -353,40 +343,50 @@ Conta Corrente]]></text>
 				<text><![CDATA[Total
 Sub Recursos]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="370" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="375" y="76" width="72" height="12"/>
+				<reportElement x="195" y="40" width="72" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{pagamentosNaoEfetuados}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{debitos}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="375" y="60" width="43" height="16"/>
-				<textElement>
-					<font size="6"/>
-				</textElement>
-				<text><![CDATA[Contas a Pagar]]></text>
-			</staticText>
-			<rectangle>
-				<reportElement x="460" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="465" y="76" width="72" height="12"/>
+				<reportElement x="105" y="40" width="72" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{deficitSuperavit}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{creditos}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="465" y="60" width="52" height="16"/>
+				<reportElement x="195" y="24" width="43" height="16"/>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Déficit/Superávit]]></text>
+				<text><![CDATA[Débitos em
+Conta Corrente]]></text>
 			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="15" y="40" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{saldoAnterior}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="15" y="24" width="43" height="16"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Saldo Anterior
+Conta Corrente]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="105" y="76" width="72" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{emprestimos}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>
