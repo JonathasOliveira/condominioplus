@@ -493,16 +493,16 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtratoContaIndividual() {
-        DialogoDadosExtratoContaIndividual dialogo = new DialogoDadosExtratoContaIndividual(null, true, dataInicial, dataFinal, TipoRelatorio.EXTRATO_CONTA_INDIVIDUAL);
+        DialogoDadosExtratoContaIndividual dialogo = new DialogoDadosExtratoContaIndividual(null, true, DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), (Pagamento)modeloTabela.getObjetoSelecionado(), TipoRelatorio.EXTRATO_CONTA_INDIVIDUAL);
         dialogo.setVisible(true);
 
-        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null && dialogo.getConta() != null) {
+        if (dialogo.isContinuar() && dialogo.getDataInicial() != null && dialogo.getDataFinal() != null && dialogo.getConta() != null) {
             List<Pagamento> listaPagamentos = new DAO().listar("PagamentosEfetuadosPorConta", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), dialogo.getConta());
 
             System.out.println("lista pagamentos: " + listaPagamentos.size());
             
             if (listaPagamentos.isEmpty()){
-                ApresentacaoUtil.exibirAdvertencia("Não existem registros dessa conta para os período selecionado.", this);
+                ApresentacaoUtil.exibirAdvertencia("Não existem registros dessa conta para o período selecionado.", this);
             } else {
                 new Relatorios().imprimirExtratoContaIndividual(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
             }

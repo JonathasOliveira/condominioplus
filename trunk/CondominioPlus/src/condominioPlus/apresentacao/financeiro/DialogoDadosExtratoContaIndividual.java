@@ -11,11 +11,13 @@
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
+import java.util.Calendar;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.util.DataUtil;
@@ -31,19 +33,21 @@ public class DialogoDadosExtratoContaIndividual extends javax.swing.JDialog {
     private DateTime dataFinal;
     private TipoRelatorio tipo;
     private Conta conta;
+    private Pagamento pagamento;
+    private boolean continuar = true;
 
     /** Creates new form DialogoDadosRelatorioGerencial */
-    public DialogoDadosExtratoContaIndividual(java.awt.Frame parent, boolean modal, DateTime dataInicial, DateTime dataFinal, TipoRelatorio tipo) {
+    public DialogoDadosExtratoContaIndividual(java.awt.Frame parent, boolean modal, DateTime dataInicial, DateTime dataFinal, Pagamento pagamento, TipoRelatorio tipo) {
         super(parent, modal);
         initComponents();
         new ControladorEventos();
         this.setLocationRelativeTo(null);
+        this.dataInicial = dataInicial;
+        this.dataFinal = dataFinal;
+        this.pagamento = pagamento;
         this.tipo = tipo;
 
-        if (dataInicial != null && dataFinal != null) {
-            txtDataInicial.setValue(DataUtil.getDate(dataInicial));
-            txtDataFinal.setValue(DataUtil.getDate(dataFinal));
-        }
+        preencherTela();
 
         this.setTitle(tipo.toString());
     }
@@ -55,9 +59,29 @@ public class DialogoDadosExtratoContaIndividual extends javax.swing.JDialog {
     public DateTime getDataFinal() {
         return dataFinal;
     }
-    
-    public Conta getConta(){
+
+    public Conta getConta() {
         return conta;
+    }
+    
+    public boolean isContinuar(){
+        return continuar;
+    }
+
+    private void preencherTela() {
+        if (pagamento != null) {
+            txtConta.setText(pagamento.getConta().getCodigo() + "");
+        }
+        if (DataUtil.compararData(dataInicial, dataFinal) == 0) {
+            Calendar dat1 = Calendar.getInstance();
+            dat1.setTime(DataUtil.getDate(DataUtil.hoje()));
+            dat1.add(Calendar.MONTH, -1);
+            txtDataInicial.setValue(DataUtil.getDate(DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(dat1))));
+            txtDataFinal.setValue(DataUtil.getDate(DataUtil.getUltimoDiaMes(DataUtil.getDateTime(dat1))));
+        } else {
+            txtDataInicial.setValue(DataUtil.getDate(dataInicial));
+            txtDataFinal.setValue(DataUtil.getDate(dataFinal));
+        }
     }
 
     private void salvarDados() {
@@ -87,6 +111,7 @@ public class DialogoDadosExtratoContaIndividual extends javax.swing.JDialog {
             if (source == btnOk) {
                 salvarDados();
             } else if (source == btnCancelar) {
+                continuar = false;
                 sair();
             }
             source = null;
