@@ -870,7 +870,9 @@ public class Relatorios implements Printable {
                 mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
+                if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE){
+                    mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
+                }
                 listaPagamentos.add(mapa2);
                 soma = soma.add(pagamento.getValor());
             }
@@ -892,7 +894,11 @@ public class Relatorios implements Printable {
 
         if (!lista.isEmpty()) {
             parametros.put("titulo", tipo.toString());
-            imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
+            if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
+                imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
+            } else if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO){
+                imprimir("RelatorioExtratoCustomizado", parametros, lista, false, true, null);
+            }
         }
     }
 
