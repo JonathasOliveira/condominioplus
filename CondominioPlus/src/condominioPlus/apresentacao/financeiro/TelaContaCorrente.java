@@ -467,23 +467,27 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtrato(TipoRelatorio tipo) {
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
-        dialogo.setVisible(true);
+        if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
+            new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, null, null, (List<Pagamento>)modeloTabela.getObjetosSelecionados(), tipo);
+        } else {
+            DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
+            dialogo.setVisible(true);
 
-        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
-            List<Pagamento> listaPagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()));
+            if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
+                List<Pagamento> listaPagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()));
 
-            ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
-            Collections.sort(listaPagamentos, comCod);
-            ComparatorPagamento comparator = new ComparatorPagamento();
-            Collections.sort(listaPagamentos, comparator);
+                ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+                Collections.sort(listaPagamentos, comCod);
+                ComparatorPagamento comparator = new ComparatorPagamento();
+                Collections.sort(listaPagamentos, comparator);
 
-            if (tipo == TipoRelatorio.EXTRATO_CONTA_CORRENTE) {
-                new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
-            } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
-                new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
-            } else if (tipo == TipoRelatorio.BALANCETE_SINTETICO || tipo == TipoRelatorio.BALANCETE_ANALITICO) {
-                new Relatorios().imprimirBalancete(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
+                if (tipo == TipoRelatorio.EXTRATO_CONTA_CORRENTE) {
+                    new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+                } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
+                    new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
+                } else if (tipo == TipoRelatorio.BALANCETE_SINTETICO || tipo == TipoRelatorio.BALANCETE_ANALITICO) {
+                    new Relatorios().imprimirBalancete(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
+                }
             }
         }
     }
@@ -493,15 +497,15 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtratoContaIndividual() {
-        DialogoDadosExtratoContaIndividual dialogo = new DialogoDadosExtratoContaIndividual(null, true, DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), (Pagamento)modeloTabela.getObjetoSelecionado(), TipoRelatorio.EXTRATO_CONTA_INDIVIDUAL);
+        DialogoDadosExtratoContaIndividual dialogo = new DialogoDadosExtratoContaIndividual(null, true, DataUtil.getDateTime(txtDataInicial.getValue()), DataUtil.getDateTime(txtDataFinal.getValue()), (Pagamento) modeloTabela.getObjetoSelecionado(), TipoRelatorio.EXTRATO_CONTA_INDIVIDUAL);
         dialogo.setVisible(true);
 
         if (dialogo.isContinuar() && dialogo.getDataInicial() != null && dialogo.getDataFinal() != null && dialogo.getConta() != null) {
             List<Pagamento> listaPagamentos = new DAO().listar("PagamentosEfetuadosPorConta", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), dialogo.getConta());
 
             System.out.println("lista pagamentos: " + listaPagamentos.size());
-            
-            if (listaPagamentos.isEmpty()){
+
+            if (listaPagamentos.isEmpty()) {
                 ApresentacaoUtil.exibirAdvertencia("Não existem registros dessa conta para o período selecionado.", this);
             } else {
                 new Relatorios().imprimirExtratoContaIndividual(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
@@ -566,6 +570,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 imprimirRecibo();
             } else if (origem == itemMenuImprimirExtratoContaIndividual) {
                 imprimirExtratoContaIndividual();
+            } else if (origem == itemMenuImprimirExtratoCustomizado) {
+                imprimirExtrato(TipoRelatorio.EXTRATO_CUSTOMIZADO);
             }
         }
 
@@ -596,6 +602,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             itemMenuImprimirBalanceteAnalitico.addActionListener(this);
             itemMenuImprimirRecibo.addActionListener(this);
             itemMenuImprimirExtratoContaIndividual.addActionListener(this);
+            itemMenuImprimirExtratoCustomizado.addActionListener(this);
         }
 
         @Override
@@ -630,6 +637,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuImprimirBalanceteAnalitico = new javax.swing.JMenuItem();
         itemMenuImprimirRecibo = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoContaIndividual = new javax.swing.JMenuItem();
+        itemMenuImprimirExtratoCustomizado = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
@@ -696,6 +704,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuImprimirExtratoContaIndividual.setText("Imprimir Extrato Conta Individual");
         popupMenu.add(itemMenuImprimirExtratoContaIndividual);
+
+        itemMenuImprimirExtratoCustomizado.setText("Imprimir Extrato Customizado do Movimento Contábil");
+        popupMenu.add(itemMenuImprimirExtratoCustomizado);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -994,7 +1005,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -1027,7 +1038,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1050,6 +1061,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuImprimirExtrato;
     private javax.swing.JMenuItem itemMenuImprimirExtratoConferencia;
     private javax.swing.JMenuItem itemMenuImprimirExtratoContaIndividual;
+    private javax.swing.JMenuItem itemMenuImprimirExtratoCustomizado;
     private javax.swing.JMenuItem itemMenuImprimirRecibo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
