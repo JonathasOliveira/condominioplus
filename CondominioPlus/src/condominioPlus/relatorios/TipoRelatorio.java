@@ -33,7 +33,8 @@ public enum TipoRelatorio {
     EXTRATO_CONFERENCIA_CONTA_CORRENTE("Extrato Conferência da Conta Corrente"),
     BALANCETE_SINTETICO("Balancete Sintético"),
     BALANCETE_ANALITICO("Balancete Analítico"),
-    EXTRATO_CONTA_INDIVIDUAL("Extrato de Conta Individual");
+    EXTRATO_CONTA_INDIVIDUAL("Extrato de Conta Individual"),
+    EXTRATO_CUSTOMIZADO("Extrato Customizado do Movimento Contábil");
 
     TipoRelatorio(String nome) {
         this.nome = nome;
