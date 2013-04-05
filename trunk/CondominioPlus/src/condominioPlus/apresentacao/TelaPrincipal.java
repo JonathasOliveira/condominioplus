@@ -39,6 +39,7 @@ import condominioPlus.apresentacao.condominio.TelaCondominio;
 import condominioPlus.apresentacao.condominio.TelaDadosCondominio;
 import condominioPlus.apresentacao.condominio.TelaSelecionarCondominio;
 import condominioPlus.apresentacao.condomino.TelaCondomino;
+import condominioPlus.apresentacao.financeiro.DialogoDadosCapa;
 import condominioPlus.apresentacao.financeiro.TelaAplicacaoFinanceira;
 import condominioPlus.apresentacao.financeiro.TelaConsignacao;
 import condominioPlus.apresentacao.financeiro.TelaConta;
@@ -385,8 +386,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     }
                 } else if (source == menuItemEnvelopeAvulso) {
                     criarFrame(new TelaDadosEnvelopeAvulso());
-                } else if (source == menuItemRelatorioProduto) {
-//                    TelaPrincipal.getInstancia().criarJanela(new DialogoRelatorioProduto());
+                } else if (source == menuItemCapaPrestacaoContas) {
+                    TelaPrincipal.getInstancia().criarJanela(new DialogoDadosCapa(null, false));
                 } else if (source == menuItemRelatorioProdutoNegativo) {
 //                    TelaPrincipal.getInstancia().criarJanela(new DialogoRelatorioProdutoNegativo());
                 } else if (source == menuItemRelatorioEstorno) {
@@ -488,7 +489,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemRelatorioTaxaExtra.addActionListener(this);
             menuItemInadimplenciaSintetica.addActionListener(this);
             menuItemEnvelopeAvulso.addActionListener(this);
-            menuItemRelatorioProduto.addActionListener(this);
+            menuItemCapaPrestacaoContas.addActionListener(this);
             menuItemRelatorioProdutoNegativo.addActionListener(this);
             menuItemRelatorioEstorno.addActionListener(this);
             menuItemContaCorrente.addActionListener(this);
@@ -583,7 +584,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemRelatorioTaxaExtra = new javax.swing.JMenuItem();
         menuItemInadimplenciaSintetica = new javax.swing.JMenuItem();
         menuItemEnvelopeAvulso = new javax.swing.JMenuItem();
-        menuItemRelatorioProduto = new javax.swing.JMenuItem();
+        menuItemCapaPrestacaoContas = new javax.swing.JMenuItem();
         menuItemRelatorioProdutoNegativo = new javax.swing.JMenuItem();
         menuItemRelatorioEstorno = new javax.swing.JMenuItem();
         menuFuncionario = new javax.swing.JMenu();
@@ -853,8 +854,8 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemEnvelopeAvulso.setText("Envelope Avulso");
         menuRelatorio.add(menuItemEnvelopeAvulso);
 
-        menuItemRelatorioProduto.setText("Produtos");
-        menuRelatorio.add(menuItemRelatorioProduto);
+        menuItemCapaPrestacaoContas.setText("Capa Prestação de Contas");
+        menuRelatorio.add(menuItemCapaPrestacaoContas);
 
         menuItemRelatorioProdutoNegativo.setText("Produtos em Falta");
         menuRelatorio.add(menuItemRelatorioProdutoNegativo);
@@ -937,6 +938,7 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemAplicacao;
     private javax.swing.JMenuItem menuItemBanco;
     private javax.swing.JMenuItem menuItemCalculoMaiorCota;
+    private javax.swing.JMenuItem menuItemCapaPrestacaoContas;
     private javax.swing.JMenuItem menuItemCategoriaFuncionario;
     private javax.swing.JMenuItem menuItemCobrancaBase;
     private javax.swing.JMenuItem menuItemCobrancas;
@@ -966,7 +968,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemOrcamento;
     private javax.swing.JMenuItem menuItemPoupanca;
     private javax.swing.JMenuItem menuItemRelatorioEstorno;
-    private javax.swing.JMenuItem menuItemRelatorioProduto;
     private javax.swing.JMenuItem menuItemRelatorioProdutoNegativo;
     private javax.swing.JMenuItem menuItemRelatorioTaxaExtra;
     private javax.swing.JMenuItem menuItemRemessaSalario;

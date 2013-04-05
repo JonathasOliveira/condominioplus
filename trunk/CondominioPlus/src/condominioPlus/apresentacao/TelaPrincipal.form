@@ -191,9 +191,9 @@
                 <Property name="text" type="java.lang.String" value="Envelope Avulso"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioProduto">
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContas">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Produtos"/>
+                <Property name="text" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioProdutoNegativo">
