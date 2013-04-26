@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CapaPrestacaoContas" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="0.75"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="432"/>
 	<subDataset name="dataset1"/>
 	<field name="periodo" class="java.lang.String"/>
 	<field name="texto" class="java.lang.String"/>
@@ -52,6 +52,52 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{condominio}]]></textFieldExpression>
 			</textField>
+			<break>
+				<reportElement x="0" y="781" width="100" height="1"/>
+			</break>
+		</band>
+		<band height="802">
+			<rectangle>
+				<reportElement x="3" y="4" width="548" height="794"/>
+				<graphicElement>
+					<pen lineWidth="5.0"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="63" width="555" height="33"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[PRESTAÇÃO DE CONTAS DO MÊS DE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="91" width="555" height="33"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{periodo}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="187" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="false" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[PARECER DO CONSELHO CONSULTIVO]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="61" y="293" width="440" height="160"/>
+				<textElement textAlignment="Justified" markup="html">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["         Nós, abaixo assinados, membros do CONSELHO CONSULTIVO DO CONDOMÍNIO "+ $F{condominio}.replaceAll($F{condominio},"<b>"+$F{condominio}.toUpperCase()+"</b>") + " no desempenho das atribuições a nós conferidas pela Convenção do Condomínio, atestamos ter analisado as contas apresentadas, referentes ao Mês " + "04/2013" + " e ter achado tudo de acordo, razão pela qual firmamos o presente."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="61" y="454" width="440" height="20"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Arial" size="14" isBold="true" isItalic="true" isUnderline="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[CONSELHEIRO(S):]]></text>
+			</staticText>
 		</band>
 	</detail>
 </jasperReport>

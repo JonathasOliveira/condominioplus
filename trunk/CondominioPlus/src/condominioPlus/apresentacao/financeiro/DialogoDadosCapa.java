@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
+import logicpoint.util.ComboModelo;
+import logicpoint.util.Util;
 
 /**
  *
@@ -29,6 +31,7 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         initComponents();
         this.setLocationRelativeTo(null);
         new ControladorEventos();
+        carregarComboMes();
     }
 
     private void sair() {
@@ -43,13 +46,17 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         HashMap<String, String> mapa = new HashMap();
 
         mapa.put("condominio", txtCondominio.getText());
-        mapa.put("periodo", txtMes.getText() + "/" + txtAno.getText());
+        mapa.put("periodo", cmbMes.getModel().getSelectedItem().toString() + "/" + txtAno.getText());
 
         listaCondominos.add(mapa);
 
         if (!listaCondominos.isEmpty()) {
             new Relatorios().imprimir("CapaPrestacaoContas", parametros, listaCondominos, false, false, null);
         }
+    }
+
+    private void carregarComboMes() {
+        cmbMes.setModel(new ComboModelo<String>(Util.toList(new String[]{"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"}), false));
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -86,11 +93,11 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         btnOk = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         jLabel23 = new javax.swing.JLabel();
-        txtMes = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
         jLabel30 = new javax.swing.JLabel();
         txtCondominio = new javax.swing.JTextField();
         txtAno = new javax.swing.JTextField();
+        cmbMes = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Capa Prestação de Contas");
@@ -124,9 +131,6 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
 
         jLabel23.setText("Mês:");
 
-        txtMes.setToolTipText("Digite o Endereço");
-        txtMes.setName("logradouro"); // NOI18N
-
         jLabel24.setText("Ano:");
 
         jLabel30.setText("Condominio:");
@@ -148,7 +152,7 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txtMes, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel24)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -169,9 +173,9 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel23)
-                    .addComponent(txtMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtAno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel24))
+                    .addComponent(jLabel24)
+                    .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -181,7 +185,6 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 312, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -189,7 +192,6 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 163, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -198,10 +200,10 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOk;
+    private javax.swing.JComboBox cmbMes;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel30;
@@ -209,6 +211,5 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtAno;
     private javax.swing.JTextField txtCondominio;
-    private javax.swing.JTextField txtMes;
     // End of variables declaration//GEN-END:variables
 }
