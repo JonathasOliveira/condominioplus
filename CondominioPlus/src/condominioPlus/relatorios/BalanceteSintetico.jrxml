@@ -312,11 +312,11 @@ Conta Corrente]]></text>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{poupanca}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="375" y="24" width="43" height="16"/>
+				<reportElement x="375" y="24" width="72" height="16"/>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Poupança]]></text>
+				<text><![CDATA[Poupança/ Fundo de Reserva]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement x="10" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>

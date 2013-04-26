@@ -322,11 +322,11 @@ Conta Corrente]]></text>
 				<text><![CDATA[RESULTADO DOS SALDOS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="375" y="24" width="43" height="16"/>
+				<reportElement x="375" y="24" width="72" height="16"/>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Poupança]]></text>
+				<text><![CDATA[Poupança/ Fundo de Reserva]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement x="375" y="40" width="72" height="12"/>
