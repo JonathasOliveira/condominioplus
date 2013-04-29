@@ -65,27 +65,27 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
     private String retornarMesPorExtenso(String mesExtenso){
         if (mesExtenso.equals("Janeiro")) {
             return "01";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Fevereiro")) {
+        } else if (mesExtenso.equals("Fevereiro")) {
             return "02";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Março")) {
+        } else if (mesExtenso.equals("Março")) {
             return "03";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Abril")) {
+        } else if (mesExtenso.equals("Abril")) {
             return "04";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Maio")) {
+        } else if (mesExtenso.equals("Maio")) {
             return "05";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Junho")) {
+        } else if (mesExtenso.equals("Junho")) {
             return "06";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Julho")) {
+        } else if (mesExtenso.equals("Julho")) {
             return "07";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Agosto")) {
+        } else if (mesExtenso.equals("Agosto")) {
             return "08";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Setembro")) {
+        } else if (mesExtenso.equals("Setembro")) {
             return "09";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Outubro")) {
+        } else if (mesExtenso.equals("Outubro")) {
             return "10";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Novembro")) {
+        } else if (mesExtenso.equals("Novembro")) {
             return "11";
-        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Dezembro")) {
+        } else if (mesExtenso.equals("Dezembro")) {
             return"12";
         }
         return "";
