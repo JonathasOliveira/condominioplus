@@ -2,11 +2,12 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CapaPrestacaoContas" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="0.75"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="432"/>
+	<property name="ireport.y" value="571"/>
 	<subDataset name="dataset1"/>
 	<field name="periodo" class="java.lang.String"/>
 	<field name="texto" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
+	<field name="periodoExtenso" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -89,7 +90,7 @@
 				<textElement textAlignment="Justified" markup="html">
 					<font size="14"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["         Nós, abaixo assinados, membros do CONSELHO CONSULTIVO DO CONDOMÍNIO "+ $F{condominio}.replaceAll($F{condominio},"<b>"+$F{condominio}.toUpperCase()+"</b>") + " no desempenho das atribuições a nós conferidas pela Convenção do Condomínio, atestamos ter analisado as contas apresentadas, referentes ao Mês " + "04/2013" + " e ter achado tudo de acordo, razão pela qual firmamos o presente."]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["         Nós, abaixo assinados, membros do CONSELHO CONSULTIVO DO CONDOMÍNIO "+ $F{condominio}.replaceAll($F{condominio},"<b>"+$F{condominio}.toUpperCase()+"</b>") + " no desempenho das atribuições a nós conferidas pela Convenção do Condomínio, atestamos ter analisado as contas apresentadas, referentes ao Mês " + $F{periodoExtenso}.replaceAll($F{periodoExtenso},"<b>"+$F{periodoExtenso}+"</b>") + " e ter achado tudo de acordo, razão pela qual firmamos o presente."]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="61" y="454" width="440" height="20"/>
