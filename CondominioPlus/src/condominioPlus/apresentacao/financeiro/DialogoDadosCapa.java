@@ -45,8 +45,11 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
 
         HashMap<String, String> mapa = new HashMap();
 
+        String mesExtenso = cmbMes.getModel().getSelectedItem().toString();
+
         mapa.put("condominio", txtCondominio.getText());
-        mapa.put("periodo", cmbMes.getModel().getSelectedItem().toString() + "/" + txtAno.getText());
+        mapa.put("periodo", mesExtenso + "/" + txtAno.getText());
+        mapa.put("periodoExtenso", retornarMesPorExtenso(mesExtenso) + "/" + txtAno.getText());
 
         listaCondominos.add(mapa);
 
@@ -57,6 +60,35 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
 
     private void carregarComboMes() {
         cmbMes.setModel(new ComboModelo<String>(Util.toList(new String[]{"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"}), false));
+    }
+    
+    private String retornarMesPorExtenso(String mesExtenso){
+        if (mesExtenso.equals("Janeiro")) {
+            return "01";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Fevereiro")) {
+            return "02";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Março")) {
+            return "03";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Abril")) {
+            return "04";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Maio")) {
+            return "05";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Junho")) {
+            return "06";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Julho")) {
+            return "07";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Agosto")) {
+            return "08";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Setembro")) {
+            return "09";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Outubro")) {
+            return "10";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Novembro")) {
+            return "11";
+        } else if (cmbMes.getModel().getSelectedItem().toString().equals("Dezembro")) {
+            return"12";
+        }
+        return "";
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
