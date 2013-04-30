@@ -515,7 +515,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
     
     public void imprimirCapaPrestacaoContas(){
-        DialogoDadosCapa dialogo = new DialogoDadosCapa(null, false);
+        DialogoDadosCapa dialogo = new DialogoDadosCapa(null, false, new ArrayList<Condominio>());
         dialogo.setVisible(true);
     }
 
