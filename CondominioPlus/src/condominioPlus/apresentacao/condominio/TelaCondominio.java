@@ -61,7 +61,7 @@ public class TelaCondominio extends javax.swing.JInternalFrame implements Notifi
 
             @Override
             protected List<Condominio> getCarregarObjetos() {
-                return new DAO().listar(Condominio.class);
+                return new DAO().listar(Condominio.class, "CondominioPorOrdemAlfabetica");
             }
 
             @Override

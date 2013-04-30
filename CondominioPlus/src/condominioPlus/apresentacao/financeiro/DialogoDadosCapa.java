@@ -10,7 +10,9 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import condominioPlus.negocio.Condominio;
 import condominioPlus.util.Relatorios;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,20 +27,27 @@ import logicpoint.util.Util;
  */
 public class DialogoDadosCapa extends javax.swing.JDialog {
 
+    private List<Condominio> listaCondominios;
+
     /** Creates new form DialogoDadosCapa */
-    public DialogoDadosCapa(java.awt.Frame parent, boolean modal) {
+    public DialogoDadosCapa(java.awt.Frame parent, boolean modal, List<Condominio> listaCondominios) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(null);
         new ControladorEventos();
         carregarComboMes();
+        this.listaCondominios = listaCondominios;
+        if (!listaCondominios.isEmpty()) {
+            txtCondominio.setEnabled(false);
+            txtCondominio.setBackground(Color.LIGHT_GRAY);
+        }
     }
 
     private void sair() {
         dispose();
     }
 
-    private void imprimir() {
+    private void imprimir(Condominio condominio) {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
@@ -47,7 +56,12 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
 
         String mesExtenso = cmbMes.getModel().getSelectedItem().toString();
 
-        mapa.put("condominio", txtCondominio.getText());
+        if (condominio != null) {
+            mapa.put("condominio", converterLetraMinuscula(condominio.getRazaoSocial()));
+        } else {
+            mapa.put("condominio", converterLetraMinuscula(txtCondominio.getText()));
+        }
+
         mapa.put("periodo", mesExtenso + "/" + txtAno.getText());
         mapa.put("periodoExtenso", retornarMesPorExtenso(mesExtenso) + "/" + txtAno.getText());
 
@@ -61,8 +75,8 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
     private void carregarComboMes() {
         cmbMes.setModel(new ComboModelo<String>(Util.toList(new String[]{"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"}), false));
     }
-    
-    private String retornarMesPorExtenso(String mesExtenso){
+
+    private String retornarMesPorExtenso(String mesExtenso) {
         if (mesExtenso.equals("Janeiro")) {
             return "01";
         } else if (mesExtenso.equals("Fevereiro")) {
@@ -86,9 +100,45 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         } else if (mesExtenso.equals("Novembro")) {
             return "11";
         } else if (mesExtenso.equals("Dezembro")) {
-            return"12";
+            return "12";
         }
         return "";
+    }
+
+    public static String converterLetraMinuscula(String frase) {
+        String sentence = frase;
+        StringBuilder bob = new StringBuilder();
+
+        TESTE:
+        for (String string : sentence.split(" ")) {
+            if (string.equals("DOS") || string.equals("DA") || string.equals("DAS") || string.equals("E") || string.equals("DU") || string.equals("DE")) {
+                bob.append(string.toLowerCase());
+                bob.append(" ");
+                continue TESTE;
+            }
+            if (string.equals("AC") || string.equals("AL") || string.equals("AP") || string.equals("AM") || string.equals("BA") || string.equals("CE")
+                    || string.equals("DF") || string.equals("ES") || string.equals("GO") || string.equals("MA") || string.equals("MT") || string.equals("MS")
+                    || string.equals("MG") || string.equals("PA") || string.equals("PB") || string.equals("PR") || string.equals("PE") || string.equals("PI")
+                    || string.equals("RJ") || string.equals("RN") || string.equals("RS") || string.equals("RO") || string.equals("RR") || string.equals("SC")
+                    || string.equals("SP") || string.equals("SE") || string.equals("TO")) {
+                bob.append(string.toUpperCase());
+                bob.append(" ");
+            } else {
+                if (string.equals("")) {
+                    continue TESTE;
+                }
+                bob.append(string.trim().substring(0, 1).toUpperCase());
+                bob.append(string.substring(1).toLowerCase());
+                bob.append(" ");
+            }
+
+        }
+
+        sentence = bob.substring(0, bob.length() - 1);
+
+        sentence = bob.toString().trim();
+
+        return sentence;
     }
 
     private class ControladorEventos extends ControladorEventosGenerico {
@@ -103,7 +153,13 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         public void actionPerformed(ActionEvent e) {
             source = e.getSource();
             if (source == btnOk) {
-                imprimir();
+                if (listaCondominios.isEmpty()) {
+                    imprimir(null);
+                } else {
+                    for (Condominio condominio : listaCondominios) {
+                        imprimir(condominio);
+                    }
+                }
             } else if (source == btnCancelar) {
                 sair();
             }

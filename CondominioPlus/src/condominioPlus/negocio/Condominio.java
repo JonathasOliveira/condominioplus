@@ -47,6 +47,7 @@ import logicpoint.persistencia.Removivel;
  */
 @Entity
 @NamedQueries(value = {
+    @NamedQuery(name = "CondominioPorOrdemAlfabetica", query = "SELECT c FROM Condominio c order by c.razaoSocial"),
     @NamedQuery(name = "CondominioPorRazaoSocial", query = "SELECT c FROM Condominio c WHERE c.razaoSocial like ?1 AND c.removido = false AND c.ativo = true")
 })
 public class Condominio implements Removivel, Comparable<Condominio>, Serializable {

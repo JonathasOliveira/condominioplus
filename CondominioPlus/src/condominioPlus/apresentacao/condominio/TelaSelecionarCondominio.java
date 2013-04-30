@@ -7,6 +7,7 @@ package condominioPlus.apresentacao.condominio;
 
 import condominioPlus.Main;
 import condominioPlus.apresentacao.TelaPrincipal;
+import condominioPlus.apresentacao.financeiro.DialogoDadosCapa;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +32,20 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
     private ControladorEventos controlador;
     private TabelaModelo_2<Condominio> modelo;
     private JDesktopPane desktop;
+    private boolean selecionarVarios;
 
     /** Creates new form TelaFuncionario */
-    public TelaSelecionarCondominio(JDesktopPane desktop) {
+    public TelaSelecionarCondominio(JDesktopPane desktop, boolean selecionarVarios) {
         initComponents();
 
         this.desktop = desktop;
+        this.selecionarVarios = selecionarVarios;
         controlador = new ControladorEventos();
+
+        if (selecionarVarios) {
+            this.setTitle("Imprimir Capa Prestação de Contas - Selecionar Condomínios");
+            btnSelecionar.setText("Imprimir");
+        }
 
         carregarTabela();
     }
@@ -60,7 +68,7 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
 
             @Override
             protected List<Condominio> getCarregarObjetos() {
-                return new DAO().listar(Condominio.class);
+                return new DAO().listar(Condominio.class, "CondominioPorOrdemAlfabetica");
             }
 
             @Override
@@ -121,6 +129,16 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
         }
     }
 
+    private void selecionarVariosCondominios() {
+        if (!modelo.getObjetosSelecionados().isEmpty()) {
+            DialogoDadosCapa dialogo = new DialogoDadosCapa(null, false, modelo.getObjetosSelecionados());
+            dialogo.setVisible(true);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Você precisa selecionar, ao menos, um condominio para prosseguir!", this);
+
+        }
+    }
+
     private void verificarNumeroTaloes() {
         List<DadosTalaoCheque> listaTaloes = new ArrayList<DadosTalaoCheque>();
         for (DadosTalaoCheque dados : Main.getCondominio().getDadosTalaoCheques()) {
@@ -154,7 +172,11 @@ public class TelaSelecionarCondominio extends javax.swing.JInternalFrame impleme
                     modelo.editar(new Condominio(txtNome.getText()));
                 }
             } else if (source == btnSelecionar) {
-                selecionarCondominio();
+                if (selecionarVarios) {
+                    selecionarVariosCondominios();
+                } else {
+                    selecionarCondominio();
+                }
             }
             source = null;
         }

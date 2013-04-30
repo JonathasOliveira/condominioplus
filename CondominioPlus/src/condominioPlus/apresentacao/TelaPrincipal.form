@@ -191,19 +191,29 @@
                 <Property name="text" type="java.lang.String" value="Envelope Avulso"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContas">
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContasIndividual">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas - Individual"/>
+                <Property name="actionCommand" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas - Individual"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContasGrupo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator4">
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioEstorno">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Estornos"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioProdutoNegativo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Produtos em Falta"/>
-              </Properties>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemRelatorioEstorno">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Estornos"/>
               </Properties>
             </MenuItem>
           </SubComponents>
