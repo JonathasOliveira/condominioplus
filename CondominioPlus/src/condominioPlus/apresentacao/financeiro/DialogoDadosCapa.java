@@ -63,7 +63,7 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         }
 
         mapa.put("periodo", mesExtenso + "/" + txtAno.getText());
-        mapa.put("periodoExtenso", retornarMesPorExtenso(mesExtenso) + "/" + txtAno.getText());
+        mapa.put("periodoExtenso", retornarMesNumerico(mesExtenso) + "/" + txtAno.getText());
 
         listaCondominos.add(mapa);
 
@@ -76,7 +76,7 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         cmbMes.setModel(new ComboModelo<String>(Util.toList(new String[]{"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"}), false));
     }
 
-    private String retornarMesPorExtenso(String mesExtenso) {
+    private String retornarMesNumerico(String mesExtenso) {
         if (mesExtenso.equals("Janeiro")) {
             return "01";
         } else if (mesExtenso.equals("Fevereiro")) {
