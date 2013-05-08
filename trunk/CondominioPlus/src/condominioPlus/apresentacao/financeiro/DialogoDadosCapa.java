@@ -11,15 +11,18 @@
 package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.Condominio;
+import condominioPlus.negocio.Unidade;
 import condominioPlus.util.Relatorios;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.util.ComboModelo;
 import logicpoint.util.Util;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  *
@@ -37,10 +40,6 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         new ControladorEventos();
         carregarComboMes();
         this.listaCondominios = listaCondominios;
-        if (!listaCondominios.isEmpty()) {
-            txtCondominio.setEnabled(false);
-            txtCondominio.setBackground(Color.LIGHT_GRAY);
-        }
     }
 
     private void sair() {
@@ -48,24 +47,34 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
     }
 
     private void imprimir(Condominio condominio) {
-        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+        List<HashMap<String, Object>> listaCondominos = new ArrayList<HashMap<String, Object>>();
 
         HashMap<String, Object> parametros = new HashMap();
 
-        HashMap<String, String> mapa = new HashMap();
+        List<HashMap<String, String>> listaConselheiros = new ArrayList<HashMap<String, String>>();
+        UNIDADES:
+        for (Unidade unidade : condominio.getConselheiros()) {
+            if (unidade.getCondomino().getTipoConselheiro().equals("Conselheiro de Obras")) {
+                continue UNIDADES;
+            }
+            HashMap<String, String> mapa2 = new HashMap();
+            mapa2.put("nome", converterLetraMinuscula(unidade.getCondomino().getNome()));
+            mapa2.put("unidade", unidade.getUnidade());
+            listaConselheiros.add(mapa2);
+        }
 
+        HashMap<String, Object> mapa = new HashMap();
         String mesExtenso = cmbMes.getModel().getSelectedItem().toString();
 
-        if (condominio != null) {
-            mapa.put("condominio", converterLetraMinuscula(condominio.getRazaoSocial()));
-        } else {
-            mapa.put("condominio", converterLetraMinuscula(txtCondominio.getText()));
-        }
+        mapa.put("condominio", converterLetraMinuscula(condominio.getRazaoSocial()));
 
         mapa.put("periodo", mesExtenso + "/" + txtAno.getText());
         mapa.put("periodoExtenso", retornarMesNumerico(mesExtenso) + "/" + txtAno.getText());
-
+        mapa.put("listaConselheiros", new JRBeanCollectionDataSource(listaConselheiros));
         listaCondominos.add(mapa);
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
 
         if (!listaCondominos.isEmpty()) {
             new Relatorios().imprimir("CapaPrestacaoContas", parametros, listaCondominos, false, false, null);
@@ -182,8 +191,6 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         btnCancelar = new javax.swing.JButton();
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        txtCondominio = new javax.swing.JTextField();
         txtAno = new javax.swing.JTextField();
         cmbMes = new javax.swing.JComboBox();
 
@@ -201,30 +208,25 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(49, 49, 49)
+                .addGap(33, 33, 33)
                 .addComponent(btnOk, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnCancelar)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(33, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancelar)
                     .addComponent(btnOk))
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jLabel23.setText("Mês:");
 
         jLabel24.setText("Ano:");
-
-        jLabel30.setText("Condominio:");
-
-        txtCondominio.setToolTipText("Digite o Endereço");
-        txtCondominio.setName("logradouro"); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -233,38 +235,27 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel23)
-                            .addComponent(jLabel30))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel23)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel24)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtAno))
-                            .addComponent(txtCondominio, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(19, 19, 19))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                        .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtAno, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel30)
-                    .addComponent(txtCondominio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel23)
+                    .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtAno, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel24)
-                    .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jLabel24))
+                .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -294,10 +285,8 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
     private javax.swing.JComboBox cmbMes;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel30;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField txtAno;
-    private javax.swing.JTextField txtCondominio;
     // End of variables declaration//GEN-END:variables
 }

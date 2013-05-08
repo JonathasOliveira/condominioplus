@@ -193,12 +193,6 @@
             </MenuItem>
             <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContasIndividual">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas - Individual"/>
-                <Property name="actionCommand" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas - Individual"/>
-              </Properties>
-            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuItemCapaPrestacaoContasGrupo">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Capa Presta&#xe7;&#xe3;o de Contas"/>

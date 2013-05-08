@@ -386,8 +386,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
                     }
                 } else if (source == menuItemEnvelopeAvulso) {
                     criarFrame(new TelaDadosEnvelopeAvulso());
-                } else if (source == menuItemCapaPrestacaoContasIndividual) {
-                    TelaPrincipal.getInstancia().criarJanela(new DialogoDadosCapa(null, false, new ArrayList<Condominio>()));
                 } else if (source == menuItemCapaPrestacaoContasGrupo) {
                     criarFrame(new TelaSelecionarCondominio(desktop, true));
                 } else if (source == menuItemRelatorioProdutoNegativo) {
@@ -491,7 +489,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
             menuItemRelatorioTaxaExtra.addActionListener(this);
             menuItemInadimplenciaSintetica.addActionListener(this);
             menuItemEnvelopeAvulso.addActionListener(this);
-            menuItemCapaPrestacaoContasIndividual.addActionListener(this);
             menuItemCapaPrestacaoContasGrupo.addActionListener(this);
             menuItemRelatorioProdutoNegativo.addActionListener(this);
             menuItemRelatorioEstorno.addActionListener(this);
@@ -588,7 +585,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuItemInadimplenciaSintetica = new javax.swing.JMenuItem();
         menuItemEnvelopeAvulso = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        menuItemCapaPrestacaoContasIndividual = new javax.swing.JMenuItem();
         menuItemCapaPrestacaoContasGrupo = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         menuItemRelatorioEstorno = new javax.swing.JMenuItem();
@@ -861,10 +857,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
         menuRelatorio.add(menuItemEnvelopeAvulso);
         menuRelatorio.add(jSeparator1);
 
-        menuItemCapaPrestacaoContasIndividual.setText("Capa Prestação de Contas - Individual");
-        menuItemCapaPrestacaoContasIndividual.setActionCommand("Capa Prestação de Contas - Individual");
-        menuRelatorio.add(menuItemCapaPrestacaoContasIndividual);
-
         menuItemCapaPrestacaoContasGrupo.setText("Capa Prestação de Contas");
         menuRelatorio.add(menuItemCapaPrestacaoContasGrupo);
         menuRelatorio.add(jSeparator4);
@@ -953,7 +945,6 @@ public class TelaPrincipal extends javax.swing.JFrame implements NotificavelAtal
     private javax.swing.JMenuItem menuItemBanco;
     private javax.swing.JMenuItem menuItemCalculoMaiorCota;
     private javax.swing.JMenuItem menuItemCapaPrestacaoContasGrupo;
-    private javax.swing.JMenuItem menuItemCapaPrestacaoContasIndividual;
     private javax.swing.JMenuItem menuItemCategoriaFuncionario;
     private javax.swing.JMenuItem menuItemCobrancaBase;
     private javax.swing.JMenuItem menuItemCobrancas;
