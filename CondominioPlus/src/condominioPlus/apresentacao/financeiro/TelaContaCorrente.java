@@ -468,7 +468,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     public void imprimirExtrato(TipoRelatorio tipo) {
         if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
-            new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, null, null, (List<Pagamento>)modeloTabela.getObjetosSelecionados(), tipo);
+            new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, null, null, (List<Pagamento>) modeloTabela.getObjetosSelecionados(), tipo);
         } else {
             DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
             dialogo.setVisible(true);
@@ -513,8 +513,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         }
     }
-    
-    public void imprimirCapaPrestacaoContas(){
+
+    public void imprimirCapaPrestacaoContas() {
         DialogoDadosCapa dialogo = new DialogoDadosCapa(null, false, new ArrayList<Condominio>());
         dialogo.setVisible(true);
     }
@@ -577,8 +577,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 imprimirExtratoContaIndividual();
             } else if (origem == itemMenuImprimirExtratoCustomizado) {
                 imprimirExtrato(TipoRelatorio.EXTRATO_CUSTOMIZADO);
-            } else if (origem == itemMenuImprimirCapaPrestacaoContas){
-                imprimirCapaPrestacaoContas();
             }
         }
 
@@ -610,7 +608,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             itemMenuImprimirRecibo.addActionListener(this);
             itemMenuImprimirExtratoContaIndividual.addActionListener(this);
             itemMenuImprimirExtratoCustomizado.addActionListener(this);
-            itemMenuImprimirCapaPrestacaoContas.addActionListener(this);
         }
 
         @Override
@@ -646,7 +643,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuImprimirRecibo = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoContaIndividual = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoCustomizado = new javax.swing.JMenuItem();
-        itemMenuImprimirCapaPrestacaoContas = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabelaContaCorrente = new javax.swing.JTable();
@@ -716,9 +712,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuImprimirExtratoCustomizado.setText("Imprimir Extrato Customizado do Movimento Contábil");
         popupMenu.add(itemMenuImprimirExtratoCustomizado);
-
-        itemMenuImprimirCapaPrestacaoContas.setText("Imprimir Capa Prestção de Contas");
-        popupMenu.add(itemMenuImprimirCapaPrestacaoContas);
 
         setClosable(true);
         setTitle("Conta Corrente");
@@ -1017,7 +1010,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -1050,7 +1043,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1070,7 +1063,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuEditarPagamento;
     private javax.swing.JMenuItem itemMenuImprimirBalanceteAnalitico;
     private javax.swing.JMenuItem itemMenuImprimirBalanceteSintetico;
-    private javax.swing.JMenuItem itemMenuImprimirCapaPrestacaoContas;
     private javax.swing.JMenuItem itemMenuImprimirExtrato;
     private javax.swing.JMenuItem itemMenuImprimirExtratoConferencia;
     private javax.swing.JMenuItem itemMenuImprimirExtratoContaIndividual;
