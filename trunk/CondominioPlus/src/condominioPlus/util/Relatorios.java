@@ -857,6 +857,8 @@ public class Relatorios implements Printable {
 
         saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
         saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
+        
+        BigDecimal totalGeral = new BigDecimal(0);
 
         for (PagamentoAuxiliar p : pagamentosAuxiliares) {
             HashMap<String, Object> mapa = new HashMap();
@@ -875,6 +877,7 @@ public class Relatorios implements Printable {
                 }
                 listaPagamentos.add(mapa2);
                 soma = soma.add(pagamento.getValor());
+                totalGeral = totalGeral.add(pagamento.getValor());
             }
 
             mapa.put("documento", p.getFormaPagamento());
@@ -888,6 +891,7 @@ public class Relatorios implements Printable {
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
         parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
+        parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
         parametros.put("subrelatorio", caminho.toString());
