@@ -501,8 +501,21 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         dialogo.setVisible(true);
 
         if (dialogo.isContinuar() && dialogo.getDataInicial() != null && dialogo.getDataFinal() != null && dialogo.getConta() != null) {
-            List<Pagamento> listaPagamentos = new DAO().listar("PagamentosEfetuadosPorConta", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), dialogo.getConta());
-
+            List<Pagamento> listaAuxiliar = new DAO().listar("PagamentosEfetuadosPorConta", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), dialogo.getConta());
+            List<Pagamento> listaPagamentos = new ArrayList<Pagamento>();
+            
+            if (dialogo.getUnidade() == null || dialogo.getUnidade().equals("")){
+                listaPagamentos = listaAuxiliar;
+                System.out.println("A unidade é inválida!");
+            } else {
+                for (Pagamento p : listaAuxiliar){
+                    if(p.getCobranca().getUnidade().getUnidade().equals(dialogo.getUnidade())){
+                        listaPagamentos.add(p);
+                    }
+                }
+                System.out.println("A unidade selecionada é: " + dialogo.getUnidade());
+            }
+            
 //            System.out.println("lista pagamentos: " + listaPagamentos.size());
 
             if (listaPagamentos.isEmpty()) {
