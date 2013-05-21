@@ -11,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Temporal;
 import logicpoint.usuario.Usuario;
 
@@ -19,6 +21,9 @@ import logicpoint.usuario.Usuario;
  * @author Administrador
  */
 @Entity
+@NamedQueries ( value= {
+    @NamedQuery (name="AnotacoesCondominio", query="SELECT a FROM Anotacao a WHERE a.condominio = ?1 AND a.cobranca = ?2")
+})
 public class Anotacao implements Serializable {
 
     @Id
@@ -34,6 +39,7 @@ public class Anotacao implements Serializable {
     private Condominio condominio;
     @ManyToOne
     private Condomino condomino;
+    private boolean cobranca;
 
     public Anotacao() {
     }
@@ -52,7 +58,7 @@ public class Anotacao implements Serializable {
 
     public void setCondomino(Condomino condomino) {
         this.condomino = condomino;
-    } 
+    }
 
     public int getCodigo() {
         return codigo;
@@ -69,7 +75,7 @@ public class Anotacao implements Serializable {
     public void setAssunto(String assunto) {
         this.assunto = assunto;
     }
-    
+
     public Calendar getData() {
         return data;
     }
@@ -77,15 +83,15 @@ public class Anotacao implements Serializable {
     public void setData(Calendar data) {
         this.data = data;
     }
-    
-     public String getTexto() {
+
+    public String getTexto() {
         return texto;
     }
 
     public void setTexto(String texto) {
         this.texto = texto;
     }
-    
+
     public Usuario getUsuario() {
         return usuario;
     }
@@ -102,11 +108,19 @@ public class Anotacao implements Serializable {
         this.condominio = condominio;
     }
 
+    public boolean isCobranca() {
+        return cobranca;
+    }
+
+    public void setCobranca(boolean cobranca) {
+        this.cobranca = cobranca;
+    }   
+    
     @Override
     public String toString() {
         return assunto;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
