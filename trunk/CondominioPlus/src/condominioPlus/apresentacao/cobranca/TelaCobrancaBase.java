@@ -10,7 +10,11 @@
  */
 package condominioPlus.apresentacao.cobranca;
 
+import condominioPlus.Main;
+import condominioPlus.apresentacao.DialogoAnotacao;
+import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.apresentacao.financeiro.DialogoConta;
+import condominioPlus.negocio.Anotacao;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Configuracao;
 import condominioPlus.negocio.NegocioUtil;
@@ -19,14 +23,18 @@ import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
+import condominioPlus.util.Relatorios;
 import condominioPlus.validadores.ValidadorGenerico;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -36,6 +44,8 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
+import logicpoint.usuario.Usuario;
+import logicpoint.util.DataUtil;
 
 /**
  *
@@ -49,6 +59,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private List<CobrancaBase> listaCobrancas;
     private Conta conta;
     private Configuracao configuracao = NegocioUtil.getConfiguracao();
+    private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
+    private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
 
     /** Creates new form TelaCobrancaBase */
     public TelaCobrancaBase(Condominio condominio) {
@@ -63,6 +75,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         carregarTabela();
         preencherPainelDados(new CobrancaBase());
         preencherPainelConfiguracoes();
+        carregarTabelaAnotacoes();
 
         if (condominio != null) {
             this.setTitle("Cobrança Base - " + condominio.getRazaoSocial());
@@ -254,12 +267,12 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 //        txtMulta.setText(String.valueOf(configuracao.getPercentualMulta()));
         txtDesconto.setText(PagamentoUtil.formatarMoeda(condominio.getDesconto().doubleValue()));
         chkCalcularMultaProximoMes.setSelected(condominio.isCalcularMultaProximoMes());
-        if (condominio.getNumeroMinimoParcelasAcordo() < 1){
+        if (condominio.getNumeroMinimoParcelasAcordo() < 1) {
             spnNumeroMinimoInamplencia.setValue(1);
         } else {
             spnNumeroMinimoInamplencia.setValue(condominio.getNumeroMinimoParcelasAcordo());
         }
-        
+
     }
 
     private void salvarPercentualJuros() {
@@ -279,6 +292,131 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         spnNumeroMinimoInamplencia.setModel(nm);
     }
 
+    private void carregarTabelaAnotacoes() {
+        modeloTabelaAnotacoes = new TabelaModelo_2<Anotacao>(tabelaAnotacoes, "Assunto, Data, Texto, Usuario".split(",")) {
+
+            @Override
+            protected List<Anotacao> getCarregarObjetos() {
+                return getAnotacoes();
+            }
+
+            @Override
+            public Object getValor(Anotacao anotacao, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return anotacao.getAssunto();
+                    case 1:
+                        return DataUtil.getDateTime(anotacao.getData());
+                    case 2:
+                        return anotacao.getTexto();
+                    case 3:
+                        return anotacao.getUsuario().getUsuario();
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    private List<Anotacao> getAnotacoes() {
+        listaAnotacoes.clear();
+        for (Anotacao a : condominio.getAnotacoes()) {
+            if (a.isCobranca()) {
+                listaAnotacoes.add(a);
+            }
+        }
+//        listaAnotacoes = new DAO().listar(Anotacao.class, "AnotacoesCondominio", condominio, true);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Anotacao a1 = (Anotacao) o1;
+                Anotacao a2 = (Anotacao) o2;
+                return a1.getData().compareTo(a2.getData());
+            }
+        };
+
+        Collections.sort(listaAnotacoes, c);
+
+        return listaAnotacoes;
+    }
+
+    private void adicionarAnotacao() {
+        Anotacao anotacao = DialogoAnotacao.getAnotacao(new Anotacao(condominio), TelaPrincipal.getInstancia(), true);
+        if (anotacao.getTexto().equals("")) {
+            return;
+        }
+
+        if (Main.getFuncionario().getUsuario().getUsuario().equals("")) {
+            Usuario usuario = new DAO().localizar(Usuario.class, 50452);
+            anotacao.setUsuario(usuario);
+        } else {
+            anotacao.setUsuario(Main.getFuncionario().getUsuario());
+        }
+
+        condominio.adicionarAnotacao(anotacao, true);
+        carregarTabelaAnotacoes();
+    }
+
+    private void editarAnotacao() {
+        Anotacao anotacao = modeloTabelaAnotacoes.getObjetoSelecionado();
+        if (anotacao == null) {
+            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editada!", this);
+            return;
+        }
+        DialogoAnotacao.getAnotacao(anotacao, TelaPrincipal.getInstancia(), true);
+        carregarTabelaAnotacoes();
+    }
+
+    private void removerAnotacao() {
+        if (modeloTabelaAnotacoes.getLinhaSelecionada() > -1) {
+            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+                return;
+            }
+            System.out.println("removendo... " + modeloTabelaAnotacoes.getLinhasSelecionadas());
+            List<Anotacao> itensRemover = modeloTabelaAnotacoes.getObjetosSelecionados();
+            if (!itensRemover.isEmpty()) {
+                for (Anotacao a : itensRemover) {
+                    modeloTabelaAnotacoes.remover(a);
+                    //lista auxiliar para não dar erro ao remover o registro da lista de anotações do condominio
+                    List<Anotacao> listaAuxiliar = new ArrayList<Anotacao>();
+                    for (Anotacao anotacao : condominio.getAnotacoes()) {
+                        listaAuxiliar.add(anotacao);
+                    }
+                    //fim lista auxiliar para não dar erro ao remover o registro da lista de anotações do condominio
+                    for (Anotacao o : listaAuxiliar) {
+                        if (a.getCodigo() == o.getCodigo()) {
+                            condominio.getAnotacoes().remove(a);
+                        }
+                    }
+                    new DAO().remover(a);
+                }
+            }
+            ApresentacaoUtil.exibirInformacao("Anotação(ões) removida(s) com sucesso!", this);
+        } else {
+            ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
+        }
+    }
+
+    private void imprimirAnotacoes() {
+        if (modeloTabelaAnotacoes.getObjetosSelecionados().isEmpty()) {
+            List<Anotacao> lista = new DAO().listar(Anotacao.class, "AnotacoesCondominio", condominio, true);
+            if (lista.isEmpty()) {
+                ApresentacaoUtil.exibirAdvertencia("Não há registros a serem impressos.", this);
+            } else {
+                new Relatorios().imprimirAnotacoes(condominio, null, lista, TipoRelatorio.ANOTACOES_COBRANCA_BASE);
+            }
+        } else {
+            new Relatorios().imprimirAnotacoes(condominio, null, modeloTabelaAnotacoes.getObjetosSelecionados(), TipoRelatorio.ANOTACOES_COBRANCA_BASE);
+        }
+    }
+
+    private void salvarAnotacoes() {
+        new DAO().salvar(condominio);
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         Object origem;
@@ -294,6 +432,11 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             txtConta.addFocusListener(this);
             btnSalvar.addActionListener(this);
             btnSalvarJuros.addActionListener(this);
+            btnAdicionarAnotacao.addActionListener(this);
+            btnEditarAnotacao.addActionListener(this);
+            btnRemoverAnotacao.addActionListener(this);
+            btnImprimirAnotacoes.addActionListener(this);
+            btnSalvarAnotacoes.addActionListener(this);
         }
 
         @Override
@@ -315,6 +458,16 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
                 remover();
             } else if (origem == btnSalvarJuros) {
                 salvarPercentualJuros();
+            } else if (e.getSource() == btnAdicionarAnotacao) {
+                adicionarAnotacao();
+            } else if (e.getSource() == btnEditarAnotacao) {
+                editarAnotacao();
+            } else if (e.getSource() == btnRemoverAnotacao) {
+                removerAnotacao();
+            } else if (e.getSource() == btnImprimirAnotacoes) {
+                imprimirAnotacoes();
+            } else if (e.getSource() == btnSalvarAnotacoes) {
+                salvarAnotacoes();
             }
         }
 
@@ -385,6 +538,14 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         spnNumeroMinimoInamplencia = new javax.swing.JSpinner();
         jLabel6 = new javax.swing.JLabel();
         btnSalvarJuros = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tabelaAnotacoes = new javax.swing.JTable();
+        btnAdicionarAnotacao = new javax.swing.JButton();
+        btnEditarAnotacao = new javax.swing.JButton();
+        btnRemoverAnotacao = new javax.swing.JButton();
+        btnImprimirAnotacoes = new javax.swing.JButton();
+        btnSalvarAnotacoes = new javax.swing.JButton();
 
         itemMenuAdicionar.setText("Adicionar Cobrança");
         popupMenu.add(itemMenuAdicionar);
@@ -573,7 +734,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
                         .addGap(252, 252, 252)
                         .addComponent(spnNumeroMinimoInamplencia, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)))
-                .addGap(157, 157, 157))
+                .addGap(158, 158, 158))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -619,6 +780,80 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Dados Cobrança", jPanel3);
 
+        tabelaAnotacoes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane5.setViewportView(tabelaAnotacoes);
+
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
+        btnAdicionarAnotacao.setToolTipText("Adicionar Anotação");
+        btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
+        btnEditarAnotacao.setToolTipText("Editar Anotação");
+        btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnEditarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnEditarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
+        btnRemoverAnotacao.setToolTipText("Remover Anotação");
+        btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
+        btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
+
+        btnImprimirAnotacoes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/Print24.gif"))); // NOI18N
+        btnImprimirAnotacoes.setToolTipText("Imprimir Anotação(ões)");
+
+        btnSalvarAnotacoes.setText("Salvar Alterações");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnImprimirAnotacoes, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 246, Short.MAX_VALUE)
+                        .addComponent(btnSalvarAnotacoes)))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnSalvarAnotacoes, javax.swing.GroupLayout.DEFAULT_SIZE, 33, Short.MAX_VALUE)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btnImprimirAnotacoes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnEditarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Anotações", jPanel5);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -639,9 +874,14 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdicionarAnotacao;
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnConta;
+    private javax.swing.JButton btnEditarAnotacao;
+    private javax.swing.JButton btnImprimirAnotacoes;
+    private javax.swing.JButton btnRemoverAnotacao;
     private javax.swing.JButton btnSalvar;
+    private javax.swing.JButton btnSalvarAnotacoes;
     private javax.swing.JButton btnSalvarJuros;
     private javax.swing.JCheckBox checkDividirFracaoIdeal;
     private javax.swing.JCheckBox chkCalcularMultaProximoMes;
@@ -656,12 +896,15 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel painelDados;
     private javax.swing.JPanel painelTabela;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JSpinner spnNumeroMinimoInamplencia;
+    private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tabelaCobranca;
     private javax.swing.JTextField txtConta;
     private javax.swing.JTextField txtDesconto;

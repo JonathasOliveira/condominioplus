@@ -285,9 +285,10 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.anotacoes = anotacoes;
     }
     
-    public void adicionarAnotacao(Anotacao anotacao) {
+    public void adicionarAnotacao(Anotacao anotacao, boolean cobranca) {
         anotacao.setCondominio(this);
-        anotacoes.add(anotacao);
+        anotacao.setCobranca(cobranca);
+        anotacoes.add(anotacao);        
     }
 
     public void removerAnotacao(Anotacao anotacao) {

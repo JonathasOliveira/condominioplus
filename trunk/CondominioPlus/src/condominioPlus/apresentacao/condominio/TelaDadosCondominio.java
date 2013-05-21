@@ -235,7 +235,13 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     }
 
     private List<Anotacao> getAnotacoes() {
-        listaAnotacoes = condominio.getAnotacoes();
+        listaAnotacoes.clear();
+        for (Anotacao a : condominio.getAnotacoes()) {
+            if (!a.isCobranca()) {
+                listaAnotacoes.add(a);
+            }
+        }
+//        listaAnotacoes = new DAO().listar(Anotacao.class, "AnotacoesCondominio", condominio, false);
 
         Comparator c = null;
 
@@ -266,7 +272,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             anotacao.setUsuario(Main.getFuncionario().getUsuario());
         }
 
-        condominio.adicionarAnotacao(anotacao);
+        condominio.adicionarAnotacao(anotacao, false);
         carregarTabelaAnotacoes();
     }
 
@@ -290,7 +296,13 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             if (!itensRemover.isEmpty()) {
                 for (Anotacao a : itensRemover) {
                     modeloTabelaAnotacoes.remover(a);
-                    for (Anotacao o : condominio.getAnotacoes()) {
+                    //lista auxiliar para não dar erro ao remover o registro da lista de anotações do condominio
+                    List<Anotacao> listaAuxiliar = new ArrayList<Anotacao>();
+                    for (Anotacao anotacao : condominio.getAnotacoes()) {
+                        listaAuxiliar.add(anotacao);
+                    }
+                    //fim lista auxiliar para não dar erro ao remover o registro da lista de anotações do condominio
+                    for (Anotacao o : listaAuxiliar) {
                         if (a.getCodigo() == o.getCodigo()) {
                             condominio.getAnotacoes().remove(a);
                         }
@@ -306,10 +318,11 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void imprimirAnotacoes() {
         if (modeloTabelaAnotacoes.getObjetosSelecionados().isEmpty()) {
-            if (condominio.getAnotacoes().isEmpty()) {
+            List<Anotacao> lista = new DAO().listar(Anotacao.class, "AnotacoesCondominio", condominio, false);
+            if (lista.isEmpty()) {
                 ApresentacaoUtil.exibirAdvertencia("Não há registros a serem impressos.", this);
             } else {
-                new Relatorios().imprimirAnotacoes(condominio, null, condominio.getAnotacoes(), TipoRelatorio.ANOTACOES_CONDOMINIO);
+                new Relatorios().imprimirAnotacoes(condominio, null, lista, TipoRelatorio.ANOTACOES_CONDOMINIO);
             }
         } else {
             new Relatorios().imprimirAnotacoes(condominio, null, modeloTabelaAnotacoes.getObjetosSelecionados(), TipoRelatorio.ANOTACOES_CONDOMINIO);
@@ -1657,21 +1670,21 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         ));
         jScrollPane5.setViewportView(tabelaAnotacoes);
 
-        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarAnotacao.setToolTipText("Adicionar Anotação");
         btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarAnotacao.setToolTipText("Editar Anotação");
         btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
