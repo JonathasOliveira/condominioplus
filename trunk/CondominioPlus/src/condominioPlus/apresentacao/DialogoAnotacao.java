@@ -119,7 +119,7 @@ public class DialogoAnotacao extends javax.swing.JDialog {
         txtTexto = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Cadastro Telefone");
+        setTitle("Cadastro Anotação");
 
         jLabel1.setText("Data:");
 
