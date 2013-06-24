@@ -87,6 +87,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         modificarCamposInquilino(false);
 
+        carregarTela();
+
+    }
+
+    private void carregarTela() {
         carregarTabelaTelefone();
         carregarTabelaEndereco();
         carregarTabelaAnotacoes();
@@ -97,7 +102,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             verificarCNPJ();
             preencherTela(this.unidade);
         }
-
     }
 
     public TelaDadosCondomino(Unidade unidade, TabelaModelo_2 modelo) {
@@ -212,13 +216,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             if (!verificarEnderecoPadrao()) {
                 return;
             }
-            
+
             if (!validador.validarDatas(DataUtil.getCalendar(dateInicioJudicial.getValue()), DataUtil.getCalendar(dateFimJudicial.getValue()))) {
                 return;
             }
 
             preencherObjeto();
-            
+
             if (unidade.getInquilino() != null) {
                 if (!verificarEnderecoPadraoInquilino()) {
                     return;
@@ -260,7 +264,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             String descricao = "Cadastro do Condominio " + unidade.getCondomino().getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
-            sair();
+            carregarTela();
+//            sair();
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
         }
@@ -994,8 +999,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 //            txtCepInquilino.setBackground(color);
         }
     }
-    
-    private void exibirDetalheInquilino(){
+
+    private void exibirDetalheInquilino() {
         DialogoDetalheInquilino dialogo = new DialogoDetalheInquilino(modeloTabelaHistoricoInquilino.getObjetoSelecionado(), null, true);
         dialogo.setVisible(true);
     }
@@ -1062,7 +1067,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 ativarProcessoJuridico(selecionado);
             } else if (e.getSource() == btnTeste) {
                 teste();
-            } else if (e.getSource() == itemMenuDetalhe){
+            } else if (e.getSource() == itemMenuDetalhe) {
                 exibirDetalheInquilino();
             }
         }
@@ -1099,13 +1104,13 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             itemMenuDetalhe.addActionListener(this);
             tabelaHistoricoInquilino.addMouseListener(this);
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
-             if (e.isPopupTrigger()) {
+            if (e.isPopupTrigger()) {
                 if (e.getSource() == tabelaHistoricoInquilino) {
                     popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                } 
+                }
             }
         }
     }
