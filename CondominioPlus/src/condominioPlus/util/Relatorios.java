@@ -1242,18 +1242,17 @@ public class Relatorios implements Printable {
                 saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
-                mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
+                mapa2.put("contaCorrente", p.getCondominio().getContaBancaria().getBanco().getAgencia() + " " + p.getCondominio().getContaBancaria().getContaCorrente() + " " + p.getCondominio().getContaBancaria().getDigitoCorrente());
                 mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("numeroCheque", getNumeroDocumento(pagamento));
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
-                    mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
-                }
+                
                 listaPagamentos.add(mapa2);
                 soma = soma.add(pagamento.getValor());
                 totalGeral = totalGeral.add(pagamento.getValor());
             }
 
-            mapa.put("condominio", p.getCondominio());
+            mapa.put("condominio", p.getCondominio().getRazaoSocial());
             mapa.put("soma", PagamentoUtil.formatarMoeda(soma.doubleValue()));
             mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
 
