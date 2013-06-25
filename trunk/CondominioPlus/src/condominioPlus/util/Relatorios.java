@@ -30,7 +30,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -775,7 +774,7 @@ public class Relatorios implements Printable {
             HashMap<String, Object> mapa = new HashMap();
 
             mapa.put("data", DataUtil.toString(p.getDataPagamento()));
-            mapa.put("documento", getFormaPagamento(p));
+            mapa.put("documento", getNumeroDocumento(p));
             mapa.put("codigoConta", p.getConta().getCodigo() + "");
             mapa.put("historico", p.getHistorico());
             mapa.put("valor", PagamentoUtil.formatarMoeda(p.getValor().doubleValue()));
@@ -822,21 +821,21 @@ public class Relatorios implements Printable {
 
         for (Pagamento p : pagamentos) {
             boolean continuar = true;
-            String formaPagamento = getFormaPagamento(p);
+            String numeroDocumento = getNumeroDocumento(p);
             PagamentoAuxiliar pa = null;
 
             if (pagamentosAuxiliares.isEmpty()) {
                 pa = new PagamentoAuxiliar();
-                pa.setFormaPagamento(formaPagamento);
+                pa.setNumeroDocumento(numeroDocumento);
                 pa.adicionarPagamento(p);
             } else {
                 for (PagamentoAuxiliar p1 : pagamentosAuxiliares) {
-                    if (p1.getFormaPagamento().equalsIgnoreCase(formaPagamento)) {
+                    if (p1.getNumeroDocumento().equalsIgnoreCase(numeroDocumento)) {
                         p1.adicionarPagamento(p);
                         continuar = false;
                     } else {
                         pa = new PagamentoAuxiliar();
-                        pa.setFormaPagamento(formaPagamento);
+                        pa.setNumeroDocumento(numeroDocumento);
                         pa.adicionarPagamento(p);
                     }
                 }
@@ -857,7 +856,7 @@ public class Relatorios implements Printable {
 
         saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
         saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
-        
+
         BigDecimal totalGeral = new BigDecimal(0);
 
         for (PagamentoAuxiliar p : pagamentosAuxiliares) {
@@ -872,7 +871,7 @@ public class Relatorios implements Printable {
                 mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE){
+                if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
                     mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
                 }
                 listaPagamentos.add(mapa2);
@@ -880,7 +879,7 @@ public class Relatorios implements Printable {
                 totalGeral = totalGeral.add(pagamento.getValor());
             }
 
-            mapa.put("documento", p.getFormaPagamento());
+            mapa.put("documento", p.getNumeroDocumento());
             mapa.put("soma", PagamentoUtil.formatarMoeda(soma.doubleValue()));
             mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
 
@@ -900,13 +899,13 @@ public class Relatorios implements Printable {
             parametros.put("titulo", tipo.toString());
             if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
                 imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
-            } else if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO){
+            } else if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
                 imprimir("RelatorioExtratoCustomizado", parametros, lista, false, true, null);
             }
         }
     }
 
-    private String getFormaPagamento(Pagamento p) {
+    private String getNumeroDocumento(Pagamento p) {
         if (p.getForma() == FormaPagamento.BOLETO) {
             return ((DadosBoleto) p.getDadosPagamento()).getNumeroBoleto();
         } else if (p.getForma() == FormaPagamento.CHEQUE) {
@@ -1087,7 +1086,7 @@ public class Relatorios implements Printable {
             if (tipo == TipoRelatorio.BALANCETE_ANALITICO) {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
-                mapa2.put("documento", getFormaPagamento(pagamento));
+                mapa2.put("documento", getNumeroDocumento(pagamento));
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 listaPagamentos.add(mapa2);
@@ -1110,7 +1109,7 @@ public class Relatorios implements Printable {
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
         PagamentoAuxiliar pa = new PagamentoAuxiliar();
-        pa.setFormaPagamento(getFormaPagamento(p));
+        pa.setNumeroDocumento(getNumeroDocumento(p));
 
         pagamentos = new DAO().listar(Pagamento.class, "PagamentosContaCorrentePorNumeroDocumento", condominio.getContaCorrente(), p.getDataPagamento());
 
@@ -1118,7 +1117,7 @@ public class Relatorios implements Printable {
         BigDecimal soma = new BigDecimal(0);
 
         for (Pagamento pagamento : pagamentos) {
-            if (pa.getFormaPagamento().equalsIgnoreCase(getFormaPagamento(pagamento))) {
+            if (pa.getNumeroDocumento().equalsIgnoreCase(getNumeroDocumento(pagamento))) {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("descricao", pagamento.getHistorico());
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
@@ -1132,7 +1131,7 @@ public class Relatorios implements Printable {
 
         HashMap<String, Object> mapa = new HashMap();
         mapa.put("data", DataUtil.toString(p.getDataPagamento()));
-        mapa.put("numeroDocumento", pa.getFormaPagamento());
+        mapa.put("numeroDocumento", pa.getNumeroDocumento());
         mapa.put("condominio", condominio.getRazaoSocial());
         mapa.put("endereco", condominio.getEndereco().getLogradouro());
         mapa.put("cnpj", condominio.getCnpj());
@@ -1156,7 +1155,7 @@ public class Relatorios implements Printable {
         Pagamento p = new Pagamento();
         p = pagamentos.get(0);
         PagamentoAuxiliar pa = new PagamentoAuxiliar();
-        pa.setFormaPagamento(getFormaPagamento(p));
+        pa.setNumeroDocumento(getNumeroDocumento(p));
         pa.setNomeConta(p.getConta().getNome());
         pa.setCodigoConta(p.getConta().getCodigo());
 
@@ -1166,7 +1165,7 @@ public class Relatorios implements Printable {
         for (Pagamento pagamento : pagamentos) {
             HashMap<String, String> mapa2 = new HashMap();
             mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
-            mapa2.put("documento", getFormaPagamento(pagamento));
+            mapa2.put("documento", getNumeroDocumento(pagamento));
             mapa2.put("historico", pagamento.getHistorico());
             mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
             listaPagamentos.add(mapa2);
@@ -1189,6 +1188,86 @@ public class Relatorios implements Printable {
 
         if (!lista.isEmpty()) {
             imprimir("RelatorioExtratoContaIndividual", parametros, lista, false, true, null);
+        }
+    }
+
+    public void imprimirExtratoChequesEmitidos(DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
+        List<PagamentoAuxiliar> pagamentosAuxiliares = new ArrayList<PagamentoAuxiliar>();
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        parametros.put("periodo", DataUtil.toString(dataInicial) + " a " + DataUtil.toString(dataFinal));
+
+        //campo para calcular o saldo de cada pagamento e mostrar no relatorio
+        BigDecimal saldoAuxiliar = new BigDecimal(0);
+
+        for (Pagamento p : pagamentos) {
+            boolean continuar = true;
+            Condominio condominio = p.getContaCorrente().getCondominio();
+            PagamentoAuxiliar pa = null;
+
+            if (pagamentosAuxiliares.isEmpty()) {
+                pa = new PagamentoAuxiliar();
+                pa.setNumeroDocumento(getNumeroDocumento(p));
+                pa.setCondominio(condominio);
+                pa.adicionarPagamento(p);
+            } else {
+                for (PagamentoAuxiliar p1 : pagamentosAuxiliares) {
+                    if (p1.getCondominio() == condominio) {
+                        p1.adicionarPagamento(p);
+                        continuar = false;
+                    } else {
+                        pa = new PagamentoAuxiliar();
+                        pa.setNumeroDocumento(getNumeroDocumento(p));
+                        pa.setCondominio(condominio);
+                        pa.adicionarPagamento(p);
+                    }
+                }
+            }
+
+            if (pa != null && continuar == true) {
+                pagamentosAuxiliares.add(pa);
+            }
+
+        }
+
+        BigDecimal totalGeral = new BigDecimal(0);
+
+        for (PagamentoAuxiliar p : pagamentosAuxiliares) {
+            HashMap<String, Object> mapa = new HashMap();
+            List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
+            BigDecimal soma = new BigDecimal(0);
+
+            for (Pagamento pagamento : p.getListaPagamentos()) {
+                saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());
+                HashMap<String, String> mapa2 = new HashMap();
+                mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
+                mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
+                mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
+                    mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
+                }
+                listaPagamentos.add(mapa2);
+                soma = soma.add(pagamento.getValor());
+                totalGeral = totalGeral.add(pagamento.getValor());
+            }
+
+            mapa.put("condominio", p.getCondominio());
+            mapa.put("soma", PagamentoUtil.formatarMoeda(soma.doubleValue()));
+            mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
+
+            lista.add(mapa);
+        }
+
+        parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!lista.isEmpty()) {
+            parametros.put("titulo", tipo.toString());
+            imprimir("RelatorioExtratoChequesEmitidos", parametros, lista, false, true, null);
         }
     }
 }

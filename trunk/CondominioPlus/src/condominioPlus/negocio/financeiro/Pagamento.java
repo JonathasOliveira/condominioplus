@@ -53,7 +53,8 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosConsignacaoOrdenados", query = "SELECT p FROM Pagamento p WHERE p.consignacao = ?1 order by p.dataPagamento"),
     @NamedQuery(name = "PagamentosPorContratoEmprestimo", query = "SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 order by p.dataVencimento"),
     @NamedQuery(name = "PagamentosPorContratoEmprestimoCodigo", query = "SELECT p FROM Pagamento p WHERE p.contratoEmprestimo = ?1 and p.contaCorrente is null and p.contaPagar is null order by p.codigo"),
-    @NamedQuery(name = "PagamentosPorPeriodoContaCorrente", query = "SELECT p FROM Pagamento p WHERE p.contaCorrente = ?1 and p.pago = true and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento")
+    @NamedQuery(name = "PagamentosPorPeriodoContaCorrente", query = "SELECT p FROM Pagamento p WHERE p.contaCorrente = ?1 and p.pago = true and p.dataPagamento >= ?2 and p.dataPagamento <= ?3 order by p.dataPagamento"),
+    @NamedQuery(name = "PagamentosEfetuadosPorForma", query = "SELECT p FROM Pagamento p WHERE p.pago = true and p.dataPagamento >= ?1 and p.dataPagamento <= ?2 and p.forma = ?3 order by p.dataPagamento")
 })
 public class Pagamento implements Serializable {
 
