@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio.financeiro;
 
+import condominioPlus.negocio.Condominio;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,17 +14,18 @@ import java.util.List;
  */
 public class PagamentoAuxiliar {
 
-    private String formaPagamento;
+    private String numeroDocumento;
     private int codigoConta;
     private String nomeConta;
+    private Condominio condominio;
     private List<Pagamento> listaPagamentos = new ArrayList<Pagamento>();
 
-    public String getFormaPagamento() {
-        return formaPagamento;
+    public String getNumeroDocumento() {
+        return numeroDocumento;
     }
 
-    public void setFormaPagamento(String formaPagamento) {
-        this.formaPagamento = formaPagamento;
+    public void setNumeroDocumento(String numeroDocumento) {
+        this.numeroDocumento = numeroDocumento;
     }
 
     public int getCodigoConta() {
@@ -42,6 +44,14 @@ public class PagamentoAuxiliar {
         this.nomeConta = nomeConta;
     }
 
+    public Condominio getCondominio() {
+        return condominio;
+    }
+
+    public void setCondominio(Condominio condominio) {
+        this.condominio = condominio;
+    }
+    
     public List<Pagamento> getListaPagamentos() {
         return listaPagamentos;
     }
