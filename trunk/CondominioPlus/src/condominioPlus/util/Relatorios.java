@@ -1242,7 +1242,7 @@ public class Relatorios implements Printable {
                 saldoAuxiliar = saldoAuxiliar.add(pagamento.getValor());
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
-                mapa2.put("contaCorrente", p.getCondominio().getContaBancaria().getBanco().getAgencia() + " " + p.getCondominio().getContaBancaria().getContaCorrente() + " " + p.getCondominio().getContaBancaria().getDigitoCorrente());
+                mapa2.put("contaCorrente", p.getCondominio().getContaBancaria().getContaCorrente() + " " + p.getCondominio().getContaBancaria().getDigitoCorrente());
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("numeroCheque", getNumeroDocumento(pagamento));
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
@@ -1257,6 +1257,11 @@ public class Relatorios implements Printable {
             mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
 
             lista.add(mapa);
+            
+            parametros.put("numeroBanco", p.getCondominio().getContaBancaria().getBanco().getNumeroBanco());
+            parametros.put("agencia", p.getCondominio().getContaBancaria().getBanco().getAgencia());
+            parametros.put("contaMaster", p.getCondominio().getContaBancaria().getBanco().getContaMaster());
+            
         }
 
         parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));

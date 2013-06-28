@@ -1,6 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <NonVisualComponents>
+    <Component class="javax.swing.JLabel" name="jLabel4">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Nome:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNome1">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="nomeBanco" noResource="true"/>
+      </Properties>
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
   </Properties>
@@ -25,46 +37,66 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <Component id="txtNome" min="-2" pref="107" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="txtAgencia" alignment="0" max="32767" attributes="1"/>
+                                  <Component id="txtNumero" alignment="0" pref="57" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace pref="69" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="txtContaMaster" min="-2" pref="80" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btnCancelar" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="txtNumero" alignment="0" min="-2" pref="57" max="-2" attributes="1"/>
-                  <Component id="txtAgencia" alignment="0" pref="113" max="32767" attributes="0"/>
-                  <Component id="txtNome" alignment="0" pref="113" max="32767" attributes="1"/>
-              </Group>
-              <EmptySpace min="-2" pref="30" max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="55" pref="55" max="55" attributes="0"/>
-              <Component id="btnSalvar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnCancelar" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="74" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtNumero" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtAgencia" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace pref="18" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="17" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txtNome" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtNumero" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtAgencia" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtContaMaster" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="btnCancelar" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="btnSalvar" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -88,11 +120,6 @@
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
         <Property name="text" type="java.lang.String" value="Nome:"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JTextField" name="txtNome">
-      <Properties>
-        <Property name="name" type="java.lang.String" value="nomeBanco" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnSalvar">
@@ -141,6 +168,21 @@
     <Component class="javax.swing.JTextField" name="txtAgencia">
       <Properties>
         <Property name="name" type="java.lang.String" value="agencia" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel5">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Conta Master:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtContaMaster">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="contaMaster" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNome">
+      <Properties>
+        <Property name="name" type="java.lang.String" value="nomeBanco" noResource="true"/>
       </Properties>
     </Component>
   </SubComponents>
