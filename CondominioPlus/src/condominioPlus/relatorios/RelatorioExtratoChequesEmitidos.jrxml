@@ -10,6 +10,9 @@
 	<parameter name="subrelatorio" class="java.lang.String"/>
 	<parameter name="titulo" class="java.lang.String"/>
 	<parameter name="totalGeral" class="java.lang.String"/>
+	<parameter name="numeroBanco" class="java.lang.String"/>
+	<parameter name="agencia" class="java.lang.String"/>
+	<parameter name="contaMaster" class="java.lang.String"/>
 	<field name="condominio" class="java.lang.String"/>
 	<field name="soma" class="java.lang.String"/>
 	<field name="lista" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -23,7 +26,7 @@
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<rectangle>
-				<reportElement x="0" y="96" width="364" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="96" width="323" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
 				<reportElement x="490" y="63" width="65" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
@@ -35,7 +38,7 @@
 				<reportElement x="377" y="63" width="110" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="108" width="266" height="15"/>
+				<reportElement x="6" y="108" width="186" height="15"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
@@ -101,22 +104,56 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{titulo}]]></textFieldExpression>
 			</textField>
 			<rectangle>
-				<reportElement x="367" y="96" width="120" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="421" y="96" width="66" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="374" y="98" width="106" height="15"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="424" y="98" width="60" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Agência / Nº Conta Corrente Mãe]]></text>
+				<text><![CDATA[Conta Master]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="374" y="108" width="106" height="15"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
+				<reportElement x="424" y="108" width="60" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["3918 / 13000500-4"]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{contaMaster}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="372" y="96" width="46" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="326" y="96" width="43" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="375" y="98" width="40" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Agência]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="375" y="108" width="40" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{agencia}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="108" width="35" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{numeroBanco}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="330" y="98" width="35" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Banco]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -132,7 +169,7 @@
 				<text><![CDATA[Cheque Nº]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="501" y="1" width="50" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="512" y="1" width="39" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
@@ -183,7 +220,7 @@
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioExtratoChequesEmitidos.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
-				<reportElement positionType="FixRelativeToBottom" x="501" y="24" width="50" height="12"/>
+				<reportElement positionType="FixRelativeToBottom" x="501" y="24" width="40" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
@@ -227,7 +264,7 @@
 				<text><![CDATA[Total Emitido]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="449" y="22" width="98" height="15"/>
+				<reportElement x="449" y="22" width="92" height="15"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
@@ -238,7 +275,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[* Uso Exclusivo do Banco Santander]]></text>
+				<text><![CDATA[* Uso Exclusivo do Banco]]></text>
 			</staticText>
 		</band>
 	</summary>

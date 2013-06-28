@@ -28,6 +28,8 @@ public class Banco implements Serializable, Removivel {
     private String agencia = "";
     @Column(name="nome_banco")
     private String nomeBanco = "";
+    @Column(name="conta_master")
+    private String contaMaster = "";
     private boolean removido;
 
     public String getAgencia() {
@@ -60,6 +62,14 @@ public class Banco implements Serializable, Removivel {
 
     public void setNumeroBanco(String numeroBanco) {
         this.numeroBanco = numeroBanco;
+    }
+
+    public String getContaMaster() {
+        return contaMaster;
+    }
+
+    public void setContaMaster(String contaMaster) {
+        this.contaMaster = contaMaster;
     }
 
     public void setRemovido(boolean removido) {
