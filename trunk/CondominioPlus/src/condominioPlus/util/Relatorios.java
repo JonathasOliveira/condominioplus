@@ -9,6 +9,7 @@
 package condominioPlus.util;
 
 import condominioPlus.negocio.Anotacao;
+import condominioPlus.negocio.Banco;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
@@ -1191,7 +1192,7 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirExtratoChequesEmitidos(DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
+    public void imprimirExtratoChequesEmitidos(DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo, Banco banco) {
         List<PagamentoAuxiliar> pagamentosAuxiliares = new ArrayList<PagamentoAuxiliar>();
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
@@ -1246,7 +1247,7 @@ public class Relatorios implements Printable {
                 mapa2.put("historico", pagamento.getHistorico());
                 mapa2.put("numeroCheque", getNumeroDocumento(pagamento));
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
-                
+
                 listaPagamentos.add(mapa2);
                 soma = soma.add(pagamento.getValor());
                 totalGeral = totalGeral.add(pagamento.getValor());
@@ -1257,13 +1258,11 @@ public class Relatorios implements Printable {
             mapa.put("lista", new JRBeanCollectionDataSource(listaPagamentos));
 
             lista.add(mapa);
-            
-            parametros.put("numeroBanco", p.getCondominio().getContaBancaria().getBanco().getNumeroBanco());
-            parametros.put("agencia", p.getCondominio().getContaBancaria().getBanco().getAgencia());
-            parametros.put("contaMaster", p.getCondominio().getContaBancaria().getBanco().getContaMaster());
-            
         }
 
+        parametros.put("numeroBanco", banco.getNumeroBanco());
+        parametros.put("agencia", banco.getAgencia());
+        parametros.put("contaMaster", banco.getContaMaster());
         parametros.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
