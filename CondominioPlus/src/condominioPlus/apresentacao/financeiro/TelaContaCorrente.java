@@ -531,19 +531,30 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirExtratoChequesEmitidos(TipoRelatorio tipo) {
-        DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
+        DialogoRelatorioExtratoChequesEmitidos dialogo = new DialogoRelatorioExtratoChequesEmitidos(null, true, dataInicial, dataFinal, tipo);
         dialogo.setVisible(true);
+        
+        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null && dialogo.getBanco() != null) {
+            List<Pagamento> listaAuxiliar = new DAO().listar("PagamentosEfetuadosPorForma", DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), FormaPagamento.CHEQUE);
+            List<Pagamento> listaPagamentos = new ArrayList<Pagamento>();
 
-        if (dialogo.getDataInicial() != null && dialogo.getDataFinal() != null) {
-            List<Pagamento> listaPagamentos = new DAO().listar("PagamentosEfetuadosPorForma", DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()), FormaPagamento.CHEQUE);
+            for (Pagamento p : listaAuxiliar) {
+                if (p.getContaCorrente().getCondominio().getContaBancaria().getBanco().getCodigo() == dialogo.getBanco().getCodigo()) {
+                    listaPagamentos.add(p);
+                }
+            }
 
             ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
             Collections.sort(listaPagamentos, comCod);
             ComparatorPagamento comparator = new ComparatorPagamento();
             Collections.sort(listaPagamentos, comparator);
 
-            new Relatorios().imprimirExtratoChequesEmitidos(dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
-        }
+            if (!listaPagamentos.isEmpty()) {
+                new Relatorios().imprimirExtratoChequesEmitidos(dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo, dialogo.getBanco());
+            } else {
+                ApresentacaoUtil.exibirAdvertencia("Não há registros no período selecionado.", this);
+            }
+        } 
     }
 
     public void verificarListaVisualizacao() {

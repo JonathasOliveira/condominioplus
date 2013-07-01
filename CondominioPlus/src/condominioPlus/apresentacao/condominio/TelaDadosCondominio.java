@@ -108,7 +108,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         cmbInstrumento.setModel(new ComboModelo<String>(Util.toList(new String[]{"ATA", "PROCURAÇÃO"}), false));
     }
 
-    private void carregarComboBanco() {
+     private void carregarComboBanco() {
         modelo = new ComboModelo<Banco>(new DAO().listar(Banco.class), cmbBanco);
         cmbBanco.setModel(modelo);
     }
