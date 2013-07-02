@@ -279,7 +279,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private void editarAnotacao() {
         Anotacao anotacao = modeloTabelaAnotacoes.getObjetoSelecionado();
         if (anotacao == null) {
-            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editado!", this);
+            ApresentacaoUtil.exibirAdvertencia("Selecione a anotação a ser editada!", this);
             return;
         }
         DialogoAnotacao.getAnotacao(anotacao, TelaPrincipal.getInstancia(), true);
@@ -288,7 +288,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void removerAnotacao() {
         if (modeloTabelaAnotacoes.getLinhaSelecionada() > -1) {
-            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+            if (!ApresentacaoUtil.perguntar("Deseja remover o(s) registro(s)?", this)) {
                 return;
             }
             System.out.println("removendo... " + modeloTabelaAnotacoes.getLinhasSelecionadas());
@@ -421,7 +421,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 
     private void adicionarConselheiro() {
         if (condominio.getUnidades().isEmpty()) {
-            ApresentacaoUtil.exibirInformacao("Não existem Unidades Cadastradas!", this);
+            ApresentacaoUtil.exibirInformacao("Não há unidades cadastradas!", this);
             return;
         }
         boolean ok = DialogoConselheiro.getConselheiro(condominio, TelaPrincipal.getInstancia(), true);
