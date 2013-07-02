@@ -379,7 +379,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void removerEndereco() {
-        
+
         if (getModeloEndereco().getObjeto() != null) {
             if (getModeloEndereco().getObjeto().isPadrao()) {
                 if (unidade.getCondomino().getEnderecos().size() > 1) {
@@ -401,11 +401,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione o endereço a ser removido!", this);
         }
-        
+
     }
 
     private void preencherPainelEndereco() {
-
         for (Endereco e : unidade.getCondomino().getEnderecos()) {
             if (e.isPadrao()) {
                 txtRua.setText(e.getLogradouro());
@@ -418,7 +417,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 txtCep.setText(e.getCep());
             }
         }
-
     }
 
     private void carregarTabelaAnotacoes() {
