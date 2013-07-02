@@ -351,8 +351,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         tblEndereco.getColumn(campos[2]).setMinWidth(150);
 
         tblEndereco.setFont(new Font("Verdana", Font.PLAIN, 11));
-
-
     }
 
     private TabelaModelo<Endereco> getModeloEndereco() {
