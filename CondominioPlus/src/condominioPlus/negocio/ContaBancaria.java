@@ -35,6 +35,8 @@ public class ContaBancaria implements Serializable {
     private String digitoPoupanca = "";
     @Column(name="codigo_cedente")
     private String codigoCedente;
+    @Column(name="digito_cedente")
+    private String digitoCedente;
     @OneToOne(cascade = CascadeType.ALL)
     private Banco banco;
     @Column(name = "usuario_banking")
@@ -143,6 +145,14 @@ public class ContaBancaria implements Serializable {
 
     public void setCodigoCedente(String codigoCedente) {
         this.codigoCedente = codigoCedente;
+    }
+
+    public String getDigitoCedente() {
+        return digitoCedente;
+    }
+
+    public void setDigitoCedente(String digitoCedente) {
+        this.digitoCedente = digitoCedente;
     }
     
 }

@@ -137,7 +137,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         List<Object> campos = new ArrayList<Object>();
         campos.add(txtNome);
 //        if (!checkBoxCNPJ.isSelected()) {
-        campos.add(txtCpf);
+//        campos.add(txtCpf);
 //        } else {
 //            txtCpf.setName("CNPJ");
 //            campos.add(txtCpf);
@@ -379,7 +379,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void removerEndereco() {
-
+        
         if (getModeloEndereco().getObjeto() != null) {
             if (getModeloEndereco().getObjeto().isPadrao()) {
                 if (unidade.getCondomino().getEnderecos().size() > 1) {
@@ -394,12 +394,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Adicione um novo endereço padrão ou edite esse!", this);
                 }
+            } else {
+                getModeloEndereco().remover(getModeloEndereco().getObjeto());
+                preencherTela(unidade);
             }
-
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione o endereço a ser removido!", this);
         }
-
+        
     }
 
     private void preencherPainelEndereco() {
@@ -1651,7 +1653,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addGap(22, 22, 22))
         );
 
-        jTabbedPane1.addTab("Contato", painelContato);
+        jTabbedPane1.addTab("Proprietário", painelContato);
 
         jLabel6.setText("CPF*:");
 
@@ -1860,7 +1862,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             .addGap(0, 178, Short.MAX_VALUE)
         );
 
-        jTabbedPane1.addTab("Correspondência", painelCorrespondencia);
+        jTabbedPane1.addTab("Correspondência - Enviar Para:", painelCorrespondencia);
 
         jPanel9.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(102, 102, 102), 1, true));
 

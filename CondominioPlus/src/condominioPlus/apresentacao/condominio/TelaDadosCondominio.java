@@ -493,6 +493,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtDigitoContaCorrente.setText(condominio.getContaBancaria().getDigitoCorrente());
         txtDigitoContaPoupanca.setText(condominio.getContaBancaria().getDigitoPoupanca());
         txtCodigoCedente.setText(condominio.getContaBancaria().getCodigoCedente());
+        txtDigitoCedente.setText(condominio.getContaBancaria().getDigitoCedente());
 
         txtUsuarioBanking.setText(condominio.getContaBancaria().getUsuarioBanking());
         txtSenhaBanking.setText(condominio.getContaBancaria().getSenhaBanking());
@@ -555,6 +556,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         condominio.getContaBancaria().setDigitoPoupanca(txtDigitoContaPoupanca.getText());
         condominio.getContaBancaria().setContaPoupanca(txtContaPoupanca.getText());
         condominio.getContaBancaria().setCodigoCedente(txtCodigoCedente.getText());
+        condominio.getContaBancaria().setDigitoCedente(txtDigitoCedente.getText());
         condominio.getContaBancaria().setUsuarioBanking(txtUsuarioBanking.getText().toUpperCase().trim());
         condominio.getContaBancaria().setSenhaBanking(txtSenhaBanking.getText().toUpperCase().trim());
         condominio.getContaBancaria().setCpfBanking(txtCpfBanking.getText());
@@ -754,6 +756,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtDigitoContaPoupanca = new javax.swing.JTextField();
         jLabel34 = new javax.swing.JLabel();
         txtCodigoCedente = new javax.swing.JTextField();
+        txtDigitoCedente = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
@@ -1363,6 +1366,10 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtAgencia.setBackground(new java.awt.Color(204, 204, 204));
         txtAgencia.setEditable(false);
 
+        txtContaCorrente.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        txtContaPoupanca.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
         jLabel10.setText("Número do Banco:");
 
         jLabel11.setText("Agência:");
@@ -1374,6 +1381,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jLabel14.setText("Conta Poupança:");
 
         jLabel34.setText("Cód. Cedente:");
+
+        txtCodigoCedente.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         javax.swing.GroupLayout painelBancoLayout = new javax.swing.GroupLayout(painelBanco);
         painelBanco.setLayout(painelBancoLayout);
@@ -1411,7 +1420,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtDigitoCedente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(12, 12, 12)))
                 .addGap(40, 40, 40))
         );
@@ -1444,7 +1454,8 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(txtCodigoCedente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel34)))
+                            .addComponent(jLabel34)
+                            .addComponent(txtDigitoCedente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(painelBancoLayout.createSequentialGroup()
                         .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1670,21 +1681,21 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         ));
         jScrollPane5.setViewportView(tabelaAnotacoes);
 
-        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnAdicionarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
         btnAdicionarAnotacao.setToolTipText("Adicionar Anotação");
         btnAdicionarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnAdicionarAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnRemoverAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
         btnRemoverAnotacao.setToolTipText("Remover Anotação");
         btnRemoverAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setMinimumSize(new java.awt.Dimension(32, 32));
         btnRemoverAnotacao.setPreferredSize(new java.awt.Dimension(32, 32));
 
-        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
+        btnEditarAnotacao.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarAnotacao.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
         btnEditarAnotacao.setToolTipText("Editar Anotação");
         btnEditarAnotacao.setMaximumSize(new java.awt.Dimension(32, 32));
@@ -1883,6 +1894,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private net.sf.nachocalendar.components.DateField txtDataCadastro;
     private net.sf.nachocalendar.components.DateField txtDataCertificacao;
     private net.sf.nachocalendar.components.DateField txtDataFechamentoCaixa;
+    private javax.swing.JTextField txtDigitoCedente;
     private javax.swing.JTextField txtDigitoContaCorrente;
     private javax.swing.JTextField txtDigitoContaPoupanca;
     private javax.swing.JTextField txtEmail;
