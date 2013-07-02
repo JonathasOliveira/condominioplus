@@ -261,7 +261,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             TelaPrincipal.getInstancia().notificarClasse(unidade);
             TelaPrincipal.getInstancia().notificarClasse(condominio);
 
-            String descricao = "Cadastro do Condominio " + unidade.getCondomino().getNome() + ".";
+            String descricao = "Cadastro do Condômino " + unidade.getCondomino().getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
             carregarTela();
@@ -576,7 +576,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     private void removerTelefoneInquilino() {
         if (modeloTabelaTelefone.getLinhaSelecionada() > -1) {
-            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+            if (!ApresentacaoUtil.perguntar("Deseja remover o(s) registro(s)?", this)) {
                 return;
             }
             System.out.println("removendo... " + modeloTabelaTelefone.getLinhasSelecionadas());
@@ -651,7 +651,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
     private void removerEnderecoInquilino() {
         if (modeloTabelaEnderecoInquilino.getLinhaSelecionada() > -1) {
-            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+            if (!ApresentacaoUtil.perguntar("Deseja remover o(s) registro(s)?", this)) {
                 return;
             }
             System.out.println("removendo... " + modeloTabelaEnderecoInquilino.getLinhasSelecionadas());
@@ -713,7 +713,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 //    }
     private void removerInquilinoHistorico() {
         if (modeloTabelaHistoricoInquilino.getLinhaSelecionada() > -1) {
-            if (!ApresentacaoUtil.perguntar("Desejar remover o(s) registro(s)?", this)) {
+            if (!ApresentacaoUtil.perguntar("Deseja remover o(s) registro(s)?", this)) {
                 return;
             }
             System.out.println("removendo... " + modeloTabelaHistoricoInquilino.getLinhasSelecionadas());
