@@ -90,15 +90,16 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
 
             @Override
             public boolean getRemover(Unidade unidade) {
-                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Condomínio - " + unidade.getCondomino().getNome() + " ?", TelaCondomino.this)) {
+                if (!ApresentacaoUtil.perguntar("Deseja mesmo excluir o Condômino - " + unidade.getCondomino().getNome() + " ?", TelaCondomino.this)) {
                     return false;
                 }
 
                 try {
                     new DAO().remover(unidade);
-                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Condomínio - " + unidade.getCondomino().getNome());
+                    FuncionarioUtil.registrar(TipoAcesso.REMOCAO, "Remoção do Condômino - " + unidade.getCondomino().getNome());
                     return true;
                 } catch (Throwable t) {
+                    ApresentacaoUtil.exibirErro("Impossível remover o registro selecionado, pois o mesmo está vinculado a cobranças, taxas extras, etc.", TelaCondomino.this);
                     new TratadorExcecao(t, TelaCondomino.this);
                     return false;
                 }

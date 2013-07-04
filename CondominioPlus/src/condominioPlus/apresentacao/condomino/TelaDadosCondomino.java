@@ -70,7 +70,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private TabelaModelo_2 modeloTabela;
     private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
     private TabelaModelo_2<Endereco> modeloTabelaEnderecoInquilino;
-    private TabelaModelo_2<Telefone> modeloTabelaTelefone;
+    private TabelaModelo_2<Telefone> modeloTabelaTelefoneInquilino;
     private TabelaModelo_2<Inquilino> modeloTabelaHistoricoInquilino;
     private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
     private List<Endereco> listaEnderecoInquilino = new ArrayList<Endereco>();
@@ -266,6 +266,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
             carregarTela();
 //            sair();
+            ApresentacaoUtil.exibirInformacao("Os dados foram salvos com sucesso!", this);
         } catch (Throwable t) {
             new TratadorExcecao(t, this, true);
         }
@@ -526,7 +527,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaTelefoneInquilino() {
-        modeloTabelaTelefone = new TabelaModelo_2<Telefone>(tblTelefoneInquilino, "Tipo, Número".split(",")) {
+        modeloTabelaTelefoneInquilino = new TabelaModelo_2<Telefone>(tblTelefoneInquilino, "Tipo, Número".split(",")) {
 
             @Override
             protected List<Telefone> getCarregarObjetos() {
@@ -565,7 +566,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void editarTelefoneInquilino() {
-        Telefone telefone = modeloTabelaTelefone.getObjetoSelecionado();
+        Telefone telefone = modeloTabelaTelefoneInquilino.getObjetoSelecionado();
         if (telefone == null) {
             ApresentacaoUtil.exibirAdvertencia("Selecione o registro a ser editado!", this);
             return;
@@ -575,15 +576,15 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     }
 
     private void removerTelefoneInquilino() {
-        if (modeloTabelaTelefone.getLinhaSelecionada() > -1) {
+        if (modeloTabelaTelefoneInquilino.getLinhaSelecionada() > -1) {
             if (!ApresentacaoUtil.perguntar("Deseja remover o(s) registro(s)?", this)) {
                 return;
             }
-            System.out.println("removendo... " + modeloTabelaTelefone.getLinhasSelecionadas());
-            List<Telefone> itensRemover = modeloTabelaTelefone.getObjetosSelecionados();
+            System.out.println("removendo... " + modeloTabelaTelefoneInquilino.getLinhasSelecionadas());
+            List<Telefone> itensRemover = modeloTabelaTelefoneInquilino.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
                 for (Telefone t : itensRemover) {
-                    modeloTabelaTelefone.remover(t);
+                    modeloTabelaTelefoneInquilino.remover(t);
                     for (Telefone o : unidade.getInquilino().getTelefones()) {
                         if (t.getCodigo() == o.getCodigo()) {
                             unidade.getInquilino().getTelefones().remove(t);
@@ -884,6 +885,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 inquilino.setCodigoUnidade(unidade.getCodigo());
                 new DAO().salvar(inquilino);
                 unidade.setInquilino(null);
+                txtNomeInquilino.setText("");
+                txtCpfInquilino.setText("");
+                txtRgInquilino.setText("");
+                modeloTabelaEnderecoInquilino.limpar();
+                modeloTabelaTelefoneInquilino.limpar();
             }
         }
 
@@ -1042,7 +1048,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 adicionarEnderecoInquilino();
             } else if (e.getSource() == btnEditarEnderecoInquilino) {
                 editarEnderecoInquilino();
-            } else if (e.getSource() == btnRemoverTelefoneInquilino) {
+            } else if (e.getSource() == btnRemoverEnderecoInquilino) {
                 removerEnderecoInquilino();
             } else if (e.getSource() == btnAdicionarTelefoneInquilino) {
                 adicionarTelefoneInquilino();
