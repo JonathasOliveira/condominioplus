@@ -175,6 +175,7 @@ public class Condomino implements Serializable {
     }
 
     public void adicionarEndereco(Endereco endereco) {
+        endereco.setCondomino(this);
         enderecos.add(endereco);
     }
 

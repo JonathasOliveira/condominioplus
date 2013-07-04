@@ -96,6 +96,7 @@ public class Inquilino implements Serializable {
     }
     
     public void adicionarEndereco(Endereco endereco) {
+        endereco.setInquilino(this);
         enderecos.add(endereco);
     }
 
