@@ -60,6 +60,13 @@
             <Property name="text" type="java.lang.String" value="Imprimir Extrato de Cheques Emitidos"/>
           </Properties>
         </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator2">
+        </Component>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuPesquisarConteudoCaixa">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Pesquisar Conte&#xfa;do do Caixa"/>
+          </Properties>
+        </MenuItem>
       </SubComponents>
     </Container>
     <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
@@ -104,7 +111,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="223" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="231" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               <Component id="painelSaldos" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -402,7 +409,7 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="32" max="32767" attributes="0"/>
+                          <EmptySpace pref="40" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
