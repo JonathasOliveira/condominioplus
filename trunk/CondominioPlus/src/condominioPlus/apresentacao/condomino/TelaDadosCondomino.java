@@ -1132,6 +1132,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         jPanel11 = new javax.swing.JPanel();
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuDetalhe = new javax.swing.JMenuItem();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -1203,6 +1204,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnEditarTelefoneInquilino = new javax.swing.JButton();
         btnRemoverTelefoneInquilino = new javax.swing.JButton();
         painelCorrespondencia = new javax.swing.JPanel();
+        radioProprietarioInquilino = new javax.swing.JRadioButton();
+        radioProprietario = new javax.swing.JRadioButton();
+        radioInquilino = new javax.swing.JRadioButton();
         painelUnidade = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -1853,15 +1857,38 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Inquilino", painelInquilino);
 
+        buttonGroup1.add(radioProprietarioInquilino);
+        radioProprietarioInquilino.setText("Proprietário e Inquilino");
+
+        buttonGroup1.add(radioProprietario);
+        radioProprietario.setSelected(true);
+        radioProprietario.setText("Somente Proprietário");
+
+        buttonGroup1.add(radioInquilino);
+        radioInquilino.setText("Somente Inquilino");
+
         javax.swing.GroupLayout painelCorrespondenciaLayout = new javax.swing.GroupLayout(painelCorrespondencia);
         painelCorrespondencia.setLayout(painelCorrespondenciaLayout);
         painelCorrespondenciaLayout.setHorizontalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 602, Short.MAX_VALUE)
+            .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(radioInquilino)
+                    .addComponent(radioProprietario)
+                    .addComponent(radioProprietarioInquilino))
+                .addContainerGap(454, Short.MAX_VALUE))
         );
         painelCorrespondenciaLayout.setVerticalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 178, Short.MAX_VALUE)
+            .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(radioProprietario)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioInquilino)
+                .addGap(3, 3, 3)
+                .addComponent(radioProprietarioInquilino)
+                .addContainerGap(84, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Correspondência - Enviar Para:", painelCorrespondencia);
@@ -2251,6 +2278,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Coeficiente;
     private javax.swing.JButton btnAdicionarAnotacao;
@@ -2273,6 +2301,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnSalvar;
     private javax.swing.JButton btnTeste;
     private javax.swing.JButton btnVoltar;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox checkBoxCNPJ;
     private javax.swing.JCheckBox checkBoxFalecido;
     private javax.swing.JCheckBox checkBoxInquilino;
@@ -2338,6 +2367,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JPanel painelTelefoneInquilino;
     private javax.swing.JPanel painelUnidade;
     private javax.swing.JPopupMenu popupMenu;
+    private javax.swing.JRadioButton radioInquilino;
+    private javax.swing.JRadioButton radioProprietario;
+    private javax.swing.JRadioButton radioProprietarioInquilino;
     private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tabelaHistoricoInquilino;
     private javax.swing.JTable tblEndereco;
