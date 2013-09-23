@@ -457,7 +457,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
     public void imprimirExtrato(TipoRelatorio tipo) {
         if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
-            new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, null, null, (List<Pagamento>) modeloTabela.getObjetosSelecionados(), tipo);
+            new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, null, null, (List<Pagamento>) modeloTabela.getObjetosSelecionados(), tipo, "");
         } else {
             DialogoDadosRelatorioGerencial dialogo = new DialogoDadosRelatorioGerencial(null, true, dataInicial, dataFinal, tipo);
             dialogo.setVisible(true);
@@ -473,7 +473,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 if (tipo == TipoRelatorio.EXTRATO_CONTA_CORRENTE) {
                     new Relatorios().imprimirExtratoContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
                 } else if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
-                    new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
+                    new Relatorios().imprimirExtratoConferenciaContaCorrente(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo, "");
                 } else if (tipo == TipoRelatorio.BALANCETE_SINTETICO || tipo == TipoRelatorio.BALANCETE_ANALITICO) {
                     new Relatorios().imprimirBalancete(condominio, dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos, tipo);
                 }
