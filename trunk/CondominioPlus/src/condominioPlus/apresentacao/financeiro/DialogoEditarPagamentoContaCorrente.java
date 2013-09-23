@@ -185,9 +185,9 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         pagamento.setHistorico(txtHistorico.getText());
         pagamento.setFornecedor(modelo.getSelectedItem());
         pagamento.setConta(conta);
-        if(pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0))== -1){
+        if (pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0)) == -1) {
             pagamento.setValor(valor.negate());
-        } else if(!pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0))== 1){
+        } else if (!pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0)) == 1) {
             pagamento.setValor(valor.negate());
         } else {
             pagamento.setValor(valor);
@@ -271,7 +271,10 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         }
         preencherObjeto();
 
-
+        if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1) {
+            ApresentacaoUtil.exibirAdvertencia("Não é possível editar o pagamento. Caixa Fechado!", this);
+            return;
+        }
 
         if (!listaPagamentos.isEmpty()) {
             System.out.println("teste");
@@ -301,9 +304,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             }
             System.out.println("listta" + listaPagamentos);
 
-
             new DAO().salvar(listaPagamentos);
-
 
         }
 

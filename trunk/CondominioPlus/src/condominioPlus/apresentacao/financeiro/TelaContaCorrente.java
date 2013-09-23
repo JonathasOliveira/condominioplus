@@ -237,7 +237,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             for (Pagamento p : getPagamentos()) {
                 p.setSaldo(p.getValor());
                 condominio.getContaCorrente().setSaldo(p.getValor());
-
             }
         }
     }
@@ -449,7 +448,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             DialogoEditarPagamentoContaCorrente tela = new DialogoEditarPagamentoContaCorrente((Pagamento) modeloTabela.getObjetoSelecionado());
             tela.setLocationRelativeTo(this);
             tela.setVisible(true);
-            modeloTabela.carregarObjetos();
+//            modeloTabela.carregarObjetos();
+            calcularSaldo();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
         }
@@ -554,7 +554,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         DialogoPesquisarConteudoCaixa dialogo = new DialogoPesquisarConteudoCaixa(null, true, condominio.getContaCorrente());
         dialogo.setVisible(true);
 
-        carregarTabela();
+//        carregarTabela();
+        calcularSaldo();
     }
 
     public void verificarListaVisualizacao() {

@@ -10,6 +10,8 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
+import condominioPlus.apresentacao.TelaPrincipal;
+import condominioPlus.apresentacao.condominio.TelaDadosCondominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.DadosBoleto;
@@ -76,17 +78,6 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
 
     private void carregarTabela() {
         modeloTabela = new TabelaModelo_2<Pagamento>(tabela, "Data, Documento, Conta, Descrição, Valor".split(",")) {
-
-            @Override
-            protected Pagamento getAdicionar() {
-                editar(new Pagamento());
-                return null;
-            }
-
-            @Override
-            public void editar(Pagamento pagamento) {
-//              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondominio(condominio));
-            }
 
             @Override
             protected List<Pagamento> getCarregarObjetos() {
@@ -159,13 +150,9 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
                 }
             }
         }
-        //depois de realizados os teste, apagar as 3 linhas abaixo
-        for (Pagamento pg : listaPagamentos) {
-            System.out.println("data: " + DataUtil.toString(pg.getDataPagamento()) + " - conta: " + pg.getConta().getCodigo() + " - valor pagamento: " + pg.getValor().doubleValue());
-        }
         return listaPagamentos;
     }
-    
+
     private void editarPagamento() {
         if (!modeloTabela.getObjetosSelecionados().isEmpty()) {
             DialogoEditarPagamentoContaCorrente tela = new DialogoEditarPagamentoContaCorrente((Pagamento) modeloTabela.getObjetoSelecionado());
@@ -258,11 +245,11 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
                 pegarConta();
             } else if (origem == radioConta || origem == radioValor || origem == radioNumeroDocumento) {
                 verificarSelecaoRadio();
-            } else if (origem == itemMenuEditarPagamento){
+            } else if (origem == itemMenuEditarPagamento) {
                 editarPagamento();
             }
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
