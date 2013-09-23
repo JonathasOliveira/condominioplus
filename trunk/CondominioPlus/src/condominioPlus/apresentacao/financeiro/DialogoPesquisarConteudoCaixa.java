@@ -10,8 +10,6 @@
  */
 package condominioPlus.apresentacao.financeiro;
 
-import condominioPlus.apresentacao.TelaPrincipal;
-import condominioPlus.apresentacao.condominio.TelaDadosCondominio;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaCorrente;
 import condominioPlus.negocio.financeiro.DadosBoleto;
@@ -20,8 +18,10 @@ import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
+import condominioPlus.util.Relatorios;
 import condominioPlus.util.RenderizadorCelulaCor;
 import condominioPlus.util.RenderizadorCelulaCorData;
 import java.awt.Color;
@@ -52,6 +52,7 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
     private List<Pagamento> listaPagamentos = new ArrayList<Pagamento>();
     private TabelaModelo_2 modeloTabela;
     private RenderizadorCelulaCor renderizadorCelulaCor;
+    private String texto;
 
     /** Creates new form DialogoPesquisarConteudoCaixa */
     public DialogoPesquisarConteudoCaixa(java.awt.Frame parent, boolean modal, ContaCorrente contaCorrente) {
@@ -127,11 +128,14 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
 
     private List<Pagamento> getPagamentos() {
         listaPagamentos.clear();
+        texto = "Pesquisa por ";
         dataInicial = DataUtil.getDateTime(txtDataInicial.getValue());
         dataFinal = DataUtil.getDateTime(txtDataFinal.getValue());
         if (radioConta.isSelected()) {
+            texto = texto + "Conta: " + conta.getCodigo();
             listaPagamentos = new DAO().listar(Pagamento.class, "PagamentosEfetuadosPorConta", contaCorrente, DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal), conta);
         } else if (radioValor.isSelected()) {
+            texto = texto + "Valor: " + PagamentoUtil.formatarMoeda(new BigDecimal(txtValor.getText().replace(',', '.')).doubleValue());
             List<Pagamento> listaAuxiliar = new ArrayList<Pagamento>();
             BigDecimal valor = new BigDecimal(txtValor.getText().replace(',', '.'));
             listaAuxiliar = new DAO().listar(Pagamento.class, "PagamentosPorPeriodoContaCorrente", contaCorrente, DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
@@ -141,6 +145,7 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
                 }
             }
         } else if (radioNumeroDocumento.isSelected()) {
+            texto = texto + "Nº Documento: " + txtNumeroDocumento.getText();
             List<Pagamento> listaAuxiliar = new ArrayList<Pagamento>();
             String documento = txtNumeroDocumento.getText();
             listaAuxiliar = new DAO().listar(Pagamento.class, "PagamentosPorPeriodoContaCorrente", contaCorrente, DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
@@ -165,6 +170,7 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
     }
 
     private void imprimir() {
+        new Relatorios().imprimirExtratoConferenciaContaCorrente(contaCorrente.getCondominio(), dataInicial, dataFinal, (List<Pagamento>) modeloTabela.getObjetos(), TipoRelatorio.EXTRATO_PESQUISAR_CONTEUDO_CAIXA, texto);
     }
 
     private void verificarSelecaoRadio() {
@@ -239,6 +245,7 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
             if (origem == btnPesquisar) {
                 carregarTabela();
             } else if (origem == btnImprimir) {
+                imprimir();
             } else if (origem == btnCancelar) {
                 sair();
             } else if (origem == btnConta) {

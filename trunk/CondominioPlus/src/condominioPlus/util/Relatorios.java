@@ -804,7 +804,7 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirExtratoConferenciaContaCorrente(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo) {
+    public void imprimirExtratoConferenciaContaCorrente(Condominio condominio, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos, TipoRelatorio tipo, String texto) {
         List<PagamentoAuxiliar> pagamentosAuxiliares = new ArrayList<PagamentoAuxiliar>();
         List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
@@ -902,6 +902,9 @@ public class Relatorios implements Printable {
                 imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
             } else if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
                 imprimir("RelatorioExtratoCustomizado", parametros, lista, false, true, null);
+            } else if (tipo == TipoRelatorio.EXTRATO_PESQUISAR_CONTEUDO_CAIXA){
+                parametros.put("texto", texto);
+                imprimir("RelatorioPesquisaConteudoCaixa", parametros, lista, false, true, null);
             }
         }
     }
