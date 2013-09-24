@@ -476,7 +476,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             anotacao.setUsuario(Main.getFuncionario().getUsuario());
         }
 
-        unidade.getCondomino().adicionarAnotacao(anotacao);
+        unidade.getCondomino().adicionarAnotacao(anotacao, false);
         carregarTabelaAnotacoes();
     }
 

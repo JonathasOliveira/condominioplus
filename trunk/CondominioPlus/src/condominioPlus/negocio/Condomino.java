@@ -182,7 +182,7 @@ public class Condomino implements Serializable {
     public void removerEndereco(Endereco endereco) {
         enderecos.remove(endereco);
     }
-    
+
     public List<Anotacao> getAnotacoes() {
         return anotacoes;
     }
@@ -191,8 +191,9 @@ public class Condomino implements Serializable {
         this.anotacoes = anotacoes;
     }
 
-    public void adicionarAnotacao(Anotacao anotacao) {
+    public void adicionarAnotacao(Anotacao anotacao, boolean cobranca) {
         anotacao.setCondomino(this);
+        anotacao.setCobranca(cobranca);
         anotacoes.add(anotacao);
     }
 
