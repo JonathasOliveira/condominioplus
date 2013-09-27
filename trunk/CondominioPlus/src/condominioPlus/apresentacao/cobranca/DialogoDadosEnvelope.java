@@ -26,6 +26,7 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
     private boolean imprimirRemetente;
     private boolean cancelar;
     private boolean imprimirParaInquilino;
+    private boolean imprimirParaProprietario;
 
     /** Creates new form DialogoDadosEnvelope */
     public DialogoDadosEnvelope(java.awt.Frame parent, boolean modal) {
@@ -48,6 +49,10 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
     public boolean getImprimirParaInquilino() {
         return imprimirParaInquilino;
     }
+    
+    public boolean getImprimirParaProprietario(){
+        return imprimirParaProprietario;
+    }
 
     public boolean getCancelar() {
         return cancelar;
@@ -61,7 +66,17 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
         }
 
         imprimirRemetente = chkImprimirRemetente.isSelected();
-        imprimirParaInquilino = chkImprimirInquilino.isSelected();
+        
+        if (radioProprietario.isSelected()){
+            imprimirParaProprietario = true;
+            imprimirParaInquilino = false;
+        } else if(radioInquilino.isSelected()){
+            imprimirParaProprietario = false;
+            imprimirParaInquilino = true;
+        } else if (radioProprietarioInquilino.isSelected()){
+            imprimirParaProprietario = true;
+            imprimirParaInquilino = true;
+        }
         
         cancelar = false;
         sair();
@@ -120,7 +135,9 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
         txtDataVencimento = new net.sf.nachocalendar.components.DateField();
         chkExibirDataVencimento = new javax.swing.JCheckBox();
         chkImprimirRemetente = new javax.swing.JCheckBox();
-        chkImprimirInquilino = new javax.swing.JCheckBox();
+        radioProprietario = new javax.swing.JRadioButton();
+        radioInquilino = new javax.swing.JRadioButton();
+        radioProprietarioInquilino = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Impressão de Envelopes");
@@ -162,7 +179,15 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
 
         chkImprimirRemetente.setText("Imprimir remetente?");
 
-        chkImprimirInquilino.setText("Imprimir para inquilino?");
+        buttonGroup1.add(radioProprietario);
+        radioProprietario.setSelected(true);
+        radioProprietario.setText("Somente Proprietário");
+
+        buttonGroup1.add(radioInquilino);
+        radioInquilino.setText("Somente Inquilino");
+
+        buttonGroup1.add(radioProprietarioInquilino);
+        radioProprietarioInquilino.setText("Proprietário e Inquilino");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -171,12 +196,17 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(chkImprimirInquilino)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(chkExibirDataVencimento)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(chkImprimirRemetente)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(2, 2, 2)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(radioInquilino)
+                            .addComponent(radioProprietario)
+                            .addComponent(radioProprietarioInquilino)))
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -189,11 +219,15 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkExibirDataVencimento)
                     .addComponent(txtDataVencimento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addComponent(chkImprimirInquilino)
+                .addGap(18, 18, 18)
+                .addComponent(radioProprietario)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioProprietarioInquilino)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -209,8 +243,8 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -220,10 +254,12 @@ public class DialogoDadosEnvelope extends javax.swing.JDialog {
     private javax.swing.JButton btnOk;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chkExibirDataVencimento;
-    private javax.swing.JCheckBox chkImprimirInquilino;
     private javax.swing.JCheckBox chkImprimirRemetente;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JRadioButton radioInquilino;
+    private javax.swing.JRadioButton radioProprietario;
+    private javax.swing.JRadioButton radioProprietarioInquilino;
     private net.sf.nachocalendar.components.DateField txtDataVencimento;
     // End of variables declaration//GEN-END:variables
 }

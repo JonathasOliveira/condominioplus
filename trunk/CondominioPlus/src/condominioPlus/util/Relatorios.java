@@ -582,30 +582,33 @@ public class Relatorios implements Printable {
         return listaCobrancas;
     }
 
-    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, boolean imprimirInquilino) {
+    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, boolean imprimirInquilino, boolean imprimirProprietario) {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
 
         List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
         for (Unidade unidade : unidades) {
-            DadosCorrespondencia dados = new DadosCorrespondencia();
-            dados.setCondominio(unidade.getCondominio().getRazaoSocial());
-            dados.setUnidade(unidade.getUnidade());
-            dados.setNome(unidade.getCondomino().getNome());
-            for (Endereco e : unidade.getCondomino().getEnderecos()) {
-                if (e.isPadrao()) {
-                    dados.setLogradouro(e.getLogradouro());
-                    dados.setNumero(e.getNumero());
-                    dados.setComplemento(e.getComplemento());
-                    dados.setBairro(e.getBairro());
-                    dados.setCidade(e.getCidade());
-                    dados.setEstado(e.getEstado());
-                    dados.setCep(e.getCep());
-                    dados.setInquilino(false);
+
+            if (imprimirProprietario) {
+                DadosCorrespondencia dados = new DadosCorrespondencia();
+                dados.setCondominio(unidade.getCondominio().getRazaoSocial());
+                dados.setUnidade(unidade.getUnidade());
+                dados.setNome(unidade.getCondomino().getNome());
+                for (Endereco e : unidade.getCondomino().getEnderecos()) {
+                    if (e.isPadrao()) {
+                        dados.setLogradouro(e.getLogradouro());
+                        dados.setNumero(e.getNumero());
+                        dados.setComplemento(e.getComplemento());
+                        dados.setBairro(e.getBairro());
+                        dados.setCidade(e.getCidade());
+                        dados.setEstado(e.getEstado());
+                        dados.setCep(e.getCep());
+                        dados.setInquilino(false);
+                    }
                 }
+                listaDados.add(dados);
             }
-            listaDados.add(dados);
 
             if (imprimirInquilino) {
                 if (unidade.getInquilino() != null) {
