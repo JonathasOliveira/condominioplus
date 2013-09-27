@@ -37,13 +37,13 @@ public class DialogoImpressaoCondomino extends javax.swing.JDialog {
 
     private void imprimir() {
         if (chkRelacaoProprietarios.isSelected()) {
-            new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS);
+            new Relatorios().imprimirRelacaoProprietarios(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS);
         }
         if (chkRelacaoProprietariosEmail.isSelected()) {
-            new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL);
+            new Relatorios().imprimirRelacaoProprietarios(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL);
         }
         if (chkRelacaoProprietariosUnidade.isSelected()) {
-            new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
+            new Relatorios().imprimirRelacaoProprietarios(true, null, condominio, condominio.getUnidades(), TipoRelatorio.RELACAO_PROPRIETARIOS_UNIDADE);
         }
         if (chkFracaoIdeal.isSelected()) {
             new Relatorios().imprimirListaFracoesIdeais(condominio, condominio.getUnidades());

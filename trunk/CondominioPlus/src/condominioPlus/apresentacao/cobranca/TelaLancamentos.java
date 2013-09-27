@@ -975,36 +975,57 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
                 calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
             }
-
-            /*
-             * INFORMANDO DADOS SOBRE O CEDENTE.
-             */
-            Cedente cedente = new Cedente(cobranca.getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(cobranca.getUnidade().getCondominio().getCnpj()));
-
-            /*
-             * INFORMANDO DADOS SOBRE O SACADO.
-             */
-            Sacado sacado = new Sacado(cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-
-            // Informando o endereço do sacado.
-            Endereco enderecoSac = new Endereco();
-
-            for (condominioPlus.negocio.Endereco e : cobranca.getUnidade().getCondomino().getEnderecos()) {
-                if (e.isPadrao()) {
-                    enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(e.getEstado()));
-                    enderecoSac.setLocalidade(e.getCidade());
-                    enderecoSac.setCep(new CEP(e.getCep()));
-                    enderecoSac.setBairro(e.getBairro());
-                    enderecoSac.setLogradouro(e.getLogradouro());
-                    enderecoSac.setNumero(e.getNumero() + " " + e.getComplemento());
-                }
+            
+            if(cobranca.getUnidade().isBoletoInquilino()){
+                
             }
+            
+            Sacado sacado = getSacado(cobranca);
+            gerarBoleto(boletos, cobranca, sacado);
+        }
 
-            sacado.addEndereco(enderecoSac);
+        /*
+         * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
+         */
 
-            /*
-             * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
-             */
+        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
+        BoletoBancario.mostreBoletoNaTela(pdf);
+    }
+    
+    private Sacado getSacado(Cobranca cobranca){
+        /*
+         * INFORMANDO DADOS SOBRE O SACADO.
+         */
+        Sacado sacado = new Sacado(cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+
+        // Informando o endereço do sacado.
+        Endereco enderecoSac = new Endereco();
+
+        for (condominioPlus.negocio.Endereco e : cobranca.getUnidade().getCondomino().getEnderecos()) {
+            if (e.isPadrao()) {
+                enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(e.getEstado()));
+                enderecoSac.setLocalidade(e.getCidade());
+                enderecoSac.setCep(new CEP(e.getCep()));
+                enderecoSac.setBairro(e.getBairro());
+                enderecoSac.setLogradouro(e.getLogradouro());
+                enderecoSac.setNumero(e.getNumero() + " " + e.getComplemento());
+            }
+        }
+
+        sacado.addEndereco(enderecoSac);
+        
+        return sacado;
+    }
+    
+    private void gerarBoleto(List<Boleto> boletos, Cobranca cobranca, Sacado sacado) {
+        /*
+         * INFORMANDO DADOS SOBRE O CEDENTE.
+         */
+        Cedente cedente = new Cedente(cobranca.getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(cobranca.getUnidade().getCondominio().getCnpj()));        
+
+        /*
+         * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
+         */
 //                SacadorAvalista sacadorAvalista = new SacadorAvalista("JRimum Enterprise", "00.000.000/0001-91");
 //
 //                // Informando o endereço do sacador avalista.
@@ -1017,68 +1038,60 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 //                enderecoSacAval.setNumero("001");9
 //                sacadorAvalista.addEndereco(enderecoSacAval);
 
-            /*
-             * INFORMANDO OS DADOS SOBRE O TÍTULO.
-             */
-
-            // Informando dados sobre a conta bancária do título.
-            ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-            contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
-            contaBancaria.setCarteira(new Carteira(102));
-            contaBancaria.setAgencia(new Agencia(3918, "0"));
-
-            Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
-            titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
-            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
-            titulo.setValor(cobranca.getValorTotal());
-            titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
-            if (cobranca.getVencimentoProrrogado() != null) {
-                titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getVencimentoProrrogado()));
-            } else {
-                titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
-            }
-            titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-            titulo.setAceite(EnumAceite.N);
-            titulo.setDesconto(null);
-            titulo.setDeducao(null);
-            titulo.setMora(null);
-            titulo.setAcrecimo(null);
-            titulo.setValorCobrado(null);
-
-            /*
-             * INFORMANDO OS DADOS SOBRE O BOLETO.
-             */
-            Boleto boleto = new Boleto(titulo);
-
-            boleto.setLocalPagamento("Pagável preferencialmente na Rede X ou em "
-                    + "qualquer Banco até o Vencimento.");
-//                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
-//                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
-            boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
-            boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
-            boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
-            boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
-            boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
-            boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
-            boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
-            boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
-
-            System.out.println("campo livre " + boleto.getCampoLivre().write());
-            System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
-            System.out.println("Codigo Barras " + boleto.getCodigoDeBarras().write());
-
-            boletos.add(boleto);
-        }
-
         /*
-         * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
+         * INFORMANDO OS DADOS SOBRE O TÍTULO.
          */
 
-        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
-        BoletoBancario.mostreBoletoNaTela(pdf);
-    }
+        // Informando dados sobre a conta bancária do título.
+        ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
+        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
+        contaBancaria.setCarteira(new Carteira(102));
+        contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
+        Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
+        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
+        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
+        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
+        titulo.setValor(cobranca.getValorTotal());
+        titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
+        if (cobranca.getVencimentoProrrogado() != null) {
+            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getVencimentoProrrogado()));
+        } else {
+            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
+        }
+        titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
+        titulo.setAceite(EnumAceite.N);
+        titulo.setDesconto(null);
+        titulo.setDeducao(null);
+        titulo.setMora(null);
+        titulo.setAcrecimo(null);
+        titulo.setValorCobrado(null);
+
+        /*
+         * INFORMANDO OS DADOS SOBRE O BOLETO.
+         */
+        Boleto boleto = new Boleto(titulo);
+
+        boleto.setLocalPagamento("Pagável preferencialmente na Rede X ou em "
+                + "qualquer Banco até o Vencimento.");
+//                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
+//                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
+        boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
+        boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
+        boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
+        boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
+        boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
+        boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
+        boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
+        boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
+
+        System.out.println("campo livre " + boleto.getCampoLivre().write());
+        System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
+        System.out.println("Codigo Barras " + boleto.getCodigoDeBarras().write());
+
+        boletos.add(boleto);
+    }
+    
     private void limparSelecoesTabelas() {
         tabelaCobrancas.clearSelection();
         tabelaCondominos.clearSelection();
@@ -1754,7 +1767,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             DialogoDadosEnvelope dialogo = new DialogoDadosEnvelope(null, true);
             dialogo.setVisible(true);
             if (!dialogo.getCancelar()) {
-                new Relatorios().imprimirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento(), condominio, modeloTabelaCondominos.getObjetosSelecionados(), TipoRelatorio.ENVELOPE_PEQUENO);
+                new Relatorios().imprimirRelatorioEnvelope(dialogo.getImprimirRemetente(), dialogo.getDataVencimento(), condominio, modeloTabelaCondominos.getObjetosSelecionados(), dialogo.getImprimirParaInquilino());
             }
         }
     }
@@ -1763,7 +1776,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         if (modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Selecione as unidades desejadas.", this);
         } else {
-            new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetosSelecionados(), TipoRelatorio.RELACAO_POSTAGEM);
+            new Relatorios().imprimirRelacaoProprietarios(true, null, condominio, modeloTabelaCondominos.getObjetosSelecionados(), TipoRelatorio.RELACAO_POSTAGEM);
         }
     }
 
@@ -1780,7 +1793,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     public void imprimirRelacaoProprietarios(TipoRelatorio tipo) {
-        new Relatorios().imprimirRelatorioEnvelope(true, null, condominio, modeloTabelaCondominos.getObjetos(), tipo);
+        new Relatorios().imprimirRelacaoProprietarios(true, null, condominio, modeloTabelaCondominos.getObjetos(), tipo);
     }
 
     public void imprimirCertificadoQuitacao() {
@@ -1798,7 +1811,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     if (co.getDataPagamento() == null && DataUtil.compararData(dialogo.getDataIncial(), DataUtil.getDateTime(co.getDataVencimento())) == -1 && DataUtil.compararData(dialogo.getDataFinal(), DataUtil.getDateTime(co.getDataVencimento())) == 1 && co.isExibir()) {
                         imprimir = false;
                     }
-                    if (co.getAcordo() != null){
+                    if (co.getAcordo() != null) {
                         imprimirObservacao = true;
                     }
                 }

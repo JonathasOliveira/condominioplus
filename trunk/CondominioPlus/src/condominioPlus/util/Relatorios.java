@@ -16,6 +16,7 @@ import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
+import condominioPlus.negocio.cobranca.DadosCorrespondencia;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
@@ -581,7 +582,75 @@ public class Relatorios implements Printable {
         return listaCobrancas;
     }
 
-    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, TipoRelatorio tipo) {
+    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, boolean imprimirInquilino) {
+        List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+
+        List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
+        for (Unidade unidade : unidades) {
+            DadosCorrespondencia dados = new DadosCorrespondencia();
+            dados.setCondominio(unidade.getCondominio().getRazaoSocial());
+            dados.setUnidade(unidade.getUnidade());
+            dados.setNome(unidade.getCondomino().getNome());
+            for (Endereco e : unidade.getCondomino().getEnderecos()) {
+                if (e.isPadrao()) {
+                    dados.setLogradouro(e.getLogradouro());
+                    dados.setNumero(e.getNumero());
+                    dados.setComplemento(e.getComplemento());
+                    dados.setBairro(e.getBairro());
+                    dados.setCidade(e.getCidade());
+                    dados.setEstado(e.getEstado());
+                    dados.setCep(e.getCep());
+                    dados.setInquilino(false);
+                }
+            }
+            listaDados.add(dados);
+
+            if (imprimirInquilino) {
+                if (unidade.getInquilino() != null) {
+                    DadosCorrespondencia dadosInquilino = new DadosCorrespondencia();
+                    dadosInquilino.setCondominio(unidade.getCondominio().getRazaoSocial());
+                    dadosInquilino.setUnidade(unidade.getUnidade());
+                    dadosInquilino.setNome(unidade.getInquilino().getNome());
+                    for (Endereco e : unidade.getInquilino().getEnderecos()) {
+                        if (e.isPadrao()) {
+                            dadosInquilino.setLogradouro(e.getLogradouro());
+                            dadosInquilino.setNumero(e.getNumero());
+                            dadosInquilino.setComplemento(e.getComplemento());
+                            dadosInquilino.setBairro(e.getBairro());
+                            dadosInquilino.setCidade(e.getCidade());
+                            dadosInquilino.setEstado(e.getEstado());
+                            dadosInquilino.setCep(e.getCep());
+                            dadosInquilino.setInquilino(true);
+                        }
+                    }
+                    listaDados.add(dadosInquilino);
+                }
+            }
+        }
+
+        for (DadosCorrespondencia dados : listaDados) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nome", dados.getNome().toUpperCase());
+
+            mapa.put("endereco", dados.getLogradouro() + ", " + dados.getNumero() + " - " + dados.getComplemento());
+            mapa.put("bairro", dados.getBairro());
+            mapa.put("cidade", dados.getCidade() + " - " + dados.getEstado());
+            mapa.put("cep", dados.getCep());
+
+            mapa.put("inquilino", dados.isInquilino() ? "(Inquilino)" : "");
+            mapa.put("condominio", dados.getCondominio() + " " + dados.getUnidade());
+            mapa.put("dataVencimento", dataVencimento == null ? " " : "VENCIMENTO: " + DataUtil.toString(dataVencimento));
+            listaCondominos.add(mapa);
+        }
+
+        if (!listaCondominos.isEmpty()) {
+            imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
+        }
+    }
+
+    public void imprimirRelacaoProprietarios(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, TipoRelatorio tipo) {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
@@ -626,9 +695,7 @@ public class Relatorios implements Printable {
         }
 
         if (!listaCondominos.isEmpty()) {
-            if (tipo == TipoRelatorio.ENVELOPE_PEQUENO) {
-                imprimir("EnvelopePequeno", parametros, listaCondominos, false, imprimirRemetente, null);
-            } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS) {
+            if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS) {
                 imprimir("RelatorioRelacaoProprietarios", parametros, listaCondominos, false, imprimirRemetente, null);
             } else if (tipo == TipoRelatorio.RELACAO_PROPRIETARIOS_EMAIL) {
                 imprimir("RelatorioRelacaoProprietariosEmail", parametros, listaCondominos, false, imprimirRemetente, null);
@@ -902,7 +969,7 @@ public class Relatorios implements Printable {
                 imprimir("RelatorioExtratoConferenciaContaCorrente", parametros, lista, false, true, null);
             } else if (tipo == TipoRelatorio.EXTRATO_CUSTOMIZADO) {
                 imprimir("RelatorioExtratoCustomizado", parametros, lista, false, true, null);
-            } else if (tipo == TipoRelatorio.EXTRATO_PESQUISAR_CONTEUDO_CAIXA){
+            } else if (tipo == TipoRelatorio.EXTRATO_PESQUISAR_CONTEUDO_CAIXA) {
                 parametros.put("texto", texto);
                 imprimir("RelatorioPesquisaConteudoCaixa", parametros, lista, false, true, null);
             }
