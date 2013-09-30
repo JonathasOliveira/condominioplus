@@ -582,7 +582,7 @@ public class Relatorios implements Printable {
         return listaCobrancas;
     }
 
-    public void imprimirRelatorioEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, boolean imprimirInquilino, boolean imprimirProprietario) {
+    public void imprimirEnvelope(boolean imprimirRemetente, DateTime dataVencimento, Condominio condominio, List<Unidade> unidades, boolean imprimirInquilino, boolean imprimirProprietario) {
         List<HashMap<String, String>> listaCondominos = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
