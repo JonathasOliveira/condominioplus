@@ -588,7 +588,9 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
 
         List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
-        listaDados = DadosCorrespondencia.preencherLista(unidades, listaDados, imprimirProprietario, imprimirInquilino);
+        for (Unidade unidade : unidades) {
+            listaDados = DadosCorrespondencia.preencherLista(unidade, listaDados, imprimirProprietario, imprimirInquilino, null);
+        }
 
         for (DadosCorrespondencia dados : listaDados) {
             HashMap<String, String> mapa = new HashMap();
