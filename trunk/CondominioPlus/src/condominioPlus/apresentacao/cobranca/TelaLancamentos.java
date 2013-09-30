@@ -18,6 +18,7 @@ import condominioPlus.negocio.cobranca.AcordoCobranca;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.CobrancaBase;
+import condominioPlus.negocio.cobranca.DadosCorrespondencia;
 import condominioPlus.negocio.cobranca.ItemCobranca;
 import condominioPlus.negocio.cobranca.MensagemBoleto;
 import condominioPlus.negocio.cobranca.agua.ContaAgua;
@@ -975,13 +976,29 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
                 calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
             }
-            
-            if(cobranca.getUnidade().isBoletoInquilino()){
-                
+
+            List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
+
+            for (Cobranca co : listaCobrancas) {
+                boolean imprimirProprietario = false;
+                boolean imprimirInquilino = false;
+                if (co.getUnidade().isBoletoProprietario()) {
+                    imprimirProprietario = true;
+                    imprimirInquilino = false;
+                } else if (co.getUnidade().isBoletoInquilino()) {
+                    imprimirProprietario = false;
+                    imprimirInquilino = true;
+                } else if (co.getUnidade().isBoletoProprietarioInquilino()) {
+                    imprimirProprietario = true;
+                    imprimirInquilino = true;
+                }
+                listaDados = DadosCorrespondencia.preencherLista(co.getUnidade(), listaDados, imprimirProprietario, imprimirInquilino, co);
             }
-            
-            Sacado sacado = getSacado(cobranca);
-            gerarBoleto(boletos, cobranca, sacado);
+
+            for (DadosCorrespondencia dados : listaDados) {
+                Sacado sacado = getSacado(dados);
+                gerarBoleto(boletos, dados.getCobranca(), sacado);
+            }
         }
 
         /*
@@ -991,37 +1008,33 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
         BoletoBancario.mostreBoletoNaTela(pdf);
     }
-    
-    private Sacado getSacado(Cobranca cobranca){
+
+    private Sacado getSacado(DadosCorrespondencia dados) {
         /*
          * INFORMANDO DADOS SOBRE O SACADO.
          */
-        Sacado sacado = new Sacado(cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+        Sacado sacado = new Sacado(dados.getUnidade() + " " + dados.getNome());
 
         // Informando o endereço do sacado.
         Endereco enderecoSac = new Endereco();
 
-        for (condominioPlus.negocio.Endereco e : cobranca.getUnidade().getCondomino().getEnderecos()) {
-            if (e.isPadrao()) {
-                enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(e.getEstado()));
-                enderecoSac.setLocalidade(e.getCidade());
-                enderecoSac.setCep(new CEP(e.getCep()));
-                enderecoSac.setBairro(e.getBairro());
-                enderecoSac.setLogradouro(e.getLogradouro());
-                enderecoSac.setNumero(e.getNumero() + " " + e.getComplemento());
-            }
-        }
+        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(dados.getEstado()));
+        enderecoSac.setLocalidade(dados.getCidade());
+        enderecoSac.setCep(new CEP(dados.getCep()));
+        enderecoSac.setBairro(dados.getBairro());
+        enderecoSac.setLogradouro(dados.getLogradouro());
+        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
 
         sacado.addEndereco(enderecoSac);
-        
+
         return sacado;
     }
-    
+
     private void gerarBoleto(List<Boleto> boletos, Cobranca cobranca, Sacado sacado) {
         /*
          * INFORMANDO DADOS SOBRE O CEDENTE.
          */
-        Cedente cedente = new Cedente(cobranca.getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(cobranca.getUnidade().getCondominio().getCnpj()));        
+        Cedente cedente = new Cedente(cobranca.getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(cobranca.getUnidade().getCondominio().getCnpj()));
 
         /*
          * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
@@ -1091,7 +1104,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         boletos.add(boleto);
     }
-    
+
     private void limparSelecoesTabelas() {
         tabelaCobrancas.clearSelection();
         tabelaCondominos.clearSelection();

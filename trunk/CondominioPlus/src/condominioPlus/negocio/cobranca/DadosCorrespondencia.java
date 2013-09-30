@@ -13,7 +13,7 @@ import java.util.List;
  * @author eugenia
  */
 public class DadosCorrespondencia {
-    
+
     private String condominio;
     private String unidade;
     private String nome;
@@ -25,6 +25,7 @@ public class DadosCorrespondencia {
     private String estado;
     private String cep;
     private boolean inquilino;
+    private Cobranca cobranca;
 
     public String getBairro() {
         return bairro;
@@ -113,53 +114,60 @@ public class DadosCorrespondencia {
     public void setCondominio(String condominio) {
         this.condominio = condominio;
     }
-    
-    public static List<DadosCorrespondencia> preencherLista(List<Unidade> unidades, List<DadosCorrespondencia> listaDados, boolean imprimirProprietario, boolean imprimirInquilino){
-        for (Unidade u : unidades) {
 
-            if (imprimirProprietario) {
-                DadosCorrespondencia dados = new DadosCorrespondencia();
-                dados.setCondominio(u.getCondominio().getRazaoSocial());
-                dados.setUnidade(u.getUnidade());
-                dados.setNome(u.getCondomino().getNome());
-                for (Endereco e : u.getCondomino().getEnderecos()) {
-                    if (e.isPadrao()) {
-                        dados.setLogradouro(e.getLogradouro());
-                        dados.setNumero(e.getNumero());
-                        dados.setComplemento(e.getComplemento());
-                        dados.setBairro(e.getBairro());
-                        dados.setCidade(e.getCidade());
-                        dados.setEstado(e.getEstado());
-                        dados.setCep(e.getCep());
-                        dados.setInquilino(false);
-                    }
+    public Cobranca getCobranca() {
+        return cobranca;
+    }
+
+    public void setCobranca(Cobranca cobranca) {
+        this.cobranca = cobranca;
+    }
+
+    public static List<DadosCorrespondencia> preencherLista(Unidade u, List<DadosCorrespondencia> listaDados, boolean imprimirProprietario, boolean imprimirInquilino, Cobranca cobranca) {
+        if (imprimirProprietario) {
+            DadosCorrespondencia dados = new DadosCorrespondencia();
+            dados.setCondominio(u.getCondominio().getRazaoSocial());
+            dados.setUnidade(u.getUnidade());
+            dados.setNome(u.getCondomino().getNome());
+            for (Endereco e : u.getCondomino().getEnderecos()) {
+                if (e.isPadrao()) {
+                    dados.setLogradouro(e.getLogradouro());
+                    dados.setNumero(e.getNumero());
+                    dados.setComplemento(e.getComplemento());
+                    dados.setBairro(e.getBairro());
+                    dados.setCidade(e.getCidade());
+                    dados.setEstado(e.getEstado());
+                    dados.setCep(e.getCep());
+                    dados.setInquilino(false);
+                    dados.setCobranca(cobranca);
                 }
-                listaDados.add(dados);
             }
+            listaDados.add(dados);
+        }
 
-            if (imprimirInquilino) {
-                if (u.getInquilino() != null) {
-                    DadosCorrespondencia dadosInquilino = new DadosCorrespondencia();
-                    dadosInquilino.setCondominio(u.getCondominio().getRazaoSocial());
-                    dadosInquilino.setUnidade(u.getUnidade());
-                    dadosInquilino.setNome(u.getInquilino().getNome());
-                    for (Endereco e : u.getInquilino().getEnderecos()) {
-                        if (e.isPadrao()) {
-                            dadosInquilino.setLogradouro(e.getLogradouro());
-                            dadosInquilino.setNumero(e.getNumero());
-                            dadosInquilino.setComplemento(e.getComplemento());
-                            dadosInquilino.setBairro(e.getBairro());
-                            dadosInquilino.setCidade(e.getCidade());
-                            dadosInquilino.setEstado(e.getEstado());
-                            dadosInquilino.setCep(e.getCep());
-                            dadosInquilino.setInquilino(true);
-                        }
+        if (imprimirInquilino) {
+            if (u.getInquilino() != null) {
+                DadosCorrespondencia dadosInquilino = new DadosCorrespondencia();
+                dadosInquilino.setCondominio(u.getCondominio().getRazaoSocial());
+                dadosInquilino.setUnidade(u.getUnidade());
+                dadosInquilino.setNome(u.getInquilino().getNome());
+                for (Endereco e : u.getInquilino().getEnderecos()) {
+                    if (e.isPadrao()) {
+                        dadosInquilino.setLogradouro(e.getLogradouro());
+                        dadosInquilino.setNumero(e.getNumero());
+                        dadosInquilino.setComplemento(e.getComplemento());
+                        dadosInquilino.setBairro(e.getBairro());
+                        dadosInquilino.setCidade(e.getCidade());
+                        dadosInquilino.setEstado(e.getEstado());
+                        dadosInquilino.setCep(e.getCep());
+                        dadosInquilino.setInquilino(true);
+                        dadosInquilino.setCobranca(cobranca);
                     }
-                    listaDados.add(dadosInquilino);
                 }
+                listaDados.add(dadosInquilino);
             }
         }
+
         return listaDados;
     }
-    
 }
