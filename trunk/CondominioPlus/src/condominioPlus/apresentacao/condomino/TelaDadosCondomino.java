@@ -790,10 +790,18 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             cmbAdvogado1.setSelectedItem(unidade.getProcessoJudicial().getAdvogado());
             dateProcessoJuridico.setValue(DataUtil.getDate(unidade.getProcessoJudicial().getData_processo().getTimeInMillis()));
             txtNumeroProcesso.setText(unidade.getProcessoJudicial().getNumero_processo());
-
         }
 
         //processos com datas
+        
+        //informações para o envio de correspondências/boletos
+        radioBalanceteInquilino.setSelected(unidade.isBalanceteInquilino());
+        radioBalanceteProprietario.setSelected(unidade.isBalanceteProprietario());
+        radioBalanceteProprietarioInquilino.setSelected(unidade.isBalanceteProprietarioInquilino());
+        radioBoletoInquilino.setSelected(unidade.isBoletoInquilino());
+        radioBoletoProprietario.setSelected(unidade.isBoletoProprietario());
+        radioBoletoProprietarioInquilino.setSelected(unidade.isBoletoProprietarioInquilino());
+        
     }
 
     private void ativarProcessoJuridico(boolean valor) {
@@ -940,6 +948,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 unidade.setProcessoJudicial(pj);
             }
         }
+        
+        //informações para o envio de correspondências/boletos
+        unidade.setBalanceteInquilino(radioBalanceteInquilino.isSelected());
+        unidade.setBalanceteProprietario(radioBalanceteProprietario.isSelected());
+        unidade.setBalanceteProprietarioInquilino(radioBalanceteProprietarioInquilino.isSelected());
+        unidade.setBoletoInquilino(radioBoletoInquilino.isSelected());
+        unidade.setBoletoProprietario(radioBoletoProprietario.isSelected());
+        unidade.setBoletoProprietarioInquilino(radioBoletoProprietarioInquilino.isSelected());
     }
 
     private void teste() {
@@ -1009,6 +1025,19 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         dialogo.setVisible(true);
     }
 
+    private void verificarSelecaoRadios() {
+        if (radioBoletoInquilino.isSelected() || radioBoletoProprietarioInquilino.isSelected() || radioBalanceteInquilino.isSelected() || radioBalanceteProprietarioInquilino.isSelected()) {
+            if (unidade.getInquilino() == null) {
+                ApresentacaoUtil.exibirAdvertencia("Essa unidade não possui inquilino.", this);
+                if (radioBoletoInquilino.isSelected() || radioBoletoProprietarioInquilino.isSelected()) {
+                    radioBoletoProprietario.setSelected(true);
+                } else if (radioBalanceteInquilino.isSelected() || radioBalanceteProprietarioInquilino.isSelected()) {
+                    radioBalanceteProprietario.setSelected(true);
+                }
+            }
+        }
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
@@ -1073,6 +1102,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 teste();
             } else if (e.getSource() == itemMenuDetalhe) {
                 exibirDetalheInquilino();
+            } else if (e.getSource() == radioBalanceteInquilino || e.getSource() == radioBalanceteProprietario || e.getSource() == radioBalanceteProprietarioInquilino
+                    || e.getSource() == radioBoletoInquilino || e.getSource() == radioBoletoProprietario || e.getSource() == radioBoletoProprietarioInquilino) {
+
+                verificarSelecaoRadios();
             }
         }
 
@@ -1107,6 +1140,12 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             btnTeste.addActionListener(this);
             itemMenuDetalhe.addActionListener(this);
             tabelaHistoricoInquilino.addMouseListener(this);
+            radioBoletoInquilino.addActionListener(this);
+            radioBoletoProprietario.addActionListener(this);
+            radioBoletoProprietarioInquilino.addActionListener(this);
+            radioBalanceteInquilino.addActionListener(this);
+            radioBalanceteProprietario.addActionListener(this);
+            radioBalanceteProprietarioInquilino.addActionListener(this);
         }
 
         @Override
@@ -1133,6 +1172,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuDetalhe = new javax.swing.JMenuItem();
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
@@ -1204,9 +1245,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnEditarTelefoneInquilino = new javax.swing.JButton();
         btnRemoverTelefoneInquilino = new javax.swing.JButton();
         painelCorrespondencia = new javax.swing.JPanel();
-        radioProprietarioInquilino = new javax.swing.JRadioButton();
-        radioProprietario = new javax.swing.JRadioButton();
-        radioInquilino = new javax.swing.JRadioButton();
+        painelBoleto = new javax.swing.JPanel();
+        radioBoletoProprietario = new javax.swing.JRadioButton();
+        radioBoletoInquilino = new javax.swing.JRadioButton();
+        radioBoletoProprietarioInquilino = new javax.swing.JRadioButton();
+        painelEnvelope1 = new javax.swing.JPanel();
+        radioBalanceteProprietario = new javax.swing.JRadioButton();
+        radioBalanceteInquilino = new javax.swing.JRadioButton();
+        radioBalanceteProprietarioInquilino = new javax.swing.JRadioButton();
         painelUnidade = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -1857,38 +1903,98 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Inquilino", painelInquilino);
 
-        buttonGroup1.add(radioProprietarioInquilino);
-        radioProprietarioInquilino.setText("Proprietário e Inquilino");
+        painelBoleto.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Boleto(s)"));
+        painelBoleto.setPreferredSize(new java.awt.Dimension(182, 124));
 
-        buttonGroup1.add(radioProprietario);
-        radioProprietario.setSelected(true);
-        radioProprietario.setText("Somente Proprietário");
+        buttonGroup3.add(radioBoletoProprietario);
+        radioBoletoProprietario.setSelected(true);
+        radioBoletoProprietario.setText("Somente Proprietário");
 
-        buttonGroup1.add(radioInquilino);
-        radioInquilino.setText("Somente Inquilino");
+        buttonGroup3.add(radioBoletoInquilino);
+        radioBoletoInquilino.setText("Somente Inquilino");
+
+        buttonGroup3.add(radioBoletoProprietarioInquilino);
+        radioBoletoProprietarioInquilino.setText("Proprietário e Inquilino");
+
+        javax.swing.GroupLayout painelBoletoLayout = new javax.swing.GroupLayout(painelBoleto);
+        painelBoleto.setLayout(painelBoletoLayout);
+        painelBoletoLayout.setHorizontalGroup(
+            painelBoletoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelBoletoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(painelBoletoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(radioBoletoInquilino)
+                    .addComponent(radioBoletoProprietario)
+                    .addComponent(radioBoletoProprietarioInquilino))
+                .addContainerGap(31, Short.MAX_VALUE))
+        );
+        painelBoletoLayout.setVerticalGroup(
+            painelBoletoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelBoletoLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(radioBoletoProprietario)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioBoletoInquilino)
+                .addGap(3, 3, 3)
+                .addComponent(radioBoletoProprietarioInquilino)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
+
+        painelEnvelope1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Balancete(s)"));
+
+        buttonGroup2.add(radioBalanceteProprietario);
+        radioBalanceteProprietario.setSelected(true);
+        radioBalanceteProprietario.setText("Somente Proprietário");
+
+        buttonGroup2.add(radioBalanceteInquilino);
+        radioBalanceteInquilino.setText("Somente Inquilino");
+
+        buttonGroup2.add(radioBalanceteProprietarioInquilino);
+        radioBalanceteProprietarioInquilino.setText("Proprietário e Inquilino");
+
+        javax.swing.GroupLayout painelEnvelope1Layout = new javax.swing.GroupLayout(painelEnvelope1);
+        painelEnvelope1.setLayout(painelEnvelope1Layout);
+        painelEnvelope1Layout.setHorizontalGroup(
+            painelEnvelope1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelEnvelope1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(painelEnvelope1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(radioBalanceteInquilino)
+                    .addComponent(radioBalanceteProprietario)
+                    .addComponent(radioBalanceteProprietarioInquilino))
+                .addContainerGap(31, Short.MAX_VALUE))
+        );
+        painelEnvelope1Layout.setVerticalGroup(
+            painelEnvelope1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelEnvelope1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(radioBalanceteProprietario)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(radioBalanceteInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioBalanceteProprietarioInquilino)
+                .addContainerGap(16, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout painelCorrespondenciaLayout = new javax.swing.GroupLayout(painelCorrespondencia);
         painelCorrespondencia.setLayout(painelCorrespondenciaLayout);
         painelCorrespondenciaLayout.setHorizontalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(radioInquilino)
-                    .addComponent(radioProprietario)
-                    .addComponent(radioProprietarioInquilino))
-                .addContainerGap(454, Short.MAX_VALUE))
+                .addGap(24, 24, 24)
+                .addComponent(painelEnvelope1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(painelBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(196, Short.MAX_VALUE))
         );
         painelCorrespondenciaLayout.setVerticalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(radioProprietario)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(radioInquilino)
-                .addGap(3, 3, 3)
-                .addComponent(radioProprietarioInquilino)
-                .addContainerGap(84, Short.MAX_VALUE))
+                .addGap(27, 27, 27)
+                .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(painelEnvelope1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(painelBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Correspondência - Enviar Para:", painelCorrespondencia);
@@ -2278,7 +2384,6 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Coeficiente;
     private javax.swing.JButton btnAdicionarAnotacao;
@@ -2302,6 +2407,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnTeste;
     private javax.swing.JButton btnVoltar;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JCheckBox checkBoxCNPJ;
     private javax.swing.JCheckBox checkBoxFalecido;
     private javax.swing.JCheckBox checkBoxInquilino;
@@ -2360,16 +2467,21 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblCpf;
     private javax.swing.JPanel painelAnotacoes;
+    private javax.swing.JPanel painelBoleto;
     private javax.swing.JPanel painelContato;
     private javax.swing.JPanel painelCorrespondencia;
     private javax.swing.JPanel painelEnderecoInquilino;
+    private javax.swing.JPanel painelEnvelope1;
     private javax.swing.JPanel painelInquilino;
     private javax.swing.JPanel painelTelefoneInquilino;
     private javax.swing.JPanel painelUnidade;
     private javax.swing.JPopupMenu popupMenu;
-    private javax.swing.JRadioButton radioInquilino;
-    private javax.swing.JRadioButton radioProprietario;
-    private javax.swing.JRadioButton radioProprietarioInquilino;
+    private javax.swing.JRadioButton radioBalanceteInquilino;
+    private javax.swing.JRadioButton radioBalanceteProprietario;
+    private javax.swing.JRadioButton radioBalanceteProprietarioInquilino;
+    private javax.swing.JRadioButton radioBoletoInquilino;
+    private javax.swing.JRadioButton radioBoletoProprietario;
+    private javax.swing.JRadioButton radioBoletoProprietarioInquilino;
     private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tabelaHistoricoInquilino;
     private javax.swing.JTable tblEndereco;
