@@ -588,50 +588,7 @@ public class Relatorios implements Printable {
         HashMap<String, Object> parametros = new HashMap();
 
         List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
-        for (Unidade unidade : unidades) {
-
-            if (imprimirProprietario) {
-                DadosCorrespondencia dados = new DadosCorrespondencia();
-                dados.setCondominio(unidade.getCondominio().getRazaoSocial());
-                dados.setUnidade(unidade.getUnidade());
-                dados.setNome(unidade.getCondomino().getNome());
-                for (Endereco e : unidade.getCondomino().getEnderecos()) {
-                    if (e.isPadrao()) {
-                        dados.setLogradouro(e.getLogradouro());
-                        dados.setNumero(e.getNumero());
-                        dados.setComplemento(e.getComplemento());
-                        dados.setBairro(e.getBairro());
-                        dados.setCidade(e.getCidade());
-                        dados.setEstado(e.getEstado());
-                        dados.setCep(e.getCep());
-                        dados.setInquilino(false);
-                    }
-                }
-                listaDados.add(dados);
-            }
-
-            if (imprimirInquilino) {
-                if (unidade.getInquilino() != null) {
-                    DadosCorrespondencia dadosInquilino = new DadosCorrespondencia();
-                    dadosInquilino.setCondominio(unidade.getCondominio().getRazaoSocial());
-                    dadosInquilino.setUnidade(unidade.getUnidade());
-                    dadosInquilino.setNome(unidade.getInquilino().getNome());
-                    for (Endereco e : unidade.getInquilino().getEnderecos()) {
-                        if (e.isPadrao()) {
-                            dadosInquilino.setLogradouro(e.getLogradouro());
-                            dadosInquilino.setNumero(e.getNumero());
-                            dadosInquilino.setComplemento(e.getComplemento());
-                            dadosInquilino.setBairro(e.getBairro());
-                            dadosInquilino.setCidade(e.getCidade());
-                            dadosInquilino.setEstado(e.getEstado());
-                            dadosInquilino.setCep(e.getCep());
-                            dadosInquilino.setInquilino(true);
-                        }
-                    }
-                    listaDados.add(dadosInquilino);
-                }
-            }
-        }
+        listaDados = DadosCorrespondencia.preencherLista(unidades, listaDados, imprimirProprietario, imprimirInquilino);
 
         for (DadosCorrespondencia dados : listaDados) {
             HashMap<String, String> mapa = new HashMap();
