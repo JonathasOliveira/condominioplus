@@ -14,6 +14,8 @@ import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
+import java.util.Collections;
+import java.util.Comparator;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
@@ -59,12 +61,13 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
 
             @Override
             public void editar(Unidade unidade) {
-                TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade, modelo));
+                TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondomino(unidade, modelo, condominio));
             }
 
             @Override
             protected List<Unidade> getCarregarObjetos() {
-                return new DAO().listar("UnidadePorCondominio", condominio.getCodigo());
+//                return new DAO().listar("UnidadePorCondominio", condominio.getCodigo());
+                return getUnidades();
             }
 
             @Override
@@ -111,6 +114,25 @@ public class TelaCondomino extends javax.swing.JInternalFrame {
         btnAdicionar.addActionListener(modelo.listenerAdicao);
         btnEditar.addActionListener(modelo.listenerEdicao);
         btnRemover.addActionListener(modelo.listenerRemocao);
+    }
+
+    private List<Unidade> getUnidades() {
+        List<Unidade> listaUnidades = condominio.getUnidades();
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Unidade u1 = (Unidade) o1;
+                Unidade u2 = (Unidade) o2;
+                return u1.getUnidade().compareTo(u2.getUnidade());
+            }
+        };
+
+        Collections.sort(listaUnidades, c);
+
+        return listaUnidades;
     }
 
     private List<Unidade> filtrarListaPorNome(String sequencia, List<Unidade> unidades) {
