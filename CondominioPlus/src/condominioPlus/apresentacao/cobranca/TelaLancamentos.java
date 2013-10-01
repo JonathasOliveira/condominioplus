@@ -110,7 +110,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     /** Creates new form TelaLancamentos */
     public TelaLancamentos(Condominio condominio) {
         this.condominio = condominio;
-
         initComponents();
 
         new ControladorEventos();
@@ -980,19 +979,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
 
             for (Cobranca co : listaCobrancas) {
-                boolean imprimirProprietario = false;
-                boolean imprimirInquilino = false;
-                if (co.getUnidade().isBoletoProprietario()) {
-                    imprimirProprietario = true;
-                    imprimirInquilino = false;
-                } else if (co.getUnidade().isBoletoInquilino()) {
-                    imprimirProprietario = false;
-                    imprimirInquilino = true;
-                } else if (co.getUnidade().isBoletoProprietarioInquilino()) {
-                    imprimirProprietario = true;
-                    imprimirInquilino = true;
-                }
-                listaDados = DadosCorrespondencia.preencherLista(co.getUnidade(), listaDados, imprimirProprietario, imprimirInquilino, co);
+                System.out.println("imprimir inquilino: " + co.getUnidade().isBoletoProprietario());
+                System.out.println("imprimir proprietario: " + co.getUnidade().isBoletoInquilino());
+                listaDados = DadosCorrespondencia.preencherLista(co.getUnidade(), listaDados, co.getUnidade().isBoletoProprietario(), co.getUnidade().isBoletoInquilino(), co);
             }
 
             for (DadosCorrespondencia dados : listaDados) {

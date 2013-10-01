@@ -51,7 +51,7 @@ public class Unidade implements Serializable {
     private String descricao;
     private String iptu;
     @Column(name = "fracao_ideal")
-    private double  fracaoIdeal;
+    private double fracaoIdeal;
     private String bloco;
     private String coeficiente;
     @Column(name = "valor_principal", precision = 20, scale = 2)
@@ -70,6 +70,17 @@ public class Unidade implements Serializable {
     private List<Cobranca> cobrancas;
     @OneToMany(mappedBy = "unidade", cascade = CascadeType.ALL)
     private List<AcordoCobranca> acordos;
+    //informações para o envio de correspondências/boletos
+    @Column(name = "balancete_proprietario")
+    private boolean balanceteProprietario;
+    @Column(name = "balancete_inquilino")
+    private boolean balanceteInquilino;
+    @Column(name = "balancete_proprietario_inquilino")
+    private boolean balanceteProprietarioInquilino;
+    @Column(name = "boleto_proprietario")
+    private boolean boletoProprietario;
+    @Column(name = "boleto_inquilino")
+    private boolean boletoInquilino;
 
     public Unidade() {
     }
@@ -244,6 +255,46 @@ public class Unidade implements Serializable {
 
     public void setAcordos(List<AcordoCobranca> acordos) {
         this.acordos = acordos;
+    }
+
+    public boolean isBoletoInquilino() {
+        return boletoInquilino;
+    }
+
+    public void setBoletoInquilino(boolean boletoInquilino) {
+        this.boletoInquilino = boletoInquilino;
+    }
+
+    public boolean isBoletoProprietario() {
+        return boletoProprietario;
+    }
+
+    public void setBoletoProprietario(boolean boletoProprietario) {
+        this.boletoProprietario = boletoProprietario;
+    }
+
+    public boolean isBalanceteInquilino() {
+        return balanceteInquilino;
+    }
+
+    public void setBalanceteInquilino(boolean balanceteInquilino) {
+        this.balanceteInquilino = balanceteInquilino;
+    }
+
+    public boolean isBalanceteProprietario() {
+        return balanceteProprietario;
+    }
+
+    public void setBalanceteProprietario(boolean balanceteProprietario) {
+        this.balanceteProprietario = balanceteProprietario;
+    }
+
+    public boolean isBalanceteProprietarioInquilino() {
+        return balanceteProprietarioInquilino;
+    }
+
+    public void setBalanceteProprietarioInquilino(boolean balanceteProprietarioInquilino) {
+        this.balanceteProprietarioInquilino = balanceteProprietarioInquilino;
     }
 
     @Override

@@ -1221,9 +1221,8 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="radioBoletoInquilino" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="radioBoletoProprietario" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="radioBoletoProprietarioInquilino" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="31" max="32767" attributes="0"/>
+                              <EmptySpace pref="37" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1234,9 +1233,7 @@
                               <Component id="radioBoletoProprietario" min="-2" max="-2" attributes="0"/>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="radioBoletoInquilino" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                              <Component id="radioBoletoProprietarioInquilino" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="16" max="32767" attributes="0"/>
+                              <EmptySpace pref="42" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1257,14 +1254,6 @@
                           <ComponentRef name="buttonGroup3"/>
                         </Property>
                         <Property name="text" type="java.lang.String" value="Somente Inquilino"/>
-                      </Properties>
-                    </Component>
-                    <Component class="javax.swing.JRadioButton" name="radioBoletoProprietarioInquilino">
-                      <Properties>
-                        <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
-                          <ComponentRef name="buttonGroup3"/>
-                        </Property>
-                        <Property name="text" type="java.lang.String" value="Propriet&#xe1;rio e Inquilino"/>
                       </Properties>
                     </Component>
                   </SubComponents>
