@@ -8,7 +8,6 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import org.joda.time.DateTime;
@@ -185,13 +184,13 @@ public class BoletoBancario {
 
         // Informando dados sobre a conta bancária do título.
         ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
+        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + cobranca.getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
         contaBancaria.setCarteira(new Carteira(102));
-        contaBancaria.setAgencia(new Agencia(3918, "0"));
+        contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
 //        if (cobranca.getNumeroDocumento().length() == 13) {
-            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
             titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
             titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
 //        } else if (cobranca.getNumeroDocumento().length() == 12) {
@@ -207,7 +206,7 @@ public class BoletoBancario {
             titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
         }
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-        titulo.setAceite(EnumAceite.N);
+        titulo.setAceite(EnumAceite.A);
         titulo.setDesconto(null);
         titulo.setDeducao(null);
         titulo.setMora(null);

@@ -52,6 +52,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import org.joda.time.DateTime;
+import org.jrimum.bopepo.Boleto;
 
 /**
  *
@@ -755,6 +756,46 @@ public class Relatorios implements Printable {
         lista.add(mapa);
 
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
+    }
+
+    public void imprimirBoleto(List<Boleto> boletos) {
+
+        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+        
+        URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
+        parametros.put("logoSantander", logoSantander.toString());
+
+        for (Boleto boleto : boletos) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("nomeCedente", boleto.getTitulo().getCedente().getNome());
+            mapa.put("cnpjCedente", boleto.getTitulo().getCedente().getCPRF().getCodigoFormatado());
+            mapa.put("nomeSacado", boleto.getTitulo().getSacado().getNome());
+            
+            //endereço sacado
+           
+            mapa.put("agencia", "" + boleto.getTitulo().getContaBancaria().getAgencia().getCodigo());
+            mapa.put("codigoCedente", "" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta());
+            mapa.put("numeroDocumento", boleto.getTitulo().getNumeroDoDocumento());
+            mapa.put("dataDocumento", DataUtil.toString(boleto.getTitulo().getDataDoDocumento()));
+            mapa.put("dataVencimento", DataUtil.toString(boleto.getTitulo().getDataDoVencimento()));
+            mapa.put("tipoDocumento", boleto.getTitulo().getTipoDeDocumento().getSigla());
+            mapa.put("aceite", boleto.getTitulo().getAceite().name());
+            mapa.put("carteira", "" + boleto.getTitulo().getContaBancaria().getCarteira().getCodigo());
+            mapa.put("especie", "R$");
+            mapa.put("localPagamento", boleto.getLocalPagamento());
+            mapa.put("valor", PagamentoUtil.formatarMoeda(boleto.getTitulo().getValor().doubleValue()));
+            mapa.put("codigoBanco", "033");
+            mapa.put("digitoBanco", "7");
+            mapa.put("linhaDigitavel", boleto.getLinhaDigitavel().write());
+            
+            lista.add(mapa);
+        }
+        
+        if (!lista.isEmpty()) {
+            imprimir("Boleto", parametros, lista, false, true, null);
+        }
     }
 
     public void imprimirAnotacoes(Condominio condominio, Unidade unidade, List<Anotacao> anotacoes, TipoRelatorio tipo) {

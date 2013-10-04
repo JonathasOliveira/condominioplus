@@ -979,8 +979,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
 
             for (Cobranca co : listaCobrancas) {
-                System.out.println("imprimir inquilino: " + co.getUnidade().isBoletoProprietario());
-                System.out.println("imprimir proprietario: " + co.getUnidade().isBoletoInquilino());
                 listaDados = DadosCorrespondencia.preencherLista(co.getUnidade(), listaDados, co.getUnidade().isBoletoProprietario(), co.getUnidade().isBoletoInquilino(), co);
             }
 
@@ -994,8 +992,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
          * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
          */
 
-        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
-        BoletoBancario.mostreBoletoNaTela(pdf);
+        new Relatorios().imprimirBoleto(boletos);
+//        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
+//        BoletoBancario.mostreBoletoNaTela(pdf);
     }
 
     private Sacado getSacado(DadosCorrespondencia dados) {
@@ -1046,12 +1045,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         // Informando dados sobre a conta bancária do título.
         ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
+        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + cobranca.getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
         contaBancaria.setCarteira(new Carteira(102));
         contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 12));
+        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
         titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
         titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
         titulo.setValor(cobranca.getValorTotal());
@@ -1062,7 +1061,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
         }
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-        titulo.setAceite(EnumAceite.N);
+        titulo.setAceite(EnumAceite.A);
         titulo.setDesconto(null);
         titulo.setDeducao(null);
         titulo.setMora(null);
@@ -1074,8 +1073,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
          */
         Boleto boleto = new Boleto(titulo);
 
-        boleto.setLocalPagamento("Pagável preferencialmente na Rede X ou em "
-                + "qualquer Banco até o Vencimento.");
+        boleto.setLocalPagamento("ATÉ O VENCIMENTO PAGAR EM QUALQUER BANCO E/OU AGÊNCIA");
 //                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
 //                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
         boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
