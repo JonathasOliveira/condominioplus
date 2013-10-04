@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Boleto" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="dataset1"/>
+	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="logoSantander" class="java.lang.String"/>
+	<field name="nomeCedente" class="java.lang.String"/>
+	<field name="nomeSacado" class="java.lang.String"/>
+	<field name="dataVencimento" class="java.lang.String"/>
+	<field name="numeroDocumento" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="802" splitType="Stretch">
+			<image hAlign="Left" vAlign="Middle">
+				<reportElement x="0" y="-7" width="555" height="75"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="384" width="555" height="34" forecolor="#999999"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[---------------------------------------------------------------------------------------------]]></text>
+			</staticText>
+			<image hAlign="Right">
+				<reportElement x="311" y="-28" width="244" height="98"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoSantander}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="452" y="64" width="100" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Recibo do Sacado]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="84" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement x="0" y="104" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="5" y="85" width="44" height="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[ Cedente]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="13" y="92" width="528" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nomeCedente}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="124" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="13" y="112" width="293" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nomeSacado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="5" y="105" width="44" height="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Sacado]]></text>
+			</staticText>
+			<line direction="BottomUp">
+				<reportElement x="311" y="104" width="1" height="20"/>
+			</line>
+			<staticText>
+				<reportElement x="467" y="105" width="44" height="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="475" y="112" width="75" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dataVencimento}]]></textFieldExpression>
+			</textField>
+			<line direction="BottomUp">
+				<reportElement x="461" y="104" width="1" height="20"/>
+			</line>
+			<staticText>
+				<reportElement x="318" y="105" width="83" height="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Número Documento]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="318" y="112" width="135" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{numeroDocumento}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
