@@ -776,7 +776,7 @@ public class Relatorios implements Printable {
             //endereço sacado
            
             mapa.put("agencia", "" + boleto.getTitulo().getContaBancaria().getAgencia().getCodigo());
-            mapa.put("codigoCedente", "" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta());
+            mapa.put("codigoCedente", "" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
             mapa.put("numeroDocumento", boleto.getTitulo().getNumeroDoDocumento());
             mapa.put("dataDocumento", DataUtil.toString(boleto.getTitulo().getDataDoDocumento()));
             mapa.put("dataVencimento", DataUtil.toString(boleto.getTitulo().getDataDoVencimento()));
