@@ -789,6 +789,7 @@ public class Relatorios implements Printable {
             mapa.put("codigoBanco", "033");
             mapa.put("digitoBanco", "7");
             mapa.put("linhaDigitavel", boleto.getLinhaDigitavel().write());
+            mapa.put("codigoDeBarras", boleto.getCodigoDeBarras().write());
             
             lista.add(mapa);
         }
