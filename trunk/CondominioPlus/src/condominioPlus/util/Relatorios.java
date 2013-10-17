@@ -15,6 +15,7 @@ import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.Telefone;
 import condominioPlus.negocio.Unidade;
+import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.DadosCorrespondencia;
 import condominioPlus.negocio.financeiro.DadosBoleto;
@@ -52,7 +53,6 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.view.JasperViewer;
 import org.joda.time.DateTime;
-import org.jrimum.bopepo.Boleto;
 
 /**
  *
@@ -758,7 +758,7 @@ public class Relatorios implements Printable {
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
     }
 
-    public void imprimirBoleto(List<Boleto> boletos) {
+    public void imprimirBoleto(List<BoletoBancario> boletos) {
 
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 
@@ -767,29 +767,31 @@ public class Relatorios implements Printable {
         URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
         parametros.put("logoSantander", logoSantander.toString());
 
-        for (Boleto boleto : boletos) {
+        for (BoletoBancario boleto : boletos) {
             HashMap<String, String> mapa = new HashMap();
-            mapa.put("nomeCedente", boleto.getTitulo().getCedente().getNome());
-            mapa.put("cnpjCedente", boleto.getTitulo().getCedente().getCPRF().getCodigoFormatado());
-            mapa.put("nomeSacado", boleto.getTitulo().getSacado().getNome());
+            mapa.put("nomeCedente", boleto.getNomeCedente());
+            mapa.put("cnpjCedente", boleto.getCnpjCedente());
+            mapa.put("nomeSacado", boleto.getNomeSacado());
             
             //endereço sacado
-           
-            mapa.put("agencia", "" + boleto.getTitulo().getContaBancaria().getAgencia().getCodigo());
-            mapa.put("codigoCedente", "" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boleto.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
-            mapa.put("numeroDocumento", boleto.getTitulo().getNumeroDoDocumento());
-            mapa.put("dataDocumento", DataUtil.toString(boleto.getTitulo().getDataDoDocumento()));
-            mapa.put("dataVencimento", DataUtil.toString(boleto.getTitulo().getDataDoVencimento()));
-            mapa.put("tipoDocumento", boleto.getTitulo().getTipoDeDocumento().getSigla());
-            mapa.put("aceite", boleto.getTitulo().getAceite().name());
-            mapa.put("carteira", "" + boleto.getTitulo().getContaBancaria().getCarteira().getCodigo());
-            mapa.put("especie", "R$");
+            mapa.put("dadoscorrespondencia", boleto.getLogradouroSacado() + ", " + boleto.getNumeroSacado() + " / " + boleto.getComplementoSacado() + " - " + boleto.getBairroSacado());
+            mapa.put("dadoscorrespondencia2", boleto.getCepSacado() + "   " + boleto.getCidadeSacado() + " - " + boleto.getUfSacado());
+                       
+            mapa.put("agencia", boleto.getAgencia());
+            mapa.put("codigoCedente", boleto.getCnpjCedente());
+            mapa.put("numeroDocumento", boleto.getNumeroDocumento());
+            mapa.put("dataDocumento", boleto.getDataDocumento());
+            mapa.put("dataVencimento", boleto.getDataVencimento());
+            mapa.put("tipoDocumento", boleto.getTipoDocumento());
+            mapa.put("aceite", boleto.getAceite());
+            mapa.put("carteira", boleto.getCarteira());
+            mapa.put("especie", boleto.getEspecie());
             mapa.put("localPagamento", boleto.getLocalPagamento());
-            mapa.put("valor", PagamentoUtil.formatarMoeda(boleto.getTitulo().getValor().doubleValue()));
-            mapa.put("codigoBanco", "033");
-            mapa.put("digitoBanco", "7");
-            mapa.put("linhaDigitavel", boleto.getLinhaDigitavel().write());
-            mapa.put("codigoDeBarras", boleto.getCodigoDeBarras().write());
+            mapa.put("valor", boleto.getValor());
+            mapa.put("codigoBanco", boleto.getCodigoBanco());
+            mapa.put("digitoBanco",boleto.getDigitoBanco());
+            mapa.put("linhaDigitavel", boleto.getLinhaDigitavel());
+            mapa.put("codigoDeBarras", boleto.getCodigoBarras());
             
             lista.add(mapa);
         }

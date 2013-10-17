@@ -969,7 +969,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirBoleto(List<Cobranca> listaCobrancas) {
-        List<Boleto> boletos = new ArrayList<Boleto>();
+        List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
         for (Cobranca cobranca : listaCobrancas) {
 
             if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
@@ -983,8 +983,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
 
             for (DadosCorrespondencia dados : listaDados) {
-                Sacado sacado = getSacado(dados);
-                gerarBoleto(boletos, dados.getCobranca(), sacado);
+                gerarBoleto(boletos, dados);
             }
         }
 
@@ -997,32 +996,27 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 //        BoletoBancario.mostreBoletoNaTela(pdf);
     }
 
-    private Sacado getSacado(DadosCorrespondencia dados) {
+    private void gerarBoleto(List<BoletoBancario> boletos, DadosCorrespondencia dados) {
+        /*
+         * INFORMANDO DADOS SOBRE O CEDENTE.
+         */
+        Cedente cedente = new Cedente(dados.getCobranca().getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(dados.getCobranca().getUnidade().getCondominio().getCnpj()));
+
         /*
          * INFORMANDO DADOS SOBRE O SACADO.
          */
         Sacado sacado = new Sacado(dados.getUnidade() + " " + dados.getNome());
-
         // Informando o endereço do sacado.
-        Endereco enderecoSac = new Endereco();
-
-        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(dados.getEstado()));
-        enderecoSac.setLocalidade(dados.getCidade());
-        enderecoSac.setCep(new CEP(dados.getCep()));
-        enderecoSac.setBairro(dados.getBairro());
-        enderecoSac.setLogradouro(dados.getLogradouro());
-        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
-
-        sacado.addEndereco(enderecoSac);
-
-        return sacado;
-    }
-
-    private void gerarBoleto(List<Boleto> boletos, Cobranca cobranca, Sacado sacado) {
-        /*
-         * INFORMANDO DADOS SOBRE O CEDENTE.
-         */
-        Cedente cedente = new Cedente(cobranca.getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(cobranca.getUnidade().getCondominio().getCnpj()));
+//        Endereco enderecoSac = new Endereco();
+//
+//        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(dados.getEstado()));
+//        enderecoSac.setLocalidade(dados.getCidade());
+//        enderecoSac.setCep(new CEP(dados.getCep()));
+//        enderecoSac.setBairro(dados.getBairro());
+//        enderecoSac.setLogradouro(dados.getLogradouro());
+//        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
+//
+//        sacado.addEndereco(enderecoSac);
 
         /*
          * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
@@ -1045,20 +1039,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         // Informando dados sobre a conta bancária do título.
         ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + cobranca.getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
+        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
         contaBancaria.setCarteira(new Carteira(102));
-        contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
+        contaBancaria.setAgencia(new Agencia(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
-        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
-        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
-        titulo.setValor(cobranca.getValorTotal());
+        titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento().substring(0, 13));
+        titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento().substring(0, 12));
+        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(dados.getCobranca().getNumeroDocumento().substring(0, 12)));
+        titulo.setValor(dados.getCobranca().getValorTotal());
         titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
-        if (cobranca.getVencimentoProrrogado() != null) {
-            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getVencimentoProrrogado()));
+        if (dados.getCobranca().getVencimentoProrrogado() != null) {
+            titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getVencimentoProrrogado()));
         } else {
-            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
+            titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getDataVencimento()));
         }
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
         titulo.setAceite(EnumAceite.A);
@@ -1071,23 +1065,47 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         /*
          * INFORMANDO OS DADOS SOBRE O BOLETO.
          */
-        Boleto boleto = new Boleto(titulo);
+        Boleto boletoAuxiliar = new Boleto(titulo);
 
+        System.out.println("campo livre " + boletoAuxiliar.getCampoLivre().write());
+        System.out.println("linha digitavel " + boletoAuxiliar.getLinhaDigitavel().write());
+        System.out.println("Codigo Barras " + boletoAuxiliar.getCodigoDeBarras().write());
+
+        BoletoBancario boleto = new BoletoBancario();
+        boleto.setNomeCedente(boletoAuxiliar.getTitulo().getCedente().getNome());
+        boleto.setCnpjCedente(boletoAuxiliar.getTitulo().getCedente().getCPRF().getCodigoFormatado());
+        boleto.setNomeSacado(boletoAuxiliar.getTitulo().getSacado().getNome());
+        boleto.setLogradouroSacado(dados.getLogradouro());
+        boleto.setNumeroSacado(dados.getNumero());
+        boleto.setComplementoSacado(dados.getComplemento());
+        boleto.setBairroSacado(dados.getBairro());
+        boleto.setCidadeSacado(dados.getCidade());
+        boleto.setUfSacado(dados.getEstado());
+        boleto.setCepSacado(dados.getCep());
+        boleto.setAgencia("" + boletoAuxiliar.getTitulo().getContaBancaria().getAgencia().getCodigo());
+        boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
+        boleto.setNumeroDocumento(boletoAuxiliar.getTitulo().getNumeroDoDocumento());
+        boleto.setDataDocumento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoDocumento()));
+        boleto.setDataVencimento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoVencimento()));
+        boleto.setTipoDocumento(boletoAuxiliar.getTitulo().getTipoDeDocumento().getSigla());
+        boleto.setAceite(boletoAuxiliar.getTitulo().getAceite().name());
+        boleto.setCarteira("" + boletoAuxiliar.getTitulo().getContaBancaria().getCarteira().getCodigo());
+        boleto.setEspecie( "R$");       
         boleto.setLocalPagamento("ATÉ O VENCIMENTO PAGAR EM QUALQUER BANCO E/OU AGÊNCIA");
-//                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
-//                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
-        boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
-        boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
-        boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
-        boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
-        boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
-        boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
-        boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
-        boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
+        boleto.setValor(PagamentoUtil.formatarMoeda(boletoAuxiliar.getTitulo().getValor().doubleValue()));
+        boleto.setCodigoBanco(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco());
+        boleto.setDigitoBanco("7");
+        boleto.setLinhaDigitavel(boletoAuxiliar.getLinhaDigitavel().write());
+        boleto.setCodigoBarras(boletoAuxiliar.getCodigoDeBarras().write());
 
-        System.out.println("campo livre " + boleto.getCampoLivre().write());
-        System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
-        System.out.println("Codigo Barras " + boleto.getCodigoDeBarras().write());
+//        boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
+//        boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
+//        boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
+//        boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
+//        boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
+//        boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
+//        boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
+//        boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
 
         boletos.add(boleto);
     }

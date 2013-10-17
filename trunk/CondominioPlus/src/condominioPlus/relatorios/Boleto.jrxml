@@ -23,6 +23,8 @@
 	<field name="aceite" class="java.lang.String"/>
 	<field name="carteira" class="java.lang.String"/>
 	<field name="codigoDeBarras" class="java.lang.String"/>
+	<field name="dadoscorrespondencia" class="java.lang.String"/>
+	<field name="dadoscorrespondencia2" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -710,14 +712,14 @@
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{nomeSacado}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dadoscorrespondencia}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="25" y="687" width="389" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{nomeSacado}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dadoscorrespondencia2}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="5" y="699" width="68" height="10"/>
@@ -737,10 +739,10 @@
 				<text><![CDATA[Autenticação Mecânica / FICHA DE COMPENSAÇÃO]]></text>
 			</staticText>
 			<componentElement>
-				<reportElement x="12" y="721" width="351" height="62"/>
-				<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code39" drawText="false" checksumRequired="false">
+				<reportElement x="12" y="719" width="392" height="37"/>
+				<jr:Interleaved2Of5 xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" textPosition="none">
 					<jr:codeExpression><![CDATA[$F{codigoDeBarras}]]></jr:codeExpression>
-				</jr:barbecue>
+				</jr:Interleaved2Of5>
 			</componentElement>
 		</band>
 	</detail>
