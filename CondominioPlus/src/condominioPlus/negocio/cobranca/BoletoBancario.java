@@ -6,8 +6,10 @@ package condominioPlus.negocio.cobranca;
 
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
+import condominioPlus.negocio.financeiro.Pagamento;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import org.joda.time.DateTime;
@@ -30,9 +32,243 @@ import org.jrimum.domkee.financeiro.banco.febraban.Titulo.EnumAceite;
  * @author eugenia
  */
 public class BoletoBancario {
+    
+    private String nomeCedente;
+    private String cnpjCedente;
+    private String nomeSacado;
+    private String logradouroSacado;
+    private String numeroSacado;
+    private String complementoSacado;
+    private String bairroSacado;
+    private String cidadeSacado;
+    private String ufSacado;
+    private String cepSacado;
+    private String agencia;
+    private String codigoCedente;
+    private String numeroDocumento;
+    private String dataDocumento;
+    private String dataVencimento;
+    private String tipoDocumento;
+    private String aceite;
+    private String carteira;
+    private String especie;
+    private String localPagamento;
+    private String valor;
+    private String codigoBanco;
+    private String digitoBanco;
+    private String linhaDigitavel;
+    private String codigoBarras;
+    private List<Pagamento> pagamentos;
 
+    public String getAceite() {
+        return aceite;
+    }
+
+    public void setAceite(String aceite) {
+        this.aceite = aceite;
+    }
+
+    public String getAgencia() {
+        return agencia;
+    }
+
+    public void setAgencia(String agencia) {
+        this.agencia = agencia;
+    }
+
+    public String getCarteira() {
+        return carteira;
+    }
+
+    public void setCarteira(String carteira) {
+        this.carteira = carteira;
+    }
+
+    public String getCodigoBanco() {
+        return codigoBanco;
+    }
+
+    public void setCodigoBanco(String codigoBanco) {
+        this.codigoBanco = codigoBanco;
+    }
+
+    public String getCodigoBarras() {
+        return codigoBarras;
+    }
+
+    public void setCodigoBarras(String codigoBarras) {
+        this.codigoBarras = codigoBarras;
+    }
+
+    public String getCodigoCedente() {
+        return codigoCedente;
+    }
+
+    public void setCodigoCedente(String codigoCedente) {
+        this.codigoCedente = codigoCedente;
+    }
+
+    public String getDataDocumento() {
+        return dataDocumento;
+    }
+
+    public void setDataDocumento(String dataDocumento) {
+        this.dataDocumento = dataDocumento;
+    }
+
+    public String getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(String dataVencimento) {
+        this.dataVencimento = dataVencimento;
+    }
+
+    public String getDigitoBanco() {
+        return digitoBanco;
+    }
+
+    public void setDigitoBanco(String digitoBanco) {
+        this.digitoBanco = digitoBanco;
+    }
+
+    public String getEspecie() {
+        return especie;
+    }
+
+    public void setEspecie(String especie) {
+        this.especie = especie;
+    }
+
+    public String getLinhaDigitavel() {
+        return linhaDigitavel;
+    }
+
+    public void setLinhaDigitavel(String linhaDigitavel) {
+        this.linhaDigitavel = linhaDigitavel;
+    }
+
+    public String getLocalPagamento() {
+        return localPagamento;
+    }
+
+    public void setLocalPagamento(String localPagamento) {
+        this.localPagamento = localPagamento;
+    }
+
+    public String getNumeroDocumento() {
+        return numeroDocumento;
+    }
+
+    public void setNumeroDocumento(String numeroDocumento) {
+        this.numeroDocumento = numeroDocumento;
+    }
+
+    public List<Pagamento> getPagamentos() {
+        return pagamentos;
+    }
+
+    public void setPagamentos(List<Pagamento> pagamentos) {
+        this.pagamentos = pagamentos;
+    }
+
+    public String getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
+    public String getValor() {
+        return valor;
+    }
+
+    public void setValor(String valor) {
+        this.valor = valor;
+    }
+
+    public String getBairroSacado() {
+        return bairroSacado;
+    }
+
+    public void setBairroSacado(String bairroSacado) {
+        this.bairroSacado = bairroSacado;
+    }
+
+    public String getCepSacado() {
+        return cepSacado;
+    }
+
+    public void setCepSacado(String cepSacado) {
+        this.cepSacado = cepSacado;
+    }
+
+    public String getCidadeSacado() {
+        return cidadeSacado;
+    }
+
+    public void setCidadeSacado(String cidadeSacado) {
+        this.cidadeSacado = cidadeSacado;
+    }
+
+    public String getCnpjCedente() {
+        return cnpjCedente;
+    }
+
+    public void setCnpjCedente(String cnpjCedente) {
+        this.cnpjCedente = cnpjCedente;
+    }
+
+    public String getComplementoSacado() {
+        return complementoSacado;
+    }
+
+    public void setComplementoSacado(String complementoSacado) {
+        this.complementoSacado = complementoSacado;
+    }
+
+    public String getLogradouroSacado() {
+        return logradouroSacado;
+    }
+
+    public void setLogradouroSacado(String logradouroSacado) {
+        this.logradouroSacado = logradouroSacado;
+    }
+
+    public String getNomeCedente() {
+        return nomeCedente;
+    }
+
+    public void setNomeCedente(String nomeCedente) {
+        this.nomeCedente = nomeCedente;
+    }
+
+    public String getNomeSacado() {
+        return nomeSacado;
+    }
+
+    public void setNomeSacado(String nomeSacado) {
+        this.nomeSacado = nomeSacado;
+    }
+
+    public String getNumeroSacado() {
+        return numeroSacado;
+    }
+
+    public void setNumeroSacado(String numeroSacado) {
+        this.numeroSacado = numeroSacado;
+    }
+
+    public String getUfSacado() {
+        return ufSacado;
+    }
+
+    public void setUfSacado(String ufSacado) {
+        this.ufSacado = ufSacado;
+    }
+     
     public static void mostreBoletoNaTela(File arquivoBoleto) {
-
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 
         try {
