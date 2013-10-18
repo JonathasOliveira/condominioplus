@@ -759,11 +759,10 @@ public class Relatorios implements Printable {
     }
 
     public void imprimirBoleto(List<BoletoBancario> boletos) {
-
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
-        
+
         URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
         parametros.put("logoSantander", logoSantander.toString());
 
@@ -772,13 +771,13 @@ public class Relatorios implements Printable {
             mapa.put("nomeCedente", boleto.getNomeCedente());
             mapa.put("cnpjCedente", boleto.getCnpjCedente());
             mapa.put("nomeSacado", boleto.getNomeSacado());
-            
+
             //endereço sacado
             mapa.put("dadoscorrespondencia", boleto.getLogradouroSacado() + ", " + boleto.getNumeroSacado() + " / " + boleto.getComplementoSacado() + " - " + boleto.getBairroSacado());
             mapa.put("dadoscorrespondencia2", boleto.getCepSacado() + "   " + boleto.getCidadeSacado() + " - " + boleto.getUfSacado());
-                       
+
             mapa.put("agencia", boleto.getAgencia());
-            mapa.put("codigoCedente", boleto.getCnpjCedente());
+            mapa.put("codigoCedente", boleto.getCodigoCedente());
             mapa.put("numeroDocumento", boleto.getNumeroDocumento());
             mapa.put("dataDocumento", boleto.getDataDocumento());
             mapa.put("dataVencimento", boleto.getDataVencimento());
@@ -789,13 +788,21 @@ public class Relatorios implements Printable {
             mapa.put("localPagamento", boleto.getLocalPagamento());
             mapa.put("valor", boleto.getValor());
             mapa.put("codigoBanco", boleto.getCodigoBanco());
-            mapa.put("digitoBanco",boleto.getDigitoBanco());
+            mapa.put("digitoBanco", boleto.getDigitoBanco());
             mapa.put("linhaDigitavel", boleto.getLinhaDigitavel());
             mapa.put("codigoDeBarras", boleto.getCodigoBarras());
-            
+
+            //preenchendo a lista de pagamentos
+            int i = 0;
+            for (Pagamento p : boleto.getPagamentos()) {
+                i += 1;
+                mapa.put("detalhe" + i, "   " + p.getDescricao());
+                mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
+            }
+
             lista.add(mapa);
         }
-        
+
         if (!lista.isEmpty()) {
             imprimir("Boleto", parametros, lista, false, true, null);
         }

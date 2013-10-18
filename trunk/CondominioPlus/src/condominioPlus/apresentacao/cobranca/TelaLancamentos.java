@@ -1017,7 +1017,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 //        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
 //
 //        sacado.addEndereco(enderecoSac);
-
+        
+     
         /*
          * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
          */
@@ -1097,6 +1098,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         boleto.setDigitoBanco("7");
         boleto.setLinhaDigitavel(boletoAuxiliar.getLinhaDigitavel().write());
         boleto.setCodigoBarras(boletoAuxiliar.getCodigoDeBarras().write());
+        
+        boleto.setPagamentos(dados.getCobranca().getPagamentos());
 
 //        boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
 //        boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
