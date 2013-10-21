@@ -59,6 +59,7 @@ public class BoletoBancario {
     private String linhaDigitavel;
     private String codigoBarras;
     private List<Pagamento> pagamentos;
+    private String mensagens;
 
     public String getAceite() {
         return aceite;
@@ -266,6 +267,14 @@ public class BoletoBancario {
 
     public void setUfSacado(String ufSacado) {
         this.ufSacado = ufSacado;
+    }
+
+    public String getMensagens() {
+        return mensagens;
+    }
+
+    public void setMensagens(String mensagens) {
+        this.mensagens = mensagens;
     }
      
     public static void mostreBoletoNaTela(File arquivoBoleto) {

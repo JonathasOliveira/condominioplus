@@ -1100,15 +1100,22 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         boleto.setCodigoBarras(boletoAuxiliar.getCodigoDeBarras().write());
         
         boleto.setPagamentos(dados.getCobranca().getPagamentos());
+        
+        Comparator c = null;
+        c = new Comparator() {
 
-//        boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
-//        boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
-//        boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
-//        boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
-//        boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
-//        boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
-//        boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
-//        boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
+            public int compare(Object o1, Object o2) {
+                MensagemBoleto p1 = (MensagemBoleto) o1;
+                MensagemBoleto p2 = (MensagemBoleto) o2;
+                return Integer.valueOf(p1.getCodigo()).compareTo(Integer.valueOf(p2.getCodigo()));
+            }
+        };
+        List<MensagemBoleto> mensagens = dados.getCobranca().getUnidade().getCondominio().getMensagens();        
+        Collections.sort(mensagens, c);
+        
+        boleto.setMensagens(mensagens.get(0).getMensagem() + "\n" + mensagens.get(1).getMensagem() + "\n" + mensagens.get(2).getMensagem()
+                + "\n" + mensagens.get(3).getMensagem() + "\n" + mensagens.get(4).getMensagem() + "\n" + mensagens.get(5).getMensagem()
+                + "\n" + mensagens.get(6).getMensagem() + "\n" + mensagens.get(7).getMensagem());
 
         boletos.add(boleto);
     }

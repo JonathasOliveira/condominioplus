@@ -799,6 +799,8 @@ public class Relatorios implements Printable {
                 mapa.put("detalhe" + i, "   " + p.getDescricao());
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
             }
+            
+            mapa.put("mensagens", boleto.getMensagens());
 
             lista.add(mapa);
         }
