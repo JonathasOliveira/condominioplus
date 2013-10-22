@@ -1111,8 +1111,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
         };
         List<MensagemBoleto> mensagens = dados.getCobranca().getUnidade().getCondominio().getMensagens();        
-        Collections.sort(mensagens, c);
-        
+        Collections.sort(mensagens, c);        
         boleto.setMensagens(mensagens.get(0).getMensagem() + "\n" + mensagens.get(1).getMensagem() + "\n" + mensagens.get(2).getMensagem()
                 + "\n" + mensagens.get(3).getMensagem() + "\n" + mensagens.get(4).getMensagem() + "\n" + mensagens.get(5).getMensagem()
                 + "\n" + mensagens.get(6).getMensagem() + "\n" + mensagens.get(7).getMensagem());
