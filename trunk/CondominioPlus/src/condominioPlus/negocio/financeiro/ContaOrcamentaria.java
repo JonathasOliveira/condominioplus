@@ -11,7 +11,7 @@ import java.math.BigDecimal;
  * @author Roberto Jana
  */
 public class ContaOrcamentaria {
-    
+
     private int codigo;
     private Conta Conta;
     private BigDecimal total = new BigDecimal(0);
@@ -19,6 +19,18 @@ public class ContaOrcamentaria {
     private BigDecimal media1 = new BigDecimal(0);
     private BigDecimal media2 = new BigDecimal(0);
     private BigDecimal media3 = new BigDecimal(0);
+    private BigDecimal somaJaneiro = new BigDecimal(0);
+    private BigDecimal somaFevereiro = new BigDecimal(0);
+    private BigDecimal somaMarco = new BigDecimal(0);
+    private BigDecimal somaAbril = new BigDecimal(0);
+    private BigDecimal somaMaio = new BigDecimal(0);
+    private BigDecimal somaJunho = new BigDecimal(0);
+    private BigDecimal somaJulho = new BigDecimal(0);
+    private BigDecimal somaAgosto = new BigDecimal(0);
+    private BigDecimal somaSetembro = new BigDecimal(0);
+    private BigDecimal somaOutubro = new BigDecimal(0);
+    private BigDecimal somaNovembro = new BigDecimal(0);
+    private BigDecimal somaDezembro = new BigDecimal(0);
 
     public condominioPlus.negocio.financeiro.Conta getConta() {
         return Conta;
@@ -43,8 +55,8 @@ public class ContaOrcamentaria {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
-    
-    public String descricao(){
+
+    public String descricao() {
         return getConta().getNome();
     }
 
@@ -79,9 +91,100 @@ public class ContaOrcamentaria {
     public void setMedia3(BigDecimal media3) {
         this.media3 = media3;
     }
-    
-    
-    
-    
-    
+
+    public BigDecimal getSomaAbril() {
+        return somaAbril;
+    }
+
+    public void setSomaAbril(BigDecimal somaAbril) {
+        this.somaAbril = somaAbril;
+    }
+
+    public BigDecimal getSomaAgosto() {
+        return somaAgosto;
+    }
+
+    public void setSomaAgosto(BigDecimal somaAgosto) {
+        this.somaAgosto = somaAgosto;
+    }
+
+    public BigDecimal getSomaDezembro() {
+        return somaDezembro;
+    }
+
+    public void setSomaDezembro(BigDecimal somaDezembro) {
+        this.somaDezembro = somaDezembro;
+    }
+
+    public BigDecimal getSomaFevereiro() {
+        return somaFevereiro;
+    }
+
+    public void setSomaFevereiro(BigDecimal somaFevereiro) {
+        this.somaFevereiro = somaFevereiro;
+    }
+
+    public BigDecimal getSomaJaneiro() {
+        return somaJaneiro;
+    }
+
+    public void setSomaJaneiro(BigDecimal somaJaneiro) {
+        this.somaJaneiro = somaJaneiro;
+    }
+
+    public BigDecimal getSomaJulho() {
+        return somaJulho;
+    }
+
+    public void setSomaJulho(BigDecimal somaJulho) {
+        this.somaJulho = somaJulho;
+    }
+
+    public BigDecimal getSomaJunho() {
+        return somaJunho;
+    }
+
+    public void setSomaJunho(BigDecimal somaJunho) {
+        this.somaJunho = somaJunho;
+    }
+
+    public BigDecimal getSomaMaio() {
+        return somaMaio;
+    }
+
+    public void setSomaMaio(BigDecimal somaMaio) {
+        this.somaMaio = somaMaio;
+    }
+
+    public BigDecimal getSomaMarco() {
+        return somaMarco;
+    }
+
+    public void setSomaMarco(BigDecimal somaMarco) {
+        this.somaMarco = somaMarco;
+    }
+
+    public BigDecimal getSomaNovembro() {
+        return somaNovembro;
+    }
+
+    public void setSomaNovembro(BigDecimal somaNovembro) {
+        this.somaNovembro = somaNovembro;
+    }
+
+    public BigDecimal getSomaOutubro() {
+        return somaOutubro;
+    }
+
+    public void setSomaOutubro(BigDecimal somaOutubro) {
+        this.somaOutubro = somaOutubro;
+    }
+
+    public BigDecimal getSomaSetembro() {
+        return somaSetembro;
+    }
+
+    public void setSomaSetembro(BigDecimal somaSetembro) {
+        this.somaSetembro = somaSetembro;
+    }
 }
