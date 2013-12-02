@@ -16,20 +16,27 @@ import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaOrcamentaria;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
+import javax.swing.table.DefaultTableCellRenderer;
 import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -40,12 +47,16 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private Condominio condominio;
     private Calendar datInicio = DataUtil.getCalendar(DataUtil.hoje());
     private Calendar datTermino = DataUtil.getCalendar(DataUtil.hoje());
-    private TabelaModelo_2 modeloTabela;
+    private TabelaModelo_2 modeloTabelaContaOrcamentaria;
     private List<ContaOrcamentaria> contasOrcamentarias = new ArrayList<ContaOrcamentaria>();
     private TabelaModelo_2 modeloTabelaContasExtraordinarias;
     private List<ContaOrcamentaria> contasExtraordinarias = new ArrayList<ContaOrcamentaria>();
     private TabelaModelo_2 modeloTabelaContasExcluidas;
     private List<ContaOrcamentaria> contasExcluidas = new ArrayList<ContaOrcamentaria>();
+    private TabelaModelo_2<Unidade> modeloTabelaCondominos;
+    private List<Unidade> listaUnidades = new ArrayList<Unidade>();
+    private TabelaModelo_2<Unidade> modeloTabelaCondominosADescartar;
+    private List<Unidade> listaUnidadesADescartar = new ArrayList<Unidade>();
     private boolean calcular;
     BigDecimal quantidadeMes = new BigDecimal(0);
 
@@ -61,6 +72,15 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         if (condominio != null) {
             this.setTitle("Orçamento - " + condominio.getRazaoSocial());
         }
+
+        carregarTabelas();
+    }
+
+    private void carregarTabelas() {
+        carregarTabelaCondominos();
+        carregarTabelaContasOrcamentarias();
+        carregarTabelaContasExcluidas();
+        carregarTabelaContasExtraordinarias();
     }
 
     private void preencherTela() {
@@ -71,37 +91,248 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         calcularQuantidadeMeses();
     }
 
+//    private List<Unidade> getUnidades() {
+//        return condominio.getUnidades();
+//    }
     private List<Unidade> getUnidades() {
-        return condominio.getUnidades();
-    }
+        listaUnidades = condominio.getUnidades();
 
-    private int getUnidadesDescartadas() {
-        int unidadesADescartar = 0;
-        for (Unidade u : getUnidades()) {
-            if (u.isSindico() && !condominio.isSindicoPaga()) {
-                unidadesADescartar += 1;
-            } else {
-                int quantidadeCobrancasInadimplentes = 0;
-                for (Cobranca c : u.getCobrancas()) {
-                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1 && c.isExibir()) {
-                        quantidadeCobrancasInadimplentes += 1;
-                    }
-                }
-                System.out.println("Unidade " + u.getUnidade() + " - número cobranças inadimplentes: " + quantidadeCobrancasInadimplentes);
-                if (quantidadeCobrancasInadimplentes >= (Integer) spnQtdeDescarte.getValue() && (Integer) spnQtdeDescarte.getValue() != 0) {
-                    unidadesADescartar += 1;
-                }
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Unidade u1 = (Unidade) o1;
+                Unidade u2 = (Unidade) o2;
+                return u1.getUnidade().compareTo(u2.getUnidade());
             }
-        }
-        System.out.println("Quantidade Unidades a descartar: " + unidadesADescartar);
-        return unidadesADescartar;
+        };
+
+        Collections.sort(listaUnidades, c);
+
+        return listaUnidades;
     }
 
     private void periodoParaMeses() {
     }
+
+    private List<ContaOrcamentaria> getContasOrcamentarias() {
+        return contasOrcamentarias;
+    }
+
+    private List<ContaOrcamentaria> getContasExcluidas() {
+        return contasExcluidas;
+    }
+
+    private List<ContaOrcamentaria> getContasExtraordinarias() {
+        return contasExtraordinarias;
+    }
+
+    private void carregarTabelaCondominos() {
+
+        modeloTabelaCondominos = new TabelaModelo_2<Unidade>(tabelaCondominos, "Unidade, Nome dos Condôminos, É Sindico?".split(",")) {
+
+            @Override
+            protected List<Unidade> getCarregarObjetos() {
+                return getUnidades();
+            }
+
+            @Override
+            public Object getValor(Unidade unidade, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return unidade.getUnidade();
+                    case 1:
+                        return unidade.getCondomino().getNome();
+                    case 2:
+                        return unidade.isSindico() ? "Sim" : "Não";
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
+        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(0)).setMaxWidth(50);
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(0)).setCellRenderer(direito);
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(1)).setMinWidth(200);
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(2)).setMaxWidth(60);
+        tabelaCondominos.getColumn(modeloTabelaCondominos.getCampo(2)).setCellRenderer(centralizado);
+    }
     
-    private void carregarTabelaContasOrcamentarias(){
-        
+    private void carregarTabelaCondominosADescartar() {
+
+        modeloTabelaCondominosADescartar = new TabelaModelo_2<Unidade>(tabelaCondominosADescartar, "Unidade, Nome dos Condôminos, É Sindico?".split(",")) {
+
+            @Override
+            protected List<Unidade> getCarregarObjetos() {
+                return getUnidadesDescartadas();
+            }
+
+            @Override
+            public Object getValor(Unidade unidade, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return unidade.getUnidade();
+                    case 1:
+                        return unidade.getCondomino().getNome();
+                    case 2:
+                        return unidade.isSindico() ? "Sim" : "Não";
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
+        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+        DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
+        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
+
+        tabelaCondominosADescartar.getColumn(modeloTabelaCondominosADescartar.getCampo(0)).setMaxWidth(50);
+        tabelaCondominosADescartar.getColumn(modeloTabelaCondominosADescartar.getCampo(0)).setCellRenderer(direito);
+        tabelaCondominosADescartar.getColumn(modeloTabelaCondominosADescartar.getCampo(1)).setMinWidth(200);
+        tabelaCondominosADescartar.getColumn(modeloTabelaCondominosADescartar.getCampo(2)).setMaxWidth(60);
+        tabelaCondominosADescartar.getColumn(modeloTabelaCondominosADescartar.getCampo(2)).setCellRenderer(centralizado);
+    }
+
+    private void carregarTabelaContasOrcamentarias() {
+        String valores = "Conta, Descrição das Despesas, Média, Média + " + spnIncremento1.getValue() + "%, Média + " + spnIncremento2.getValue() + " %, Média + " + spnIncremento3.getValue() + " %";
+        modeloTabelaContaOrcamentaria = new TabelaModelo_2<ContaOrcamentaria>(tabelaContaOrcamentaria, valores.split(",")) {
+
+            @Override
+            protected List<ContaOrcamentaria> getCarregarObjetos() {
+                return getContasOrcamentarias();
+            }
+
+            @Override
+            public Object getValor(ContaOrcamentaria contaOrcamentaria, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return contaOrcamentaria.getConta().getCodigo();
+                    case 1:
+                        return contaOrcamentaria.getConta().getNome();
+                    case 2:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia().doubleValue());
+                    case 3:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia1().doubleValue());
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia2().doubleValue());
+                    case 5:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia3().doubleValue());
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
+        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(0)).setMaxWidth(50);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(1)).setMinWidth(200);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(2)).setMaxWidth(70);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(2)).setCellRenderer(direito);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(3)).setMaxWidth(80);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(3)).setCellRenderer(direito);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(4)).setMinWidth(70);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(4)).setCellRenderer(direito);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(5)).setMinWidth(70);
+        tabelaContaOrcamentaria.getColumn(modeloTabelaContaOrcamentaria.getCampo(5)).setCellRenderer(direito);
+    }
+
+    private void carregarTabelaContasExcluidas() {
+        String valores = "Conta, Descrição das Despesas, Média, Média + " + spnIncremento1.getValue() + "%, Média + " + spnIncremento2.getValue() + " %, Média + " + spnIncremento3.getValue() + " %";
+        modeloTabelaContasExcluidas = new TabelaModelo_2<ContaOrcamentaria>(tabelaContasExcluidas, valores.split(",")) {
+
+            @Override
+            protected List<ContaOrcamentaria> getCarregarObjetos() {
+                return getContasExcluidas();
+            }
+
+            @Override
+            public Object getValor(ContaOrcamentaria contaOrcamentaria, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return contaOrcamentaria.getConta().getCodigo();
+                    case 1:
+                        return contaOrcamentaria.getConta().getNome();
+                    case 2:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia().doubleValue());
+                    case 3:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia1().doubleValue());
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia2().doubleValue());
+                    case 5:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia3().doubleValue());
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
+        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(0)).setMaxWidth(50);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(1)).setMinWidth(200);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(2)).setMaxWidth(70);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(2)).setCellRenderer(direito);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(3)).setMaxWidth(80);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(3)).setCellRenderer(direito);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(4)).setMinWidth(70);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(4)).setCellRenderer(direito);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(5)).setMinWidth(70);
+        tabelaContasExcluidas.getColumn(modeloTabelaContasExcluidas.getCampo(5)).setCellRenderer(direito);
+    }
+
+    private void carregarTabelaContasExtraordinarias() {
+        String valores = "Conta, Descrição das Despesas, Média, Média + " + spnIncremento1.getValue() + "%, Média + " + spnIncremento2.getValue() + " %, Média + " + spnIncremento3.getValue() + " %";
+        modeloTabelaContasExtraordinarias = new TabelaModelo_2<ContaOrcamentaria>(tabelaContasExtraordinarias, valores.split(",")) {
+
+            @Override
+            protected List<ContaOrcamentaria> getCarregarObjetos() {
+                return getContasExtraordinarias();
+            }
+
+            @Override
+            public Object getValor(ContaOrcamentaria contaOrcamentaria, int indiceColuna) {
+                switch (indiceColuna) {
+                    case 0:
+                        return contaOrcamentaria.getConta().getCodigo();
+                    case 1:
+                        return contaOrcamentaria.getConta().getNome();
+                    case 2:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia().doubleValue());
+                    case 3:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia1().doubleValue());
+                    case 4:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia2().doubleValue());
+                    case 5:
+                        return PagamentoUtil.formatarMoeda(contaOrcamentaria.getMedia3().doubleValue());
+                    default:
+                        return null;
+                }
+            }
+        };
+
+        DefaultTableCellRenderer direito = new DefaultTableCellRenderer();
+        direito.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(0)).setMaxWidth(50);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(1)).setMinWidth(200);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(2)).setMaxWidth(70);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(2)).setCellRenderer(direito);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(3)).setMaxWidth(80);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(3)).setCellRenderer(direito);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(4)).setMinWidth(70);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(4)).setCellRenderer(direito);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(5)).setMinWidth(70);
+        tabelaContasExtraordinarias.getColumn(modeloTabelaContasExtraordinarias.getCampo(5)).setCellRenderer(direito);
     }
 
     private List<Pagamento> getContasPorPeriodo() {
@@ -109,7 +340,8 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         return pagamentos;
     }
 
-    private void getApenasDespesas(List<Pagamento> getContasPorPeriodo) {
+    private void getApenasDespesas(List<Pagamento> getContasPorPeriodo, List<ContaOrcamentaria> listaContas) {
+        listaContas.clear();
         List<Pagamento> pagamentos = new ArrayList<Pagamento>();
         for (Pagamento pagamento : getContasPorPeriodo) {
             if (!pagamento.getConta().isCredito()) {
@@ -197,19 +429,135 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 System.out.println("c1 valores outubro = " + c1.getSomaOutubro());
                 System.out.println("c1 valores novembro = " + c1.getSomaNovembro());
                 System.out.println("c1 valores dezembro = " + c1.getSomaDezembro());
-                contasOrcamentarias.add(c1);
+                listaContas.add(c1);
             }
-        }       
-        
-        if(contasOrcamentarias.isEmpty()){
+        }
+
+        System.out.println("PEGUEI OS TOTAIS!!!");
+
+        if (listaContas.isEmpty()) {
+            carregarTabelaContasOrcamentarias();
             ApresentacaoUtil.exibirAdvertencia("Não houve custos no período selecionado.", this);
         } else {
-            calcularMedias();
+            calcularMedias(listaContas);
+            carregarTabelaContasOrcamentarias();
+            carregarTabelaCondominosADescartar();
         }
     }
-    
-    private void calcularMedias(){
-        getUnidadesDescartadas();
+
+    private void calcularMedias(List<ContaOrcamentaria> listaContas) {
+        for (ContaOrcamentaria co : listaContas) {
+            double total = 0;
+            total += co.getTotal().doubleValue();
+            int numeroMeses = 0;
+            numeroMeses = verificarValorMes(co);
+            co.setMedia(new Moeda(total / numeroMeses).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+            co.setMedia1(co.getMedia());
+            co.setMedia1(co.getMedia1().add(co.getMedia1().multiply(new Moeda((Integer) spnIncremento1.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+            co.setMedia2(co.getMedia());
+            co.setMedia2(co.getMedia2().add(co.getMedia2().multiply(new Moeda((Integer) spnIncremento2.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+            co.setMedia3(co.getMedia());
+            co.setMedia3(co.getMedia3().add(co.getMedia3().multiply(new Moeda((Integer) spnIncremento3.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+        }
+//        getUnidadesDescartadas();
+    }
+
+    private int verificarValorMes(ContaOrcamentaria co) {
+        int numeroMeses = 0;
+        numeroMeses = quantidadeMes.intValue();
+
+        if (co.getSomaJaneiro().doubleValue() == 0 && verificarMes(1)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaFevereiro().doubleValue() == 0 && verificarMes(2)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaMarco().doubleValue() == 0 && verificarMes(3)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaAbril().doubleValue() == 0 && verificarMes(4)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaMaio().doubleValue() == 0 && verificarMes(5)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaJunho().doubleValue() == 0 && verificarMes(6)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaJulho().doubleValue() == 0 && verificarMes(7)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaAgosto().doubleValue() == 0 && verificarMes(8)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaSetembro().doubleValue() == 0 && verificarMes(9)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaOutubro().doubleValue() == 0 && verificarMes(10)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaNovembro().doubleValue() == 0 && verificarMes(11)) {
+            numeroMeses -= 1;
+        }
+        if (co.getSomaDezembro().doubleValue() == 0 && verificarMes(12)) {
+            numeroMeses -= 1;
+        }
+
+        return numeroMeses;
+    }
+
+    private boolean verificarMes(int mes) {
+        boolean estaNoPeriodo = false;
+
+        for (int i = 0; i < quantidadeMes.intValue(); i++) {
+            DateTime dataInicioAuxiliar = new DateTime(DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(datInicio).plusMonths(i)));
+            DateTime dataTerminoAuxiliar = new DateTime(DataUtil.getUltimoDiaMes(dataInicioAuxiliar));
+
+            if (mes == DataUtil.getDateTime(dataInicioAuxiliar).getMonthOfYear() && DataUtil.compararData(dataInicioAuxiliar, DataUtil.getDateTime(datInicio)) <= 1 && DataUtil.compararData(dataTerminoAuxiliar, DataUtil.getDateTime(datTermino)) >= -1) {
+                estaNoPeriodo = true;
+            }
+        }
+
+        return estaNoPeriodo;
+    }
+
+    private List<Unidade> getUnidadesDescartadas() {
+        int unidadesADescartar = 0;
+        listaUnidadesADescartar.clear();
+        for (Unidade u : getUnidades()) {
+            if (u.isSindico() && !condominio.isSindicoPaga()) {
+                unidadesADescartar += 1;
+                listaUnidadesADescartar.add(u);
+            } else {
+                int quantidadeCobrancasInadimplentes = 0;
+                for (Cobranca c : u.getCobrancas()) {
+                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.hoje(), DataUtil.getDateTime(c.getDataVencimento())) >= 1 && c.isExibir()) {
+                        quantidadeCobrancasInadimplentes += 1;
+                    }
+                }
+                System.out.println("Unidade " + u.getUnidade() + " - número cobranças inadimplentes: " + quantidadeCobrancasInadimplentes);
+                if (quantidadeCobrancasInadimplentes >= (Integer) spnQtdeDescarte.getValue() && (Integer) spnQtdeDescarte.getValue() != 0) {
+                    unidadesADescartar += 1;
+                    listaUnidadesADescartar.add(u);
+                }
+            }
+        }
+        System.out.println("Quantidade Unidades a descartar: " + unidadesADescartar);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Unidade u1 = (Unidade) o1;
+                Unidade u2 = (Unidade) o2;
+                return u1.getUnidade().compareTo(u2.getUnidade());
+            }
+        };
+
+        Collections.sort(listaUnidadesADescartar, c);
+
+        return listaUnidadesADescartar;
     }
 
     private void calcularQuantidadeMeses() {
@@ -245,6 +593,49 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         spnIncremento3.setValue(15);
     }
 
+    private void incluirAdicional() {
+        ContaOrcamentaria contaOrcamentariaAdicional = new ContaOrcamentaria();
+        Conta conta = new Conta();
+        conta.setCodigo(0);
+        conta.setNome(txtDescricaoDiversos.getText());
+        contaOrcamentariaAdicional.setConta(conta);
+        contaOrcamentariaAdicional.setMedia(new BigDecimal(txtValorDiversos.getText().replace(",", ".")));
+        contaOrcamentariaAdicional.setMedia1(contaOrcamentariaAdicional.getMedia());
+        contaOrcamentariaAdicional.setMedia1(contaOrcamentariaAdicional.getMedia1().add(contaOrcamentariaAdicional.getMedia1().multiply(new Moeda((Integer) spnIncremento1.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+        contaOrcamentariaAdicional.setMedia2(contaOrcamentariaAdicional.getMedia());
+        contaOrcamentariaAdicional.setMedia2(contaOrcamentariaAdicional.getMedia2().add(contaOrcamentariaAdicional.getMedia2().multiply(new Moeda((Integer) spnIncremento2.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+        contaOrcamentariaAdicional.setMedia3(contaOrcamentariaAdicional.getMedia());
+        contaOrcamentariaAdicional.setMedia3(contaOrcamentariaAdicional.getMedia3().add(contaOrcamentariaAdicional.getMedia3().multiply(new Moeda((Integer) spnIncremento3.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
+        contasOrcamentarias.add(contaOrcamentariaAdicional);
+        carregarTabelaContasOrcamentarias();
+        limparCamposDiversos();
+    }
+
+    private void moverParaContasExcluidasExtraordinarias(List<ContaOrcamentaria> lista) {
+        ContaOrcamentaria co = (ContaOrcamentaria) modeloTabelaContaOrcamentaria.getObjetoSelecionado();
+        contasOrcamentarias.remove(co);
+        lista.add(co);
+        carregarTabelas();
+    }
+
+    private void moverParaContasOrcamentarias(ContaOrcamentaria itemASerMovido, List<ContaOrcamentaria> lista) {
+        lista.remove(itemASerMovido);
+        contasOrcamentarias.add(itemASerMovido);
+        carregarTabelas();
+    }
+
+    private void limparCamposDiversos() {
+        txtDescricaoDiversos.setText("");
+        txtValorDiversos.setText("");
+    }
+
+    private void limparTabelas() {
+        contasOrcamentarias.clear();
+        contasExcluidas.clear();
+        contasExtraordinarias.clear();
+        carregarTabelas();
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
@@ -252,6 +643,11 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             txtDataInicial.addChangeListener(this);
             txtDataFinal.addChangeListener(this);
             btnCalcular.addActionListener(this);
+            btnIncluir.addActionListener(this);
+            btnLimpar.addActionListener(this);
+            tabelaContaOrcamentaria.addMouseListener(this);
+            itemMenuContasExcluidas.addActionListener(this);
+            itemMenuContasExtraordinarias.addActionListener(this);
         }
 
         @Override
@@ -259,10 +655,19 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             source = e.getSource();
             if (source == btnCalcular) {
                 if (calcular) {
-                    getApenasDespesas(getContasPorPeriodo());
+                    limparTabelas();
+                    getApenasDespesas(getContasPorPeriodo(), getContasOrcamentarias());
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Não é possível efetuar o cálculo para um período maior que 1 ano!", TelaOrcamento.this);
                 }
+            } else if (source == btnIncluir) {
+                incluirAdicional();
+            } else if (source == btnLimpar) {
+                limparTabelas();
+            } else if (source == itemMenuContasExcluidas) {
+                moverParaContasExcluidasExtraordinarias(contasExcluidas);
+            } else if (source == itemMenuContasExtraordinarias) {
+                moverParaContasExcluidasExtraordinarias(contasExtraordinarias);
             }
             source = null;
         }
@@ -279,6 +684,13 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 System.out.println(" thiago");
             }
         }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (e.isPopupTrigger() && e.getSource() == tabelaContaOrcamentaria) {
+                popupMenuContasOrcamentarias.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -290,6 +702,9 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        popupMenuContasOrcamentarias = new javax.swing.JPopupMenu();
+        itemMenuContasExcluidas = new javax.swing.JMenuItem();
+        itemMenuContasExtraordinarias = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -306,11 +721,19 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         painelTabelas = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        TabelaMedias = new javax.swing.JTable();
+        tabelaContaOrcamentaria = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tabelaContasExtraordinarias = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tabelaContasExcluidas = new javax.swing.JTable();
         jPanel6 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        tabelaCondominosADescartar = new javax.swing.JTable();
         jPanel7 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        tabelaCondominos = new javax.swing.JTable();
         btnLimpar = new javax.swing.JButton();
         btnCalcular = new javax.swing.JButton();
         btnImprimir = new javax.swing.JButton();
@@ -326,6 +749,12 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         txtTaxaBase = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         txtQtdeMeses = new javax.swing.JTextField();
+
+        itemMenuContasExcluidas.setText("Mover para Contas Excluídas");
+        popupMenuContasOrcamentarias.add(itemMenuContasExcluidas);
+
+        itemMenuContasExtraordinarias.setText("Mover para Contas Extraordinárias");
+        popupMenuContasOrcamentarias.add(itemMenuContasExtraordinarias);
 
         setClosable(true);
         setTitle("Orçamento");
@@ -349,18 +778,15 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
 
         jLabel6.setText("Taxa Base R$");
 
-        TabelaMedias.setModel(new javax.swing.table.DefaultTableModel(
+        tabelaContaOrcamentaria.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+
             }
         ));
-        jScrollPane1.setViewportView(TabelaMedias);
+        jScrollPane1.setViewportView(tabelaContaOrcamentaria);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -375,60 +801,130 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         painelTabelas.addTab("Médias Obtidas", jPanel2);
 
+        tabelaContasExtraordinarias.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane3.setViewportView(tabelaContasExtraordinarias);
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 589, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 185, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         painelTabelas.addTab("Contas Extraordinárias", jPanel3);
+
+        tabelaContasExcluidas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(tabelaContasExcluidas);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 589, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 185, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         painelTabelas.addTab("Contas Excluídas", jPanel4);
+
+        tabelaCondominosADescartar.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane5.setViewportView(tabelaCondominosADescartar);
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 589, Short.MAX_VALUE)
+            .addGap(0, 589, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 185, Short.MAX_VALUE)
+            .addGap(0, 219, Short.MAX_VALUE)
+            .addGap(0, 219, Short.MAX_VALUE)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         painelTabelas.addTab("Unidades a Descartar", jPanel6);
+
+        tabelaCondominos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane4.setViewportView(tabelaCondominos);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 589, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 185, Short.MAX_VALUE)
+            .addGap(0, 219, Short.MAX_VALUE)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         painelTabelas.addTab("Unidades", jPanel7);
@@ -448,7 +944,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "Diversos - Adicional"));
 
         btnIncluir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnIncluir.setToolTipText("Incluir Conta");
+        btnIncluir.setToolTipText("Incluir Conta Adicional");
         btnIncluir.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 
         jLabel10.setText("Descrição");
@@ -514,8 +1010,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(painelTabelas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
-                            .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(painelTabelas, javax.swing.GroupLayout.DEFAULT_SIZE, 594, Short.MAX_VALUE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel1)
@@ -557,6 +1052,10 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnImprimir)
                 .addGap(48, 48, 48))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(41, 41, 41))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCalcular, btnImprimir, btnLimpar});
@@ -591,10 +1090,10 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                     .addComponent(spnIncremento2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(spnIncremento3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(painelTabelas, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(painelTabelas, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLimpar)
@@ -623,11 +1122,12 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable TabelaMedias;
     private javax.swing.JButton btnCalcular;
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.JMenuItem itemMenuContasExcluidas;
+    private javax.swing.JMenuItem itemMenuContasExtraordinarias;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -646,11 +1146,21 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane painelTabelas;
+    private javax.swing.JPopupMenu popupMenuContasOrcamentarias;
     private javax.swing.JSpinner spnIncremento1;
     private javax.swing.JSpinner spnIncremento2;
     private javax.swing.JSpinner spnIncremento3;
     private javax.swing.JSpinner spnQtdeDescarte;
+    private javax.swing.JTable tabelaCondominos;
+    private javax.swing.JTable tabelaCondominosADescartar;
+    private javax.swing.JTable tabelaContaOrcamentaria;
+    private javax.swing.JTable tabelaContasExcluidas;
+    private javax.swing.JTable tabelaContasExtraordinarias;
     private net.sf.nachocalendar.components.DateField txtDataFinal;
     private net.sf.nachocalendar.components.DateField txtDataInicial;
     private javax.swing.JTextField txtDescricaoDiversos;
