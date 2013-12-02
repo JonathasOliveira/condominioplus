@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  */
 public class ContaOrcamentaria {
 
-    private int codigo;
+//    private int codigo;
     private Conta Conta;
     private BigDecimal total = new BigDecimal(0);
     private BigDecimal media = new BigDecimal(0);
@@ -40,13 +40,13 @@ public class ContaOrcamentaria {
         this.Conta = Conta;
     }
 
-    public int getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(int codigo) {
-        this.codigo = codigo;
-    }
+//    public int getCodigo() {
+//        return codigo;
+//    }
+//
+//    public void setCodigo(int codigo) {
+//        this.codigo = codigo;
+//    }
 
     public BigDecimal getTotal() {
         return total;
