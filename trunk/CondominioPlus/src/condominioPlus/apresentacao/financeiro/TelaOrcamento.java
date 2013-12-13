@@ -17,14 +17,17 @@ import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaOrcamentaria;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
+import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
@@ -665,6 +668,52 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         carregarTabelas();
     }
 
+    private void imprimir() {
+        List<HashMap<String, Object>> listaContasOrcamentarias = new ArrayList<HashMap<String, Object>>();
+
+        HashMap<String, Object> parametros = new HashMap();
+
+//        DADOS SUBRELATORIO
+//        List<HashMap<String, String>> listaConselheiros = new ArrayList<HashMap<String, String>>();
+//        for (Unidade unidade : condominio.getConselheiros()) {
+//            HashMap<String, String> mapa2 = new HashMap();
+//            mapa2.put("nome", converterLetraMinuscula(unidade.getCondomino().getNome()));
+//            mapa2.put("unidade", unidade.getUnidade());
+//            listaConselheiros.add(mapa2);
+//        }
+
+        parametros.put("condominio", condominio.getRazaoSocial());
+        parametros.put("periodo", DataUtil.toString(datInicio) + " a " + DataUtil.toString(datTermino));
+        parametros.put("media1", "Média + " + spnIncremento1.getValue() + " %");
+        parametros.put("media2", "Média + " + spnIncremento2.getValue() + " %");
+        parametros.put("media3", "Média + " + spnIncremento3.getValue() + " %");
+        parametros.put("somaMedia", txtSomaMedia.getText());
+        parametros.put("somaMedia1", txtSomaMedia1.getText());
+        parametros.put("somaMedia2", txtSomaMedia2.getText());
+        parametros.put("somaMedia3", txtSomaMedia3.getText());
+        parametros.put("numeroUnidades", "" + condominio.getUnidades().size());
+        parametros.put("sindicoPaga", condominio.isSindicoPaga() ? "Sim" : "Não");
+        parametros.put("cobrancasDesprezadas", "" + spnQtdeDescarte.getValue());
+
+        for (ContaOrcamentaria co : contasOrcamentarias) {
+            HashMap<String, Object> mapa = new HashMap();
+            mapa.put("codigoConta", co.getConta().getCodigo() + "");
+            mapa.put("historico", co.getConta().getNome());
+            mapa.put("media", PagamentoUtil.formatarMoeda(co.getMedia().doubleValue()));
+            mapa.put("media1", PagamentoUtil.formatarMoeda(co.getMedia1().doubleValue()));
+            mapa.put("media2", PagamentoUtil.formatarMoeda(co.getMedia2().doubleValue()));
+            mapa.put("media3", PagamentoUtil.formatarMoeda(co.getMedia3().doubleValue()));
+            listaContasOrcamentarias.add(mapa);
+        }
+
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!listaContasOrcamentarias.isEmpty()) {
+            new Relatorios().imprimir("Orcamento", parametros, listaContasOrcamentarias, false, true, null);
+        }
+    }
+
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
@@ -674,6 +723,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             btnCalcular.addActionListener(this);
             btnIncluir.addActionListener(this);
             btnLimpar.addActionListener(this);
+            btnImprimir.addActionListener(this);
             tabelaContaOrcamentaria.addMouseListener(this);
             tabelaContasExtraordinarias.addMouseListener(this);
             tabelaContasExcluidas.addMouseListener(this);
@@ -696,6 +746,8 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 incluirAdicional();
             } else if (source == btnLimpar) {
                 limparTabelas();
+            } else if (source == btnImprimir) {
+                imprimir();
             } else if (source == itemMenuContasExcluidas) {
                 moverParaContasExcluidasExtraordinarias(contasExcluidas);
             } else if (source == itemMenuContasExtraordinarias) {
