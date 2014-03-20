@@ -755,7 +755,6 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
 
             for (Unidade u : listaUnidadesAConsiderar) {
                 //verificando a soma da Fração Ideal
-                System.out.println("total frações ideais: " + totalFracoesIdeais);
                 double fracaoIdeal = 0;
                 if (totalFracoesIdeais >= 0.9 && totalFracoesIdeais <= 1.2) {
                     fracaoIdeal = u.getFracaoIdeal();
