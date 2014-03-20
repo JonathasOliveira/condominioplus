@@ -13,8 +13,10 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.Cobranca;
+import condominioPlus.negocio.cobranca.CobrancaBase;
 import condominioPlus.negocio.financeiro.Conta;
 import condominioPlus.negocio.financeiro.ContaOrcamentaria;
+import condominioPlus.negocio.financeiro.ItemOrcamento;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.Relatorios;
@@ -39,6 +41,7 @@ import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
 
 /**
@@ -60,8 +63,11 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private List<Unidade> listaUnidades = new ArrayList<Unidade>();
     private TabelaModelo_2<Unidade> modeloTabelaCondominosADescartar;
     private List<Unidade> listaUnidadesADescartar = new ArrayList<Unidade>();
+    private List<Unidade> listaUnidadesAConsiderar = new ArrayList<Unidade>();
     private boolean calcular;
-    BigDecimal quantidadeMes = new BigDecimal(0);
+    private BigDecimal quantidadeMes = new BigDecimal(0);
+    private List<ItemOrcamento> listaItemOrcamento = new ArrayList<ItemOrcamento>();
+    private double totalFracoesIdeais;
 
     /** Creates new form TelaOrcamento */
     public TelaOrcamento(Condominio condominio) {
@@ -91,6 +97,16 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         txtDataInicial.setValue(DataUtil.toString(DataUtil.getPrimeiroDiaMes()));
         txtDataFinal.setValue(DataUtil.toString(DataUtil.getUltimoDiaMes()));
         txtNumeroUnidades.setText(Integer.toString(condominio.getUnidades().size()));
+
+        String taxaBase = "";
+        for (CobrancaBase co : condominio.getCobrancasBase()) {
+            //verifica se a CobrancaBase é Taxa Condominial
+            if (co.getConta().getCodigo() == 26952) {
+                taxaBase = PagamentoUtil.formatarMoeda(co.getValor().doubleValue());
+            }
+        }
+        txtTaxaBase.setText(taxaBase);
+
         calcularQuantidadeMeses();
     }
 
@@ -118,6 +134,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         BigDecimal somaMedia1 = new BigDecimal(0);
         BigDecimal somaMedia2 = new BigDecimal(0);
         BigDecimal somaMedia3 = new BigDecimal(0);
+
         for (ContaOrcamentaria co : contasOrcamentarias) {
             somaMedia = somaMedia.add(co.getMedia());
             somaMedia1 = somaMedia1.add(co.getMedia1());
@@ -128,6 +145,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         txtSomaMedia1.setText(PagamentoUtil.formatarMoeda(somaMedia1.doubleValue()));
         txtSomaMedia2.setText(PagamentoUtil.formatarMoeda(somaMedia2.doubleValue()));
         txtSomaMedia3.setText(PagamentoUtil.formatarMoeda(somaMedia3.doubleValue()));
+
         return contasOrcamentarias;
     }
 
@@ -546,7 +564,10 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
 
     private List<Unidade> getUnidadesDescartadas() {
         listaUnidadesADescartar.clear();
+        listaUnidadesAConsiderar.clear();
+        totalFracoesIdeais = 0;
         for (Unidade u : getUnidades()) {
+            totalFracoesIdeais += u.getFracaoIdeal();
             if (u.isSindico() && !condominio.isSindicoPaga()) {
                 listaUnidadesADescartar.add(u);
             } else {
@@ -559,6 +580,8 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 System.out.println("Unidade " + u.getUnidade() + " - número cobranças inadimplentes: " + quantidadeCobrancasInadimplentes);
                 if (quantidadeCobrancasInadimplentes >= (Integer) spnQtdeDescarte.getValue() && (Integer) spnQtdeDescarte.getValue() != 0) {
                     listaUnidadesADescartar.add(u);
+                } else {
+                    listaUnidadesAConsiderar.add(u);
                 }
             }
         }
@@ -668,25 +691,135 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         carregarTabelas();
     }
 
+    private void carregarDadosSubRelatorio() {
+        listaItemOrcamento.clear();
+
+        BigDecimal taxa1 = new BigDecimal(txtSomaMedia1.getText().replace(",", "."));
+        BigDecimal taxa2 = new BigDecimal(txtSomaMedia2.getText().replace(",", "."));
+        BigDecimal taxa3 = new BigDecimal(txtSomaMedia3.getText().replace(",", "."));
+
+        if (radioIgualParaTodos.isSelected()) {
+            taxa1 = new Moeda(taxa1.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+            taxa2 = new Moeda(taxa2.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+            taxa3 = new Moeda(taxa3.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+
+            for (Unidade u : listaUnidadesAConsiderar) {
+                if (listaItemOrcamento.isEmpty()) {
+                    ItemOrcamento item = new ItemOrcamento();
+                    item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
+                    item.setNumeroUnidades(item.getNumeroUnidades() + 1);
+                    item.setTaxa1(taxa1);
+                    item.setTaxa2(taxa2);
+                    item.setTaxa3(taxa3);
+                    listaItemOrcamento.add(item);
+                } else {
+                    List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
+                    for (ItemOrcamento i : listaItemOrcamento) {
+                        if (String.valueOf(u.getFracaoIdeal()).equals(i.getFracaoIdeal())) {
+                            i.setNumeroUnidades(i.getNumeroUnidades() + 1);
+                        } else {
+                            ItemOrcamento item = new ItemOrcamento();
+                            item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
+                            item.setNumeroUnidades(item.getNumeroUnidades() + 1);
+                            item.setTaxa1(taxa1);
+                            item.setTaxa2(taxa2);
+                            item.setTaxa3(taxa3);
+                            listaAuxiliar.add(item);
+                        }
+                    }
+                    for (ItemOrcamento i : listaAuxiliar) {
+                        listaItemOrcamento.add(i);
+                    }
+                }
+            }
+        } else if (radioFracaoIdeal.isSelected()) {
+
+            //calcular o valor das unidades descartadas e dividir pelas unidades consideradas
+            double somaFracoesIdeaisDescartadas = 0;
+            BigDecimal valorTaxa1FracionadoPorUnidade = new BigDecimal(0);
+            BigDecimal valorTaxa2FracionadoPorUnidade = new BigDecimal(0);
+            BigDecimal valorTaxa3FracionadoPorUnidade = new BigDecimal(0);
+
+            for (Unidade u : listaUnidadesADescartar) {
+                if (totalFracoesIdeais >= 0.9 && totalFracoesIdeais <= 1.2) {
+                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal();
+                } else if (totalFracoesIdeais >= 90 && totalFracoesIdeais <= 105) {
+                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal() / 100;
+                }
+            }
+
+            valorTaxa1FracionadoPorUnidade = new Moeda((taxa1.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+            valorTaxa2FracionadoPorUnidade = new Moeda((taxa2.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+            valorTaxa3FracionadoPorUnidade = new Moeda((taxa3.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
+            //fim calcular o valor das unidades descartadas e dividir pelas unidades consideradas
+
+            for (Unidade u : listaUnidadesAConsiderar) {
+                //verificando a soma da Fração Ideal
+                System.out.println("total frações ideais: " + totalFracoesIdeais);
+                double fracaoIdeal = 0;
+                if (totalFracoesIdeais >= 0.9 && totalFracoesIdeais <= 1.2) {
+                    fracaoIdeal = u.getFracaoIdeal();
+                } else if (totalFracoesIdeais >= 90 && totalFracoesIdeais <= 105) {
+                    fracaoIdeal += u.getFracaoIdeal() / 100;
+                }
+                //fim
+                if (listaItemOrcamento.isEmpty()) {
+                    ItemOrcamento item = new ItemOrcamento();
+                    item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
+                    item.setNumeroUnidades(item.getNumeroUnidades() + 1);
+                    item.setTaxa1(new Moeda((taxa1.doubleValue() * fracaoIdeal) + valorTaxa1FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                    item.setTaxa2(new Moeda((taxa2.doubleValue() * fracaoIdeal) + valorTaxa2FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                    item.setTaxa3(new Moeda((taxa3.doubleValue() * fracaoIdeal) + valorTaxa3FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                    listaItemOrcamento.add(item);
+                } else {
+                    List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
+                    for (ItemOrcamento i : listaItemOrcamento) {
+                        if (String.valueOf(u.getFracaoIdeal()).equals(i.getFracaoIdeal())) {
+                            i.setNumeroUnidades(i.getNumeroUnidades() + 1);
+                        } else {
+                            ItemOrcamento item = new ItemOrcamento();
+                            item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
+                            item.setNumeroUnidades(item.getNumeroUnidades() + 1);
+                            item.setTaxa1(new Moeda((taxa1.doubleValue() * fracaoIdeal) + valorTaxa1FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                            item.setTaxa2(new Moeda((taxa2.doubleValue() * fracaoIdeal) + valorTaxa2FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                            item.setTaxa3(new Moeda((taxa3.doubleValue() * fracaoIdeal) + valorTaxa3FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                            listaAuxiliar.add(item);
+                        }
+                    }
+                    for (ItemOrcamento i : listaAuxiliar) {
+                        listaItemOrcamento.add(i);
+                    }
+                }
+            }
+        }
+    }
+
     private void imprimir() {
         List<HashMap<String, Object>> listaContasOrcamentarias = new ArrayList<HashMap<String, Object>>();
 
         HashMap<String, Object> parametros = new HashMap();
 
 //        DADOS SUBRELATORIO
-//        List<HashMap<String, String>> listaConselheiros = new ArrayList<HashMap<String, String>>();
-//        for (Unidade unidade : condominio.getConselheiros()) {
-//            HashMap<String, String> mapa2 = new HashMap();
-//            mapa2.put("nome", converterLetraMinuscula(unidade.getCondomino().getNome()));
-//            mapa2.put("unidade", unidade.getUnidade());
-//            listaConselheiros.add(mapa2);
-//        }
+        carregarDadosSubRelatorio();
+        List<HashMap<String, String>> listaItens = new ArrayList<HashMap<String, String>>();
+        for (ItemOrcamento item : listaItemOrcamento) {
+            HashMap<String, String> mapa2 = new HashMap();
+            mapa2.put("numeroUnidades", "" + item.getNumeroUnidades());
+            mapa2.put("fracaoIdeal", item.getFracaoIdeal());
+            mapa2.put("taxa1", PagamentoUtil.formatarMoeda(item.getTaxa1().doubleValue()));
+            mapa2.put("taxa2", PagamentoUtil.formatarMoeda(item.getTaxa2().doubleValue()));
+            mapa2.put("taxa3", PagamentoUtil.formatarMoeda(item.getTaxa3().doubleValue()));
+            listaItens.add(mapa2);
+        }
 
         parametros.put("condominio", condominio.getRazaoSocial());
         parametros.put("periodo", DataUtil.toString(datInicio) + " a " + DataUtil.toString(datTermino));
         parametros.put("media1", "Média + " + spnIncremento1.getValue() + " %");
         parametros.put("media2", "Média + " + spnIncremento2.getValue() + " %");
         parametros.put("media3", "Média + " + spnIncremento3.getValue() + " %");
+        parametros.put("taxa1", "Taxa + " + spnIncremento1.getValue() + " %");
+        parametros.put("taxa2", "Taxa + " + spnIncremento2.getValue() + " %");
+        parametros.put("taxa3", "Taxa + " + spnIncremento3.getValue() + " %");
         parametros.put("somaMedia", txtSomaMedia.getText());
         parametros.put("somaMedia1", txtSomaMedia1.getText());
         parametros.put("somaMedia2", txtSomaMedia2.getText());
@@ -694,6 +827,18 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         parametros.put("numeroUnidades", "" + condominio.getUnidades().size());
         parametros.put("sindicoPaga", condominio.isSindicoPaga() ? "Sim" : "Não");
         parametros.put("cobrancasDesprezadas", "" + spnQtdeDescarte.getValue());
+
+        String unidadesConsideradas = "Unidades Consideradas" + "\n";
+        for (Unidade u : listaUnidadesAConsiderar) {
+            unidadesConsideradas = unidadesConsideradas + u.getUnidade() + "; ";
+        }
+        parametros.put("unidadesConsideradas", unidadesConsideradas);
+
+        String unidadesDesprezadas = "Unidades Desprezadas" + "\n";
+        for (Unidade u : listaUnidadesADescartar) {
+            unidadesDesprezadas = unidadesDesprezadas + u.getUnidade() + "; ";
+        }
+        parametros.put("unidadesDesprezadas", unidadesDesprezadas);
 
         for (ContaOrcamentaria co : contasOrcamentarias) {
             HashMap<String, Object> mapa = new HashMap();
@@ -703,6 +848,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             mapa.put("media1", PagamentoUtil.formatarMoeda(co.getMedia1().doubleValue()));
             mapa.put("media2", PagamentoUtil.formatarMoeda(co.getMedia2().doubleValue()));
             mapa.put("media3", PagamentoUtil.formatarMoeda(co.getMedia3().doubleValue()));
+            mapa.put("listaItens", new JRBeanCollectionDataSource(listaItens));
             listaContasOrcamentarias.add(mapa);
         }
 
@@ -797,6 +943,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         itemMenuContasExcluidas = new javax.swing.JMenuItem();
         popupMenuContasExtraordinarias = new javax.swing.JPopupMenu();
         itemMenuContasOrcamentarias = new javax.swing.JMenuItem();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -849,6 +996,8 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         txtTaxaBase = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         txtQtdeMeses = new javax.swing.JTextField();
+        radioIgualParaTodos = new javax.swing.JRadioButton();
+        radioFracaoIdeal = new javax.swing.JRadioButton();
 
         itemMenuContasExtraordinarias.setText("Mover para Contas Extraordinárias");
         popupMenuContasOrcamentarias.add(itemMenuContasExtraordinarias);
@@ -1046,7 +1195,6 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 589, Short.MAX_VALUE)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
@@ -1054,7 +1202,6 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 251, Short.MAX_VALUE)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
@@ -1148,12 +1295,20 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
 
         txtTaxaBase.setBackground(new java.awt.Color(204, 204, 204));
         txtTaxaBase.setEditable(false);
+        txtTaxaBase.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         jLabel8.setText("Qtde. de Meses");
 
         txtQtdeMeses.setBackground(new java.awt.Color(204, 204, 204));
         txtQtdeMeses.setEditable(false);
         txtQtdeMeses.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        buttonGroup1.add(radioIgualParaTodos);
+        radioIgualParaTodos.setSelected(true);
+        radioIgualParaTodos.setText("Igual para todos");
+
+        buttonGroup1.add(radioFracaoIdeal);
+        radioFracaoIdeal.setText("Dividir por Fração Ideal");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1195,15 +1350,23 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                                                 .addComponent(jLabel9)
                                                 .addGap(18, 18, 18)
                                                 .addComponent(spnQtdeDescarte, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                                 .addGap(50, 50, 50)
-                                                .addComponent(jLabel6)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(txtTaxaBase, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
-                                                .addComponent(jLabel8)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(txtQtdeMeses, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(radioIgualParaTodos)
+                                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(jLabel6)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(txtTaxaBase, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                                                        .addComponent(jLabel8)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                        .addComponent(txtQtdeMeses, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(radioFracaoIdeal))))))
                                     .addComponent(txtNomeCondominio, javax.swing.GroupLayout.DEFAULT_SIZE, 449, Short.MAX_VALUE))))
                         .addGap(41, 41, 41)))
                 .addContainerGap())
@@ -1252,7 +1415,9 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                     .addComponent(spnIncremento1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(spnIncremento2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
-                    .addComponent(spnIncremento3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(spnIncremento3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(radioIgualParaTodos)
+                    .addComponent(radioFracaoIdeal))
                 .addGap(18, 18, 18)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1280,7 +1445,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 591, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1291,6 +1456,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnImprimir;
     private javax.swing.JButton btnIncluir;
     private javax.swing.JButton btnLimpar;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JMenuItem itemMenuContasExcluidas;
     private javax.swing.JMenuItem itemMenuContasExtraordinarias;
     private javax.swing.JMenuItem itemMenuContasOrcamentarias;
@@ -1319,6 +1485,8 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private javax.swing.JTabbedPane painelTabelas;
     private javax.swing.JPopupMenu popupMenuContasExtraordinarias;
     private javax.swing.JPopupMenu popupMenuContasOrcamentarias;
+    private javax.swing.JRadioButton radioFracaoIdeal;
+    private javax.swing.JRadioButton radioIgualParaTodos;
     private javax.swing.JSpinner spnIncremento1;
     private javax.swing.JSpinner spnIncremento2;
     private javax.swing.JSpinner spnIncremento3;
