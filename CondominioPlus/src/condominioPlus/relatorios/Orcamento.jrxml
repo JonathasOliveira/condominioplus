@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Orcamento" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
-	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="1799"/>
-	<property name="ireport.y" value="810"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<subDataset name="dataset1"/>
 	<parameter name="condominio" class="java.lang.String"/>
 	<parameter name="dataEmissao" class="java.lang.String"/>
@@ -18,12 +18,19 @@
 	<parameter name="media1" class="java.lang.String"/>
 	<parameter name="media2" class="java.lang.String"/>
 	<parameter name="media3" class="java.lang.String"/>
+	<parameter name="subrelatorio" class="java.lang.String"/>
+	<parameter name="taxa1" class="java.lang.String"/>
+	<parameter name="taxa2" class="java.lang.String"/>
+	<parameter name="taxa3" class="java.lang.String"/>
+	<parameter name="unidadesConsideradas" class="java.lang.String"/>
+	<parameter name="unidadesDesprezadas" class="java.lang.String"/>
 	<field name="codigoConta" class="java.lang.String"/>
 	<field name="historico" class="java.lang.String"/>
 	<field name="media" class="java.lang.String"/>
 	<field name="media1" class="java.lang.String"/>
 	<field name="media2" class="java.lang.String"/>
 	<field name="media3" class="java.lang.String"/>
+	<field name="listaItens" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -46,7 +53,7 @@
 				</graphicElement>
 			</rectangle>
 			<rectangle>
-				<reportElement x="490" y="96" width="64" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
+				<reportElement x="490" y="96" width="65" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
 				<graphicElement>
 					<pen lineWidth="0.25"/>
 				</graphicElement>
@@ -354,9 +361,9 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="29">
+		<band height="470">
 			<staticText>
-				<reportElement x="6" y="6" width="128" height="15"/>
+				<reportElement x="6" y="4" width="128" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
@@ -408,6 +415,73 @@
 					<pen lineWidth="1.0"/>
 				</graphicElement>
 			</line>
+			<subreport runToBottom="false">
+				<reportElement x="14" y="33" width="247" height="27"/>
+				<subreportParameter name="taxa1">
+					<subreportParameterExpression><![CDATA[$P{taxa1}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="taxa3">
+					<subreportParameterExpression><![CDATA[$P{taxa3}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="taxa2">
+					<subreportParameterExpression><![CDATA[$P{taxa2}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[$F{listaItens}]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioOrcamento.jasper"]]></subreportExpression>
+			</subreport>
+			<rectangle>
+				<reportElement x="0" y="22" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="280" y="33" width="255" height="12" forecolor="#FFFFFF" backcolor="#999999">
+					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 0)]]></printWhenExpression>
+				</reportElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="281" y="45" width="253" height="415"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<line>
+				<reportElement x="281" y="33" width="254" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="286" y="33" width="187" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Quadro III - Demonstrativo das Frações Ideais"]]></textFieldExpression>
+			</textField>
+			<line direction="BottomUp">
+				<reportElement x="534" y="33" width="1" height="12"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="280" y="33" width="1" height="12"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="286" y="51" width="243" height="9"/>
+				<textElement>
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidadesConsideradas}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="286" y="71" width="243" height="9"/>
+				<textElement>
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidadesDesprezadas}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>
