@@ -694,9 +694,9 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private void carregarDadosSubRelatorio() {
         listaItemOrcamento.clear();
 
-        BigDecimal taxa1 = new BigDecimal(txtSomaMedia1.getText().replace(",", "."));
-        BigDecimal taxa2 = new BigDecimal(txtSomaMedia2.getText().replace(",", "."));
-        BigDecimal taxa3 = new BigDecimal(txtSomaMedia3.getText().replace(",", "."));
+        BigDecimal taxa1 = new BigDecimal(txtSomaMedia1.getText().replace(".", "").replace(",", "."));
+        BigDecimal taxa2 = new BigDecimal(txtSomaMedia2.getText().replace(".", "").replace(",", "."));
+        BigDecimal taxa3 = new BigDecimal(txtSomaMedia3.getText().replace(".", "").replace(",", "."));
 
         if (radioIgualParaTodos.isSelected()) {
             taxa1 = new Moeda(taxa1.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
