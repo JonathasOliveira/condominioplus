@@ -23,6 +23,7 @@ import condominioPlus.negocio.cobranca.agua.Rateio;
 import condominioPlus.negocio.cobranca.agua.TarifaProlagos;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.util.FormatadorNumeros;
+import condominioPlus.util.Relatorios;
 import condominioPlus.util.RenderizadorCelulaCorGenerico;
 import condominioPlus.util.RenderizadorCelulaDireita;
 import condominioPlus.validadores.ValidadorGenerico;
@@ -1145,6 +1146,14 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         }
 
     }
+    
+    private void imprimir(){
+        if (modeloContaAgua.getObjetoSelecionado() == null){
+            ApresentacaoUtil.exibirAdvertencia("Selecione um registro na tabela das contas.", this);
+        } else {
+            new Relatorios().imprimirRelatorioConsumoAgua(modeloContaAgua.getObjetoSelecionado());
+        }
+    }
 
     private class ControladorEventos extends ControladorEventosGenerico {
 
@@ -1174,6 +1183,8 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                 incluirPipa();
             } else if (origem == btnSalvarAgua || origem == itemMenuGravarAlteracoesContaAgua || origem == itemMenuGravarAlteracoesPipa) {
                 salvarAgua();
+            } else if (origem == btnImprimir){
+                imprimir();
             }
         }
 
@@ -1204,6 +1215,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             btnCalcular.addActionListener(this);
             btnIncluirPipa.addActionListener(this);
             btnSalvarAgua.addActionListener(this);
+            btnImprimir.addActionListener(this);
         }
 
         @Override
