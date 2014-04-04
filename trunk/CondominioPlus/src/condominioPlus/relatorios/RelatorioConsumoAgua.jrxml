@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioConsumoAgua" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="180"/>
+	<subDataset name="dataset1"/>
+	<parameter name="condominio" class="java.lang.String"/>
+	<parameter name="dataEmissao" class="java.lang.String"/>
+	<parameter name="logoEmpresa" class="java.lang.String"/>
+	<parameter name="periodoConsumo" class="java.lang.String"/>
+	<parameter name="formaRateioAreaComum" class="java.lang.String"/>
+	<parameter name="qtdeM3TaxaCondominial" class="java.lang.String"/>
+	<parameter name="possuiHidrometroAreaComum" class="java.lang.String"/>
+	<parameter name="formaCalculoValor" class="java.lang.String"/>
+	<parameter name="consideraPipa" class="java.lang.String"/>
+	<parameter name="vencimentoCobranca" class="java.lang.String"/>
+	<parameter name="precoM3" class="java.lang.String"/>
+	<parameter name="despesaPipa" class="java.lang.String"/>
+	<parameter name="consumoUnidades" class="java.lang.String"/>
+	<parameter name="consumoAreaComum" class="java.lang.String"/>
+	<field name="unidade" class="java.lang.String"/>
+	<field name="fracaoIdeal" class="java.lang.String"/>
+	<field name="leituraAnterior" class="java.lang.String"/>
+	<field name="leituraAtual" class="java.lang.String"/>
+	<field name="consumoM3" class="java.lang.String"/>
+	<field name="consumoACobrarM3" class="java.lang.String"/>
+	<field name="percentualAreaComum" class="java.lang.String"/>
+	<field name="consumoM3AreaComum" class="java.lang.String"/>
+	<field name="consumoUnidade" class="java.lang.String"/>
+	<field name="consumoAreaComum" class="java.lang.String"/>
+	<field name="totalACobrar" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="130" splitType="Stretch">
+			<image>
+				<reportElement x="0" y="9" width="385" height="105"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement x="0" y="95" width="487" height="28" forecolor="#000000" backcolor="#CCCCCC"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="490" y="63" width="65" height="29" forecolor="#000000" backcolor="#CCCCCC"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="490" y="95" width="64" height="28" forecolor="#000000" backcolor="#CCCCCC"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="109" width="474" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="496" y="77" width="54" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="496" y="67" width="59" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Emissão]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="418" y="6" width="132" height="57"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="13" isBold="true" isItalic="false"/>
+				</textElement>
+				<text><![CDATA[Relatório do Consumo de Água]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="496" y="109" width="54" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="99" width="76" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Entidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="496" y="99" width="59" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Folha]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="125" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="163" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="6" width="352" height="112" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="6" width="352" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="4" y="34" width="344" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="4" y="62" width="344" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="4" y="90" width="344" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="356" y="6" width="199" height="112" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="356" y="6" width="199" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="361" y="34" width="189" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="361" y="62" width="189" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="361" y="90" width="189" height="14" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="4" y="7" width="88" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Parâmetros Cadastrais]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="21" width="187" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Forma de Rateio do Consumo de Água da Área Comum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="35" width="187" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Quantidade de M3 incluídos na Taxa Condominial]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="49" width="187" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Condomínio possui Hidrômetro na Área Comum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="63" width="187" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Forma de Cálculo do Valor do M3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="49" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Preço do M3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="7" width="92" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Informações do Período]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="35" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Vencimento Cobrança]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="63" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Despesas ref. PIPAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="21" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Período do Consumo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="77" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Consumo Unidades (R$)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="91" width="90" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Consumo Área Comum (R$)]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="8" y="77" width="187" height="12"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{consideraPipa}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="225" y="21" width="120" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{formaRateioAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="225" y="35" width="120" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{qtdeM3TaxaCondominial}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="225" y="63" width="120" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{formaCalculoValor}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="225" y="49" width="120" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{possuiHidrometroAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="63" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{despesaPipa}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="77" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{consumoUnidades}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="35" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{vencimentoCobranca}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="49" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{precoM3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="21" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{periodoConsumo}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="465" y="91" width="83" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{consumoAreaComum}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="128" width="264" height="31" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="128" width="264" height="10" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="356" y="128" width="199" height="31" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="356" y="128" width="199" height="10" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="362" y="128" width="186" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Valores Apurados (R$)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="359" y="138" width="48" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Consumo da Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="413" y="138" width="48" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Consumo da Área Comum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="508" y="138" width="44" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Total a Cobrar]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="138" width="32" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Unidade ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="138" width="34" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Fração Ideal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="138" width="47" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Leitura Anterior]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="138" width="39" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Leitura Atual]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="174" y="138" width="41" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Consumo M3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="217" y="138" width="47" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Consumo a Cobrar M3]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="268" y="128" width="84" height="31" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="268" y="128" width="84" height="10" forecolor="#D7D7D7" backcolor="#D7D7D7"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="272" y="128" width="76" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Consumo Área Comum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="271" y="138" width="38" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[% Rateio  ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="138" width="38" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Consumo M3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="38" y="128" width="186" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Consumo Unidade]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="162" width="264" height="1" forecolor="#B4B4B4"/>
+			</line>
+			<line>
+				<reportElement x="268" y="162" width="84" height="1" forecolor="#B4B4B4"/>
+			</line>
+			<line>
+				<reportElement x="356" y="162" width="199" height="1" forecolor="#B4B4B4"/>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="39" y="0" width="32" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fracaoIdeal}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="5" y="0" width="28" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{unidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="76" y="0" width="45" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{leituraAnterior}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="125" y="0" width="45" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{leituraAtual}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="173" y="0" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{consumoM3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="0" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{consumoACobrarM3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="271" y="0" width="36" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{percentualAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="312" y="0" width="36" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{consumoM3AreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="359" y="0" width="44" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{consumoUnidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="414" y="0" width="44" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{consumoAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="506" y="0" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalACobrar}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="9" width="264" height="1" forecolor="#B4B4B4"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="0" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="555" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="268" y="9" width="84" height="1" forecolor="#B4B4B4"/>
+			</line>
+			<line>
+				<reportElement x="356" y="9" width="199" height="1" forecolor="#B4B4B4"/>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="264" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="268" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="352" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="356" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="37" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="311" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="504" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="463" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="409" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="74" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="217" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="172" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="124" y="-1" width="1" height="11" forecolor="#B4B4B4"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="18">
+			<rectangle>
+				<reportElement x="0" y="13" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+		</band>
+	</summary>
+</jasperReport>

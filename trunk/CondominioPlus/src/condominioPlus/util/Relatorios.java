@@ -18,6 +18,8 @@ import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
 import condominioPlus.negocio.cobranca.DadosCorrespondencia;
+import condominioPlus.negocio.cobranca.agua.ContaAgua;
+import condominioPlus.negocio.cobranca.agua.Rateio;
 import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
@@ -799,7 +801,7 @@ public class Relatorios implements Printable {
                 mapa.put("detalhe" + i, "   " + p.getDescricao());
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
             }
-            
+
             mapa.put("mensagens", boleto.getMensagens());
 
             lista.add(mapa);
@@ -1356,6 +1358,50 @@ public class Relatorios implements Printable {
         if (!lista.isEmpty()) {
             parametros.put("titulo", tipo.toString());
             imprimir("RelatorioExtratoChequesEmitidos", parametros, lista, false, true, null);
+        }
+    }
+
+    public void imprimirRelatorioConsumoAgua(ContaAgua conta) {
+        HashMap<String, Object> parametros = new HashMap();
+
+//      DADOS DO RATEIO
+        List<HashMap<String, String>> listaRateio = new ArrayList<HashMap<String, String>>();
+        for (Rateio rateio : conta.getRateios()) {
+            HashMap<String, String> mapa = new HashMap();
+            mapa.put("unidade", rateio.getUnidade().getUnidade());
+            mapa.put("fracaoIdeal", FormatadorNumeros.formatarDoubleToString(rateio.getUnidade().getFracaoIdeal(), "0.###"));
+            mapa.put("leituraAnterior", "" + rateio.getLeituraAnterior());
+            mapa.put("leituraAtual", "" + rateio.getLeituraAtual());
+            mapa.put("consumoM3", "" + rateio.getConsumoMetroCubico());
+            mapa.put("consumoACobrarM3", "" + rateio.getConsumoMetroCubicoACobrar());
+            mapa.put("percentualAreaComum", "" + FormatadorNumeros.casasDecimais(2, rateio.getPercentualRateioAreaComum()));
+            mapa.put("consumoM3AreaComum", "" + FormatadorNumeros.casasDecimais(3, rateio.getConsumoMetroCubicoAreaComum()));
+            mapa.put("consumoUnidade", PagamentoUtil.formatarMoeda(rateio.getValorTotalConsumido().setScale(2, RoundingMode.UP).doubleValue()));
+            mapa.put("consumoAreaComum", PagamentoUtil.formatarMoeda(rateio.getConsumoEmDinheiroAreaComum().doubleValue()));
+            mapa.put("totalACobrar", PagamentoUtil.formatarMoeda(rateio.getValorTotalCobrar().doubleValue()));
+            listaRateio.add(mapa);
+        }
+
+        parametros.put("condominio", conta.getCondominio().getRazaoSocial());
+
+//      DADOS DA CONTA DE AGUA
+        parametros.put("formaRateioAreaComum", "");
+        parametros.put("qtdeM3TaxaCondominial", "");
+        parametros.put("possuiHidrometroAreaComum", "");
+        parametros.put("formaCalculoValor", "");
+        parametros.put("consideraPipa", "");
+        parametros.put("periodoConsumo", DataUtil.toString(conta.getDataInicial()) + " a " + DataUtil.toString(conta.getDataFinal()));
+        parametros.put("vencimentoCobranca", DataUtil.toString(conta.getDataVencimentoConta()));
+        parametros.put("precoM3", PagamentoUtil.formatarMoeda(conta.getPrecoMetroCubico().doubleValue()));
+        parametros.put("despesaPipa", PagamentoUtil.formatarMoeda(conta.getValorPipa().doubleValue()));
+        parametros.put("consumoUnidades", PagamentoUtil.formatarMoeda(conta.getPrecoTotalUnidades().doubleValue()));
+        parametros.put("consumoAreaComum", PagamentoUtil.formatarMoeda(conta.getPrecoAreaComum().doubleValue()));
+       
+        URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+        parametros.put("subrelatorio", caminho.toString());
+
+        if (!listaRateio.isEmpty()) {
+            new Relatorios().imprimir("RelatorioConsumoAgua", parametros, listaRateio, false, true, null);
         }
     }
 }
