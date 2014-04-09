@@ -18,6 +18,13 @@
 	<parameter name="despesaPipa" class="java.lang.String"/>
 	<parameter name="consumoUnidades" class="java.lang.String"/>
 	<parameter name="consumoAreaComum" class="java.lang.String"/>
+	<parameter name="somaConsumoM3" class="java.lang.String"/>
+	<parameter name="somaConsumoACobrarM3" class="java.lang.String"/>
+	<parameter name="somaPercentualAreaComum" class="java.lang.String"/>
+	<parameter name="somaConsumoM3AreaComum" class="java.lang.String"/>
+	<parameter name="somaConsumoUnidade" class="java.lang.String"/>
+	<parameter name="somaConsumoAreaComum" class="java.lang.String"/>
+	<parameter name="somaTotalACobrar" class="java.lang.String"/>
 	<field name="unidade" class="java.lang.String"/>
 	<field name="fracaoIdeal" class="java.lang.String"/>
 	<field name="leituraAnterior" class="java.lang.String"/>
@@ -633,6 +640,76 @@
 			<rectangle>
 				<reportElement x="0" y="13" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
+			<rectangle>
+				<reportElement x="174" y="0" width="43" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="220" y="0" width="45" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="270" y="0" width="41" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="314" y="0" width="39" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="358" y="0" width="51" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="412" y="0" width="52" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="506" y="0" width="49" height="4" forecolor="#FFFFFF" backcolor="#D7D7D7"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="173" y="4" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaConsumoM3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="217" y="4" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaConsumoACobrarM3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="271" y="4" width="36" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaPercentualAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="312" y="4" width="36" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaConsumoM3AreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="359" y="4" width="44" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaConsumoUnidade}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="414" y="4" width="44" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaConsumoAreaComum}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="FixRelativeToBottom" x="506" y="4" width="40" height="9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaTotalACobrar}]]></textFieldExpression>
+			</textField>
 		</band>
 	</summary>
 </jasperReport>
