@@ -1151,7 +1151,17 @@ public class TelaAgua extends javax.swing.JInternalFrame {
         if (modeloContaAgua.getObjetoSelecionado() == null){
             ApresentacaoUtil.exibirAdvertencia("Selecione um registro na tabela das contas.", this);
         } else {
-            new Relatorios().imprimirRelatorioConsumoAgua(modeloContaAgua.getObjetoSelecionado());
+            boolean possuiHidrometro = false;
+            if (checkHidrometroAreaComum.isSelected()){
+                possuiHidrometro = true;
+            }
+            boolean consideraPipa = true;
+            if (checkNaoCobrarPipa.isSelected()){
+                possuiHidrometro = false;
+            }
+            String formaRateio = cbFormaCalculoMetroCubico.getSelectedItem().toString();
+            String formaRateioAreaComum = cbFormaRateioAreaComum.getSelectedItem().toString();
+            new Relatorios().imprimirRelatorioConsumoAgua(modeloContaAgua.getObjetoSelecionado(), formaRateio, (Integer)spinnerQuantidadeIncluirCota.getValue(), possuiHidrometro, formaRateioAreaComum, consideraPipa);
         }
     }
 

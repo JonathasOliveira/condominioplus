@@ -35,6 +35,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1361,10 +1362,17 @@ public class Relatorios implements Printable {
         }
     }
 
-    public void imprimirRelatorioConsumoAgua(ContaAgua conta) {
+    public void imprimirRelatorioConsumoAgua(ContaAgua conta, String formaRateio, int qtdeM3InclusosTaxaCondominial, boolean possuiHidrometro, String formaRateioAreaComum, boolean consideraPipa) {
         HashMap<String, Object> parametros = new HashMap();
 
 //      DADOS DO RATEIO
+        BigDecimal somaConsumoM3 = new BigDecimal(0);
+        BigDecimal somaConsumoACobrarM3 = new BigDecimal(0);
+        BigDecimal somaPercentualAreaComum = new BigDecimal(0);
+        BigDecimal somaConsumoM3AreaComum = new BigDecimal(0);
+        BigDecimal somaConsumoUnidade = new BigDecimal(0);
+        BigDecimal somaConsumoAreaComum = new BigDecimal(0);
+        BigDecimal somaTotalACobrar = new BigDecimal(0);
         List<HashMap<String, String>> listaRateio = new ArrayList<HashMap<String, String>>();
         for (Rateio rateio : conta.getRateios()) {
             HashMap<String, String> mapa = new HashMap();
@@ -1372,31 +1380,46 @@ public class Relatorios implements Printable {
             mapa.put("fracaoIdeal", FormatadorNumeros.formatarDoubleToString(rateio.getUnidade().getFracaoIdeal(), "0.###"));
             mapa.put("leituraAnterior", "" + rateio.getLeituraAnterior());
             mapa.put("leituraAtual", "" + rateio.getLeituraAtual());
+            somaConsumoM3 = somaConsumoM3.add(rateio.getConsumoMetroCubico());
             mapa.put("consumoM3", "" + rateio.getConsumoMetroCubico());
+            somaConsumoACobrarM3 = somaConsumoACobrarM3.add(rateio.getConsumoMetroCubicoACobrar());
             mapa.put("consumoACobrarM3", "" + rateio.getConsumoMetroCubicoACobrar());
+            somaPercentualAreaComum = somaPercentualAreaComum.add(rateio.getPercentualRateioAreaComum());
             mapa.put("percentualAreaComum", "" + FormatadorNumeros.casasDecimais(2, rateio.getPercentualRateioAreaComum()));
+            somaConsumoM3AreaComum = somaConsumoM3AreaComum.add(rateio.getConsumoMetroCubicoAreaComum());
             mapa.put("consumoM3AreaComum", "" + FormatadorNumeros.casasDecimais(3, rateio.getConsumoMetroCubicoAreaComum()));
+            somaConsumoUnidade = somaConsumoUnidade.add(rateio.getValorTotalConsumido());
             mapa.put("consumoUnidade", PagamentoUtil.formatarMoeda(rateio.getValorTotalConsumido().setScale(2, RoundingMode.UP).doubleValue()));
+            somaConsumoAreaComum = somaConsumoAreaComum.add(rateio.getConsumoEmDinheiroAreaComum());
             mapa.put("consumoAreaComum", PagamentoUtil.formatarMoeda(rateio.getConsumoEmDinheiroAreaComum().doubleValue()));
+            somaTotalACobrar = somaTotalACobrar.add(rateio.getValorTotalCobrar());
             mapa.put("totalACobrar", PagamentoUtil.formatarMoeda(rateio.getValorTotalCobrar().doubleValue()));
             listaRateio.add(mapa);
         }
 
         parametros.put("condominio", conta.getCondominio().getRazaoSocial());
+        
+        parametros.put("somaConsumoM3", "" + somaConsumoM3);
+        parametros.put("somaConsumoACobrarM3", "" + somaConsumoACobrarM3);
+        parametros.put("somaPercentualAreaComum", "" + FormatadorNumeros.casasDecimais(2, somaPercentualAreaComum));
+        parametros.put("somaConsumoM3AreaComum", "" + FormatadorNumeros.casasDecimais(3, somaConsumoM3AreaComum));
+        parametros.put("somaConsumoUnidade", PagamentoUtil.formatarMoeda(somaConsumoUnidade.setScale(2, RoundingMode.UP).doubleValue()));
+        parametros.put("somaConsumoAreaComum", PagamentoUtil.formatarMoeda(somaConsumoAreaComum.doubleValue()));
+        parametros.put("somaTotalACobrar", PagamentoUtil.formatarMoeda(somaTotalACobrar.doubleValue()));
 
 //      DADOS DA CONTA DE AGUA
-        parametros.put("formaRateioAreaComum", "");
-        parametros.put("qtdeM3TaxaCondominial", "");
-        parametros.put("possuiHidrometroAreaComum", "");
-        parametros.put("formaCalculoValor", "");
-        parametros.put("consideraPipa", "");
+        parametros.put("formaRateioAreaComum", formaRateio);
+        parametros.put("qtdeM3TaxaCondominial", "" + qtdeM3InclusosTaxaCondominial);
+        parametros.put("possuiHidrometroAreaComum", possuiHidrometro ? "Sim" : "Não");
+        parametros.put("formaCalculoValor", formaRateioAreaComum);
+        parametros.put("consideraPipa", consideraPipa ? "Condomínio Considera Água Fornecida por Pipa" : "Condomínio Não Considera Água Fornecida por Pipa");
         parametros.put("periodoConsumo", DataUtil.toString(conta.getDataInicial()) + " a " + DataUtil.toString(conta.getDataFinal()));
         parametros.put("vencimentoCobranca", DataUtil.toString(conta.getDataVencimentoConta()));
         parametros.put("precoM3", PagamentoUtil.formatarMoeda(conta.getPrecoMetroCubico().doubleValue()));
         parametros.put("despesaPipa", PagamentoUtil.formatarMoeda(conta.getValorPipa().doubleValue()));
         parametros.put("consumoUnidades", PagamentoUtil.formatarMoeda(conta.getPrecoTotalUnidades().doubleValue()));
         parametros.put("consumoAreaComum", PagamentoUtil.formatarMoeda(conta.getPrecoAreaComum().doubleValue()));
-       
+
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
         parametros.put("subrelatorio", caminho.toString());
 
