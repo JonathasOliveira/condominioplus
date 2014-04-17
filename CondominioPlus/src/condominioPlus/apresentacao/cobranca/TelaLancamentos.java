@@ -43,7 +43,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -65,20 +64,6 @@ import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
-import org.jrimum.bopepo.BancoSuportado;
-import org.jrimum.bopepo.Boleto;
-import org.jrimum.bopepo.view.BoletoViewer;
-import org.jrimum.domkee.comum.pessoa.endereco.CEP;
-import org.jrimum.domkee.comum.pessoa.endereco.Endereco;
-import org.jrimum.domkee.financeiro.banco.febraban.Agencia;
-import org.jrimum.domkee.financeiro.banco.febraban.Carteira;
-import org.jrimum.domkee.financeiro.banco.febraban.Cedente;
-import org.jrimum.domkee.financeiro.banco.febraban.ContaBancaria;
-import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
-import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
-import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
-import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
-import org.jrimum.domkee.financeiro.banco.febraban.Titulo.EnumAceite;
 
 /**
  *
@@ -725,8 +710,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
 
                 u.getCobrancas().add(cobranca);
-                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
-                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+                if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                    cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelSantander(cobranca));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+                } else if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                    cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+                }
                 new DAO().salvar(u);
             }
         } else {
@@ -960,7 +950,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         cobranca.setJuros(juros.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setMulta(multa.bigDecimalValue().setScale(2, RoundingMode.UP));
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getJuros().add(cobranca.getMulta().add(diferenca.bigDecimalValue()))).setScale(2, RoundingMode.UP));
-        cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
+        if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+            cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelSantander(cobranca));
+        } else if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+            cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
+        }
         if (jTabbedPane1.getSelectedIndex() == 1) {
             System.out.println("Dentro do if em calcularJurosMulta.");
             new DAO().salvar(cobranca);
@@ -969,154 +963,29 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirBoleto(List<Cobranca> listaCobrancas) {
-        List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
+        List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
         for (Cobranca cobranca : listaCobrancas) {
 
             if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
                 calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())));
             }
 
-            List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
+            listaDados = DadosCorrespondencia.preencherLista(cobranca.getUnidade(), listaDados, cobranca.getUnidade().isBoletoProprietario(), cobranca.getUnidade().isBoletoInquilino(), cobranca);
 
-            for (Cobranca co : listaCobrancas) {
-                listaDados = DadosCorrespondencia.preencherLista(co.getUnidade(), listaDados, co.getUnidade().isBoletoProprietario(), co.getUnidade().isBoletoInquilino(), co);
-            }
+        }
 
-            for (DadosCorrespondencia dados : listaDados) {
-                gerarBoleto(boletos, dados);
-            }
+        List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
+        for (DadosCorrespondencia dados : listaDados) {
+            boletos.add(BoletoBancario.gerarBoleto(condominio, dados));
         }
 
         /*
          * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
          */
 
-        new Relatorios().imprimirBoleto(boletos);
+        new Relatorios().imprimirBoleto(boletos, condominio);
 //        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
 //        BoletoBancario.mostreBoletoNaTela(pdf);
-    }
-
-    private void gerarBoleto(List<BoletoBancario> boletos, DadosCorrespondencia dados) {
-        /*
-         * INFORMANDO DADOS SOBRE O CEDENTE.
-         */
-        Cedente cedente = new Cedente(dados.getCobranca().getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(dados.getCobranca().getUnidade().getCondominio().getCnpj()));
-
-        /*
-         * INFORMANDO DADOS SOBRE O SACADO.
-         */
-        Sacado sacado = new Sacado(dados.getUnidade() + " " + dados.getNome());
-        // Informando o endereço do sacado.
-//        Endereco enderecoSac = new Endereco();
-//
-//        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(dados.getEstado()));
-//        enderecoSac.setLocalidade(dados.getCidade());
-//        enderecoSac.setCep(new CEP(dados.getCep()));
-//        enderecoSac.setBairro(dados.getBairro());
-//        enderecoSac.setLogradouro(dados.getLogradouro());
-//        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
-//
-//        sacado.addEndereco(enderecoSac);
-        
-     
-        /*
-         * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
-         */
-//                SacadorAvalista sacadorAvalista = new SacadorAvalista("JRimum Enterprise", "00.000.000/0001-91");
-//
-//                // Informando o endereço do sacador avalista.
-//                Endereco enderecoSacAval = new Endereco();
-//                enderecoSacAval.setUF(UnidadeFederativa.DF);
-//                enderecoSacAval.setLocalidade("Brasília");
-//                enderecoSacAval.setCep(new CEP("59000-000"));
-//                enderecoSacAval.setBairro("Grande Centro");
-//                enderecoSacAval.setLogradouro("Rua Eternamente Principal");
-//                enderecoSacAval.setNumero("001");9
-//                sacadorAvalista.addEndereco(enderecoSacAval);
-
-        /*
-         * INFORMANDO OS DADOS SOBRE O TÍTULO.
-         */
-
-        // Informando dados sobre a conta bancária do título.
-        ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
-        contaBancaria.setCarteira(new Carteira(102));
-        contaBancaria.setAgencia(new Agencia(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
-
-        Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-        titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento().substring(0, 13));
-        titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento().substring(0, 12));
-        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(dados.getCobranca().getNumeroDocumento().substring(0, 12)));
-        titulo.setValor(dados.getCobranca().getValorTotal());
-        titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
-        if (dados.getCobranca().getVencimentoProrrogado() != null) {
-            titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getVencimentoProrrogado()));
-        } else {
-            titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getDataVencimento()));
-        }
-        titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-        titulo.setAceite(EnumAceite.A);
-        titulo.setDesconto(null);
-        titulo.setDeducao(null);
-        titulo.setMora(null);
-        titulo.setAcrecimo(null);
-        titulo.setValorCobrado(null);
-
-        /*
-         * INFORMANDO OS DADOS SOBRE O BOLETO.
-         */
-        Boleto boletoAuxiliar = new Boleto(titulo);
-
-        System.out.println("campo livre " + boletoAuxiliar.getCampoLivre().write());
-        System.out.println("linha digitavel " + boletoAuxiliar.getLinhaDigitavel().write());
-        System.out.println("Codigo Barras " + boletoAuxiliar.getCodigoDeBarras().write());
-
-        BoletoBancario boleto = new BoletoBancario();
-        boleto.setNomeCedente(boletoAuxiliar.getTitulo().getCedente().getNome());
-        boleto.setCnpjCedente(boletoAuxiliar.getTitulo().getCedente().getCPRF().getCodigoFormatado());
-        boleto.setNomeSacado(boletoAuxiliar.getTitulo().getSacado().getNome());
-        boleto.setLogradouroSacado(dados.getLogradouro());
-        boleto.setNumeroSacado(dados.getNumero());
-        boleto.setComplementoSacado(dados.getComplemento());
-        boleto.setBairroSacado(dados.getBairro());
-        boleto.setCidadeSacado(dados.getCidade());
-        boleto.setUfSacado(dados.getEstado());
-        boleto.setCepSacado(dados.getCep());
-        boleto.setAgencia("" + boletoAuxiliar.getTitulo().getContaBancaria().getAgencia().getCodigo());
-        boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
-        boleto.setNumeroDocumento(boletoAuxiliar.getTitulo().getNumeroDoDocumento());
-        boleto.setDataDocumento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoDocumento()));
-        boleto.setDataVencimento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoVencimento()));
-        boleto.setTipoDocumento(boletoAuxiliar.getTitulo().getTipoDeDocumento().getSigla());
-        boleto.setAceite(boletoAuxiliar.getTitulo().getAceite().name());
-        boleto.setCarteira("" + boletoAuxiliar.getTitulo().getContaBancaria().getCarteira().getCodigo());
-        boleto.setEspecie( "R$");       
-        boleto.setLocalPagamento("ATÉ O VENCIMENTO PAGAR EM QUALQUER BANCO E/OU AGÊNCIA");
-        boleto.setValor(PagamentoUtil.formatarMoeda(boletoAuxiliar.getTitulo().getValor().doubleValue()));
-        boleto.setCodigoBanco(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco());
-        boleto.setDigitoBanco("7");
-        boleto.setLinhaDigitavel(boletoAuxiliar.getLinhaDigitavel().write());
-        boleto.setCodigoBarras(boletoAuxiliar.getCodigoDeBarras().write());
-        
-        boleto.setPagamentos(dados.getCobranca().getPagamentos());
-        
-        Comparator c = null;
-        c = new Comparator() {
-
-            public int compare(Object o1, Object o2) {
-                MensagemBoleto p1 = (MensagemBoleto) o1;
-                MensagemBoleto p2 = (MensagemBoleto) o2;
-                return Integer.valueOf(p1.getCodigo()).compareTo(Integer.valueOf(p2.getCodigo()));
-            }
-        };
-        List<MensagemBoleto> mensagens = dados.getCobranca().getUnidade().getCondominio().getMensagens();        
-        Collections.sort(mensagens, c);        
-        boleto.setMensagens(mensagens.get(0).getMensagem() + "\n" + mensagens.get(1).getMensagem() + "\n" + mensagens.get(2).getMensagem()
-                + "\n" + mensagens.get(3).getMensagem() + "\n" + mensagens.get(4).getMensagem() + "\n" + mensagens.get(5).getMensagem()
-                + "\n" + mensagens.get(6).getMensagem() + "\n" + mensagens.get(7).getMensagem());
-
-        boletos.add(boleto);
     }
 
     private void limparSelecoesTabelas() {
@@ -1160,7 +1029,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(desconto.bigDecimalValue()));
                 pAuxiliar.setValor(pAuxiliar.getValor().subtract(c.getDesconto()).subtract(c.getDiferencaPagamento()));
             } else {
-
                 Moeda diferencaValorPagoValorTitulo = new Moeda();
                 diferencaValorPagoValorTitulo.soma(r.getValorPago()).subtrai(r.getValorTitulo());
 
@@ -1301,7 +1169,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void verificarMensagens() {
         List<MensagemBoleto> mensagens = condominio.getMensagens();
-        while (mensagens.size() < 8) {
+        while (mensagens.size() < 4) {
             MensagemBoleto mensagem = new MensagemBoleto();
             mensagem.setCondominio(condominio);
             mensagens.add(mensagem);
@@ -1331,10 +1199,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         txtMensagem2.setText(condominio.getMensagens().get(1).getMensagem());
         txtMensagem3.setText(condominio.getMensagens().get(2).getMensagem());
         txtMensagem4.setText(condominio.getMensagens().get(3).getMensagem());
-        txtMensagem5.setText(condominio.getMensagens().get(4).getMensagem());
-        txtMensagem6.setText(condominio.getMensagens().get(5).getMensagem());
-        txtMensagem7.setText(condominio.getMensagens().get(6).getMensagem());
-        txtMensagem8.setText(condominio.getMensagens().get(7).getMensagem());
     }
 
     private void salvarMensagens() {
@@ -1343,10 +1207,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         condominio.getMensagens().get(1).setMensagem(txtMensagem2.getText());
         condominio.getMensagens().get(2).setMensagem(txtMensagem3.getText());
         condominio.getMensagens().get(3).setMensagem(txtMensagem4.getText());
-        condominio.getMensagens().get(4).setMensagem(txtMensagem5.getText());
-        condominio.getMensagens().get(5).setMensagem(txtMensagem6.getText());
-        condominio.getMensagens().get(6).setMensagem(txtMensagem7.getText());
-        condominio.getMensagens().get(7).setMensagem(txtMensagem8.getText());
         new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Mensagens salvas com sucesso!", this);
     }
@@ -1416,8 +1276,13 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(txtDataVencimento.getValue())));
             gerarPagamentosCobrancasAcordo(ac, cobranca, i);
             u.getCobrancas().add(cobranca);
-            cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
-            cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+            if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelSantander(cobranca));
+                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+            } else if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
+                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+            }
             ac.getCobrancasGeradas().add(cobranca);
             cobranca.setAcordo(ac);
         }
@@ -2289,6 +2154,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         itemMenuOcultarDados = new javax.swing.JMenuItem();
         itemMenuLimparDadosAvulsos = new javax.swing.JMenuItem();
         itemMenuRemoverItemCobranca = new javax.swing.JMenuItem();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         painelCondominos = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         tabelaCondominos = new javax.swing.JTable();
@@ -2347,24 +2213,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         btnConfirmar = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         painelMensagem = new javax.swing.JPanel();
-        txtMensagem1 = new javax.swing.JTextField();
+        txtMensagem2 = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         btnSalvarMensagem = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
-        txtMensagem2 = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
         txtMensagem3 = new javax.swing.JTextField();
-        jLabel9 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
         txtMensagem4 = new javax.swing.JTextField();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        txtMensagem1 = new javax.swing.JTextArea();
+        jLabel9 = new javax.swing.JLabel();
+        radioSemRegistro = new javax.swing.JRadioButton();
         jLabel10 = new javax.swing.JLabel();
-        txtMensagem5 = new javax.swing.JTextField();
-        jLabel11 = new javax.swing.JLabel();
-        txtMensagem6 = new javax.swing.JTextField();
-        jLabel12 = new javax.swing.JLabel();
-        txtMensagem7 = new javax.swing.JTextField();
-        jLabel13 = new javax.swing.JLabel();
-        txtMensagem8 = new javax.swing.JTextField();
+        radioComRegistro = new javax.swing.JRadioButton();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         tabelaAcordo = new javax.swing.JTable();
@@ -2986,7 +2848,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         painelMensagem.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        txtMensagem1.setName("Valor"); // NOI18N
+        txtMensagem2.setName("Valor"); // NOI18N
 
         jLabel6.setText("Instrução 1");
 
@@ -2997,7 +2859,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel6Layout.createSequentialGroup()
-                .addContainerGap(239, Short.MAX_VALUE)
+                .addContainerGap(236, Short.MAX_VALUE)
                 .addComponent(btnSalvarMensagem)
                 .addGap(224, 224, 224))
         );
@@ -3011,94 +2873,82 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         jLabel7.setText("Instrução 2");
 
-        txtMensagem2.setName("Valor"); // NOI18N
+        txtMensagem3.setName("Valor"); // NOI18N
 
         jLabel8.setText("Instrução 3");
 
-        txtMensagem3.setName("Valor"); // NOI18N
-
-        jLabel9.setText("Instrução 4");
-
         txtMensagem4.setName("Valor"); // NOI18N
 
-        jLabel10.setText("Instrução 5");
+        txtMensagem1.setColumns(20);
+        txtMensagem1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        txtMensagem1.setLineWrap(true);
+        txtMensagem1.setRows(5);
+        txtMensagem1.setName("texto"); // NOI18N
+        jScrollPane11.setViewportView(txtMensagem1);
 
-        txtMensagem5.setName("Valor"); // NOI18N
+        jLabel9.setText("Informações aos Condôminos");
 
-        jLabel11.setText("Instrução 6");
+        buttonGroup1.add(radioSemRegistro);
+        radioSemRegistro.setSelected(true);
+        radioSemRegistro.setText("Cobrança sem registro");
 
-        txtMensagem6.setName("Valor"); // NOI18N
+        jLabel10.setText("Contrato junto ao banco ref. a Cobrança:");
 
-        jLabel12.setText("Instrução 7");
-
-        txtMensagem7.setName("Valor"); // NOI18N
-
-        jLabel13.setText("Instrução 8");
-
-        txtMensagem8.setName("Valor"); // NOI18N
+        buttonGroup1.add(radioComRegistro);
+        radioComRegistro.setText("Cobrança com registro");
 
         javax.swing.GroupLayout painelMensagemLayout = new javax.swing.GroupLayout(painelMensagem);
         painelMensagem.setLayout(painelMensagemLayout);
         painelMensagemLayout.setHorizontalGroup(
             painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelMensagemLayout.createSequentialGroup()
+            .addGroup(painelMensagemLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(txtMensagem1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txtMensagem8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING))
-                .addContainerGap())
+                .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel9)
+                    .addGroup(painelMensagemLayout.createSequentialGroup()
+                        .addComponent(jLabel10)
+                        .addGap(31, 31, 31)
+                        .addComponent(radioSemRegistro)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(radioComRegistro)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelMensagemLayout.createSequentialGroup()
+                        .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtMensagem4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(txtMensagem3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(txtMensagem2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                            .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
+                        .addContainerGap())))
         );
         painelMensagemLayout.setVerticalGroup(
             painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelMensagemLayout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(radioSemRegistro)
+                    .addComponent(radioComRegistro))
+                .addGap(9, 9, 9)
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtMensagem1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtMensagem2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel8)
+                .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtMensagem3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel9)
+                .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtMensagem4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtMensagem5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel11)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtMensagem6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtMensagem7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel13)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtMensagem8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -3110,7 +2960,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(painelMensagem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3252,7 +3102,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3273,6 +3123,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCarregarInformacoesCobranca;
     private javax.swing.JButton btnConfirmar;
@@ -3288,6 +3139,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnLerArquivoRetorno;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvarMensagem;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JMenuItem itemMenuBaixaManual;
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;
@@ -3319,9 +3171,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuRemoverSelecionados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
@@ -3347,6 +3196,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane10;
+    private javax.swing.JScrollPane jScrollPane11;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -3376,6 +3226,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JPopupMenu popupMenuDadosAvulsos;
     private javax.swing.JPopupMenu popupMenuInadimplentes;
     private javax.swing.JPopupMenu popupMenuPagos;
+    private javax.swing.JRadioButton radioComRegistro;
+    private javax.swing.JRadioButton radioSemRegistro;
     private javax.swing.JTable tabelaAcordo;
     private javax.swing.JTable tabelaArquivoRetorno;
     private javax.swing.JTable tabelaCobrancas;
@@ -3393,14 +3245,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private net.sf.nachocalendar.components.DateField txtDataVencimentoAvulso;
     private javax.swing.JTextField txtFiltro;
     private javax.swing.JTextField txtHistorico;
-    private javax.swing.JTextField txtMensagem1;
+    private javax.swing.JTextArea txtMensagem1;
     private javax.swing.JTextField txtMensagem2;
     private javax.swing.JTextField txtMensagem3;
     private javax.swing.JTextField txtMensagem4;
-    private javax.swing.JTextField txtMensagem5;
-    private javax.swing.JTextField txtMensagem6;
-    private javax.swing.JTextField txtMensagem7;
-    private javax.swing.JTextField txtMensagem8;
     private javax.swing.JTextField txtNumeroDocumento;
     private net.sf.nachocalendar.components.DateField txtVencimentoProrrogado;
     // End of variables declaration//GEN-END:variables

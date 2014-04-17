@@ -7,8 +7,12 @@ package condominioPlus.negocio.cobranca;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.financeiro.Pagamento;
+import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
@@ -32,7 +36,7 @@ import org.jrimum.domkee.financeiro.banco.febraban.Titulo.EnumAceite;
  * @author eugenia
  */
 public class BoletoBancario {
-    
+
     private String nomeCedente;
     private String cnpjCedente;
     private String nomeSacado;
@@ -59,7 +63,10 @@ public class BoletoBancario {
     private String linhaDigitavel;
     private String codigoBarras;
     private List<Pagamento> pagamentos;
-    private String mensagens;
+    private String mensagem1;
+    private String mensagem2;
+    private String mensagem3;
+    private String mensagem4;
 
     public String getAceite() {
         return aceite;
@@ -269,14 +276,38 @@ public class BoletoBancario {
         this.ufSacado = ufSacado;
     }
 
-    public String getMensagens() {
-        return mensagens;
+    public String getMensagem1() {
+        return mensagem1;
     }
 
-    public void setMensagens(String mensagens) {
-        this.mensagens = mensagens;
+    public void setMensagem1(String mensagem1) {
+        this.mensagem1 = mensagem1;
     }
-     
+
+    public String getMensagem2() {
+        return mensagem2;
+    }
+
+    public void setMensagem2(String mensagem2) {
+        this.mensagem2 = mensagem2;
+    }
+
+    public String getMensagem3() {
+        return mensagem3;
+    }
+
+    public void setMensagem3(String mensagem3) {
+        this.mensagem3 = mensagem3;
+    }
+
+    public String getMensagem4() {
+        return mensagem4;
+    }
+
+    public void setMensagem4(String mensagem4) {
+        this.mensagem4 = mensagem4;
+    }
+
     public static void mostreBoletoNaTela(File arquivoBoleto) {
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 
@@ -317,6 +348,36 @@ public class BoletoBancario {
         return ((Integer) dac).toString();
     }
 
+    public static String calculoDvNossoNumeroBradesco(String campo) {
+        int multiplicador = 2;
+        int multiplicacao = 0;
+        int soma_campo = 0;
+        for (int i = campo.length(); i > 0; i--) {
+            multiplicacao = Integer.parseInt(campo.substring(i - 1, i)) * multiplicador;
+//            System.out.println("numero " + Integer.parseInt(campo.substring(i - 1, i)));
+//            System.out.println("multiplicação " + multiplicacao);
+            soma_campo = soma_campo + multiplicacao;
+//            System.out.println("soma campo" + soma_campo);
+            multiplicador++;
+            if (multiplicador > 9) {
+                multiplicador = 2;
+//                System.out.println("primeiro if");
+
+            }
+        }
+        int dac = (soma_campo % 11);
+//        System.out.println("dac " + dac);
+        if (dac >= 10) {
+            dac = 1;
+        } else if (dac == 0 || dac == 1) {
+            dac = 0;
+        } else {
+            dac = 11 - dac;
+        }
+//        System.out.println("fasdf" + ((Integer) dac).toString());
+        return ((Integer) dac).toString();
+    }
+
     public static String gerarNumeroDocumento(Condominio condominio, DateTime data) {
 
         String resultado;
@@ -332,8 +393,15 @@ public class BoletoBancario {
 
         resultado = condominio.getCodigo() + mes + incremento;
 
-        while (resultado.length() < 12) {
-            resultado = "0" + resultado;
+        // verificar o banco antes de gerar o NumeroDocumento
+        if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+            while (resultado.length() < 12) {
+                resultado = "0" + resultado;
+            }
+        } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+            while (resultado.length() < 10) {
+                resultado = "0" + resultado;
+            }
         }
 
         if (incremento == 99999) {
@@ -410,7 +478,7 @@ public class BoletoBancario {
         }
     }
 
-    public static String getLinhaDigitavel(Cobranca cobranca) {
+    public static String getLinhaDigitavelSantander(Cobranca cobranca) {
         Cedente cedente = new Cedente("");
 
         /*
@@ -434,10 +502,66 @@ public class BoletoBancario {
         contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
+        if (cobranca.getNumeroDocumento().length() == 13) {
+        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
+        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
+        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
+        } else if (cobranca.getNumeroDocumento().length() == 12) {
+            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
+            titulo.setNossoNumero(cobranca.getNumeroDocumento());
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+        }
+        titulo.setValor(cobranca.getValorTotal());
+        titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
+        if (cobranca.getVencimentoProrrogado() != null) {
+            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getVencimentoProrrogado()));
+        } else {
+            titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
+        }
+        titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
+        titulo.setAceite(EnumAceite.A);
+        titulo.setDesconto(null);
+        titulo.setDeducao(null);
+        titulo.setMora(null);
+        titulo.setAcrecimo(null);
+        titulo.setValorCobrado(null);
+
+        /*
+         * INFORMANDO OS DADOS SOBRE O BOLETO.
+         */
+        Boleto boleto = new Boleto(titulo);
+
+        return boleto.getLinhaDigitavel().write();
+    }
+    
+    public static String getLinhaDigitavelBradesco(Cobranca cobranca) {
+        Cedente cedente = new Cedente("");
+
+        /*
+         * INFORMANDO DADOS SOBRE O SACADO.
+         */
+        Sacado sacado = new Sacado("");
+
+        // Informando o endereço do sacado.
+        Endereco enderecoSac = new Endereco();
+
+        sacado.addEndereco(enderecoSac);
+
+        /*
+         * INFORMANDO OS DADOS SOBRE O TÍTULO.
+         */
+
+        // Informando dados sobre a conta bancária do título.
+        ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_BRADESCO.create());
+        contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getContaCorrente()), cobranca.getUnidade().getCondominio().getContaBancaria().getDigitoCorrente()));
+        contaBancaria.setCarteira(new Carteira(9));
+        contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
+
+        Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
 //        if (cobranca.getNumeroDocumento().length() == 13) {
-            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
-            titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
-            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
+        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 11));
+        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 10));
+        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento().substring(0, 10)));
 //        } else if (cobranca.getNumeroDocumento().length() == 12) {
 //            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
 //            titulo.setNossoNumero(cobranca.getNumeroDocumento());
@@ -451,7 +575,7 @@ public class BoletoBancario {
             titulo.setDataDoVencimento(DataUtil.getDate(cobranca.getDataVencimento()));
         }
         titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-        titulo.setAceite(EnumAceite.A);
+        titulo.setAceite(EnumAceite.N);
         titulo.setDesconto(null);
         titulo.setDeducao(null);
         titulo.setMora(null);
@@ -487,5 +611,181 @@ public class BoletoBancario {
         cnpj = bob.toString().trim();
 
         return cnpj;
+    }
+    
+    public static BoletoBancario gerarBoleto(Condominio condominio, DadosCorrespondencia dados) {
+               
+        /*
+         * INFORMANDO DADOS SOBRE O CEDENTE.
+         */
+        Cedente cedente = new Cedente(dados.getCobranca().getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(dados.getCobranca().getUnidade().getCondominio().getCnpj()));
+
+        /*
+         * INFORMANDO DADOS SOBRE O SACADO.
+         */
+        Sacado sacado = new Sacado(dados.getUnidade() + " " + dados.getNome());
+        // Informando o endereço do sacado.
+//        Endereco enderecoSac = new Endereco();
+//
+//        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(dados.getEstado()));
+//        enderecoSac.setLocalidade(dados.getCidade());
+//        enderecoSac.setCep(new CEP(dados.getCep()));
+//        enderecoSac.setBairro(dados.getBairro());
+//        enderecoSac.setLogradouro(dados.getLogradouro());
+//        enderecoSac.setNumero(dados.getNumero() + " " + dados.getComplemento());
+//
+//        sacado.addEndereco(enderecoSac);
+
+
+        /*
+         * INFORMANDO DADOS SOBRE O SACADOR AVALISTA.
+         */
+//                SacadorAvalista sacadorAvalista = new SacadorAvalista("JRimum Enterprise", "00.000.000/0001-91");
+//
+//                // Informando o endereço do sacador avalista.
+//                Endereco enderecoSacAval = new Endereco();
+//                enderecoSacAval.setUF(UnidadeFederativa.DF);
+//                enderecoSacAval.setLocalidade("Brasília");
+//                enderecoSacAval.setCep(new CEP("59000-000"));
+//                enderecoSacAval.setBairro("Grande Centro");
+//                enderecoSacAval.setLogradouro("Rua Eternamente Principal");
+//                enderecoSacAval.setNumero("001");
+//                sacadorAvalista.addEndereco(enderecoSacAval);
+
+
+        /*
+         * INFORMANDO OS DADOS SOBRE O BOLETO.
+         */
+
+        Boleto boletoAuxiliar = BoletoBancario.getBoletoAuxiliar(condominio, sacado, cedente, dados);
+
+        System.out.println("campo livre " + boletoAuxiliar.getCampoLivre().write());
+        System.out.println("linha digitavel " + boletoAuxiliar.getLinhaDigitavel().write());
+        System.out.println("Codigo Barras " + boletoAuxiliar.getCodigoDeBarras().write());
+
+        BoletoBancario boleto = new BoletoBancario();
+        boleto.setNomeCedente(boletoAuxiliar.getTitulo().getCedente().getNome());
+        boleto.setCnpjCedente(boletoAuxiliar.getTitulo().getCedente().getCPRF().getCodigoFormatado());
+        boleto.setNomeSacado(boletoAuxiliar.getTitulo().getSacado().getNome());
+        boleto.setLogradouroSacado(dados.getLogradouro());
+        boleto.setNumeroSacado(dados.getNumero());
+        boleto.setComplementoSacado(dados.getComplemento());
+        boleto.setBairroSacado(dados.getBairro());
+        boleto.setCidadeSacado(dados.getCidade());
+        boleto.setUfSacado(dados.getEstado());
+        boleto.setCepSacado(dados.getCep());
+
+        boleto.setCodigoBanco(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco());
+        if (boleto.getCodigoBanco().equals("033")) {
+            boleto.setAgencia("" + boletoAuxiliar.getTitulo().getContaBancaria().getAgencia().getCodigo());
+            boleto.setDigitoBanco("7");
+        } else if (boleto.getCodigoBanco().equals("237")) {
+            boleto.setAgencia(boletoAuxiliar.getTitulo().getContaBancaria().getAgencia().getCodigo() + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getAgencia().getDigitoVerificador());
+            boleto.setDigitoBanco("2");
+        }
+
+        if (boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta() == null || boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta().equals("")) {
+            boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
+        } else {
+            boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 7) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta());
+        }
+
+        boleto.setNumeroDocumento(boletoAuxiliar.getTitulo().getNumeroDoDocumento());
+        boleto.setDataDocumento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoDocumento()));
+        boleto.setDataVencimento(DataUtil.toString(boletoAuxiliar.getTitulo().getDataDoVencimento()));
+        boleto.setTipoDocumento(boletoAuxiliar.getTitulo().getTipoDeDocumento().getSigla());
+        boleto.setAceite(boletoAuxiliar.getTitulo().getAceite().name());
+        boleto.setCarteira("" + boletoAuxiliar.getTitulo().getContaBancaria().getCarteira().getCodigo());
+        boleto.setEspecie("R$");
+        boleto.setLocalPagamento(boletoAuxiliar.getLocalPagamento());
+        boleto.setValor(PagamentoUtil.formatarMoeda(boletoAuxiliar.getTitulo().getValor().doubleValue()));
+
+        boleto.setLinhaDigitavel(boletoAuxiliar.getLinhaDigitavel().write());
+        boleto.setCodigoBarras(boletoAuxiliar.getCodigoDeBarras().write());
+
+        boleto.setPagamentos(dados.getCobranca().getPagamentos());
+
+        Comparator c = null;
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                MensagemBoleto p1 = (MensagemBoleto) o1;
+                MensagemBoleto p2 = (MensagemBoleto) o2;
+                return Integer.valueOf(p1.getCodigo()).compareTo(Integer.valueOf(p2.getCodigo()));
+            }
+        };
+        List<MensagemBoleto> mensagens = condominio.getMensagens();
+        Collections.sort(mensagens, c);
+        boleto.setMensagem1(mensagens.get(0).getMensagem());
+        boleto.setMensagem2(mensagens.get(1).getMensagem());
+        boleto.setMensagem3(mensagens.get(2).getMensagem());
+        boleto.setMensagem4(mensagens.get(3).getMensagem());
+               
+        return boleto;
+    }
+    
+    public static Boleto getBoletoAuxiliar(Condominio condominio, Sacado sacado, Cedente cedente, DadosCorrespondencia dados) {
+        /*
+         * INFORMANDO OS DADOS SOBRE O TÍTULO.
+         */
+        if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+            ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
+            contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getCodigoCedente() + dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getDigitoCedente())));
+            contaBancaria.setCarteira(new Carteira(102));
+            contaBancaria.setAgencia(new Agencia(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
+            Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
+            titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento().substring(0, 13));
+            titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento().substring(0, 12));
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(dados.getCobranca().getNumeroDocumento().substring(0, 12)));
+            titulo.setValor(dados.getCobranca().getValorTotal());
+            titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
+            if (dados.getCobranca().getVencimentoProrrogado() != null) {
+                titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getVencimentoProrrogado()));
+            } else {
+                titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getDataVencimento()));
+            }
+            titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
+            titulo.setAceite(EnumAceite.A);
+            titulo.setDesconto(null);
+            titulo.setDeducao(null);
+            titulo.setMora(null);
+            titulo.setAcrecimo(null);
+            titulo.setValorCobrado(null);
+
+            Boleto boleto = new Boleto(titulo);
+            boleto.setLocalPagamento("ATÉ O VENCIMENTO PAGAR EM QUALQUER BANCO E/OU AGÊNCIA");
+
+            return boleto;
+        } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+            ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_BRADESCO.create());
+            contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getContaCorrente()), dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getDigitoCorrente()));
+            contaBancaria.setCarteira(new Carteira(9));
+            contaBancaria.setAgencia(new Agencia(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
+            Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
+            titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento().substring(0, 11));
+            titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento().substring(0, 10));
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroBradesco(dados.getCobranca().getNumeroDocumento().substring(0, 10)));
+            titulo.setValor(dados.getCobranca().getValorTotal());
+            titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
+            if (dados.getCobranca().getVencimentoProrrogado() != null) {
+                titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getVencimentoProrrogado()));
+            } else {
+                titulo.setDataDoVencimento(DataUtil.getDate(dados.getCobranca().getDataVencimento()));
+            }
+            titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
+            titulo.setAceite(EnumAceite.N);
+            titulo.setDesconto(null);
+            titulo.setDeducao(null);
+            titulo.setMora(null);
+            titulo.setAcrecimo(null);
+            titulo.setValorCobrado(null);
+
+            Boleto boleto = new Boleto(titulo);
+            boleto.setLocalPagamento("Pagável Preferencialmente na rede Bradesco ou no Bradesco Expresso");
+
+            return boleto;
+        }
+
+        return null;
     }
 }
