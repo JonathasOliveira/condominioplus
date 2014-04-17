@@ -15,6 +15,7 @@ import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.negocio.cobranca.BoletoBancario;
 import condominioPlus.negocio.cobranca.Cobranca;
+import condominioPlus.negocio.cobranca.DadosCorrespondencia;
 import condominioPlus.negocio.cobranca.taxaExtra.ParcelaTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.RateioTaxaExtra;
 import condominioPlus.negocio.cobranca.taxaExtra.TaxaExtra;
@@ -369,105 +370,42 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                 cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
 //                new DAO().salvar(rateio);
 
-                cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavel(cobranca));
-                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+                if (rateio.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                    cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelSantander(cobranca));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
+                } else if (rateio.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                    cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+                }
+
+                rateio.getUnidade().getCobrancas().add(cobranca);
             }
         }
     }
 
     private void imprimirCobrancas(TaxaExtra txe) {
+        List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
 
-        List<Boleto> boletos = new ArrayList<Boleto>();
         for (ParcelaTaxaExtra parcela : txe.getParcelas()) {
             for (RateioTaxaExtra rateio : parcela.getRateios()) {
 
-                /*
-                 * INFORMANDO DADOS SOBRE O CEDENTE.
-                 */
-                Cedente cedente = new Cedente(rateio.getCobranca().getUnidade().getCondominio().getRazaoSocial(), BoletoBancario.retirarCaracteresCnpj(rateio.getCobranca().getUnidade().getCondominio().getCnpj()));
+                listaDados = DadosCorrespondencia.preencherLista(rateio.getCobranca().getUnidade(), listaDados, rateio.getCobranca().getUnidade().isBoletoProprietario(), rateio.getCobranca().getUnidade().isBoletoInquilino(), rateio.getCobranca());
 
-                /*
-                 * INFORMANDO DADOS SOBRE O SACADO.
-                 */
-                Sacado sacado = new Sacado(rateio.getCobranca().getUnidade().getUnidade() + " " + rateio.getCobranca().getUnidade().getCondomino().getNome());
-
-                // Informando o endereço do sacado.
-                Endereco enderecoSac = new Endereco();
-
-                for (condominioPlus.negocio.Endereco e : rateio.getCobranca().getUnidade().getCondomino().getEnderecos()) {
-                    if (e.isPadrao()) {
-                        enderecoSac.setUF(BoletoBancario.getUnidadeFederativa(e.getEstado()));
-                        enderecoSac.setLocalidade(e.getCidade());
-                        enderecoSac.setCep(new CEP(e.getCep()));
-                        enderecoSac.setBairro(e.getBairro());
-                        enderecoSac.setLogradouro(e.getLogradouro());
-                        enderecoSac.setNumero(e.getNumero() + " " + e.getComplemento());
-                    }
-                }
-
-                sacado.addEndereco(enderecoSac);
-
-                /*
-                 * INFORMANDO OS DADOS SOBRE O TÍTULO.
-                 */
-
-                // Informando dados sobre a conta bancária do título.
-                ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_SANTANDER.create());
-                contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(rateio.getCobranca().getUnidade().getCondominio().getContaBancaria().getCodigoCedente())));
-                contaBancaria.setCarteira(new Carteira(102));
-                contaBancaria.setAgencia(new Agencia(3918, "0"));
-
-                Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-                titulo.setNumeroDoDocumento(rateio.getCobranca().getNumeroDocumento().substring(0, 12));
-                titulo.setNossoNumero(rateio.getCobranca().getNumeroDocumento().substring(0, 12));
-                titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(rateio.getCobranca().getNumeroDocumento().substring(0, 12)));
-                titulo.setValor(rateio.getCobranca().getValorTotal());
-                titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
-                if (rateio.getCobranca().getVencimentoProrrogado() != null) {
-                    titulo.setDataDoVencimento(DataUtil.getDate(rateio.getCobranca().getVencimentoProrrogado()));
-                } else {
-                    titulo.setDataDoVencimento(DataUtil.getDate(rateio.getCobranca().getDataVencimento()));
-                }
-                titulo.setTipoDeDocumento(TipoDeTitulo.DM_DUPLICATA_MERCANTIL);
-                titulo.setAceite(EnumAceite.N);
-                titulo.setDesconto(null);
-                titulo.setDeducao(null);
-                titulo.setMora(null);
-                titulo.setAcrecimo(null);
-                titulo.setValorCobrado(null);
-
-                /*
-                 * INFORMANDO OS DADOS SOBRE O BOLETO.
-                 */
-                Boleto boleto = new Boleto(titulo);
-
-                boleto.setLocalPagamento("Pagável preferencialmente na Rede X ou em "
-                        + "qualquer Banco até o Vencimento.");
-//                boleto.setInstrucaoAoSacado("Senhor sacado, sabemos sim que o valor " +
-//                                "cobrado não é o esperado, aproveite o DESCONTÃO!");
-                boleto.setInstrucao1(condominio.getMensagens().get(0).getMensagem());
-                boleto.setInstrucao2(condominio.getMensagens().get(1).getMensagem());
-                boleto.setInstrucao3(condominio.getMensagens().get(2).getMensagem());
-                boleto.setInstrucao4(condominio.getMensagens().get(3).getMensagem());
-                boleto.setInstrucao5(condominio.getMensagens().get(4).getMensagem());
-                boleto.setInstrucao6(condominio.getMensagens().get(5).getMensagem());
-                boleto.setInstrucao7(condominio.getMensagens().get(6).getMensagem());
-                boleto.setInstrucao8(condominio.getMensagens().get(7).getMensagem());
-
-                System.out.println("campo livre " + boleto.getCampoLivre().write());
-                System.out.println("linha digitavel " + boleto.getLinhaDigitavel().write());
-                System.out.println("Codigo Barras " + boleto.getCodigoDeBarras().write());
-
-                boletos.add(boleto);
             }
+        }
+
+        List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
+        for (DadosCorrespondencia dados : listaDados) {
+            boletos.add(BoletoBancario.gerarBoleto(condominio, dados));
         }
 
         /*
          * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
          */
 
-        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
-        BoletoBancario.mostreBoletoNaTela(pdf);
+        new Relatorios().imprimirBoleto(boletos, condominio);
+//        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
+//        BoletoBancario.mostreBoletoNaTela(pdf);
     }
 
     private void salvar() {
@@ -512,6 +450,15 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             List<TaxaExtra> itensRemover = modelo.getObjetosSelecionados();
             if (!itensRemover.isEmpty()) {
                 for (TaxaExtra t : itensRemover) {
+                    for (ParcelaTaxaExtra parcela : t.getParcelas()) {
+                        for (RateioTaxaExtra rateio : parcela.getRateios()) {
+                            for (Unidade u : condominio.getUnidades()) {
+                                if (rateio.getCobranca().getUnidade().getCodigo() == u.getCodigo()) {
+                                    u.getCobrancas().remove(rateio.getCobranca());
+                                }
+                            }
+                        }
+                    }
                     modelo.remover(t);
                     new DAO().remover(t);
                 }

@@ -35,7 +35,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -761,13 +760,18 @@ public class Relatorios implements Printable {
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
     }
 
-    public void imprimirBoleto(List<BoletoBancario> boletos) {
+    public void imprimirBoleto(List<BoletoBancario> boletos, Condominio condominio) {
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
 
-        URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
-        parametros.put("logoSantander", logoSantander.toString());
+        if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+            URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
+            parametros.put("logoSantander", logoSantander.toString());
+        } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+            URL logoBradesco = getClass().getResource("/condominioPlus/recursos/imagens/bradesco_logo.jpg");
+            parametros.put("logoBradesco", logoBradesco.toString());
+        }
 
         for (BoletoBancario boleto : boletos) {
             HashMap<String, String> mapa = new HashMap();
@@ -786,7 +790,7 @@ public class Relatorios implements Printable {
             mapa.put("dataVencimento", boleto.getDataVencimento());
             mapa.put("tipoDocumento", boleto.getTipoDocumento());
             mapa.put("aceite", boleto.getAceite());
-            mapa.put("carteira", boleto.getCarteira());
+            mapa.put("carteira", (boleto.getCarteira().length() == 1) ? "0" + boleto.getCarteira() : boleto.getCarteira());
             mapa.put("especie", boleto.getEspecie());
             mapa.put("localPagamento", boleto.getLocalPagamento());
             mapa.put("valor", boleto.getValor());
@@ -803,13 +807,20 @@ public class Relatorios implements Printable {
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
             }
 
-            mapa.put("mensagens", boleto.getMensagens());
+            mapa.put("mensagem1", boleto.getMensagem1());
+            mapa.put("mensagem2", boleto.getMensagem2());
+            mapa.put("mensagem3", boleto.getMensagem3());
+            mapa.put("mensagem4", boleto.getMensagem4());
 
             lista.add(mapa);
         }
 
         if (!lista.isEmpty()) {
-            imprimir("Boleto", parametros, lista, false, true, null);
+            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                imprimir("BoletoSantander", parametros, lista, false, true, null);
+            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                imprimir("BoletoBradesco", parametros, lista, false, true, null);
+            }
         }
     }
 
@@ -1398,7 +1409,7 @@ public class Relatorios implements Printable {
         }
 
         parametros.put("condominio", conta.getCondominio().getRazaoSocial());
-        
+
         parametros.put("somaConsumoM3", "" + somaConsumoM3);
         parametros.put("somaConsumoACobrarM3", "" + somaConsumoACobrarM3);
         parametros.put("somaPercentualAreaComum", "" + FormatadorNumeros.casasDecimais(2, somaPercentualAreaComum));
