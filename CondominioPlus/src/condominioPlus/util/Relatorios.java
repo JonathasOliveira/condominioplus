@@ -771,6 +771,8 @@ public class Relatorios implements Printable {
         } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
             URL logoBradesco = getClass().getResource("/condominioPlus/recursos/imagens/bradesco_logo.jpg");
             parametros.put("logoBradesco", logoBradesco.toString());
+            URL simboloBradesco = getClass().getResource("/condominioPlus/recursos/imagens/simbolo_bradesco.jpg");
+            parametros.put("simboloBradesco", simboloBradesco.toString());
         }
 
         for (BoletoBancario boleto : boletos) {
