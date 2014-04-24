@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoBradesco" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="951"/>
+	<property name="ireport.y" value="1143"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="logoBradesco" class="java.lang.String"/>
@@ -11,6 +11,7 @@
 	<field name="nomeSacado" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
 	<field name="numeroDocumento" class="java.lang.String"/>
+	<field name="nossoNumero" class="java.lang.String"/>
 	<field name="especie" class="java.lang.String"/>
 	<field name="valor" class="java.lang.String"/>
 	<field name="tipoDocumento" class="java.lang.String"/>
@@ -162,7 +163,7 @@
 				<text><![CDATA[Número Documento]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="366" y="69" width="81" height="8"/>
+				<reportElement x="358" y="69" width="81" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
@@ -506,7 +507,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{numeroDocumento}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nossoNumero}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="157" y="625" width="32" height="8"/>
@@ -544,7 +545,7 @@
 				<text><![CDATA[Número Documento]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="98" y="617" width="80" height="8"/>
+				<reportElement x="100" y="617" width="80" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>

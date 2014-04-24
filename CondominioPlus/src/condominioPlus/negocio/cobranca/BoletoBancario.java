@@ -10,7 +10,6 @@ import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -399,7 +398,7 @@ public class BoletoBancario {
                 resultado = "0" + resultado;
             }
         } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
-            while (resultado.length() < 10) {
+            while (resultado.length() < 11) {
                 resultado = "0" + resultado;
             }
         }
@@ -416,6 +415,13 @@ public class BoletoBancario {
 
         return resultado;
 
+    }
+
+    public static String preencherNumeroConta(String campo) {
+        while (campo.length() < 7) {
+            campo = "0" + campo;
+        }
+        return campo;
     }
 
     public static UnidadeFederativa getUnidadeFederativa(String uf) {
@@ -503,9 +509,9 @@ public class BoletoBancario {
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
         if (cobranca.getNumeroDocumento().length() == 13) {
-        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
-        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
-        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
+            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 13));
+            titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 12));
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento().substring(0, 12)));
         } else if (cobranca.getNumeroDocumento().length() == 12) {
             titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
             titulo.setNossoNumero(cobranca.getNumeroDocumento());
@@ -533,7 +539,7 @@ public class BoletoBancario {
 
         return boleto.getLinhaDigitavel().write();
     }
-    
+
     public static String getLinhaDigitavelBradesco(Cobranca cobranca) {
         Cedente cedente = new Cedente("");
 
@@ -554,19 +560,13 @@ public class BoletoBancario {
         // Informando dados sobre a conta bancária do título.
         ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_BRADESCO.create());
         contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getContaCorrente()), cobranca.getUnidade().getCondominio().getContaBancaria().getDigitoCorrente()));
-        contaBancaria.setCarteira(new Carteira(9));
+        contaBancaria.setCarteira(new Carteira(6));
         contaBancaria.setAgencia(new Agencia(Integer.parseInt(cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
 
         Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-//        if (cobranca.getNumeroDocumento().length() == 13) {
-        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento().substring(0, 11));
-        titulo.setNossoNumero(cobranca.getNumeroDocumento().substring(0, 10));
-        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento().substring(0, 10)));
-//        } else if (cobranca.getNumeroDocumento().length() == 12) {
-//            titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
-//            titulo.setNossoNumero(cobranca.getNumeroDocumento());
-//            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
-//        }
+        titulo.setNumeroDoDocumento(cobranca.getNumeroDocumento());
+        titulo.setNossoNumero(cobranca.getNumeroDocumento());
+        titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
         titulo.setValor(cobranca.getValorTotal());
         titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
         if (cobranca.getVencimentoProrrogado() != null) {
@@ -612,9 +612,9 @@ public class BoletoBancario {
 
         return cnpj;
     }
-    
+
     public static BoletoBancario gerarBoleto(Condominio condominio, DadosCorrespondencia dados) {
-               
+
         /*
          * INFORMANDO DADOS SOBRE O CEDENTE.
          */
@@ -687,7 +687,7 @@ public class BoletoBancario {
         if (boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta() == null || boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta().equals("")) {
             boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 6) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(6, 7));
         } else {
-            boleto.setCodigoCedente(boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta().toString().substring(0, 7) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta());
+            boleto.setCodigoCedente(BoletoBancario.preencherNumeroConta("" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getCodigoDaConta()) + "-" + boletoAuxiliar.getTitulo().getContaBancaria().getNumeroDaConta().getDigitoDaConta());
         }
 
         boleto.setNumeroDocumento(boletoAuxiliar.getTitulo().getNumeroDoDocumento());
@@ -720,10 +720,10 @@ public class BoletoBancario {
         boleto.setMensagem2(mensagens.get(1).getMensagem());
         boleto.setMensagem3(mensagens.get(2).getMensagem());
         boleto.setMensagem4(mensagens.get(3).getMensagem());
-               
+
         return boleto;
     }
-    
+
     public static Boleto getBoletoAuxiliar(Condominio condominio, Sacado sacado, Cedente cedente, DadosCorrespondencia dados) {
         /*
          * INFORMANDO OS DADOS SOBRE O TÍTULO.
@@ -759,12 +759,12 @@ public class BoletoBancario {
         } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
             ContaBancaria contaBancaria = new ContaBancaria(BancoSuportado.BANCO_BRADESCO.create());
             contaBancaria.setNumeroDaConta(new NumeroDaConta(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getContaCorrente()), dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getDigitoCorrente()));
-            contaBancaria.setCarteira(new Carteira(9));
+            contaBancaria.setCarteira(new Carteira(6));
             contaBancaria.setAgencia(new Agencia(Integer.parseInt(dados.getCobranca().getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia()), "0"));
             Titulo titulo = new Titulo(contaBancaria, sacado, cedente);
-            titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento().substring(0, 11));
-            titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento().substring(0, 10));
-            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroBradesco(dados.getCobranca().getNumeroDocumento().substring(0, 10)));
+            titulo.setNumeroDoDocumento(dados.getCobranca().getNumeroDocumento());
+            titulo.setNossoNumero(dados.getCobranca().getNumeroDocumento());
+            titulo.setDigitoDoNossoNumero(BoletoBancario.calculoDvNossoNumeroBradesco(dados.getCobranca().getNumeroDocumento()));
             titulo.setValor(dados.getCobranca().getValorTotal());
             titulo.setDataDoDocumento(DataUtil.getDate(DataUtil.hoje()));
             if (dados.getCobranca().getVencimentoProrrogado() != null) {
