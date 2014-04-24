@@ -787,7 +787,14 @@ public class Relatorios implements Printable {
 
             mapa.put("agencia", boleto.getAgencia());
             mapa.put("codigoCedente", boleto.getCodigoCedente());
-            mapa.put("numeroDocumento", boleto.getNumeroDocumento());
+            
+            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                mapa.put("numeroDocumento", boleto.getNumeroDocumento());
+            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                mapa.put("nossoNumero", boleto.getNumeroDocumento() + "-" + BoletoBancario.calculoDvNossoNumeroBradesco(boleto.getNumeroDocumento()));
+                mapa.put("numeroDocumento", boleto.getNumeroDocumento());
+            }
+            
             mapa.put("dataDocumento", boleto.getDataDocumento());
             mapa.put("dataVencimento", boleto.getDataVencimento());
             mapa.put("tipoDocumento", boleto.getTipoDocumento());

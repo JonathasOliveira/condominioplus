@@ -715,7 +715,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
                 } else if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
                     cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
-                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento());
                 }
                 new DAO().salvar(u);
             }
@@ -1281,7 +1281,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
             } else if (cobranca.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
                 cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
-                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+                cobranca.setNumeroDocumento(cobranca.getNumeroDocumento());
             }
             ac.getCobrancasGeradas().add(cobranca);
             cobranca.setAcordo(ac);

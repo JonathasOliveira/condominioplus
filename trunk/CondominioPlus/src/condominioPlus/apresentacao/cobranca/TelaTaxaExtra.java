@@ -375,7 +375,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
                     cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroSantander(cobranca.getNumeroDocumento()));
                 } else if (rateio.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
                     cobranca.setLinhaDigitavel(BoletoBancario.getLinhaDigitavelBradesco(cobranca));
-                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento() + BoletoBancario.calculoDvNossoNumeroBradesco(cobranca.getNumeroDocumento()));
+                    cobranca.setNumeroDocumento(cobranca.getNumeroDocumento());
                 }
 
                 rateio.getUnidade().getCobrancas().add(cobranca);
