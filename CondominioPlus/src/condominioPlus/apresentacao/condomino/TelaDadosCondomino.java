@@ -231,6 +231,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
             TipoAcesso tipo = null;
             if (unidade.getCodigo() == 0) {
+                condominio.getUnidades().add(unidade);
                 tipo = tipo.INSERCAO;
             } else {
                 tipo = tipo.EDICAO;

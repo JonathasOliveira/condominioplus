@@ -182,6 +182,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 1:
                         item.setDescricao((String) valor);
                         break;
+                    case 2:
+                        item.setValor(new BigDecimal(((String) valor).replace(",", ".")));
+                        break;
                 }
             }
 
@@ -210,7 +213,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaCobrancasBase.getColumn(modeloTabelaItemCobranca.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
         tabelaCobrancasBase.getColumn(modeloTabelaItemCobranca.getCampo(3)).setCellRenderer(new RenderizadorCelulaCentralizada());
 
-        modeloTabelaItemCobranca.setEditaveis(1);
+        modeloTabelaItemCobranca.setEditaveis(1, 2);
 
     }
 
@@ -326,7 +329,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         item.setDescricao((String) valor);
                         break;
                     case 2:
-                        item.setValor(((Moeda) valor).bigDecimalValue());
+                        item.setValor(new BigDecimal(((String) valor).replace(",", ".")));
                         break;
                     case 3:
                         item.setDividirFracaoIdeal((Boolean) valor);
@@ -341,7 +344,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 1:
                         return item.getDescricao();
                     case 2:
-                        return new Moeda(item.getValor());
+                        return PagamentoUtil.formatarMoeda(((BigDecimal) item.getValor()).doubleValue());
                     case 3:
                         return item.isDividirFracaoIdeal();
                     default:
@@ -665,7 +668,15 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 ApresentacaoUtil.exibirAdvertencia("Selecione apenas um condômino.", this);
                 return;
             }
-            if (!txtNumeroDocumento.getText().equals("") && txtNumeroDocumento.getText().length() != 12) {
+
+            int length = 0;
+            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                length = 12;
+            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                length = 11;
+            }
+
+            if (!txtNumeroDocumento.getText().equals("") && txtNumeroDocumento.getText().length() != length) {
                 ApresentacaoUtil.exibirAdvertencia("O número documento informado está incorreto.", this);
                 return;
             }
@@ -727,6 +738,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void calcularCobrancas(Unidade u, Cobranca cobranca) {
         String texto = "";
+        BigDecimal valor = new BigDecimal(0);
         for (CobrancaBase co : condominio.getCobrancasBase()) {
             Pagamento pagamento = new Pagamento();
             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
@@ -735,6 +747,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             for (ItemCobranca item : listaItensCobranca) {
                 if (co.getCodigo() == item.getCodigoObjeto()) {
                     texto = item.getDescricao();
+                    valor = item.getValor();
                 }
             }
             pagamento.setDescricao(texto);
@@ -743,9 +756,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 pagamento.setValor(u.getValorPrincipal());
             } else {
                 if (co.isDividirFracaoIdeal()) {
-                    pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, co.getValor())).setScale(2, RoundingMode.UP));
+                    pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, valor)).setScale(2, RoundingMode.UP));
                 } else {
-                    pagamento.setValor(co.getValor());
+                    pagamento.setValor(valor);
                 }
             }
             cobranca.getPagamentos().add(pagamento);
@@ -763,10 +776,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         for (ItemCobranca item : listaItensCobranca) {
                             if (item.getCodigoConta() == 11452) {
                                 texto = item.getDescricao();
+                                valor = item.getValor();
                             }
                         }
                         pagamento.setHistorico(texto + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                        pagamento.setValor(r.getValorTotalCobrar());
+                        pagamento.setValor(valor);
                         cobranca.getPagamentos().add(pagamento);
                         cobranca.setValorTotal(cobranca.getValorTotal().add(pagamento.getValor()));
                         cobranca.setValorOriginal(cobranca.getValorOriginal().add(pagamento.getValor()));
@@ -1819,6 +1833,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             btnGerarCobranca.addActionListener(this);
             btnGerarCobrancaAvulsa.addActionListener(this);
             btnImprimirBoleto.addActionListener(this);
+            btnImprimirBoletoAvulso.addActionListener(this);
             btnIncluirItemAvulso.addActionListener(this);
             btnLerArquivoRetorno.addActionListener(this);
             btnLimpar.addActionListener(this);
@@ -1886,7 +1901,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 } else {
                     ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para calcular!", TelaLancamentos.this);
                 }
-            } else if (origem == btnImprimirBoleto) {
+            } else if (origem == btnImprimirBoleto || origem == btnImprimirBoletoAvulso) {
                 if (modeloTabelaBoleto.getLinhaSelecionada() > -1) {
                     imprimirBoleto(modeloTabelaBoleto.getObjetosSelecionados());
                 } else {
@@ -2543,7 +2558,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
-        tabelaDadosAvulsos.setFont(new java.awt.Font("Tahoma", 0, 10));
+        tabelaDadosAvulsos.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         tabelaDadosAvulsos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -2880,7 +2895,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         txtMensagem4.setName("Valor"); // NOI18N
 
         txtMensagem1.setColumns(20);
-        txtMensagem1.setFont(new java.awt.Font("Arial", 0, 10)); // NOI18N
+        txtMensagem1.setFont(new java.awt.Font("Arial", 0, 10));
         txtMensagem1.setLineWrap(true);
         txtMensagem1.setRows(5);
         txtMensagem1.setName("texto"); // NOI18N
@@ -3102,7 +3117,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         .addComponent(painelCondominos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3123,7 +3138,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCarregarInformacoesCobranca;
     private javax.swing.JButton btnConfirmar;
