@@ -358,23 +358,24 @@ public class BoletoBancario {
             soma_campo = soma_campo + multiplicacao;
 //            System.out.println("soma campo" + soma_campo);
             multiplicador++;
-            if (multiplicador > 9) {
+            if (multiplicador > 7) {
                 multiplicador = 2;
 //                System.out.println("primeiro if");
 
             }
         }
         int dac = (soma_campo % 11);
+        String resultado = "";
 //        System.out.println("dac " + dac);
-        if (dac >= 10) {
-            dac = 1;
-        } else if (dac == 0 || dac == 1) {
-            dac = 0;
+        if (dac == 0) {
+            resultado = "0";
+        } else if (dac == 1) {
+            resultado = "P";
         } else {
-            dac = 11 - dac;
+            resultado = "" + (11 - dac);
         }
-//        System.out.println("fasdf" + ((Integer) dac).toString());
-        return ((Integer) dac).toString();
+
+        return resultado;
     }
 
     public static String gerarNumeroDocumento(Condominio condominio, DateTime data) {

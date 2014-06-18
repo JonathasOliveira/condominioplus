@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoBradesco" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoSantander" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="1143"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
-	<parameter name="logoBradesco" class="java.lang.String"/>
-	<parameter name="simboloBradesco" class="java.lang.String"/>
+	<parameter name="logoSantander" class="java.lang.String"/>
 	<field name="nomeCedente" class="java.lang.String"/>
 	<field name="nomeSacado" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
 	<field name="numeroDocumento" class="java.lang.String"/>
-	<field name="nossoNumero" class="java.lang.String"/>
 	<field name="especie" class="java.lang.String"/>
 	<field name="valor" class="java.lang.String"/>
 	<field name="tipoDocumento" class="java.lang.String"/>
@@ -73,11 +71,11 @@
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
 			<image hAlign="Right">
-				<reportElement x="360" y="-8" width="197" height="52"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{logoBradesco}]]></imageExpression>
+				<reportElement x="326" y="-15" width="229" height="70"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoSantander}]]></imageExpression>
 			</image>
 			<staticText>
-				<reportElement x="478" y="37" width="77" height="12"/>
+				<reportElement x="479" y="37" width="77" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -163,7 +161,7 @@
 				<text><![CDATA[Número Documento]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="358" y="69" width="81" height="8"/>
+				<reportElement x="366" y="69" width="81" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
@@ -246,7 +244,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
-				<text><![CDATA[Moeda]]></text>
+				<text><![CDATA[Espécie]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="382" y="509" width="38" height="8"/>
@@ -322,8 +320,8 @@
 				</graphicElement>
 			</line>
 			<image hAlign="Left">
-				<reportElement x="1" y="558" width="25" height="25"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{simboloBradesco}]]></imageExpression>
+				<reportElement x="2" y="542" width="207" height="57"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoSantander}]]></imageExpression>
 			</image>
 			<line direction="BottomUp">
 				<reportElement x="320" y="527" width="1" height="10"/>
@@ -351,7 +349,7 @@
 				</graphicElement>
 			</line>
 			<line direction="BottomUp">
-				<reportElement x="90" y="562" width="1" height="22"/>
+				<reportElement x="88" y="562" width="1" height="22"/>
 				<graphicElement>
 					<pen lineWidth="0.5"/>
 				</graphicElement>
@@ -364,14 +362,14 @@
 				<text><![CDATA[Banco]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="95" y="565" width="47" height="17"/>
+				<reportElement x="94" y="564" width="47" height="17"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{codigoBanco}+"-"+$F{digitoBanco}]]></textFieldExpression>
 			</textField>
 			<line direction="BottomUp">
-				<reportElement x="145" y="562" width="1" height="22"/>
+				<reportElement x="143" y="562" width="1" height="22"/>
 				<graphicElement>
 					<pen lineWidth="0.5"/>
 				</graphicElement>
@@ -452,7 +450,7 @@
 				</graphicElement>
 			</line>
 			<line direction="BottomUp">
-				<reportElement x="94" y="611" width="1" height="14"/>
+				<reportElement x="88" y="611" width="1" height="14"/>
 				<graphicElement>
 					<pen lineWidth="0.25"/>
 				</graphicElement>
@@ -462,7 +460,7 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Carteira/ Nosso Número]]></text>
+				<text><![CDATA[Nosso Número]]></text>
 			</staticText>
 			<line>
 				<reportElement x="0" y="625" width="555" height="1"/>
@@ -503,21 +501,21 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{dataDocumento}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="443" y="617" width="106" height="8"/>
+				<reportElement x="451" y="617" width="98" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{carteira} +"/ "+ $F{nossoNumero}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{numeroDocumento}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="157" y="625" width="32" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Moeda]]></text>
+				<text><![CDATA[Espécie]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="160" y="631" width="24" height="8"/>
+				<reportElement x="159" y="631" width="24" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
@@ -538,14 +536,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{tipoDocumento}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="99" y="611" width="64" height="8"/>
+				<reportElement x="93" y="611" width="64" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Número Documento]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="100" y="617" width="80" height="8"/>
+				<reportElement x="98" y="617" width="80" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
@@ -586,7 +584,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="6" y="625" width="42" height="8"/>
+				<reportElement x="6" y="625" width="69" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5" isBold="false"/>
 				</textElement>
@@ -633,7 +631,7 @@
 				<text><![CDATA[Quantidade]]></text>
 			</staticText>
 			<line direction="BottomUp">
-				<reportElement x="94" y="625" width="1" height="14"/>
+				<reportElement x="101" y="625" width="1" height="14"/>
 				<graphicElement>
 					<pen lineWidth="0.25"/>
 				</graphicElement>
@@ -645,14 +643,14 @@
 				</graphicElement>
 			</line>
 			<textField>
-				<reportElement x="110" y="631" width="24" height="8"/>
+				<reportElement x="120" y="631" width="24" height="8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="6" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{carteira}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="100" y="625" width="32" height="8"/>
+				<reportElement x="112" y="625" width="32" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5" isBold="false"/>
 				</textElement>
@@ -1062,33 +1060,6 @@
 				</textElement>
 				<text><![CDATA[Instruções]]></text>
 			</staticText>
-			<line direction="BottomUp">
-				<reportElement x="69" y="625" width="1" height="14"/>
-				<graphicElement>
-					<pen lineWidth="0.25"/>
-				</graphicElement>
-			</line>
-			<staticText>
-				<reportElement x="75" y="625" width="14" height="8"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="5" isBold="false"/>
-				</textElement>
-				<text><![CDATA[CIP]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="72" y="631" width="16" height="8"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="6" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["000"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="25" y="562" width="65" height="21"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="Arial Black" size="11" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Bradesco"]]></textFieldExpression>
-			</textField>
 		</band>
 	</detail>
 </jasperReport>

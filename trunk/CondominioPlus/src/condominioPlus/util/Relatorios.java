@@ -791,7 +791,8 @@ public class Relatorios implements Printable {
             if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
                 mapa.put("numeroDocumento", boleto.getNumeroDocumento());
             } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
-                mapa.put("nossoNumero", boleto.getNumeroDocumento() + "-" + BoletoBancario.calculoDvNossoNumeroBradesco(boleto.getNumeroDocumento()));
+                String carteira = (boleto.getCarteira().length() == 1) ? "0" + boleto.getCarteira() : boleto.getCarteira();
+                mapa.put("nossoNumero", boleto.getNumeroDocumento() + "-" + BoletoBancario.calculoDvNossoNumeroBradesco(carteira + boleto.getNumeroDocumento()));
                 mapa.put("numeroDocumento", boleto.getNumeroDocumento());
             }
             

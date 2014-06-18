@@ -57,10 +57,10 @@ public class DialogoEndereco extends javax.swing.JDialog {
     private List listaCampos() {
         List<Object> campos = new ArrayList<Object>();
         campos.add(txtRua);
-        campos.add(txtNumero);
-        campos.add(txtBairro);
-        campos.add(txtCidade);
-        campos.add(txtCep);
+//        campos.add(txtNumero);
+//        campos.add(txtBairro);
+//        campos.add(txtCidade);
+//        campos.add(txtCep);
         campos.add(checkBoxPadrao);
 
         return campos;
