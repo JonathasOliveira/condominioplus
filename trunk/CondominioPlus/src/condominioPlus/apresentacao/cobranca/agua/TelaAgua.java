@@ -289,7 +289,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
                     case 0:
                         return rateio.getUnidade().getUnidade();
                     case 1:
-                        return FormatadorNumeros.formatarDoubleToString(rateio.getUnidade().getFracaoIdeal(), "0.###");
+                        return rateio.getUnidade().getFracaoIdeal();
                     case 2:
                         return rateio.getLeituraAnterior();
                     case 3:
@@ -559,7 +559,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
 
                 double resultado = (conta.getConsumoAreaComum().doubleValue() * getMaiorFracaoIdeal()) / 100;
 
-                double total = (rateio.getUnidade().getFracaoIdeal() * resultado) / getMaiorFracaoIdeal();
+                double total = (rateio.getUnidade().getFracaoIdeal().doubleValue() * resultado) / getMaiorFracaoIdeal();
 
                 if (total < 0) {
                     rateio.setConsumoMetroCubicoAreaComum(BigDecimal.ZERO);
@@ -647,8 +647,8 @@ public class TelaAgua extends javax.swing.JInternalFrame {
     private double getMaiorFracaoIdeal() {
         double resultado = 0;
         for (Unidade u : condominio.getUnidades()) {
-            if (u.getFracaoIdeal() > resultado) {
-                resultado = u.getFracaoIdeal();
+            if (u.getFracaoIdeal().doubleValue() > resultado) {
+                resultado = u.getFracaoIdeal().doubleValue();
             }
         }
         return resultado;

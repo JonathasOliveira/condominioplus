@@ -215,7 +215,7 @@ public class TelaLuz extends javax.swing.JInternalFrame {
                     case 0:
                         return rateio.getUnidade().getUnidade();
                     case 1:
-                        return FormatadorNumeros.formatarDoubleToString(rateio.getUnidade().getFracaoIdeal(), "0.###");
+                        return rateio.getUnidade().getFracaoIdeal();
                     case 2:
                         return rateio.getLeituraAnterior();
                     case 3:

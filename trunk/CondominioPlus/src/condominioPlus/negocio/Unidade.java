@@ -50,8 +50,8 @@ public class Unidade implements Serializable {
     private String unidade;
     private String descricao;
     private String iptu;
-    @Column(name = "fracao_ideal")
-    private double fracaoIdeal;
+    @Column(name = "fracao_ideal", precision = 5, scale = 5)
+    private BigDecimal fracaoIdeal;
     private String bloco;
     private String coeficiente;
     @Column(name = "valor_principal", precision = 20, scale = 2)
@@ -185,11 +185,11 @@ public class Unidade implements Serializable {
         this.descricao = descricao;
     }
 
-    public double getFracaoIdeal() {
+    public BigDecimal getFracaoIdeal() {
         return fracaoIdeal;
     }
 
-    public void setFracaoIdeal(double fracaoIdeal) {
+    public void setFracaoIdeal(BigDecimal fracaoIdeal) {
         this.fracaoIdeal = fracaoIdeal;
     }
 

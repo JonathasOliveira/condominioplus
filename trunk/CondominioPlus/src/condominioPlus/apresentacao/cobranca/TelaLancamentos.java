@@ -846,7 +846,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private double calcularPorFracaoIdeal(Unidade u, BigDecimal valor) {
         double resultado = 0;
-        resultado = (u.getFracaoIdeal() * valor.doubleValue()) / getMaiorFracaoIdeal().getFracaoIdeal();
+        resultado = (u.getFracaoIdeal().doubleValue() * valor.doubleValue()) / getMaiorFracaoIdeal().getFracaoIdeal().doubleValue();
         System.out.println("resultado - " + resultado);
         return resultado;
     }
@@ -864,8 +864,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         double resultado = 0;
         Unidade unidade = new Unidade();
         for (Unidade u : condominio.getUnidades()) {
-            if (u.getFracaoIdeal() > resultado) {
-                resultado = u.getFracaoIdeal();
+            if (u.getFracaoIdeal().doubleValue() > resultado) {
+                resultado = u.getFracaoIdeal().doubleValue();
                 unidade = u;
             }
         }
