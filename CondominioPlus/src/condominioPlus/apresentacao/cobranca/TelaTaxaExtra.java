@@ -688,9 +688,9 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
         double resultado = 0;
         double soma = 0;
         if (!sindicoPaga) {
-            soma = getSindico().getFracaoIdeal() / (u.getCondominio().getUnidades().size() - 1);
+            soma = getSindico().getFracaoIdeal().doubleValue() / (u.getCondominio().getUnidades().size() - 1);
         }
-        resultado = (u.getFracaoIdeal() + soma) * valor.doubleValue();
+        resultado = (u.getFracaoIdeal().doubleValue() + soma) * valor.doubleValue();
 //        System.out.println("resultado - " + resultado);
         return resultado;
     }

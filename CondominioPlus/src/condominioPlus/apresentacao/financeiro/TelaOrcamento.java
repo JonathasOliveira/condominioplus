@@ -567,7 +567,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         listaUnidadesAConsiderar.clear();
         totalFracoesIdeais = 0;
         for (Unidade u : getUnidades()) {
-            totalFracoesIdeais += u.getFracaoIdeal();
+            totalFracoesIdeais += u.getFracaoIdeal().doubleValue();
             if (u.isSindico() && !condominio.isSindicoPaga()) {
                 listaUnidadesADescartar.add(u);
             } else {
@@ -742,9 +742,9 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
 
             for (Unidade u : listaUnidadesADescartar) {
                 if (totalFracoesIdeais >= 0.9 && totalFracoesIdeais <= 1.2) {
-                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal();
+                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal().doubleValue();
                 } else if (totalFracoesIdeais >= 90 && totalFracoesIdeais <= 105) {
-                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal() / 100;
+                    somaFracoesIdeaisDescartadas += u.getFracaoIdeal().doubleValue() / 100;
                 }
             }
 
@@ -757,9 +757,9 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 //verificando a soma da Fração Ideal
                 double fracaoIdeal = 0;
                 if (totalFracoesIdeais >= 0.9 && totalFracoesIdeais <= 1.2) {
-                    fracaoIdeal = u.getFracaoIdeal();
+                    fracaoIdeal = u.getFracaoIdeal().doubleValue();
                 } else if (totalFracoesIdeais >= 90 && totalFracoesIdeais <= 105) {
-                    fracaoIdeal += u.getFracaoIdeal() / 100;
+                    fracaoIdeal += u.getFracaoIdeal().doubleValue() / 100;
                 }
                 //fim
                 if (listaItemOrcamento.isEmpty()) {

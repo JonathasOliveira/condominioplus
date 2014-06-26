@@ -901,7 +901,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             }
         }
 
-        unidade.setFracaoIdeal(Double.parseDouble(txtFracaoIdeal.getText()));
+        unidade.setFracaoIdeal(new BigDecimal(txtFracaoIdeal.getText().replace(",", ".")));
         unidade.setIptu(txtIptu.getText());
         unidade.setBloco(txtBloco.getText());
         unidade.setCoeficiente(txtCoeficiente.getText());

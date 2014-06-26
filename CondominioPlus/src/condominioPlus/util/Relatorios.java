@@ -714,7 +714,7 @@ public class Relatorios implements Printable {
             mapa.put("unidade", unidade.getUnidade());
             mapa.put("coeficiente", unidade.getCoeficiente());
             mapa.put("fracaoIdeal", String.valueOf(unidade.getFracaoIdeal()));
-            somaFracao = somaFracao.add(new BigDecimal(unidade.getFracaoIdeal()));
+            somaFracao = somaFracao.add(unidade.getFracaoIdeal());
             lista.add(mapa);
         }
 
@@ -1398,7 +1398,7 @@ public class Relatorios implements Printable {
         for (Rateio rateio : conta.getRateios()) {
             HashMap<String, String> mapa = new HashMap();
             mapa.put("unidade", rateio.getUnidade().getUnidade());
-            mapa.put("fracaoIdeal", FormatadorNumeros.formatarDoubleToString(rateio.getUnidade().getFracaoIdeal(), "0.###"));
+            mapa.put("fracaoIdeal", "" + rateio.getUnidade().getFracaoIdeal());
             mapa.put("leituraAnterior", "" + rateio.getLeituraAnterior());
             mapa.put("leituraAtual", "" + rateio.getLeituraAtual());
             somaConsumoM3 = somaConsumoM3.add(rateio.getConsumoMetroCubico());
