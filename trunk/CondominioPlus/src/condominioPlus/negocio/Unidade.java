@@ -51,7 +51,7 @@ public class Unidade implements Serializable {
     private String descricao;
     private String iptu;
     @Column(name = "fracao_ideal", precision = 5, scale = 5)
-    private BigDecimal fracaoIdeal;
+    private BigDecimal fracaoIdeal = new BigDecimal(0);
     private String bloco;
     private String coeficiente;
     @Column(name = "valor_principal", precision = 20, scale = 2)
