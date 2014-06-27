@@ -20,6 +20,7 @@ public class DadosCorrespondencia {
     private String logradouro;
     private String numero;
     private String complemento;
+    private String referencia;
     private String bairro;
     private String cidade;
     private String estado;
@@ -57,6 +58,14 @@ public class DadosCorrespondencia {
 
     public void setComplemento(String complemento) {
         this.complemento = complemento;
+    }
+
+    public String getReferencia() {
+        return referencia;
+    }
+
+    public void setReferencia(String referencia) {
+        this.referencia = referencia;
     }
 
     public String getEstado() {
@@ -134,6 +143,7 @@ public class DadosCorrespondencia {
                     dados.setLogradouro(e.getLogradouro());
                     dados.setNumero(e.getNumero());
                     dados.setComplemento(e.getComplemento());
+                    dados.setReferencia(e.getReferencia());
                     dados.setBairro(e.getBairro());
                     dados.setCidade(e.getCidade());
                     dados.setEstado(e.getEstado());
@@ -156,6 +166,7 @@ public class DadosCorrespondencia {
                         dadosInquilino.setLogradouro(e.getLogradouro());
                         dadosInquilino.setNumero(e.getNumero());
                         dadosInquilino.setComplemento(e.getComplemento());
+                        dadosInquilino.setReferencia(e.getReferencia());
                         dadosInquilino.setBairro(e.getBairro());
                         dadosInquilino.setCidade(e.getCidade());
                         dadosInquilino.setEstado(e.getEstado());

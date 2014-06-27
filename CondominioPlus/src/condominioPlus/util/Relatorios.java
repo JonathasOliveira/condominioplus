@@ -599,7 +599,12 @@ public class Relatorios implements Printable {
             HashMap<String, String> mapa = new HashMap();
             mapa.put("nome", dados.getNome().toUpperCase());
 
-            mapa.put("endereco", dados.getLogradouro() + ", " + dados.getNumero() + " - " + dados.getComplemento());
+            String referencia = "";
+            if (!dados.getReferencia().isEmpty()) {
+                referencia = " (" + dados.getReferencia() + ")";
+            }
+
+            mapa.put("endereco", dados.getLogradouro() + ", " + dados.getNumero() + " - " + dados.getComplemento() + referencia);
             mapa.put("bairro", dados.getBairro());
             mapa.put("cidade", dados.getCidade() + " - " + dados.getEstado());
             mapa.put("cep", dados.getCep());
@@ -629,7 +634,12 @@ public class Relatorios implements Printable {
 
             for (Endereco e : unidade.getCondomino().getEnderecos()) {
                 if (e.isPadrao()) {
-                    mapa.put("endereco", e.getLogradouro() + ", " + e.getNumero() + " - " + e.getComplemento());
+                    String referencia = "";
+                    if (!e.getReferencia().isEmpty()) {
+                        referencia = " (" + e.getReferencia() + ")";
+                    }
+
+                    mapa.put("endereco", e.getLogradouro() + ", " + e.getNumero() + " - " + e.getComplemento() + referencia);
                     mapa.put("bairro", e.getBairro());
                     mapa.put("cidade", e.getCidade() + " - " + e.getEstado());
                     mapa.put("cep", e.getCep());
@@ -787,7 +797,7 @@ public class Relatorios implements Printable {
 
             mapa.put("agencia", boleto.getAgencia());
             mapa.put("codigoCedente", boleto.getCodigoCedente());
-            
+
             if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
                 mapa.put("numeroDocumento", boleto.getNumeroDocumento());
             } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
@@ -795,7 +805,7 @@ public class Relatorios implements Printable {
                 mapa.put("nossoNumero", boleto.getNumeroDocumento() + "-" + BoletoBancario.calculoDvNossoNumeroBradesco(carteira + boleto.getNumeroDocumento()));
                 mapa.put("numeroDocumento", boleto.getNumeroDocumento());
             }
-            
+
             mapa.put("dataDocumento", boleto.getDataDocumento());
             mapa.put("dataVencimento", boleto.getDataVencimento());
             mapa.put("tipoDocumento", boleto.getTipoDocumento());
