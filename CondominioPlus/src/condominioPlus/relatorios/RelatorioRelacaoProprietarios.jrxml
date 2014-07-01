@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioRelacaoProprietarios" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="53"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
 	<parameter name="condominio" class="java.lang.String"/>
@@ -120,7 +120,7 @@
 	<detail>
 		<band height="47" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="555" height="47" forecolor="#FFFFFF" backcolor="#CCCCCC">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="555" height="47" forecolor="#FFFFFF" backcolor="#CCCCCC">
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 1)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
@@ -139,16 +139,16 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{nome}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="12" width="165" height="12"/>
+				<reportElement x="374" y="12" width="178" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{telcomercial}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="1" width="165" height="12"/>
+				<reportElement x="374" y="1" width="178" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{telefone}]]></textFieldExpression>
 			</textField>
@@ -174,42 +174,42 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cep}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="23" width="165" height="12"/>
+				<reportElement x="374" y="23" width="178" height="12"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{fax}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="383" y="34" width="165" height="12"/>
+				<reportElement x="374" y="34" width="178" height="12" isPrintWhenDetailOverflows="true"/>
 				<textElement verticalAlignment="Middle">
-					<font size="7"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{email}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="347" y="1" width="38" height="12"/>
+				<reportElement x="342" y="1" width="30" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Res/Cel:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="12" width="38" height="12"/>
+				<reportElement x="342" y="12" width="30" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Com:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="23" width="38" height="12"/>
+				<reportElement x="342" y="23" width="38" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Fax:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="347" y="34" width="38" height="12"/>
+				<reportElement x="342" y="34" width="30" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
