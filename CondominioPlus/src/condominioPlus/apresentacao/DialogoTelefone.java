@@ -134,7 +134,7 @@ public class DialogoTelefone extends javax.swing.JDialog {
         btnCancelar.setPreferredSize(new java.awt.Dimension(32, 32));
 
         try {
-            txtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(##)####-####")));
+            txtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(##)########*")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }

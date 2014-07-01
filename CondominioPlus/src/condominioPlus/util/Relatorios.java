@@ -648,18 +648,23 @@ public class Relatorios implements Printable {
 
             // campos para o relatório Relacao Proprietarios
             String telefone = "";
+            String telcomercial = "";
+            String fax = "";
             for (Telefone t : unidade.getCondomino().getTelefones()) {
                 if (t.getTipo().equals("Fixo")) {
-                    telefone = t.getNumero();
+                    telefone = telefone + " / " + t.getNumero();
                 } else if (t.getTipo().equals("Celular")) {
                     telefone = telefone + " / " + t.getNumero();
-                    mapa.put("telefone", telefone);
                 } else if (t.getTipo().equals("Comercial")) {
-                    mapa.put("telcomercial", t.getNumero());
+                    telcomercial = telcomercial + " / " + t.getNumero();
                 } else if (t.getTipo().equals("Fax")) {
-                    mapa.put("fax", t.getNumero());
+                    fax = fax + " / " + t.getNumero();
                 }
             }
+            mapa.put("telefone", telefone);
+            mapa.put("telcomercial", telcomercial);
+            mapa.put("fax", fax);
+
             mapa.put("unidade", unidade.getUnidade());
             mapa.put("email", unidade.getCondomino().getEmail());
             // campos para o relatório Relacao Proprietarios       
