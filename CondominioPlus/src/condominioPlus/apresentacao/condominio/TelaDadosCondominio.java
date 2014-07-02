@@ -503,6 +503,12 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 //        txtAreaAnotacoes.setText(condominio.getAnotacoes());
 
         txtNumeroMinimoTaloes.setText(Util.IntegerToString(condominio.getNumeroMinimoTaloes()));
+        for (DadosTalaoCheque dados : condominio.getDadosTalaoCheques()){
+            if (dados.isEmUso()){
+                txtPrimeiroCheque.setText(dados.getNumeroInicial());
+                txtUltimoCheque.setText(dados.getNumeroFinal());
+            }
+        }
 
     }
 
@@ -1544,6 +1550,14 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         jLabel31.setText("Primeiro Cheque:");
 
         jLabel32.setText("Último Cheque:");
+
+        txtPrimeiroCheque.setBackground(new java.awt.Color(204, 204, 204));
+        txtPrimeiroCheque.setEditable(false);
+        txtPrimeiroCheque.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+
+        txtUltimoCheque.setBackground(new java.awt.Color(204, 204, 204));
+        txtUltimoCheque.setEditable(false);
+        txtUltimoCheque.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
 
         jLabel33.setText("Qtde Mínima de Talões:");
 
