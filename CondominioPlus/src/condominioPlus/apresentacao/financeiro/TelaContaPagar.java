@@ -206,7 +206,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     case 1:
                         return String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero());
                     case 2:
-                        return pagamento.getHistorico();
+                        return pagamento.getHistorico()  + " (" + pagamento.getFornecedor().toUpperCase() + ")";
                     case 3:
                         return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
 

@@ -38,7 +38,7 @@ import logicpoint.util.Util;
 public class DialogoReceberContaReceber extends javax.swing.JDialog {
 
     private Pagamento pagamento;
-    private ComboModelo<Fornecedor> modelo;
+//    private ComboModelo<Fornecedor> modelo;
     private ControladorEventosGenerico controlador;
     private Conta conta;
 
@@ -46,7 +46,7 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
     public DialogoReceberContaReceber(Pagamento pagamento) {
         initComponents();
         this.pagamento = pagamento;
-        carregarFornecedor();
+//        carregarFornecedor();
         preencherTela();
         bloquearCampos();
         controlador = new ControladorEventos();
@@ -58,7 +58,7 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
         txtData.setEnabled(false);
         txtNumeroDocumento.setEnabled(false);
         txtValor.setEnabled(false);
-        cbFornecedores.setEnabled(false);
+        txtFornecedor.setEnabled(false);
 
     }
 
@@ -76,7 +76,7 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
         txtHistorico.setText(pagamento.getHistorico());
         txtNumeroDocumento.setText(compararForma());
         txtValor.setText(String.valueOf(pagamento.getValor()));
-        modelo.setSelectedItem(pagamento.getFornecedor());
+        txtFornecedor.setText(pagamento.getFornecedor());
 
     }
 
@@ -107,10 +107,10 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
         this.conta = conta;
     }
 
-    private void carregarFornecedor() {
-        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
-        cbFornecedores.setModel(modelo);
-    }
+//    private void carregarFornecedor() {
+//        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
+//        cbFornecedores.setModel(modelo);
+//    }
 
     private List<Pagamento> getPagamentosContasReceber() {
         return new DAO().listar("PagamentosPorNumeroDocumentoContaReceber", Main.getCondominio().getContaReceber(), pagamento.getDadosPagamento());
@@ -201,11 +201,11 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
         txtConta = new javax.swing.JTextField();
         btnConta = new javax.swing.JButton();
         txtHistorico = new javax.swing.JTextField();
-        cbFornecedores = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
         txtNumeroDocumento = new javax.swing.JTextField();
         btnNumeroDocumento = new javax.swing.JToggleButton();
         jLabel4 = new javax.swing.JLabel();
+        txtFornecedor = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         btnPagar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
@@ -239,8 +239,6 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
 
         txtHistorico.setName("Histórico"); // NOI18N
 
-        cbFornecedores.setName("fornecedor"); // NOI18N
-
         jLabel2.setText("Fornecedor:");
 
         txtNumeroDocumento.setName("documento"); // NOI18N
@@ -257,6 +255,8 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
         });
 
         jLabel4.setText("Histórico:");
+
+        txtFornecedor.setName("Histórico"); // NOI18N
 
         javax.swing.GroupLayout painelContaPagarLayout = new javax.swing.GroupLayout(painelContaPagar);
         painelContaPagar.setLayout(painelContaPagarLayout);
@@ -291,11 +291,12 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
                         .addComponent(jLabel4))
                     .addGroup(painelContaPagarLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jLabel2))
-                    .addGroup(painelContaPagarLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(cbFornecedores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel2)))
                 .addContainerGap(11, Short.MAX_VALUE))
+            .addGroup(painelContaPagarLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(txtFornecedor, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                .addGap(11, 11, 11))
         );
         painelContaPagarLayout.setVerticalGroup(
             painelContaPagarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -328,9 +329,9 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
                 .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(7, 7, 7)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -374,7 +375,7 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(painelContaPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, 0, 423, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -402,7 +403,6 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
     private javax.swing.JButton btnImprimir;
     private javax.swing.JToggleButton btnNumeroDocumento;
     private javax.swing.JButton btnPagar;
-    private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -411,6 +411,7 @@ public class DialogoReceberContaReceber extends javax.swing.JDialog {
     private javax.swing.JPanel painelContaPagar;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
+    private javax.swing.JTextField txtFornecedor;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroDocumento;
     private javax.swing.JTextField txtValor;

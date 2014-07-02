@@ -35,6 +35,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -898,7 +899,7 @@ public class Relatorios implements Printable {
             mapa.put("data", DataUtil.toString(p.getDataPagamento()));
             mapa.put("documento", getNumeroDocumento(p));
             mapa.put("codigoConta", p.getConta().getCodigo() + "");
-            mapa.put("historico", p.getHistorico());
+            mapa.put("historico", p.getHistorico() + " (" + p.getFornecedor().toUpperCase() + ")");
             mapa.put("valor", PagamentoUtil.formatarMoeda(p.getValor().doubleValue()));
             mapa.put("saldo", PagamentoUtil.formatarMoeda(p.getSaldo().doubleValue()));
 
@@ -991,7 +992,7 @@ public class Relatorios implements Printable {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
                 mapa2.put("codigoConta", pagamento.getConta().getCodigo() + "");
-                mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("historico", pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 if (tipo == TipoRelatorio.EXTRATO_CONFERENCIA_CONTA_CORRENTE) {
                     mapa2.put("saldo", PagamentoUtil.formatarMoeda(saldoAuxiliar.doubleValue()));
@@ -1140,8 +1141,27 @@ public class Relatorios implements Printable {
         mapa.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
         lista.add(mapa);
 
+        //verificar se o saldo é nulo para nao dar erro ao gerar o relatorio//
+        BigDecimal saldoPoupanca = new BigDecimal(0);
+        BigDecimal saldoAplicacao = new BigDecimal(0);
+        BigDecimal saldoEmprestismo = new BigDecimal(0);
+        BigDecimal saldoConsignacao = new BigDecimal(0);
+        if (condominio.getPoupanca() != null) {
+            saldoPoupanca = saldoPoupanca.add(condominio.getPoupanca().getSaldo());
+        }
+        if (condominio.getAplicacao() != null){
+            saldoAplicacao = saldoAplicacao.add(condominio.getAplicacao().getSaldo());
+        }
+        if (condominio.getEmprestimo() != null){
+            saldoEmprestismo = saldoEmprestismo.add(condominio.getEmprestimo().getSaldo());
+        }
+        if (condominio.getConsignacao() != null){
+            saldoConsignacao = saldoConsignacao.add(condominio.getConsignacao().getSaldo());
+        }
+        //fim verificar se o saldo é nulo para nao dar erro ao gerar o relatorio//
+
         BigDecimal totalSubRecursos = new BigDecimal(0);
-        totalSubRecursos = totalSubRecursos.add(saldoAtual).add(condominio.getPoupanca().getSaldo()).add(condominio.getAplicacao().getSaldo()).add(condominio.getEmprestimo().getSaldo()).add(condominio.getConsignacao().getSaldo());
+        totalSubRecursos = totalSubRecursos.add(saldoAtual).add(saldoPoupanca).add(saldoAplicacao).add(saldoEmprestismo).add(saldoConsignacao);
 
         List<Pagamento> contasAPagar = new DAO().listar("PagamentosContaPagar", condominio.getContaPagar());
         BigDecimal somaValorContasAPagar = new BigDecimal(0);
@@ -1160,10 +1180,10 @@ public class Relatorios implements Printable {
         parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
         parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
         parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
-        parametros.put("poupanca", PagamentoUtil.formatarMoeda(condominio.getPoupanca().getSaldo().doubleValue()));
-        parametros.put("aplicacoes", PagamentoUtil.formatarMoeda(condominio.getAplicacao().getSaldo().doubleValue()));
-        parametros.put("emprestimos", PagamentoUtil.formatarMoeda(condominio.getEmprestimo().getSaldo().doubleValue()));
-        parametros.put("consignacoes", PagamentoUtil.formatarMoeda(condominio.getConsignacao().getSaldo().doubleValue()));
+        parametros.put("poupanca", PagamentoUtil.formatarMoeda(saldoPoupanca.doubleValue()));
+        parametros.put("aplicacoes", PagamentoUtil.formatarMoeda(saldoAplicacao.doubleValue()));
+        parametros.put("emprestimos", PagamentoUtil.formatarMoeda(saldoEmprestismo.doubleValue()));
+        parametros.put("consignacoes", PagamentoUtil.formatarMoeda(saldoConsignacao.doubleValue()));
         parametros.put("pagamentosNaoEfetuados", PagamentoUtil.formatarMoeda(somaValorContasAPagar.doubleValue()));
         parametros.put("deficitSuperavit", PagamentoUtil.formatarMoeda(deficitSuperavit.doubleValue()));
 
@@ -1212,7 +1232,7 @@ public class Relatorios implements Printable {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
                 mapa2.put("documento", getNumeroDocumento(pagamento));
-                mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("historico", pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 listaPagamentos.add(mapa2);
             }
@@ -1291,7 +1311,7 @@ public class Relatorios implements Printable {
             HashMap<String, String> mapa2 = new HashMap();
             mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
             mapa2.put("documento", getNumeroDocumento(pagamento));
-            mapa2.put("historico", pagamento.getHistorico());
+            mapa2.put("historico", pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
             mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
             listaPagamentos.add(mapa2);
 
@@ -1368,7 +1388,7 @@ public class Relatorios implements Printable {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
                 mapa2.put("contaCorrente", p.getCondominio().getContaBancaria().getContaCorrente() + " " + p.getCondominio().getContaBancaria().getDigitoCorrente());
-                mapa2.put("historico", pagamento.getHistorico());
+                mapa2.put("historico", pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
                 mapa2.put("numeroCheque", getNumeroDocumento(pagamento));
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
 
