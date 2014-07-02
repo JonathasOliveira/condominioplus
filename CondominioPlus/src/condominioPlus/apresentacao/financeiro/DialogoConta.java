@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.financeiro;
 
 import condominioPlus.negocio.financeiro.Conta;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.CaretEvent;
@@ -83,8 +84,12 @@ public class DialogoConta extends javax.swing.JDialog {
                 }
             }
         };
+        
+        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(80);
+        tabela.getColumn(modelo.getCampo(1)).setMinWidth(400);
+        tabela.getColumn(modelo.getCampo(2)).setMaxWidth(40);
 
-        modelo.setLargura(1, 200, 200, -1);
+//        modelo.setLargura(1, 200, 200, -1);
 
     }
 
@@ -170,7 +175,8 @@ public class DialogoConta extends javax.swing.JDialog {
             btnOk.addActionListener(this);
             btnCancelar.addActionListener(this);
             btnCancelar.addActionListener(this);
-            btnPesquisar.addActionListener(this);
+            tabela.addMouseListener(this);
+//            btnPesquisar.addActionListener(this);
         }
 
         @Override
@@ -183,8 +189,6 @@ public class DialogoConta extends javax.swing.JDialog {
                 }
             } else if (source == btnOk) {
                 selecionarConta();
-            } else if (source == btnPesquisar) {
-                modelo.filtrar();
             } else if (source == btnCancelar) {
                 sair();
             }
@@ -194,9 +198,14 @@ public class DialogoConta extends javax.swing.JDialog {
         @Override
         public void caretUpdate(CaretEvent e) {
             if (e.getSource() == txtNome) {
-                if (txtNome.getText().equals("")) {
-                    modelo.filtrar();
-                }
+                modelo.filtrar();
+            }
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getSource() == tabela && e.getClickCount() >= 2) {
+                selecionarConta();
             }
         }
     }
@@ -216,12 +225,12 @@ public class DialogoConta extends javax.swing.JDialog {
         cbTipo = new javax.swing.JComboBox();
         btnOk = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
-        btnPesquisar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Contas");
         setAlwaysOnTop(true);
 
+        tabela.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
         tabela.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -236,30 +245,26 @@ public class DialogoConta extends javax.swing.JDialog {
 
         btnCancelar.setText("Cancelar");
 
-        btnPesquisar.setText("pesquisar");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNome)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnPesquisar))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(102, 102, 102)
+                                .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnOk)
                         .addGap(18, 18, 18)
-                        .addComponent(btnCancelar)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(btnCancelar)
+                        .addGap(162, 162, 162))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {btnCancelar, btnOk});
@@ -270,15 +275,14 @@ public class DialogoConta extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnPesquisar))
+                    .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnOk)
                     .addComponent(btnCancelar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         pack();
@@ -286,7 +290,6 @@ public class DialogoConta extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnOk;
-    private javax.swing.JButton btnPesquisar;
     private javax.swing.JComboBox cbTipo;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tabela;

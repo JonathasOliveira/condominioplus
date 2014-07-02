@@ -12,6 +12,7 @@ package condominioPlus.apresentacao.fornecedor;
 
 import condominioPlus.negocio.fornecedor.Fornecedor;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.CaretEvent;
@@ -78,7 +79,7 @@ public class DialogoFornecedor extends javax.swing.JDialog {
             }
         };
 
-        tabela.getColumn(modelo.getCampo(0)).setMinWidth(50);
+        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(45);
         tabela.getColumn(modelo.getCampo(1)).setMinWidth(400);
 
 //        modelo.setLargura(1, 200, 200, -1);
@@ -185,6 +186,13 @@ public class DialogoFornecedor extends javax.swing.JDialog {
                 modelo.filtrar();
             }
         }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getSource() == tabela && e.getClickCount() >= 2) {
+                selecionarFornecedor();
+            }
+        }
     }
 
     /** This method is called from within the constructor to
@@ -207,6 +215,7 @@ public class DialogoFornecedor extends javax.swing.JDialog {
         setTitle("Fornecedores");
         setAlwaysOnTop(true);
 
+        tabela.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
         tabela.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -228,18 +237,18 @@ public class DialogoFornecedor extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(102, 102, 102)
                         .addComponent(btnOk)
                         .addGap(18, 18, 18)
-                        .addComponent(btnCancelar)))
+                        .addComponent(btnCancelar))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtNome, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
 
@@ -260,8 +269,6 @@ public class DialogoFornecedor extends javax.swing.JDialog {
                     .addComponent(btnCancelar))
                 .addContainerGap(14, Short.MAX_VALUE))
         );
-
-        getAccessibleContext().setAccessibleName("Fornecedores");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
