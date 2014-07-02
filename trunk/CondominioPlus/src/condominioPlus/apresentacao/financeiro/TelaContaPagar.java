@@ -414,7 +414,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 //            return;
 //        }
         if (txtFornecedor.getText().isEmpty()) {
-            ApresentacaoUtil.exibirAdvertencia("Escolha um Fornecedor para esta conta a pagar!", this);
+            ApresentacaoUtil.exibirAdvertencia("Informe um Fornecedor para esse pagamento!", this);
             return;
         }
         if (btnNumeroDocumento.isSelected() && painelContasPagarReceber.getSelectedIndex() == 0) {

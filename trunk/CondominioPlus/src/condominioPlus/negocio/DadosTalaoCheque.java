@@ -114,10 +114,12 @@ public class DadosTalaoCheque implements Serializable {
             novoValor = Long.parseLong(valor);
         }
         if (numeroInicial != null) {
-            novoNumeroInicial = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroInicial);
+//            novoNumeroInicial = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroInicial);
+            novoNumeroInicial = Long.parseLong(numeroInicial);
         }
         if (numeroFinal != null) {
-            novoNumeroFinal = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroFinal);
+//            novoNumeroFinal = Long.parseLong(condominio.getContaBancaria().getContaCorrente() + numeroFinal);
+            novoNumeroFinal = Long.parseLong(numeroFinal);
         }
         System.out.println(novoValor);
         System.out.println(novoNumeroInicial);
