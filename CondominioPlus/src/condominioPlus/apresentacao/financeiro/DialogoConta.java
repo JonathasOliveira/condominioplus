@@ -85,9 +85,9 @@ public class DialogoConta extends javax.swing.JDialog {
             }
         };
         
-        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(80);
-        tabela.getColumn(modelo.getCampo(1)).setMinWidth(400);
-        tabela.getColumn(modelo.getCampo(2)).setMaxWidth(40);
+        tabela.getColumn(modelo.getCampo(0)).setMaxWidth(50);
+        tabela.getColumn(modelo.getCampo(1)).setMaxWidth(400);
+        tabela.getColumn(modelo.getCampo(2)).setMaxWidth(55);
 
 //        modelo.setLargura(1, 200, 200, -1);
 
