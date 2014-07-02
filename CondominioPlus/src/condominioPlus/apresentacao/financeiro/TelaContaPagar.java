@@ -594,7 +594,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         if (btnNumeroDocumento.isSelected()) {
             btnNumeroDocumento.setText("Nº Cheque:");
             if (painelContasPagarReceber.getSelectedIndex() == 0) {
-                txtNumeroDocumento.setText(condominio.getContaBancaria().getContaCorrente());
+                txtNumeroDocumento.setText("");
+                txtNumeroDocumento.grabFocus();
                 painelCheques.setVisible(true);
                 btnGravar.setEnabled(true);
                 btnImprimir.setEnabled(true);
