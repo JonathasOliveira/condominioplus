@@ -95,7 +95,7 @@ public class DialogoPesquisarConteudoCaixa extends javax.swing.JDialog {
                     case 2:
                         return pagamento.getConta().getCodigo();
                     case 3:
-                        return pagamento.getHistorico().toUpperCase();
+                        return pagamento.getHistorico().toUpperCase() + " (" + pagamento.getFornecedor().toUpperCase() + ")";
                     case 4:
                         return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
                     default:

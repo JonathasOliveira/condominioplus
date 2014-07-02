@@ -132,7 +132,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                     case 2:
                         return pagamento.getConta().getCodigo();
                     case 3:
-                        return pagamento.getHistorico().toUpperCase();
+                        return pagamento.getHistorico().toUpperCase() + " (" + pagamento.getFornecedor().toUpperCase() + ")";
                     case 4:
                         return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
                     case 5:
@@ -167,9 +167,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(renderizadorCelulaCor);
 
-
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(300);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(100);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setMaxWidth(60);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(400);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(80);
 
     }
 
@@ -770,6 +770,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         setClosable(true);
         setTitle("Conta Corrente");
 
+        tabelaContaCorrente.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
         tabelaContaCorrente.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1064,7 +1065,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -1097,7 +1098,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
