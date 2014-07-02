@@ -5,7 +5,6 @@
 package condominioPlus.negocio.financeiro;
 
 import condominioPlus.negocio.cobranca.Cobranca;
-import condominioPlus.negocio.fornecedor.Fornecedor;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -71,8 +70,9 @@ public class Pagamento implements Serializable {
     private BigDecimal valor = new BigDecimal(0);
     private String historico;
     private String descricao = " ";
-    @ManyToOne
-    private Fornecedor fornecedor;
+    private String fornecedor = "";
+//    @ManyToOne
+//    private Fornecedor fornecedor;
     @ManyToOne
     private Conta conta;
     @Column(precision = 20, scale = 2)
@@ -150,11 +150,11 @@ public class Pagamento implements Serializable {
         this.dataPagamento = dataPagamento;
     }
 
-    public Fornecedor getFornecedor() {
+    public String getFornecedor() {
         return fornecedor;
     }
 
-    public void setFornecedor(Fornecedor fornecedor) {
+    public void setFornecedor(String fornecedor) {
         this.fornecedor = fornecedor;
     }
 

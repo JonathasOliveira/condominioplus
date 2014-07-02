@@ -97,7 +97,7 @@ public class TelaPagarDocumento extends javax.swing.JDialog {
         iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
         lib.Bematech_DP_IncluiAlteraBanco("555", "3,7,9,11,13,92,20,8,10,62,23,32,55");
         String valor = somarCheque().replace('.', ',');
-        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor().getNome(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataPagamento()).toString("ddMMyy"), "");
+        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataPagamento()).toString("ddMMyy"), "");
         System.out.println(iRetorno);
 
     }

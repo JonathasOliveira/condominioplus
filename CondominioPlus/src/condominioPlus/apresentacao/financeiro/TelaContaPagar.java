@@ -13,6 +13,7 @@ package condominioPlus.apresentacao.financeiro;
 import bemaJava.Bematech;
 import com.sun.jna.Native;
 import condominioPlus.Main;
+import condominioPlus.apresentacao.fornecedor.DialogoFornecedor;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.DadosTalaoCheque;
 import condominioPlus.negocio.financeiro.Conta;
@@ -60,6 +61,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private Pagamento pagamento;
     private Condominio condominio;
     private Conta conta;
+    private Fornecedor fornecedor;
     private TabelaModelo_2 modeloTabela;
     private TabelaModelo_2 modeloTabela2;
     private TabelaModelo_2 modeloTabelaContaReceber;
@@ -91,7 +93,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         initComponents();
         new ControladorEventos();
 
-        carregarFornecedor();
+//        carregarFornecedor();
 
         carregarTabela();
         carregarTabelaContaReceber();
@@ -141,7 +143,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     case 2:
                         return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
                     case 3:
-                        return pagamento.getFornecedor() != null ? pagamento.getFornecedor().getNome() : "";
+                        return pagamento.getFornecedor() != null ? pagamento.getFornecedor() : "";
                     case 4:
                         return pagamento.getHistorico();
                     case 5:
@@ -271,7 +273,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     case 2:
                         return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
                     case 3:
-                        return pagamento.getFornecedor() != null ? pagamento.getFornecedor().getNome() : "";
+                        return pagamento.getFornecedor() != null ? pagamento.getFornecedor() : "";
                     case 4:
                         return pagamento.getHistorico();
                     case 5:
@@ -352,7 +354,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         lib.Bematech_DP_IncluiAlteraBanco("555", "3,7,9,11,13,92,20,8,10,62,23,32,55");
         String valor = somarCheque().replace('.', ',');
         System.out.println("valor " + valor);
-        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor().getNome(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataVencimento()).toString("ddMMyy"), "");
+        iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataVencimento()).toString("ddMMyy"), "");
         System.out.println(iRetorno);
 
     }
@@ -362,7 +364,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         txtConta.setText("");
         txtNumeroDocumento.setText("");
         txtValor.setText("");
-        cbFornecedores.setSelectedIndex(-1);
+        txtFornecedor.setText("");
+//        cbFornecedores.setSelectedIndex(-1);
     }
 
     private List listaCampos() {
@@ -373,10 +376,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         return campos;
     }
 
-    private void carregarFornecedor() {
-        cbFornecedores.setModel(new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class)));
-    }
-
+//    private void carregarFornecedor() {
+//        cbFornecedores.setModel(new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class)));
+//    }
     private List<Pagamento> getPagamentos() {
         pagamentos = new DAO().listar(Pagamento.class, "PagamentosContaPagarPorPeriodo", contaPagar, datInicio, datTermino);
         return pagamentos;
@@ -407,7 +409,11 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             validador.exibirErros(this);
             return;
         }
-        if (cbFornecedores.getSelectedItem() == null) {
+//        if (cbFornecedores.getSelectedItem() == null) {
+//            ApresentacaoUtil.exibirAdvertencia("Escolha um Fornecedor para esta conta a pagar!", this);
+//            return;
+//        }
+        if (txtFornecedor.getText().isEmpty()) {
             ApresentacaoUtil.exibirAdvertencia("Escolha um Fornecedor para esta conta a pagar!", this);
             return;
         }
@@ -431,7 +437,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             }
         }
         pagamento.setSaldo(new BigDecimal(0));
-        pagamento.setFornecedor((Fornecedor) cbFornecedores.getModel().getSelectedItem());
+        pagamento.setFornecedor(txtFornecedor.getText());
         if (!pagamento.getConta().isCredito()) {
             pagamento.setContaPagar(condominio.getContaPagar());
             pagamento = selecionaFormaPagamento(pagamento);
@@ -534,6 +540,16 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
     public void setConta(Conta conta) {
         this.conta = conta;
+    }
+
+    private void pegarFornecedor() {
+        DialogoFornecedor f = new DialogoFornecedor(null, true, true);
+        f.setVisible(true);
+
+        if (f.getFornecedor() != null) {
+            fornecedor = f.getFornecedor();
+            txtFornecedor.setText(fornecedor.getNome());
+        }
     }
 
     private void adicionarPagamento() {
@@ -713,6 +729,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             Object origem = e.getSource();
             if (origem == btnConta) {
                 pegarConta();
+            } else if (origem == btnFornecedor) {
+                pegarFornecedor();
             } else if (origem == btnIncluir) {
                 adicionarPagamento();
                 if (painelContasPagarReceber.getSelectedIndex() == 0) {
@@ -763,6 +781,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.transferidorFocoEnter, TelaContaPagar.this, JTextField.class);
 
             btnConta.addActionListener(this);
+            btnFornecedor.addActionListener(this);
             btnFixarHistórico.addActionListener(this);
             btnIncluir.addActionListener(this);
             tabelaContaPagar.addMouseListener(this);
@@ -870,13 +889,13 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         btnConta = new javax.swing.JButton();
         txtHistorico = new javax.swing.JTextField();
         btnFixarHistórico = new javax.swing.JToggleButton();
-        cbFornecedores = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
         txtNumeroDocumento = new javax.swing.JTextField();
         btnNumeroDocumento = new javax.swing.JToggleButton();
         btnImprimir = new javax.swing.JButton();
         btnGravar = new javax.swing.JButton();
         btnExibirSaldoCC = new javax.swing.JButton();
+        btnFornecedor = new javax.swing.JButton();
+        txtFornecedor = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         dataTermino = new net.sf.nachocalendar.components.DateField();
@@ -958,8 +977,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
         btnFixarHistórico.setText("Fixar Histórico");
 
-        jLabel2.setText("Fornecedor:");
-
         btnNumeroDocumento.setText("Nº Doc");
         btnNumeroDocumento.setToolTipText("Clique para alternar o tipo de Registro!");
         btnNumeroDocumento.setBorderPainted(false);
@@ -973,6 +990,16 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         btnGravar.setToolTipText("Gravar Cheques");
 
         btnExibirSaldoCC.setText("Saldo C/C");
+
+        btnFornecedor.setText("Selecionar Fornecedor/Beneficiário:");
+        btnFornecedor.setBorder(null);
+        btnFornecedor.setBorderPainted(false);
+        btnFornecedor.setContentAreaFilled(false);
+        btnFornecedor.setFocusable(false);
+        btnFornecedor.setRequestFocusEnabled(false);
+        btnFornecedor.setVerifyInputWhenFocusTarget(false);
+
+        txtFornecedor.setName("Histórico"); // NOI18N
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -1009,15 +1036,13 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                             .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(6, 6, 6)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addGap(105, 105, 105)
-                                .addComponent(jLabel2))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbFornecedores, 0, 370, Short.MAX_VALUE)))))
-                .addContainerGap())
+                            .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnFornecedor))))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1030,8 +1055,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnNumeroDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnConta)))
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2))
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel3)
+                        .addComponent(btnFornecedor)))
                 .addGap(6, 6, 6)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1043,8 +1069,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                         .addComponent(txtConta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(1, 1, 1)
-                        .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(cbFornecedores, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txtValor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(btnFixarHistórico, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
@@ -1315,6 +1342,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnExibirSaldoCC;
     private javax.swing.JToggleButton btnFixarHistórico;
+    private javax.swing.JButton btnFornecedor;
     private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnHoje;
     private javax.swing.JButton btnImprimir;
@@ -1322,7 +1350,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnMes;
     private javax.swing.JToggleButton btnNumeroDocumento;
     private javax.swing.JButton btnSemana;
-    private javax.swing.JComboBox cbFornecedores;
     private javax.swing.JCheckBox checkBoxMostrarDateField;
     private net.sf.nachocalendar.components.DateField dataInicio;
     private net.sf.nachocalendar.components.DateField dataTermino;
@@ -1333,7 +1360,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JMenuItem itemMenuPagarSelecionados;
     private javax.swing.JMenuItem itemMenuPagarSelecionadosReceber;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1361,9 +1387,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private javax.swing.JTable tabelaContaReceber;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtData;
+    private javax.swing.JTextField txtFornecedor;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtNumeroDocumento;
     private javax.swing.JTextField txtValor;
     // End of variables declaration//GEN-END:variables
 }
-
