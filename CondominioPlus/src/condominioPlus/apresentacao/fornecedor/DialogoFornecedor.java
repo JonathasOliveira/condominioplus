@@ -204,7 +204,7 @@ public class DialogoFornecedor extends javax.swing.JDialog {
         btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Contas");
+        setTitle("Fornecedores");
         setAlwaysOnTop(true);
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
