@@ -6,7 +6,6 @@ package condominioPlus.negocio.fornecedor;
 
 import condominioPlus.negocio.Endereco;
 import condominioPlus.negocio.Telefone;
-import condominioPlus.negocio.financeiro.Pagamento;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,8 +30,8 @@ public class Fornecedor implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int codigo;
     private String nome;
-    @OneToMany(mappedBy = "fornecedor")
-    private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
+//    @OneToMany(mappedBy = "fornecedor")
+//    private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "data_cadastro")
     private Calendar data_cadastro = Calendar.getInstance();
@@ -85,11 +84,11 @@ public class Fornecedor implements Serializable {
     public String toString() {
         return nome;
     }
-    public List<Pagamento> getPagamentos() {
-        return pagamentos;
-    }
-
-    public void setPagamentos(List<Pagamento> pagamentos) {
-        this.pagamentos = pagamentos;
-    }
+//    public List<Pagamento> getPagamentos() {
+//        return pagamentos;
+//    }
+//
+//    public void setPagamentos(List<Pagamento> pagamentos) {
+//        this.pagamentos = pagamentos;
+//    }
 }
