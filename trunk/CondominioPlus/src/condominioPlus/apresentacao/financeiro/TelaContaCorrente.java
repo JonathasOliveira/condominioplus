@@ -167,9 +167,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(renderizadorCelulaCor);
 
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setMaxWidth(60);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(400);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setMinWidth(80);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setMaxWidth(70);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setMinWidth(70);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setMinWidth(530);
 
     }
 
