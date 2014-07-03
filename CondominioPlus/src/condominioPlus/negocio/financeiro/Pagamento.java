@@ -70,7 +70,7 @@ public class Pagamento implements Serializable {
     private BigDecimal valor = new BigDecimal(0);
     private String historico;
     private String descricao = " ";
-    private String fornecedor = "";
+    private String fornecedor = " ";
 //    @ManyToOne
 //    private Fornecedor fornecedor;
     @ManyToOne

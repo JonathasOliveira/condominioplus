@@ -741,6 +741,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         BigDecimal valor = new BigDecimal(0);
         for (CobrancaBase co : condominio.getCobrancasBase()) {
             Pagamento pagamento = new Pagamento();
+            pagamento.setFornecedor("");
             pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
             pagamento.setCobranca(cobranca);
             pagamento.setConta(co.getConta());
@@ -770,6 +771,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 for (Rateio r : c.getRateios()) {
                     if (r.getUnidade().getCodigo() == u.getCodigo()) {
                         Pagamento pagamento = new Pagamento();
+                        pagamento.setFornecedor("");
                         pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                         pagamento.setCobranca(cobranca);
                         pagamento.setConta(new DAO().localizar(Conta.class, 11452));
@@ -796,6 +798,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                             if (rateio.getUnidade().getCodigo() == u.getCodigo()) {
                                 rateio.setCobranca(cobranca);
                                 Pagamento pagamento = new Pagamento();
+                                pagamento.setFornecedor("");
                                 pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                                 pagamento.setCobranca(cobranca);
                                 pagamento.setConta(txe.getConta());
@@ -818,6 +821,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         for (ItemCobranca item : listaItensAvulsos) {
             if (item.getValor().doubleValue() != 0) {
                 Pagamento pagamento = new Pagamento();
+                pagamento.setFornecedor("");
                 pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimentoAvulso.getValue()));
                 pagamento.setCobranca(cobranca);
                 Conta c = new DAO().localizar(Conta.class, item.getCodigoConta());
@@ -885,6 +889,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             Cobranca ultimaCobrancaPaga = lista.get(lista.size() - 1);
             if (ultimaCobrancaPaga.getDiferencaPagamento().doubleValue() != 0) {
                 Pagamento pagamento = new Pagamento();
+                pagamento.setFornecedor("");
                 pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                 pagamento.setCobranca(c);
                 if (ultimaCobrancaPaga.getDiferencaPagamento().doubleValue() < 0) {
@@ -1087,6 +1092,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             valor.soma(c.getMulta());
             if (valor.doubleValue() > 0) {
                 Pagamento pagamento = new Pagamento();
+                pagamento.setFornecedor("");
                 pagamento.setConta(new DAO().localizar(Conta.class, 37226));
                 pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
                 pagamento.setValor(valor.bigDecimalValue());
@@ -1096,6 +1102,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             if (c.getDiferencaPagamento().doubleValue() < 0) {
                 Pagamento pagamento = new Pagamento();
+                pagamento.setFornecedor("");
                 pagamento.setConta(new DAO().localizar(Conta.class, 39602));
                 pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
                 pagamento.setValor(c.getDiferencaPagamento().negate());
@@ -1305,6 +1312,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void gerarPagamentosCobrancasAcordo(AcordoCobranca ac, Cobranca cobranca, int i) {
         Pagamento pagamento = new Pagamento();
+        pagamento.setFornecedor("");
         pagamento.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(ac.getDataPrimeiroPagamento()).plusMonths(i)));
         pagamento.setCobranca(cobranca);
         pagamento.setConta(new DAO().localizar(Conta.class, 41102));
