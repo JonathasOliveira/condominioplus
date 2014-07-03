@@ -360,6 +360,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
                 rateio.setCobranca(cobranca);
                 Pagamento pagamento = new Pagamento();
+                pagamento.setFornecedor("");
                 pagamento.setDataVencimento(rateio.getDataVencimento());
                 pagamento.setCobranca(cobranca);
                 pagamento.setConta(txe.getConta());
