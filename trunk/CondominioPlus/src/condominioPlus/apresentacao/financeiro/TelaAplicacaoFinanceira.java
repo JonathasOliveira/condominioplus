@@ -189,7 +189,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
                 }
             }
             pagamento.setSaldo(new BigDecimal(0));
-            pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+            pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
 
 
             pagamento.setAplicacao(condominio.getAplicacao());

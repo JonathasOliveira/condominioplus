@@ -249,7 +249,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                         pagamento.setHistorico(texto + " " + contrato.getDescricao());
                         System.out.println("pagamento historico " + pagamento.getHistorico());
                         pagamento.setForma(FormaPagamento.DINHEIRO);
-                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                        pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
 
                         if (conta.isCredito()) {
                             new DAO().salvar(pagamento);
@@ -277,7 +277,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
 
                     pagamento.setContratoEmprestimo(contrato);
                     pagamento.setHistorico(texto + " " + contrato.getDescricao());
-                    pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                    pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                     pagamento.setForma(FormaPagamento.DINHEIRO);
 
                     if (conta.isCredito()) {
@@ -298,7 +298,7 @@ public class TelaEmprestimo extends javax.swing.JInternalFrame {
                     p.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
                 }
                 p.setSaldo(new BigDecimal(0));
-                p.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento()) + 1));
+                p.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento() + 1));
 
                 p.setContaCorrente(condominio.getContaCorrente());
                 p.setPago(true);

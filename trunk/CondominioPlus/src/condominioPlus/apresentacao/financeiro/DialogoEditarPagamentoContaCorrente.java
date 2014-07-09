@@ -19,7 +19,6 @@ import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.Pagamento;
-import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
@@ -35,7 +34,6 @@ import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.persistencia.DAO;
-import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Util;
 
@@ -158,7 +156,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
     }
 
     private String compararForma() {
-        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
+        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
     }
 
     private void preencherTela() {
@@ -192,7 +190,6 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             pagamento.setValor(valor);
         }
         selecionaFormaPagamento(pagamento);
-
     }
 
     private DadosTalaoCheque getDadosTalaoCheque() {
@@ -211,10 +208,18 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
     private void selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            } else {
+                ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
+            }
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            } else {
+                ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+            }
         }
     }
 
@@ -350,7 +355,6 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
 //        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
 //        cbFornecedores.setModel(modelo);
 //    }
-
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override
