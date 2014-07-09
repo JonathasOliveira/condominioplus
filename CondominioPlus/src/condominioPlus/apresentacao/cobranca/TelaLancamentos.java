@@ -1126,7 +1126,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             new DAO().salvar(c);
             atualizarCobrancasCondominio(c);
-            carregarTabelaInadimplentes();
+//            carregarTabelaInadimplentes();
         }
     }
 
@@ -1186,6 +1186,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             baixarCobranca(registro, setContaCorrente);
             carregarTabelaCobranca();
+            carregarTabelaInadimplentes();
         }
     }
 
