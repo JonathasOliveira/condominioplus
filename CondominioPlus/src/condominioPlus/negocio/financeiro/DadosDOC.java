@@ -22,12 +22,12 @@ import javax.persistence.Table;
 public class DadosDOC extends DadosPagamento {
 
     @Column(name = "numero_documento")
-    private long numeroDocumento;
+    private String numeroDocumento;
 
     public DadosDOC() {
     }
 
-    public DadosDOC(long numeroDocumento) {
+    public DadosDOC(String numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
     }
 
@@ -36,11 +36,11 @@ public class DadosDOC extends DadosPagamento {
         return new DadosDOC(numeroDocumento);
     }
 
-    public long getNumeroDocumento() {
+    public String getNumeroDocumento() {
         return numeroDocumento;
     }
 
-    public void setNumeroDocumento(long numeroDocumento) {
+    public void setNumeroDocumento(String numeroDocumento) {
         this.numeroDocumento = numeroDocumento;
     }
 }

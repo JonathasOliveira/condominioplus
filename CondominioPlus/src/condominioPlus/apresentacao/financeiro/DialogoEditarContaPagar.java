@@ -137,7 +137,7 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
             }
         }
 
-        if(novaLista.isEmpty()){
+        if (novaLista.isEmpty()) {
             novaLista.add(pagamento);
         }
         return novaLista;
@@ -178,11 +178,18 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     }
 
     private void preencherObjeto() {
+        BigDecimal valor = new BigDecimal(txtValor.getText().replace(',', '.'));
         pagamento.setDataVencimento(DataUtil.getCalendar(txtData.getValue()));
         pagamento.setHistorico(txtHistorico.getText());
-        pagamento.setValor(new BigDecimal(txtValor.getText().replace(',', '.')).negate());
         pagamento.setFornecedor(txtFornecedor.getText());
         pagamento.setConta(conta);
+        if (pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0)) == -1) {
+            pagamento.setValor(valor.negate());
+        } else if (!pagamento.getConta().isCredito() && valor.compareTo(new BigDecimal(0)) == 1) {
+            pagamento.setValor(valor.negate());
+        } else {
+            pagamento.setValor(valor);
+        }
         selecionaFormaPagamento(pagamento);
 
     }
@@ -203,28 +210,30 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
     private void selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            } else {
+                ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
+            }
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            } else {
+                ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+            }
         }
     }
 
     private void setTotal() {
         lblTotal.setText(somarCheque());
-
-
     }
 
     private String somarCheque() {
         for (Pagamento p : getPagamentos()) {
             total = total.add(p.getValor());
-
-
         }
         return String.valueOf(total);
-
-
     }
 
     private void imprimirCheques() {
@@ -341,7 +350,6 @@ public class DialogoEditarContaPagar extends javax.swing.JDialog {
 //        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
 //        cbFornecedores.setModel(modelo);
 //    }
-
     private class ControladorEventos extends ControladorEventosGenerico {
 
         @Override

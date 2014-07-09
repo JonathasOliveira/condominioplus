@@ -149,7 +149,7 @@ public class EntradaExtratoDiario {
                 for (Pagamento p : pagamentosEmAberto) {
                     if (p.getForma() == FormaPagamento.CHEQUE) {
                         ex.setValor(ex.getValor().negate());
-                        if (((DadosCheque) p.getDadosPagamento()).getNumero() == Long.valueOf(ex.getCondominio().getContaBancaria().getContaCorrente() + ex.getDoc())) {
+                        if (((DadosCheque) p.getDadosPagamento()).getNumero().equals(ex.getCondominio().getContaBancaria().getContaCorrente() + ex.getDoc())) {
                             p.setContaCorrente(ex.getCondominio().getContaCorrente());
                             p.setPago(true);
                             p.setDataPagamento(ex.getDataPagamento());
@@ -195,7 +195,7 @@ public class EntradaExtratoDiario {
                     pagamento.setValor(ex.getValor().negate());
                 }
 
-                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                 new DAO().salvar(pagamento);
             } else {
                 for (Identificador identificador : identificadores) {
@@ -211,7 +211,7 @@ public class EntradaExtratoDiario {
                             pagamento.setValor(ex.getValor().negate());
                         }
 
-                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                        pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                         new DAO().salvar(pagamento);
 
                     }
@@ -236,7 +236,7 @@ public class EntradaExtratoDiario {
                     pagamento.setValor(ex.getValor().negate());
                 }
 
-                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                 new DAO().salvar(Main.getCondominio());
             }
         } else if (ident != null && ident.getConta().getCodigo() == 13072) {
@@ -251,7 +251,7 @@ public class EntradaExtratoDiario {
                 pagamento.setValor(ex.getValor().negate());
             }
 
-            pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+            pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
             new DAO().salvar(Main.getCondominio());
 
         }

@@ -64,7 +64,7 @@ public class ExtratoDiarioUtil {
                     pagamento.setValor(ex.getValor().negate());
                 }
 
-                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                 PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
                 new DAO().salvar(pagamento);
             } else {
@@ -82,7 +82,7 @@ public class ExtratoDiarioUtil {
                             pagamento.setValor(ex.getValor().negate());
                         }
 
-                        pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                        pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                         PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
                         new DAO().salvar(pagamento);
 
@@ -109,7 +109,7 @@ public class ExtratoDiarioUtil {
                     pagamento.setValor(ex.getValor().negate());
                 }
 
-                pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+                pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
                 PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
                 new DAO().salvar(Main.getCondominio());
             }
@@ -126,7 +126,7 @@ public class ExtratoDiarioUtil {
                 pagamento.setValor(ex.getValor().negate());
             }
 
-            pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+            pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
             PagamentoUtil.verificarListaVaziaContaCorrente(pagamento);
             new DAO().salvar(Main.getCondominio());
 

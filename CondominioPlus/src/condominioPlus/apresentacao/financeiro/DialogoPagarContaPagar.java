@@ -47,7 +47,7 @@ import org.joda.time.DateTime;
  * @author Administrador
  */
 public class DialogoPagarContaPagar extends javax.swing.JDialog {
-
+    
     private Pagamento pagamento;
 //    private ComboModelo<Fornecedor> modelo;
 //    private ComboModelo<Fornecedor> modelo2;
@@ -73,12 +73,12 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //        carregarFornecedorNovoPagamento();
         controlador = new ControladorEventos();
     }
-
+    
     private void verificarConformeDisponibilidade() {
         if (pagamento.getContratoEmprestimo() != null && pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
             if (ApresentacaoUtil.perguntar("Deseja pagar o total desse Empréstimo?", this)) {
                 desabilitarPainelNovoPagamento();
-
+                
             } else {
                 jTabbedPane1.setSelectedIndex(1);
                 habilitarPainelNovoPagamento();
@@ -86,7 +86,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             }
         }
     }
-
+    
     private void desabilitarPainelNovoPagamento() {
         txtNumeroDocumentoNovoPagamento.setEnabled(false);
         txtValorNovoPagamento.setEnabled(false);
@@ -95,7 +95,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         btnCancelarNovoPagamento.setEnabled(false);
         btnImprimirNovoPagamento.setEnabled(false);
     }
-
+    
     private void habilitarPainelNovoPagamento() {
         txtNumeroDocumentoNovoPagamento.setEnabled(true);
         txtNumeroDocumentoNovoPagamento.setText(Pagamento.gerarNumeroDocumento());
@@ -105,11 +105,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         btnCancelarNovoPagamento.setEnabled(true);
         btnImprimirNovoPagamento.setEnabled(true);
     }
-
+    
     private void novoPagamento() {
         if (pagamento.getValor().negate().compareTo(new BigDecimal(txtValorNovoPagamento.getText().replace(",", "."))) == 1 && new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).doubleValue() > 0) {
             Pagamento p = new Pagamento();
-
+            
             p.setDataVencimento(pagamento.getDataVencimento());
             p.setDataPagamento(DataUtil.getCalendar(DataUtil.hoje()));
             p.setContaCorrente(condominio.getContaCorrente());
@@ -123,7 +123,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             } else {
                 p.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
             }
-
+            
             selecionaFormaPagamento(p);
             p.setHistorico("PAGAMENTO PARCELA " + calcularNumeroParcela() + " " + pagamento.getConta().getContaVinculada().getNome());
             p.getContratoEmprestimo().setNumeroParcelas(calcularNumeroParcela() + 1);
@@ -135,9 +135,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             ApresentacaoUtil.exibirAdvertencia("Informe um valor menor do que R$ " + pagamento.getValor().negate().toString().replace(".", ",") + " e maior que 0.", this);
             return;
         }
-
+        
     }
-
+    
     private int calcularNumeroParcela() {
         int resultado = 0;
         for (Pagamento p : pagamento.getContratoEmprestimo().getPagamentos()) {
@@ -152,7 +152,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //        modelo2 = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedoresNovoPagamento);
 //        cbFornecedoresNovoPagamento.setModel(modelo2);
 //    }
-
     private void bloquearCampos() {
         txtConta.setEnabled(false);
         txtHistorico.setEnabled(false);
@@ -160,23 +159,23 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         txtNumeroDocumento.setEnabled(false);
         txtValor.setEnabled(false);
         txtFornecedor.setEnabled(false);
-
+        
     }
-
+    
     private void carregarTabela() {
         modeloTabela = new TabelaModelo_2<Pagamento>(tabela, "Vencimento, Conta, Documento, Valor".split(",")) {
-
+            
             @Override
             protected Pagamento getAdicionar() {
                 editar(new Pagamento());
                 return null;
             }
-
+            
             @Override
             public void editar(Pagamento pagamento) {
 //              TelaPrincipal.getInstancia().criarFrame(new TelaDadosCondominio(condominio));
             }
-
+            
             @Override
             protected List<Pagamento> getCarregarObjetos() {
                 return getPagamentosSemOriginal();
@@ -202,16 +201,16 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 }
             }
         };
-
-
+        
+        
         DefaultTableCellRenderer esquerda = new DefaultTableCellRenderer();
         DefaultTableCellRenderer centralizado = new DefaultTableCellRenderer();
         DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
-
+        
         esquerda.setHorizontalAlignment(SwingConstants.LEFT);
         centralizado.setHorizontalAlignment(SwingConstants.CENTER);
         direita.setHorizontalAlignment(SwingConstants.RIGHT);
-
+        
         tabela.getColumn(modeloTabela.getCampo(1)).setCellRenderer(direita);
         tabela.getColumn(modeloTabela.getCampo(2)).setCellRenderer(direita);
         tabela.getColumn(modeloTabela.getCampo(3)).setCellRenderer(centralizado);
@@ -220,15 +219,15 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //        tabela.getColumn(modeloTabela.getCampo(4)).setMinWidth(280);
 //        tabela.getColumn(modeloTabela.getCampo(5)).setMinWidth(110);
     }
-
+    
     private List<Pagamento> getPagamentos() {
         return new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
     }
-
+    
     private List<Pagamento> getPagamentosContasReceber() {
         return new DAO().listar("PagamentosPorNumeroDocumentoContaReceber", Main.getCondominio().getContaReceber(), pagamento.getDadosPagamento());
     }
-
+    
     private List<Pagamento> getPagamentosSemOriginal() {
         List<Pagamento> lista = new DAO().listar("PagamentosPorNumeroDocumento", Main.getCondominio().getContaPagar(), pagamento.getDadosPagamento());
         System.out.println("listaaaa  " + lista);
@@ -240,11 +239,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         }
         return listaModificada;
     }
-
+    
     private String compararForma() {
         return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
     }
-
+    
     private void preencherTela() {
         txtData.setValue(DataUtil.getDate(pagamento.getDataVencimento()));
         if (pagamento.getConta() != null) {
@@ -255,7 +254,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         txtNumeroDocumento.setText(compararForma());
         txtValor.setText(String.valueOf(pagamento.getValor()));
         txtFornecedor.setText(pagamento.getFornecedor());
-
+        
     }
 
 //    private void preencherObjeto() {
@@ -270,20 +269,28 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumentoNovoPagamento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumentoNovoPagamento.getText()), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosCheque(txtNumeroDocumentoNovoPagamento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+            } else {
+                ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumentoNovoPagamento.getText());
+            }
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumentoNovoPagamento.getText())));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosDOC(txtNumeroDocumentoNovoPagamento.getText()));
+            } else {
+                ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumentoNovoPagamento.getText());
+            }
             return p;
         }
-
+        
     }
-
+    
     private void setTotal() {
         lblTotal.setText(somarCheque());
     }
-
+    
     private String somarCheque() {
         if (pagamento.getContaPagar() != null) {
             for (Pagamento p : getPagamentos()) {
@@ -296,19 +303,19 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         }
         return String.valueOf(total);
     }
-
+    
     private void imprimirCheques() {
         int iRetorno;
         Pagamento p = null;
         if (!getPagamentos().isEmpty()) {
             p = getPagamentos().get(0);
         }
-
+        
         if (pagamento.getFornecedor() == null) {
             ApresentacaoUtil.exibirAdvertencia("Selecione um Fornecedor/Favorecido!", this);
             return;
         }
-
+        
         Bematech lib =
                 (Bematech) Native.loadLibrary("BEMADP32", Bematech.class);
         iRetorno = lib.Bematech_DP_IniciaPorta("COM1");
@@ -316,9 +323,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         String valor = somarCheque().replace('.', ',');
         iRetorno = lib.Bematech_DP_ImprimeCheque("555", valor, p.getFornecedor(), "ARMACAO DOS BUZIOS", DataUtil.getDateTime(p.getDataVencimento()).toString("ddMMyy"), "");
         System.out.println(iRetorno);
-
+        
     }
-
+    
     private void trocarFormaPagamento() {
         if (btnNumeroDocumentoNovoPagamento.isSelected()) {
             btnNumeroDocumentoNovoPagamento.setText("Nº Cheque:");
@@ -327,9 +334,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             btnNumeroDocumentoNovoPagamento.setText("Nº Doc:");
             txtNumeroDocumentoNovoPagamento.setText(Pagamento.gerarNumeroDocumento());
         }
-
+        
     }
-
+    
     private void pegarConta() {
         boolean exibirCredito = false;
         if (pagamento.getConta().isCredito()) {
@@ -337,13 +344,13 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
         }
         DialogoConta c = new DialogoConta(null, true, exibirCredito, false, "");
         c.setVisible(true);
-
+        
         if (c.getConta() != null) {
             conta = c.getConta();
             txtConta.setText(String.valueOf(conta.getCodigo()));
         }
     }
-
+    
     public void setConta(Conta conta) {
         this.conta = conta;
     }
@@ -352,7 +359,6 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
 //        modelo = new ComboModelo<Fornecedor>(new DAO().listar(Fornecedor.class), cbFornecedores);
 //        cbFornecedores.setModel(modelo);
 //    }
-
     private void efetuarPagamento() {
         if (pagamento.getContratoEmprestimo() != null) {
             if (pagamento.getContratoEmprestimo().getForma() == FormaPagamentoEmprestimo.CONFORME_DISPONIBILIDADE) {
@@ -369,11 +375,11 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             List<Pagamento> novaLista;
             if (pagamento.getContaReceber() != null) {
                 novaLista = getPagamentosContasReceber();
-
+                
             } else {
                 novaLista = getPagamentos();
             }
-
+            
             for (Pagamento p : novaLista) {
                 p.setPago(true);
                 p.setContaCorrente(Main.getCondominio().getContaCorrente());
@@ -382,13 +388,13 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 verificarVinculo(p);
                 new DAO().salvar(p);
             }
-
+            
         }
         //new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Pagamentos efetuados com sucesso!", this);
         dispose();
     }
-
+    
     private void pagarPagamentoRelacionado(Pagamento p) {
         for (Pagamento p2 : p.getTransacaoBancaria().getPagamentos()) {
             if (!p2.equals(p)) {
@@ -399,17 +405,17 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 }
             }
             new DAO().salvar(p2);
-
+            
         }
     }
-
+    
     private void verificarVinculo(Pagamento p1) {
         if (p1.getConta().getContaVinculada() != null) {
             TransacaoBancaria transacao = new TransacaoBancaria();
             if (p1.getTransacaoBancaria() != null) {
                 transacao = p1.getTransacaoBancaria();
             }
-
+            
             Pagamento pagamentoRelacionado = new Pagamento();
             if (transacao.getPagamentos() != null) {
                 for (Pagamento p : transacao.getPagamentos()) {
@@ -434,7 +440,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                     pagamentoRelacionado.setValor(new BigDecimal(txtValorNovoPagamento.getText().replace(",", ".")).negate());
                 }
             } else {
-
+                
                 pagamentoRelacionado.setHistorico(p1.getConta().getContaVinculada().getNome());
                 pagamentoRelacionado.setConta(p1.getConta().getContaVinculada());
                 if (pagamentoRelacionado.getConta().isCredito()) {
@@ -445,9 +451,9 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             }
             pagamentoRelacionado.setSaldo(new BigDecimal(0));
             pagamentoRelacionado.setDadosPagamento(p1.getDadosPagamento());
-
+            
             String nome = pagamentoRelacionado.getConta().getNomeVinculo();
-
+            
             if (nome.equals("AF")) {
                 pagamentoRelacionado.setAplicacao(condominio.getAplicacao());
             } else if (nome.equals("PO")) {
@@ -455,7 +461,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             } else if (nome.equals("CO")) {
                 pagamentoRelacionado.setConsignacao(condominio.getConsignacao());
             } else if (p1.getContratoEmprestimo() != null) {
-
+                
                 TransacaoBancaria transacaoAuxiliar = pagamento.getTransacaoBancaria();
                 Pagamento pagamentoAuxiliar = new Pagamento();
                 for (Pagamento p2 : transacaoAuxiliar.getPagamentos()) {
@@ -474,66 +480,66 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 pagamento.setValor(pagamento.getValor().add(pagamentoRelacionado.getValor()));
                 new DAO().salvar(pagamentoAuxiliar);
             }
-
+            
             pagamentoRelacionado.setPago(true);
-
-
+            
+            
             transacao.adicionarPagamento(p1);
             transacao.adicionarPagamento(pagamentoRelacionado);
-
+            
             if (nome.equals("AF")) {
-
+                
                 verificarDataPagamentoAplicacao(pagamentoRelacionado);
                 condominio.getAplicacao().adicionarPagamento(pagamentoRelacionado);
                 condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamentoRelacionado.getValor()));
-
+                
             } else if (nome.equals("PO")) {
-
+                
                 verificarDataPagamentoPoupanca(pagamentoRelacionado);
                 condominio.getPoupanca().adicionarPagamento(pagamentoRelacionado);
                 condominio.getPoupanca().setSaldo(condominio.getPoupanca().getSaldo().add(pagamentoRelacionado.getValor()));
-
+                
             } else if (nome.equals("CO")) {
-
+                
                 verificarDataPagamentoConsignacao(pagamentoRelacionado);
                 condominio.getConsignacao().adicionarPagamento(pagamentoRelacionado);
                 condominio.getConsignacao().setSaldo(condominio.getConsignacao().getSaldo().add(pagamentoRelacionado.getValor()));
-
+                
             } else if (p1.getContratoEmprestimo() != null) {
                 System.out.println("here2");
                 pagamento.getContratoEmprestimo().getPagamentos().add(pagamentoRelacionado);
             }
-
+            
             System.out.println("Transacao Bancária: " + transacao);
-
+            
             p1.setTransacaoBancaria(transacao);
             pagamentoRelacionado.setTransacaoBancaria(transacao);
         }
     }
-
+    
     private void verificarDataPagamentoAplicacao(Pagamento p2) {
         if (condominio.getAplicacao().getPagamentos().isEmpty()) {
             p2.setSaldo(p2.getValor());
             condominio.getAplicacao().setSaldo(p2.getValor());
         }
     }
-
+    
     private void verificarDataPagamentoPoupanca(Pagamento p2) {
         if (condominio.getPoupanca().getPagamentos().isEmpty()) {
             p2.setSaldo(p2.getValor());
             condominio.getPoupanca().setSaldo(p2.getValor());
         }
     }
-
+    
     private void verificarDataPagamentoConsignacao(Pagamento p2) {
         if (condominio.getConsignacao().getPagamentos().isEmpty()) {
             p2.setSaldo(p2.getValor());
             condominio.getConsignacao().setSaldo(p2.getValor());
         }
     }
-
+    
     private class ControladorEventos extends ControladorEventosGenerico {
-
+        
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == btnPagar) {
@@ -554,10 +560,10 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 trocarFormaPagamento();
             } else if (e.getSource() == btnAdicionarNovoPagamento) {
                 novoPagamento();
-
+                
             }
         }
-
+        
         @Override
         public void focusLost(FocusEvent e) {
             if (e.getSource() == txtConta) {
@@ -582,13 +588,13 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
                 }
             }
         }
-
+        
         @Override
         public void configurar() {
             ApresentacaoUtil.adicionarListener(
                     ApresentacaoUtil.transferidorFocoEnter, DialogoPagarContaPagar.this, JTextField.class, JComboBox.class);
             ApresentacaoUtil.adicionarListener(ApresentacaoUtil.selecionadorTexto, DialogoPagarContaPagar.this, JTextField.class);
-
+            
             btnPagar.addActionListener(this);
             btnCancelar.addActionListener(this);
             btnImprimir.addActionListener(this);
@@ -601,7 +607,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
             btnNumeroDocumentoNovoPagamento.addActionListener(this);
         }
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -999,7 +1005,7 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void btnNumeroDocumentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNumeroDocumentoActionPerformed
         // TODO add your handling code here:
 }//GEN-LAST:event_btnNumeroDocumentoActionPerformed
-
+    
     private void btnNumeroDocumentoNovoPagamentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNumeroDocumentoNovoPagamentoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnNumeroDocumentoNovoPagamentoActionPerformed

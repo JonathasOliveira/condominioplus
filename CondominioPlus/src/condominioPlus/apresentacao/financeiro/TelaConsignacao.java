@@ -169,7 +169,7 @@ public class TelaConsignacao extends javax.swing.JInternalFrame {
                 pagamento.setValor(new BigDecimal(txtValor.getText().replace(",", ".")).negate());
             }
             pagamento.setSaldo(new BigDecimal(0));
-            pagamento.setDadosPagamento(new DadosDOC(Long.valueOf(Pagamento.gerarNumeroDocumento())));
+            pagamento.setDadosPagamento(new DadosDOC(Pagamento.gerarNumeroDocumento()));
 
 
             pagamento.setConsignacao(condominio.getConsignacao());

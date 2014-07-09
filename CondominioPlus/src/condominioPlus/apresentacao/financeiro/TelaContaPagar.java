@@ -206,7 +206,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     case 1:
                         return String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero());
                     case 2:
-                        return pagamento.getHistorico()  + " (" + pagamento.getFornecedor().toUpperCase() + ")";
+                        return pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")";
                     case 3:
                         return PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue());
 
@@ -466,19 +466,27 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private Pagamento selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), condominio.getContaBancaria().getContaCorrente(), condominio.getRazaoSocial()));
+            } else {
+                ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
+            }
             for (Pagamento cheque : cheques) {
-                if (((DadosCheque) cheque.getDadosPagamento()).getNumero() == ((DadosCheque) p.getDadosPagamento()).getNumero()) {
+                if (((DadosCheque) cheque.getDadosPagamento()).getNumero().equals(((DadosCheque) p.getDadosPagamento()).getNumero())) {
                     p.setDadosPagamento(((DadosCheque) cheque.getDadosPagamento()));
                 }
             }
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
+            if (p.getCodigo() == 0) {
+                p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+            } else {
+                ((DadosDOC)p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+            }
             List<Pagamento> documentos = new DAO().listar("PagamentosPorForma", Main.getCondominio().getContaPagar(), FormaPagamento.DINHEIRO);
             for (Pagamento documento : documentos) {
-                if (((DadosDOC) documento.getDadosPagamento()).getNumeroDocumento() == ((DadosDOC) p.getDadosPagamento()).getNumeroDocumento()) {
+                if (((DadosDOC) documento.getDadosPagamento()).getNumeroDocumento().equals(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento())) {
                     p.setDadosPagamento(((DadosDOC) documento.getDadosPagamento()));
                 }
             }
@@ -490,11 +498,11 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     private Pagamento selecionaFormaPagamentoContaReceber(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
             p.setForma(FormaPagamento.CHEQUE);
-            p.setDadosPagamento(new DadosCheque(Long.valueOf(txtNumeroDocumento.getText()), " ", condominio.getRazaoSocial()));
+            p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), " ", condominio.getRazaoSocial()));
             return p;
         } else {
             p.setForma(FormaPagamento.DINHEIRO);
-            p.setDadosPagamento(new DadosDOC(Long.valueOf(txtNumeroDocumento.getText())));
+            p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
             return p;
         }
 
