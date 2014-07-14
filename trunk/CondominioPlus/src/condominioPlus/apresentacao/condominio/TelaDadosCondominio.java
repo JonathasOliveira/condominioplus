@@ -108,7 +108,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         cmbInstrumento.setModel(new ComboModelo<String>(Util.toList(new String[]{"ATA", "PROCURAÇÃO"}), false));
     }
 
-     private void carregarComboBanco() {
+    private void carregarComboBanco() {
         modelo = new ComboModelo<Banco>(new DAO().listar(Banco.class), cmbBanco);
         cmbBanco.setModel(modelo);
     }
@@ -394,6 +394,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         }
         DialogoTaloesCheque.getDadosTalao(dados, null, closable);
         getModeloTalao().notificarLinha(getModeloTalao().getObjetos().indexOf(dados));
+        preencherCamposCheque();
     }
 
     private void removerTaloes() {
@@ -503,13 +504,21 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
 //        txtAreaAnotacoes.setText(condominio.getAnotacoes());
 
         txtNumeroMinimoTaloes.setText(Util.IntegerToString(condominio.getNumeroMinimoTaloes()));
-        for (DadosTalaoCheque dados : condominio.getDadosTalaoCheques()){
-            if (dados.isEmUso()){
+        preencherCamposCheque();
+
+    }
+
+    private void preencherCamposCheque() {
+        List<DadosTalaoCheque> taloes = new DAO().listar("TaloesPorCondominio", condominio.getCodigo());
+        for (DadosTalaoCheque dados : taloes) {
+            if (dados.isEmUso()) {
                 txtPrimeiroCheque.setText(dados.getNumeroInicial());
                 txtUltimoCheque.setText(dados.getNumeroFinal());
+            } else {
+                txtPrimeiroCheque.setText("");
+                txtUltimoCheque.setText("");
             }
         }
-
     }
 
     private void preencherObjeto() {

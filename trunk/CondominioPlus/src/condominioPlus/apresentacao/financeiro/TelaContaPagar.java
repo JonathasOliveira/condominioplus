@@ -390,8 +390,9 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     }
 
     private DadosTalaoCheque getDadosTalaoCheque() {
-        if (!condominio.getDadosTalaoCheques().isEmpty()) {
-            for (DadosTalaoCheque dados : condominio.getDadosTalaoCheques()) {
+        List<DadosTalaoCheque> taloes = new DAO().listar("TaloesPorCondominio", condominio.getCodigo());
+        if (!taloes.isEmpty()) {
+            for (DadosTalaoCheque dados : taloes) {
                 if (dados.isEmUso()) {
                     return dados;
                 }
@@ -449,8 +450,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             cheques.add(pagamento);
             carregarTabelaCheque();
             limparCampos();
+            txtNumeroDocumento.setText("");
             txtNumeroDocumento.grabFocus();
-            txtNumeroDocumento.setText(condominio.getContaBancaria().getContaCorrente());
         } else {
             verificarDataPagamento(pagamento);
             if (!pagamento.getConta().isCredito()) {
@@ -482,7 +483,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
             if (p.getCodigo() == 0) {
                 p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
             } else {
-                ((DadosDOC)p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+                ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
             }
             List<Pagamento> documentos = new DAO().listar("PagamentosPorForma", Main.getCondominio().getContaPagar(), FormaPagamento.DINHEIRO);
             for (Pagamento documento : documentos) {
