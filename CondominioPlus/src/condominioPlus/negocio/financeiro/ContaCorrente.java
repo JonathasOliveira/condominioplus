@@ -6,6 +6,7 @@ package condominioPlus.negocio.financeiro;
 
 import condominioPlus.negocio.Condominio;
 import condominioPlus.util.ComparadorPagamentoCodigo;
+import condominioPlus.util.ComparadorPagamentoDocumento;
 import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -105,20 +106,22 @@ public class ContaCorrente implements Serializable {
         List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, novaData);
 
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
-
         Collections.sort(pagamentos, comCod);
 
-        ComparatorPagamento comparator = new ComparatorPagamento();
+        ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+        Collections.sort(pagamentos, comDoc);
 
+        ComparatorPagamento comparator = new ComparatorPagamento();
         Collections.sort(pagamentos, comparator);
+
         for (Pagamento pagamento : pagamentos) {
             System.out.println("pagamento " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
         }
-        if (!pagamentos.isEmpty()){
-            if(DataUtil.compararData(DataUtil.getDateTime(pagamentos.get(0).getDataPagamento()), DataUtil.getDateTime(dataFechamento)) == 1 ){
+        if (!pagamentos.isEmpty()) {
+            if (DataUtil.compararData(DataUtil.getDateTime(pagamentos.get(0).getDataPagamento()), DataUtil.getDateTime(dataFechamento)) == 1) {
                 Pagamento p2 = pagamentos.get(0);
                 BigDecimal valor = pagamentos.get(0).getValor();
-                 p2.setSaldo(valor);
+                p2.setSaldo(valor);
             }
         }
 
@@ -151,5 +154,3 @@ public class ContaCorrente implements Serializable {
         this.condominio = condominio;
     }
 }
-    
-
