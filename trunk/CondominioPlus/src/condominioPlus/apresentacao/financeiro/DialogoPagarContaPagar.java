@@ -21,7 +21,6 @@ import condominioPlus.negocio.financeiro.FormaPagamento;
 import condominioPlus.negocio.financeiro.FormaPagamentoEmprestimo;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.TransacaoBancaria;
-import condominioPlus.negocio.fornecedor.Fornecedor;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import java.awt.event.ActionEvent;
@@ -329,7 +328,8 @@ public class DialogoPagarContaPagar extends javax.swing.JDialog {
     private void trocarFormaPagamento() {
         if (btnNumeroDocumentoNovoPagamento.isSelected()) {
             btnNumeroDocumentoNovoPagamento.setText("Nº Cheque:");
-            txtNumeroDocumentoNovoPagamento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
+            txtNumeroDocumentoNovoPagamento.setText("");
+            txtNumeroDocumentoNovoPagamento.grabFocus();
         } else {
             btnNumeroDocumentoNovoPagamento.setText("Nº Doc:");
             txtNumeroDocumentoNovoPagamento.setText(Pagamento.gerarNumeroDocumento());
