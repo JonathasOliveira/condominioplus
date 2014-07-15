@@ -25,6 +25,7 @@ import condominioPlus.negocio.funcionario.FuncionarioUtil;
 import condominioPlus.negocio.funcionario.TipoAcesso;
 import condominioPlus.relatorios.TipoRelatorio;
 import condominioPlus.util.ComparadorPagamentoCodigo;
+import condominioPlus.util.ComparadorPagamentoDocumento;
 import condominioPlus.util.ComparatorPagamento;
 import condominioPlus.util.Relatorios;
 import condominioPlus.util.RenderizadorCelulaCor;
@@ -161,7 +162,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         renderizadorCelulaCor = new RenderizadorCelulaCor(modeloTabela);
         RenderizadorCelulaCorData renderizadorCelula = new RenderizadorCelulaCorData(modeloTabela);
-        RenderizadorCelulaCorDescricao renderizadorCelulaDescricao= new RenderizadorCelulaCorDescricao(modeloTabela);
+        RenderizadorCelulaCorDescricao renderizadorCelulaDescricao = new RenderizadorCelulaCorDescricao(modeloTabela);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setCellRenderer(renderizadorCelula);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setCellRenderer(renderizadorCelulaCor);
@@ -226,11 +227,17 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             pagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
         } else if (dataInicial == null && dataFinal == null) {
             pagamentos = new DAO().listar("PagamentosContaCorrente", condominio.getContaCorrente());
-        }
+        }       
+
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
         Collections.sort(pagamentos, comCod);
+        
+        ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+        Collections.sort(pagamentos, comDoc);
+        
         ComparatorPagamento comparator = new ComparatorPagamento();
         Collections.sort(pagamentos, comparator);
+
         return pagamentos;
     }
 
