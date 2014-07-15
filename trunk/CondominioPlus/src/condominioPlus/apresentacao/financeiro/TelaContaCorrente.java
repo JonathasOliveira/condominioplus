@@ -29,6 +29,7 @@ import condominioPlus.util.ComparatorPagamento;
 import condominioPlus.util.Relatorios;
 import condominioPlus.util.RenderizadorCelulaCor;
 import condominioPlus.util.RenderizadorCelulaCorData;
+import condominioPlus.util.RenderizadorCelulaCorDescricao;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
@@ -160,10 +161,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         renderizadorCelulaCor = new RenderizadorCelulaCor(modeloTabela);
         RenderizadorCelulaCorData renderizadorCelula = new RenderizadorCelulaCorData(modeloTabela);
+        RenderizadorCelulaCorDescricao renderizadorCelulaDescricao= new RenderizadorCelulaCorDescricao(modeloTabela);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(0)).setCellRenderer(renderizadorCelula);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(1)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(2)).setCellRenderer(renderizadorCelulaCor);
-        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(renderizadorCelulaCor);
+        tabelaContaCorrente.getColumn(modeloTabela.getCampo(3)).setCellRenderer(renderizadorCelulaDescricao);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(4)).setCellRenderer(renderizadorCelulaCor);
         tabelaContaCorrente.getColumn(modeloTabela.getCampo(5)).setCellRenderer(renderizadorCelulaCor);
 
@@ -482,7 +484,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     }
 
     public void imprimirRecibo() {
-        new Relatorios().imprimirRecibo(condominio, (Pagamento) modeloTabela.getObjetoSelecionado());
+        List<Pagamento> lista = modeloTabela.getObjetosSelecionados();
+        for (Pagamento p : lista) {
+            new Relatorios().imprimirRecibo(condominio, p);
+        }
     }
 
     public void imprimirExtratoContaIndividual() {
@@ -545,7 +550,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             } else {
                 ApresentacaoUtil.exibirAdvertencia("Não há registros no período selecionado.", this);
             }
-        } else if (dialogo.getBanco() == null){
+        } else if (dialogo.getBanco() == null) {
             ApresentacaoUtil.exibirAdvertencia("Por favor, selecione um banco.", this);
         }
     }
