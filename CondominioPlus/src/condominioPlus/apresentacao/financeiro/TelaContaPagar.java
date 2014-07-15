@@ -519,7 +519,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
     private String fixarHistorico() {
         String texto = "";
-        if (btnFixarHistórico.isSelected()) {
+        if (btnFixarHistorico.isSelected()) {
             texto = txtHistorico.getText();
             return texto;
         } else {
@@ -539,7 +539,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         if (c.getConta() != null) {
             conta = c.getConta();
             txtConta.setText(String.valueOf(conta.getCodigo()));
-            if (!btnFixarHistórico.isSelected()) {
+            if (!btnFixarHistorico.isSelected()) {
                 txtHistorico.setText(conta.getNome());
             } else {
                 txtHistorico.setText(fixarHistorico());
@@ -752,7 +752,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 apagarItensSelecionados();
             } else if (origem == itemMenuPagarSelecionados || origem == itemMenuPagarSelecionadosReceber) {
                 efetuarPagamento();
-            } else if (origem == btnFixarHistórico) {
+            } else if (origem == btnFixarHistorico) {
+                fixarHistorico();
             } else if (origem == btnNumeroDocumento) {
                 trocarFormaPagamento();
             } else if (origem == btnGravar) {
@@ -792,7 +793,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
             btnConta.addActionListener(this);
             btnFornecedor.addActionListener(this);
-            btnFixarHistórico.addActionListener(this);
+            btnFixarHistorico.addActionListener(this);
             btnIncluir.addActionListener(this);
             tabelaContaPagar.addMouseListener(this);
             itemMenuApagarSelecionados.addActionListener(this);
@@ -898,7 +899,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         txtConta = new javax.swing.JTextField();
         btnConta = new javax.swing.JButton();
         txtHistorico = new javax.swing.JTextField();
-        btnFixarHistórico = new javax.swing.JToggleButton();
+        btnFixarHistorico = new javax.swing.JToggleButton();
         txtNumeroDocumento = new javax.swing.JTextField();
         btnNumeroDocumento = new javax.swing.JToggleButton();
         btnImprimir = new javax.swing.JButton();
@@ -985,7 +986,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
 
         txtHistorico.setName("Histórico"); // NOI18N
 
-        btnFixarHistórico.setText("Fixar Histórico");
+        btnFixarHistorico.setText("Fixar Histórico");
 
         btnNumeroDocumento.setText("Nº Doc");
         btnNumeroDocumento.setToolTipText("Clique para alternar o tipo de Registro!");
@@ -1021,7 +1022,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(txtHistorico, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnFixarHistórico)
+                        .addComponent(btnFixarHistorico)
                         .addGap(37, 37, 37)
                         .addComponent(btnIncluir, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1084,7 +1085,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                             .addComponent(txtFornecedor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(btnFixarHistórico, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .addComponent(btnFixarHistorico, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
                     .addComponent(btnIncluir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnImprimir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnGravar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1093,7 +1094,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnFixarHistórico, btnGravar, btnImprimir, btnIncluir});
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnFixarHistorico, btnGravar, btnImprimir, btnIncluir});
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -1351,7 +1352,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConta;
     private javax.swing.JButton btnExibirSaldoCC;
-    private javax.swing.JToggleButton btnFixarHistórico;
+    private javax.swing.JToggleButton btnFixarHistorico;
     private javax.swing.JButton btnFornecedor;
     private javax.swing.JButton btnGravar;
     private javax.swing.JButton btnHoje;

@@ -254,7 +254,12 @@ public class Pagamento implements Serializable {
     }
 
     public static String gerarNumeroDocumento() {
-        Long resultado = (Long) new DAO().localizar("MaxNumeroDocumento");
+        
+        int codigo = (Integer)new DAO().localizar("MaxNumeroDocumento");
+        
+        DadosDOC registro = new DAO().localizar(DadosDOC.class, codigo);
+        
+        Long resultado = Long.parseLong(registro.getNumeroDocumento());
 
         if (resultado == null) {
             resultado = (long) 0;

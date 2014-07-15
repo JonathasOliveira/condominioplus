@@ -16,7 +16,7 @@ import javax.persistence.Table;
  */
 @Entity
 @NamedQueries(value = {
-    @NamedQuery(name = "MaxNumeroDocumento", query = "SELECT Max(d.numeroDocumento) FROM DadosDOC d")
+    @NamedQuery(name = "MaxNumeroDocumento", query = "SELECT Max(d.id) FROM DadosDOC d")
 })
 @Table(name = "dados_doc")
 public class DadosDOC extends DadosPagamento {

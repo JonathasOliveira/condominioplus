@@ -127,7 +127,7 @@
                       <Group type="102" attributes="0">
                           <Component id="txtHistorico" min="-2" pref="365" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="btnFixarHistórico" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnFixarHistorico" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
                           <Component id="btnIncluir" min="-2" pref="36" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
@@ -210,7 +210,7 @@
                   </Group>
                   <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                      <Component id="btnFixarHistórico" linkSize="2" alignment="1" pref="25" max="32767" attributes="1"/>
+                      <Component id="btnFixarHistorico" linkSize="2" alignment="1" pref="25" max="32767" attributes="1"/>
                       <Component id="btnIncluir" linkSize="2" alignment="1" max="32767" attributes="1"/>
                       <Component id="btnImprimir" linkSize="2" alignment="1" max="32767" attributes="1"/>
                       <Component id="btnGravar" linkSize="2" alignment="1" max="32767" attributes="1"/>
@@ -276,7 +276,7 @@
             <Property name="name" type="java.lang.String" value="Hist&#xf3;rico" noResource="true"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JToggleButton" name="btnFixarHist&#xf3;rico">
+        <Component class="javax.swing.JToggleButton" name="btnFixarHistorico">
           <Properties>
             <Property name="text" type="java.lang.String" value="Fixar Hist&#xf3;rico"/>
           </Properties>
