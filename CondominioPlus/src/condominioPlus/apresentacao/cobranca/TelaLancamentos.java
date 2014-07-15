@@ -541,6 +541,33 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 }
             }
         }
+        
+        Comparator c1 = null;
+
+        c1 = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(listaInadimplentes, c1);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca co1 = (Cobranca) o1;
+                Cobranca co2 = (Cobranca) o2;
+                return co1.getUnidade().getUnidade().compareTo(co2.getUnidade().getUnidade());
+            }
+        };
+
+        Collections.sort(listaInadimplentes, c);
+        
         return listaInadimplentes;
     }
 
@@ -613,6 +640,32 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         } else {
             listaPagos = new DAO().listar("CobrancasPagasPorPeriodoUnidade", modeloTabelaCondominos.getObjetoSelecionado(), DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
         }
+        
+        Comparator c1 = null;
+
+        c1 = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca e1 = (Cobranca) o1;
+                Cobranca e2 = (Cobranca) o2;
+                return e1.getDataVencimento().compareTo(e2.getDataVencimento());
+            }
+        };
+
+        Collections.sort(listaPagos, c1);
+
+        Comparator c = null;
+
+        c = new Comparator() {
+
+            public int compare(Object o1, Object o2) {
+                Cobranca co1 = (Cobranca) o1;
+                Cobranca co2 = (Cobranca) o2;
+                return co1.getUnidade().getUnidade().compareTo(co2.getUnidade().getUnidade());
+            }
+        };
+
+        Collections.sort(listaPagos, c);
 
         return listaPagos;
     }
