@@ -321,7 +321,8 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
     private void trocarFormaPagamento() {
         if (btnNumeroDocumento.isSelected()) {
             btnNumeroDocumento.setText("Nº Cheque:");
-            txtNumeroDocumento.setText(Main.getCondominio().getContaBancaria().getContaCorrente());
+            txtNumeroDocumento.setText("");
+            txtNumeroDocumento.grabFocus();
         } else {
             btnNumeroDocumento.setText("Nº Doc:");
             txtNumeroDocumento.setText(Pagamento.gerarNumeroDocumento());
