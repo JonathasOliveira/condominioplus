@@ -300,7 +300,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         Moeda total = new Moeda(BigDecimal.ZERO);
 
         for (Pagamento p : pagamentosUltimoDia) {
-            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
+//            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
             if (p.getConta().isCredito()) {
                 total.soma(p.getValor());
             }
@@ -313,7 +313,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         Moeda total = new Moeda(BigDecimal.ZERO);
 
         for (Pagamento p : pagamentosUltimoDia) {
-            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
+//            System.out.println("pagamento sem comparator " + DataUtil.toString(p.getDataPagamento()) + " " + p.getHistorico());
             if (!p.getConta().isCredito()) {
                 total.soma(p.getValor());
             }

@@ -114,9 +114,9 @@ public class ContaCorrente implements Serializable {
         ComparatorPagamento comparator = new ComparatorPagamento();
         Collections.sort(pagamentos, comparator);
 
-        for (Pagamento pagamento : pagamentos) {
-            System.out.println("pagamento " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
-        }
+//        for (Pagamento pagamento : pagamentos) {
+//            System.out.println("pagamento " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
+//        }
         if (!pagamentos.isEmpty()) {
             if (DataUtil.compararData(DataUtil.getDateTime(pagamentos.get(0).getDataPagamento()), DataUtil.getDateTime(dataFechamento)) == 1) {
                 Pagamento p2 = pagamentos.get(0);
@@ -128,7 +128,7 @@ public class ContaCorrente implements Serializable {
         for (int i = 0; i < pagamentos.size(); i++) {
             if (i != 0) {
                 Pagamento p1 = pagamentos.get(i);
-                System.out.println("p1 " + p1.getHistorico() + " " + DataUtil.toString(p1.getDataPagamento()));
+//                System.out.println("p1 " + p1.getHistorico() + " " + DataUtil.toString(p1.getDataPagamento()));
                 Pagamento pagamentoAnterior = pagamentos.get(i - 1);
                 p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
 
