@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoBradesco" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1143"/>
+	<property name="ireport.y" value="113"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="logoBradesco" class="java.lang.String"/>
@@ -1022,7 +1022,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valordetalhe11}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="4" y="161" width="545" height="164"/>
+				<reportElement x="4" y="161" width="192" height="345"/>
 				<textElement>
 					<font size="5"/>
 				</textElement>
@@ -1089,6 +1089,12 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Bradesco"]]></textFieldExpression>
 			</textField>
+			<line direction="BottomUp">
+				<reportElement x="198" y="154" width="1" height="354"/>
+				<graphicElement>
+					<pen lineWidth="0.75"/>
+				</graphicElement>
+			</line>
 		</band>
 	</detail>
 </jasperReport>
