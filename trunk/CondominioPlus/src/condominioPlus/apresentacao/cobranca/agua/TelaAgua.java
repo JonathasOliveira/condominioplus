@@ -1135,6 +1135,7 @@ public class TelaAgua extends javax.swing.JInternalFrame {
             if (!validarCampos()) {
                 return;
             }
+            new DAO().salvar(conta.getRateios());
             new DAO().salvar(conta);
 
             ApresentacaoUtil.exibirInformacao("Conta Salva com Sucesso!", this);
