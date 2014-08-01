@@ -6,6 +6,7 @@
 package condominioPlus.negocio.cobranca;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 
 /**
  *
@@ -18,6 +19,9 @@ public class ItemCobranca {
     private String descricao = "";
     private BigDecimal valor = new BigDecimal(0);
     private boolean dividirFracaoIdeal;
+    private boolean concederDesconto;
+    private Calendar descontoAte;
+    private BigDecimal valorComDesconto = new BigDecimal(0);
 
     public int getCodigoConta() {
         return codigoConta;
@@ -57,6 +61,30 @@ public class ItemCobranca {
 
     public void setValor(BigDecimal valor) {
         this.valor = valor;
+    }
+
+    public boolean isConcederDesconto() {
+        return concederDesconto;
+    }
+
+    public void setConcederDesconto(boolean concederDesconto) {
+        this.concederDesconto = concederDesconto;
+    }
+
+    public Calendar getDescontoAte() {
+        return descontoAte;
+    }
+
+    public void setDescontoAte(Calendar descontoAte) {
+        this.descontoAte = descontoAte;
+    }
+
+    public BigDecimal getValorComDesconto() {
+        return valorComDesconto;
+    }
+
+    public void setValorComDesconto(BigDecimal valorComDesconto) {
+        this.valorComDesconto = valorComDesconto;
     }
 
 }

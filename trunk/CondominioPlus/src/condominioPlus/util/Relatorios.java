@@ -35,7 +35,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -826,8 +825,42 @@ public class Relatorios implements Printable {
             mapa.put("codigoDeBarras", boleto.getCodigoBarras());
 
             //preenchendo a lista de pagamentos
-            int i = 0;
+            List<Pagamento> listaAuxiliarPagamentos = new ArrayList<Pagamento>();
+            Pagamento ultimoItem = null;
+            Pagamento penultimoItem = null;
+            PAGAMENTOS:
             for (Pagamento p : boleto.getPagamentos()) {
+                if (p.getConta().getCodigo() == 205) {
+                    penultimoItem = p;
+                    continue PAGAMENTOS;
+                }
+                if (p.getConta().getCodigo() == 28103 || p.getConta().getCodigo() == 795) {
+                    ultimoItem = p;
+                    continue PAGAMENTOS;
+                }
+                listaAuxiliarPagamentos.add(p);
+            }
+            
+            Comparator c = null;
+            c = new Comparator() {
+
+                public int compare(Object o1, Object o2) {
+                    Pagamento co1 = (Pagamento) o1;
+                    Pagamento co2 = (Pagamento) o2;
+                    return Integer.valueOf(co1.getConta().getCodigo()).compareTo(Integer.valueOf(co2.getConta().getCodigo()));
+                }
+            };
+            Collections.sort(listaAuxiliarPagamentos, c);
+
+            if (penultimoItem != null) {
+                listaAuxiliarPagamentos.add(penultimoItem);
+            }
+            if (ultimoItem != null) {
+                listaAuxiliarPagamentos.add(ultimoItem);
+            }
+
+            int i = 0;
+            for (Pagamento p : listaAuxiliarPagamentos) {
                 i += 1;
                 mapa.put("detalhe" + i, "   " + p.getDescricao());
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
@@ -1149,13 +1182,13 @@ public class Relatorios implements Printable {
         if (condominio.getPoupanca() != null) {
             saldoPoupanca = saldoPoupanca.add(condominio.getPoupanca().getSaldo());
         }
-        if (condominio.getAplicacao() != null){
+        if (condominio.getAplicacao() != null) {
             saldoAplicacao = saldoAplicacao.add(condominio.getAplicacao().getSaldo());
         }
-        if (condominio.getEmprestimo() != null){
+        if (condominio.getEmprestimo() != null) {
             saldoEmprestismo = saldoEmprestismo.add(condominio.getEmprestimo().getSaldo());
         }
-        if (condominio.getConsignacao() != null){
+        if (condominio.getConsignacao() != null) {
             saldoConsignacao = saldoConsignacao.add(condominio.getConsignacao().getSaldo());
         }
         //fim verificar se o saldo é nulo para nao dar erro ao gerar o relatorio//

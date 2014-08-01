@@ -101,6 +101,14 @@ public class Pagamento implements Serializable {
     private ContratoEmprestimo contratoEmprestimo;
     @ManyToOne
     private Cobranca cobranca;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(name = "desconto_ate")
+    private Calendar descontoAte;
+    @Column(name="valor_com_desconto", precision = 20, scale = 2)
+    private BigDecimal valorComDesconto = new BigDecimal(0);
+    @Column(name="valor_pago", precision = 20, scale = 2)
+    private BigDecimal valorPago = new BigDecimal(0);
+    
 
     public Calendar getDataVencimento() {
         return dataVencimento;
@@ -329,6 +337,30 @@ public class Pagamento implements Serializable {
 
     public void setCobranca(Cobranca cobranca) {
         this.cobranca = cobranca;
+    }
+
+    public Calendar getDescontoAte() {
+        return descontoAte;
+    }
+
+    public void setDescontoAte(Calendar descontoAte) {
+        this.descontoAte = descontoAte;
+    }
+
+    public BigDecimal getValorComDesconto() {
+        return valorComDesconto;
+    }
+
+    public void setValorComDesconto(BigDecimal valorComDesconto) {
+        this.valorComDesconto = valorComDesconto;
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago = valorPago;
     }
 
 }
