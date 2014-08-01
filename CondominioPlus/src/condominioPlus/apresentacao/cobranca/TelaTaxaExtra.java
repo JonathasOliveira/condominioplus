@@ -353,10 +353,19 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
             for (RateioTaxaExtra rateio : parcela.getRateios()) {
                 Cobranca cobranca = new Cobranca();
                 cobranca.setUnidade(rateio.getUnidade());
+                cobranca.setCodigoBanco(rateio.getUnidade().getCondominio().getContaBancaria().getBanco().getNumeroBanco());
+                cobranca.setAgencia(rateio.getUnidade().getCondominio().getContaBancaria().getBanco().getAgencia());
+                if (cobranca.getCodigoBanco().equals("033")){
+                    cobranca.setNumeroConta(rateio.getUnidade().getCondominio().getContaBancaria().getCodigoCedente() );
+                    cobranca.setDigitoConta(rateio.getUnidade().getCondominio().getContaBancaria().getDigitoCedente());
+                } else if(cobranca.getCodigoBanco().equals("237")){
+                    cobranca.setNumeroConta(rateio.getUnidade().getCondominio().getContaBancaria().getContaCorrente());
+                    cobranca.setDigitoConta(rateio.getUnidade().getCondominio().getContaBancaria().getDigitoCorrente());
+                }
                 cobranca.setValorTotal(new BigDecimal(0));
                 cobranca.setValorOriginal(new BigDecimal(0));
                 cobranca.setDataVencimento(rateio.getDataVencimento());
-                cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(condominio, DataUtil.getDateTime(cobranca.getDataVencimento())));
+                cobranca.setNumeroDocumento(BoletoBancario.gerarNumeroDocumento(cobranca, DataUtil.getDateTime(cobranca.getDataVencimento())));
 
                 rateio.setCobranca(cobranca);
                 Pagamento pagamento = new Pagamento();
@@ -397,7 +406,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
 
         List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
         for (DadosCorrespondencia dados : listaDados) {
-            boletos.add(BoletoBancario.gerarBoleto(condominio, dados));
+            boletos.add(BoletoBancario.gerarBoleto(dados));
         }
 
         /*

@@ -127,6 +127,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         tabelaCobranca.getColumn(modeloTabela.getCampo(4)).setMaxWidth(70);
         tabelaCobranca.getColumn(modeloTabela.getCampo(5)).setMaxWidth(55);
         tabelaCobranca.getColumn(modeloTabela.getCampo(6)).setMinWidth(65);
+        
         tabelaCobranca.getColumn(modeloTabela.getCampo(2)).setCellRenderer(direito);
         tabelaCobranca.getColumn(modeloTabela.getCampo(3)).setCellRenderer(centralizado);
         tabelaCobranca.getColumn(modeloTabela.getCampo(4)).setCellRenderer(centralizado);
@@ -842,18 +843,18 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(66, 66, 66)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(chkCalcularMultaProximoMes)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel6)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)))
-                        .addGap(28, 28, 28)
-                        .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
                         .addGap(252, 252, 252)
-                        .addComponent(spnNumeroMinimoInamplencia, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)))
+                        .addComponent(spnNumeroMinimoInamplencia, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE))
+                            .addComponent(jLabel6))
+                        .addGap(28, 28, 28)
+                        .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(chkCalcularMultaProximoMes))
                 .addGap(201, 201, 201))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap(264, Short.MAX_VALUE)
@@ -984,7 +985,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();

@@ -62,8 +62,8 @@ public class Cobranca implements Serializable {
     private BigDecimal juros = new BigDecimal(0);
     @Column(name = "diferenca_pagamento", precision = 20, scale = 2)
     private BigDecimal diferencaPagamento = new BigDecimal(0);
-    @Column(name = "desconto", precision = 20, scale = 2)
-    private BigDecimal desconto = new BigDecimal(0);
+//    @Column(name = "desconto", precision = 20, scale = 2)
+//    private BigDecimal desconto = new BigDecimal(0);
     @Column(precision = 20, scale = 2)
     private BigDecimal multa = new BigDecimal(0);
     @OneToMany(mappedBy = "cobranca", cascade = CascadeType.ALL)
@@ -77,6 +77,18 @@ public class Cobranca implements Serializable {
     @ManyToOne
     private HistoricoAcordo historico;
     private boolean exibir = true;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    @Column(name = "desconto_ate")
+    private Calendar descontoAte;
+    @Column(name="total_com_desconto", precision = 20, scale = 2)
+    private BigDecimal totalComDesconto = new BigDecimal(0);
+    @Column(name="codigo_banco")
+    private String codigoBanco = "";
+    @Column(name="numero_conta")
+    private String numeroConta = "";
+    @Column(name="digito_conta")
+    private String digitoConta = "";
+    private String agencia = "";
 
     public int getCodigo() {
         return codigo;
@@ -174,13 +186,13 @@ public class Cobranca implements Serializable {
         this.diferencaPagamento = diferencaPagamento;
     }
 
-    public BigDecimal getDesconto() {
-        return desconto;
-    }
-
-    public void setDesconto(BigDecimal desconto) {
-        this.desconto = desconto;
-    }
+//    public BigDecimal getDesconto() {
+//        return desconto;
+//    }
+//
+//    public void setDesconto(BigDecimal desconto) {
+//        this.desconto = desconto;
+//    }
    
     public Calendar getVencimentoProrrogado() {
         return vencimentoProrrogado;
@@ -228,6 +240,54 @@ public class Cobranca implements Serializable {
 
     public void setExibir(boolean exibir) {
         this.exibir = exibir;
+    }
+
+    public Calendar getDescontoAte() {
+        return descontoAte;
+    }
+
+    public void setDescontoAte(Calendar descontoAte) {
+        this.descontoAte = descontoAte;
+    }
+
+    public BigDecimal getTotalComDesconto() {
+        return totalComDesconto;
+    }
+
+    public void setTotalComDesconto(BigDecimal totalComDesconto) {
+        this.totalComDesconto = totalComDesconto;
+    }
+
+    public String getCodigoBanco() {
+        return codigoBanco;
+    }
+
+    public void setCodigoBanco(String codigoBanco) {
+        this.codigoBanco = codigoBanco;
+    }
+
+    public String getNumeroConta() {
+        return numeroConta;
+    }
+
+    public void setNumeroConta(String numeroConta) {
+        this.numeroConta = numeroConta;
+    }
+
+    public String getDigitoConta() {
+        return digitoConta;
+    }
+
+    public void setDigitoConta(String digitoConta) {
+        this.digitoConta = digitoConta;
+    }
+
+    public String getAgencia() {
+        return agencia;
+    }
+
+    public void setAgencia(String agencia) {
+        this.agencia = agencia;
     }
     
     @Override
