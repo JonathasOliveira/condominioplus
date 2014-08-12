@@ -932,7 +932,7 @@ public class Relatorios implements Printable {
             mapa.put("data", DataUtil.toString(p.getDataPagamento()));
             mapa.put("documento", getNumeroDocumento(p));
             mapa.put("codigoConta", p.getConta().getCodigo() + "");
-            mapa.put("historico", p.getHistorico() + " (" + p.getFornecedor().toUpperCase() + ")");
+            mapa.put("historico", p.getHistorico().toUpperCase() + " (" + p.getFornecedor().toUpperCase() + ")");
             mapa.put("valor", PagamentoUtil.formatarMoeda(p.getValor().doubleValue()));
             mapa.put("saldo", PagamentoUtil.formatarMoeda(p.getSaldo().doubleValue()));
 
@@ -1265,7 +1265,7 @@ public class Relatorios implements Printable {
                 HashMap<String, String> mapa2 = new HashMap();
                 mapa2.put("data", DataUtil.toString(pagamento.getDataPagamento()));
                 mapa2.put("documento", getNumeroDocumento(pagamento));
-                mapa2.put("historico", pagamento.getHistorico() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
+                mapa2.put("historico", pagamento.getHistorico().toUpperCase() + " (" + pagamento.getFornecedor().toUpperCase() + ")");
                 mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                 listaPagamentos.add(mapa2);
             }
