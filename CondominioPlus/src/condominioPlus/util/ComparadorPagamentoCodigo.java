@@ -14,6 +14,7 @@ import java.util.Comparator;
 public class ComparadorPagamentoCodigo implements Comparator<Pagamento> {
 
     public int compare(Pagamento p1, Pagamento p2) {
-        return p1.getCodigo() > p2.getCodigo() ? 1 : 0; // aqui vc implementa o metodo compare(Object o1, Object o2) da interface Comparator
+        return Integer.valueOf(p1.getCodigo()).compareTo(Integer.valueOf(p2.getCodigo()));
+//        return p1.getCodigo().compareTo(p2.getCodigo()); // aqui vc implementa o metodo compare(Object o1, Object o2) da interface Comparator
     }
 }
