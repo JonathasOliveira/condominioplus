@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JComboBox;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import logicpoint.apresentacao.ApresentacaoUtil;
@@ -97,7 +96,7 @@ public class TelaDadosFornecedor extends javax.swing.JInternalFrame implements I
 
             TelaPrincipal.getInstancia().notificarClasse(fornecedor);
 
-            String descricao = "Cadastro do Contas " + fornecedor.getNome() + ".";
+            String descricao = "Cadastro do Fornecedor " + fornecedor.getNome() + ".";
             FuncionarioUtil.registrar(tipo, descricao);
 
             sair();

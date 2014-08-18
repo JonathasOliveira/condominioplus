@@ -173,7 +173,7 @@ public class TelaConta extends javax.swing.JInternalFrame implements Notificavel
         for (Conta c : contas) {
             for (String s : sequencias) {
                 String codigo = String.valueOf(c.getCodigo());
-                System.out.println(codigo);
+//                System.out.println(codigo);
                 if (!codigo.toUpperCase().contains(s)) {
                     continue CONTAS;
                 }
