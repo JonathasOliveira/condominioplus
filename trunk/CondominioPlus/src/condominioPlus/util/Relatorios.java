@@ -350,6 +350,7 @@ public class Relatorios implements Printable {
         UNIDADES:
         for (Unidade u : listaUnidades) {
             BigDecimal somaGeral = new BigDecimal(0);
+            BigDecimal somaDiferenca = new BigDecimal(0);
             List<HashMap<String, Object>> listaCobrancas = new ArrayList<HashMap<String, Object>>();
 
             List<Cobranca> cobrancas = new ArrayList<Cobranca>();
@@ -360,6 +361,7 @@ public class Relatorios implements Printable {
                     HashMap<String, Object> mapa = new HashMap();
 
                     somaGeral = somaGeral.add(co.getValorPago());
+                    somaDiferenca = somaDiferenca.add(co.getDiferencaPagamento());
 
                     somaValorOriginal = somaValorOriginal.add(co.getValorTotal());
                     somaJuros = somaJuros.add(co.getJuros());
@@ -373,6 +375,13 @@ public class Relatorios implements Printable {
                     mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
                     mapa.put("dataPagamento", DataUtil.toString(co.getDataPagamento()));
                     mapa.put("valorPago", PagamentoUtil.formatarMoeda(co.getValorPago().doubleValue()));
+                    mapa.put("descontoAte", co.getDescontoAte() != null ? DataUtil.toString(co.getDescontoAte()) : "");
+                    String valorComDesconto = "";
+                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0){
+                        valorComDesconto = PagamentoUtil.formatarMoeda(co.getTotalComDesconto().doubleValue());
+                    }
+                    mapa.put("valorComDesconto", valorComDesconto);
+                    mapa.put("diferenca", PagamentoUtil.formatarMoeda(co.getDiferencaPagamento().negate().doubleValue()));
 
                     List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
 
@@ -397,6 +406,7 @@ public class Relatorios implements Printable {
                 mapa2.put("unidade", u.getUnidade());
                 mapa2.put("nome", u.getCondomino().getNome());
                 mapa2.put("totalGeral", PagamentoUtil.formatarMoeda(somaGeral.doubleValue()));
+                mapa2.put("somaDiferenca", PagamentoUtil.formatarMoeda(somaDiferenca.negate().doubleValue()));
                 mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
                 lista.add(mapa2);
             }
@@ -524,7 +534,7 @@ public class Relatorios implements Printable {
         cobranca.setValorTotal(cobranca.getValorTotal().add(cobranca.getValorOriginal()));
         for (Pagamento pagamento : cobranca.getPagamentos()) {
             //codigo da conta tarifa bancaria
-            if (pagamento.getConta().getCodigo() == 28103) {
+            if (pagamento.getConta().getCodigo() == 28103 || pagamento.getConta().getCodigo() == 795) {
                 diferenca.soma(pagamento.getValor());
                 cobranca.setValorTotal(cobranca.getValorTotal().subtract(pagamento.getValor()));
             }

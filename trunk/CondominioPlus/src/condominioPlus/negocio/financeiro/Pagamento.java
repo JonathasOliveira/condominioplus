@@ -32,7 +32,7 @@ import logicpoint.persistencia.DAO;
     @NamedQuery(name = "PagamentosContaCorrentePorNumeroDocumento", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true and c.dataPagamento >= ?2 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosEfetuadosPorConta", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.pago = true and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.conta = ?4 order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosConciliacao", query = "SELECT c FROM Pagamento c WHERE c.conciliacao = ?1 and c.pago = false order by c.dataPagamento"),
-    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.pago =  true order by c.dataPagamento"),
+    @NamedQuery(name = "PagamentosPorData", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento > ?2 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosDoDia", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "PagamentosDoMes", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 and c.dataPagamento >= ?2 and c.dataPagamento <= ?3 and c.pago =  true order by c.dataPagamento"),
     @NamedQuery(name = "Pagamentos", query = "SELECT c FROM Pagamento c WHERE c.contaCorrente = ?1 order by c.dataPagamento"),
@@ -106,8 +106,8 @@ public class Pagamento implements Serializable {
     private Calendar descontoAte;
     @Column(name="valor_com_desconto", precision = 20, scale = 2)
     private BigDecimal valorComDesconto = new BigDecimal(0);
-    @Column(name="valor_pago", precision = 20, scale = 2)
-    private BigDecimal valorPago = new BigDecimal(0);
+    @Column(name="valor_original", precision = 20, scale = 2)
+    private BigDecimal valorOriginal = new BigDecimal(0);
     
 
     public Calendar getDataVencimento() {
@@ -220,14 +220,14 @@ public class Pagamento implements Serializable {
         return hash;
     }
 
-    public void calcularSaldo() {
-        List<Pagamento> lista = new DAO().listar(Pagamento.class, "PagamentosPorData", this.getDataPagamento());
-
-        Pagamento p = lista.get(lista.size() - 1);
-
-        this.setSaldo(this.valor.add(p.getSaldo()));
-
-    }
+//    public void calcularSaldo() {
+//        List<Pagamento> lista = new DAO().listar(Pagamento.class, "PagamentosPorData", this.getDataPagamento());
+//
+//        Pagamento p = lista.get(lista.size() - 1);
+//
+//        this.setSaldo(this.valor.add(p.getSaldo()));
+//
+//    }
 
     public boolean isPago() {
         return pago;
@@ -355,12 +355,12 @@ public class Pagamento implements Serializable {
         this.valorComDesconto = valorComDesconto;
     }
 
-    public BigDecimal getValorPago() {
-        return valorPago;
+    public BigDecimal getValorOriginal() {
+        return valorOriginal;
     }
 
-    public void setValorPago(BigDecimal valorPago) {
-        this.valorPago = valorPago;
+    public void setValorOriginal(BigDecimal valorOriginal) {
+        this.valorOriginal = valorOriginal;
     }
 
 }

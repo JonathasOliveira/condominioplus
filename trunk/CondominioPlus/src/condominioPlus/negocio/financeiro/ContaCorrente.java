@@ -10,6 +10,7 @@ import condominioPlus.util.ComparadorPagamentoDocumento;
 import condominioPlus.util.ComparatorPagamento;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -96,40 +97,60 @@ public class ContaCorrente implements Serializable {
     public void calculaSaldo(ContaCorrente contaCorrente) {
 
         Calendar novaData = Calendar.getInstance();
+        Calendar dataAnterior = Calendar.getInstance();
 
         novaData = DataUtil.getCalendar(dataFechamento);
 
+        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+        ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+        ComparatorPagamento comparator = new ComparatorPagamento();
 
-        novaData.add(Calendar.DAY_OF_MONTH, -1);
+        //auxilia na verificacao do saldo do ultimo registro do dia anterior ao fechamento do caixa
+        dataAnterior = DataUtil.getCalendar(dataFechamento);
+        dataAnterior.add(Calendar.DAY_OF_MONTH, -9);
+        List<Pagamento> listaAuxiliar = new DAO().listar(Pagamento.class, "PagamentosDoDia", this, dataAnterior, novaData);
+
+        Collections.sort(listaAuxiliar, comCod);
+        Collections.sort(listaAuxiliar, comDoc);
+        Collections.sort(listaAuxiliar, comparator);
+
+        BigDecimal saldoAnterior = new BigDecimal(0);
+        if (!listaAuxiliar.isEmpty()) {
+            saldoAnterior = saldoAnterior.add(listaAuxiliar.get(listaAuxiliar.size() - 1).getSaldo());
+        }
+        //fim
+
+
+//        novaData.add(Calendar.DAY_OF_MONTH, -1);
         System.out.println("data " + DataUtil.toString(novaData));
 
-        List<Pagamento> pagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, novaData);
+        List<Pagamento> listaPagamentos = new DAO().listar(Pagamento.class, "PagamentosPorData", this, novaData);
 
-        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
-        Collections.sort(pagamentos, comCod);
+//        ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+        Collections.sort(listaPagamentos, comCod);
+//        ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+        Collections.sort(listaPagamentos, comDoc);
+//        ComparatorPagamento comparator = new ComparatorPagamento();
+        Collections.sort(listaPagamentos, comparator);
 
-        ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
-        Collections.sort(pagamentos, comDoc);
-
-        ComparatorPagamento comparator = new ComparatorPagamento();
-        Collections.sort(pagamentos, comparator);
 
 //        for (Pagamento pagamento : pagamentos) {
 //            System.out.println("pagamento " + pagamento.getHistorico() + " " + DataUtil.toString(pagamento.getDataPagamento()));
 //        }
-        if (!pagamentos.isEmpty()) {
-            if (DataUtil.compararData(DataUtil.getDateTime(pagamentos.get(0).getDataPagamento()), DataUtil.getDateTime(dataFechamento)) == 1) {
-                Pagamento p2 = pagamentos.get(0);
-                BigDecimal valor = pagamentos.get(0).getValor();
+        if (!listaPagamentos.isEmpty()) {
+            if (DataUtil.compararData(DataUtil.getDateTime(listaPagamentos.get(0).getDataPagamento()), DataUtil.getDateTime(dataFechamento)) == 1) {
+                Pagamento p2 = listaPagamentos.get(0);
+                BigDecimal valor = listaPagamentos.get(0).getValor();
+                valor = valor.add(saldoAnterior);
                 p2.setSaldo(valor);
             }
         }
 
-        for (int i = 0; i < pagamentos.size(); i++) {
+        for (int i = 0; i < listaPagamentos.size(); i++) {
             if (i != 0) {
-                Pagamento p1 = pagamentos.get(i);
+                Pagamento p1 = listaPagamentos.get(i);
 //                System.out.println("p1 " + p1.getHistorico() + " " + DataUtil.toString(p1.getDataPagamento()));
-                Pagamento pagamentoAnterior = pagamentos.get(i - 1);
+                Pagamento pagamentoAnterior = listaPagamentos.get(i - 1);
                 p1.setSaldo(pagamentoAnterior.getSaldo().add(p1.getValor()));
 
 //                if (p1.getConta().isCredito()) {
@@ -142,7 +163,7 @@ public class ContaCorrente implements Serializable {
             }
         }
 
-        contaCorrente.setPagamentos(pagamentos);
+        contaCorrente.setPagamentos(listaPagamentos);
         new DAO().salvar(contaCorrente);
     }
 

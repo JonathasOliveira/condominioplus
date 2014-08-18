@@ -13,6 +13,9 @@
 	<field name="vencimento" class="java.lang.String"/>
 	<field name="dataPagamento" class="java.lang.String"/>
 	<field name="valorPago" class="java.lang.String"/>
+	<field name="diferenca" class="java.lang.String"/>
+	<field name="descontoAte" class="java.lang.String"/>
+	<field name="valorComDesconto" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -22,39 +25,60 @@
 				<reportElement positionType="Float" x="0" y="0" width="554" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="14" y="0" width="76" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="4" y="0" width="76" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="138" y="0" width="81" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="154" y="0" width="81" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Valor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="358" y="0" width="84" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="372" y="0" width="54" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
-				<text><![CDATA[Data do Pgto]]></text>
+				<text><![CDATA[Data Pgto.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="482" y="0" width="60" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="435" y="0" width="60" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Valores Pagos]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="250" y="0" width="69" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="85" y="0" width="54" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Vencimento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="501" y="0" width="51" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Diferença]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="0" width="54" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Desconto até]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="301" y="0" width="64" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Valor c/ Desc.]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -66,39 +90,60 @@
 				</reportElement>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="128" y="0" width="61" height="12"/>
+				<reportElement x="144" y="0" width="61" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valor}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="250" y="0" width="69" height="12"/>
+				<reportElement x="85" y="0" width="54" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{vencimento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="480" y="0" width="60" height="12"/>
+				<reportElement positionType="Float" x="430" y="0" width="57" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorPago}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="358" y="0" width="84" height="12"/>
+				<reportElement positionType="Float" x="372" y="0" width="54" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{dataPagamento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="14" y="0" width="76" height="12"/>
+				<reportElement x="4" y="0" width="76" height="12"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{documento}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="500" y="0" width="41" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{diferenca}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="240" y="0" width="54" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{descontoAte}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="301" y="0" width="51" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorComDesconto}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

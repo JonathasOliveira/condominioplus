@@ -15,6 +15,7 @@ import com.sun.jna.Native;
 import condominioPlus.Main;
 import condominioPlus.negocio.DadosTalaoCheque;
 import condominioPlus.negocio.financeiro.Conta;
+import condominioPlus.negocio.financeiro.DadosBoleto;
 import condominioPlus.negocio.financeiro.DadosCheque;
 import condominioPlus.negocio.financeiro.DadosDOC;
 import condominioPlus.negocio.financeiro.FormaPagamento;
@@ -94,7 +95,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
                     case 1:
                         return pagamento.getConta().getCodigo();
                     case 2:
-                        return pagamento.getForma() == FormaPagamento.CHEQUE ? String.valueOf(((DadosCheque) pagamento.getDadosPagamento()).getNumero()) : String.valueOf(((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento());
+                        return compararForma(pagamento);
                     case 3:
                         return pagamento.getValor().negate();
                     default:
@@ -126,11 +127,15 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         List<Pagamento> novaLista = new ArrayList<Pagamento>();
         for (Pagamento p : lista) {
             if (pagamento.getForma() == FormaPagamento.CHEQUE && p.getForma() == FormaPagamento.CHEQUE) {
-                if (((DadosCheque) pagamento.getDadosPagamento()).getNumero() == ((DadosCheque) p.getDadosPagamento()).getNumero()) {
+                if (((DadosCheque) pagamento.getDadosPagamento()).getNumero().equals(((DadosCheque) p.getDadosPagamento()).getNumero())) {
                     novaLista.add(p);
                 }
             } else if (pagamento.getForma() == FormaPagamento.DINHEIRO && p.getForma() == FormaPagamento.DINHEIRO) {
-                if (((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento() == ((DadosDOC) p.getDadosPagamento()).getNumeroDocumento()) {
+                if (((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento().equals(((DadosDOC) p.getDadosPagamento()).getNumeroDocumento())) {
+                    novaLista.add(p);
+                }
+            } else if (pagamento.getForma() == FormaPagamento.BOLETO && p.getForma() == FormaPagamento.BOLETO) {
+                if (((DadosBoleto) pagamento.getDadosPagamento()).getNumeroBoleto().equals(((DadosBoleto) p.getDadosPagamento()).getNumeroBoleto())) {
                     novaLista.add(p);
                 }
             }
@@ -155,8 +160,17 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         return listaModificada;
     }
 
-    private String compararForma() {
-        return pagamento.getForma() == FormaPagamento.CHEQUE ? ((DadosCheque) pagamento.getDadosPagamento()).getNumero() : ((DadosDOC) pagamento.getDadosPagamento()).getNumeroDocumento();
+    private String compararForma(Pagamento p) {
+
+        if (p.getForma() == FormaPagamento.CHEQUE) {
+            return ((DadosCheque) p.getDadosPagamento()).getNumero();
+        } else if (p.getForma() == FormaPagamento.DINHEIRO) {
+            return ((DadosDOC) p.getDadosPagamento()).getNumeroDocumento();
+        } else if (p.getForma() == FormaPagamento.BOLETO) {
+            return ((DadosBoleto) p.getDadosPagamento()).getNumeroBoleto();
+        }
+
+        return "";
     }
 
     private void preencherTela() {
@@ -170,7 +184,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             trocarFormaPagamento();
         }
         txtHistorico.setText(pagamento.getHistorico());
-        txtNumeroDocumento.setText(compararForma());
+        txtNumeroDocumento.setText(compararForma(pagamento));
         txtValor.setText(String.valueOf(pagamento.getValor()));
         txtFornecedor.setText(pagamento.getFornecedor());
 
@@ -214,11 +228,17 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
                 ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
             }
         } else {
-            p.setForma(FormaPagamento.DINHEIRO);
-            if (p.getCodigo() == 0) {
-                p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
-            } else {
-                ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+            if (p.getForma() == FormaPagamento.DINHEIRO) {
+                System.out.println("dentro da forma pagamento dinheiro");
+                p.setForma(FormaPagamento.DINHEIRO);
+                if (p.getCodigo() == 0) {
+                    p.setDadosPagamento(new DadosDOC(txtNumeroDocumento.getText()));
+                } else {
+                    ((DadosDOC) p.getDadosPagamento()).setNumeroDocumento(txtNumeroDocumento.getText());
+                }
+            } else if (p.getForma() == FormaPagamento.BOLETO) {
+                p.setForma(FormaPagamento.BOLETO);
+                ((DadosBoleto) p.getDadosPagamento()).setNumeroBoleto(txtNumeroDocumento.getText());
             }
         }
     }
@@ -264,7 +284,6 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
     }
 
     private void salvar() {
-
         if (btnNumeroDocumento.isSelected()) {
             if (!getDadosTalaoCheque().verificarIntervaloCheque(txtNumeroDocumento.getText())) {
                 ApresentacaoUtil.exibirAdvertencia("Número do cheque incorreto! Digite um numero entre " + getDadosTalaoCheque().getNumeroInicial() + " - " + getDadosTalaoCheque().getNumeroFinal(), this);
@@ -274,8 +293,8 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             }
         }
         preencherObjeto();
-
-        if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1) {
+        
+         if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1) {
             ApresentacaoUtil.exibirAdvertencia("Não é possível editar o pagamento. Caixa Fechado!", this);
             return;
         }
@@ -291,18 +310,19 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
                         if (p.getDadosPagamento() != null) {
                             p.setDadosPagamento(pagamento.getDadosPagamento());
                         }
-
                         p.setFornecedor(pagamento.getFornecedor());
                     }
-
-
                 } else {
                     if (pagamento.getContratoEmprestimo() == null) {
-                        p.setForma(FormaPagamento.DINHEIRO);
-                        p.setDadosPagamento(pagamento.getDadosPagamento());
-                        p.setFornecedor(pagamento.getFornecedor());
-
-
+                        if (pagamento.getForma() == FormaPagamento.DINHEIRO) {
+                            p.setForma(FormaPagamento.DINHEIRO);
+                            p.setDadosPagamento(pagamento.getDadosPagamento());
+                            p.setFornecedor(pagamento.getFornecedor());
+                        } else if (pagamento.getForma() == FormaPagamento.BOLETO) {
+                            p.setForma(FormaPagamento.BOLETO);
+//                            p.setDadosPagamento(pagamento.getDadosPagamento());
+                            p.setFornecedor(pagamento.getFornecedor());
+                        }
                     }
                 }
             }
@@ -315,11 +335,11 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         new DAO().salvar(pagamento);
         dispose();
 
-
     }
 
     private void trocarFormaPagamento() {
         if (btnNumeroDocumento.isSelected()) {
+            System.out.println("é um cheque");
             btnNumeroDocumento.setText("Nº Cheque:");
             txtNumeroDocumento.setText("");
             txtNumeroDocumento.grabFocus();

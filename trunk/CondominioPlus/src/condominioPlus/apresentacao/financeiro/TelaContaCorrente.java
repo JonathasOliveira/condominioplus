@@ -227,14 +227,14 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             pagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dataInicial), DataUtil.getCalendar(dataFinal));
         } else if (dataInicial == null && dataFinal == null) {
             pagamentos = new DAO().listar("PagamentosContaCorrente", condominio.getContaCorrente());
-        }       
+        }
 
         ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
         Collections.sort(pagamentos, comCod);
-        
+
         ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
         Collections.sort(pagamentos, comDoc);
-        
+
         ComparatorPagamento comparator = new ComparatorPagamento();
         Collections.sort(pagamentos, comparator);
 
@@ -449,7 +449,6 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um registro para removê-lo!", this);
         }
-
     }
 
     private void editarPagamento() {
@@ -461,6 +460,24 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             calcularSaldo();
         } else {
             ApresentacaoUtil.exibirAdvertencia("Selecione pelo menos um pagamento!", this);
+        }
+    }
+
+    private void editarDataPagamento() {
+        DialogoEditarDataPagamento dialogo = new DialogoEditarDataPagamento(null, true);
+        dialogo.setVisible(true);
+
+        if (!dialogo.getCancelar() && dialogo.getDataPagamento() != null) {
+            List<Pagamento> lista = modeloTabela.getObjetosSelecionados();
+            for (Pagamento p : lista) {
+                if (DataUtil.compararData(DataUtil.getDateTime(p.getDataPagamento()), DataUtil.getDateTime(contaCorrente.getDataFechamento())) == -1) {
+                    ApresentacaoUtil.exibirAdvertencia("Não é possível editar o(s) pagamento(s). Caixa Fechado!", this);
+                    return;
+                }
+                p.setDataPagamento(DataUtil.getCalendar(dialogo.getDataPagamento()));
+            }
+            new DAO().salvar(lista);
+            calcularSaldo();
         }
     }
 
@@ -476,6 +493,10 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
                 ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
                 Collections.sort(listaPagamentos, comCod);
+
+                ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+                Collections.sort(listaPagamentos, comDoc);
+
                 ComparatorPagamento comparator = new ComparatorPagamento();
                 Collections.sort(listaPagamentos, comparator);
 
@@ -604,6 +625,8 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 preencherTelaComSaldos();
             } else if (origem == itemMenuEditarPagamento) {
                 editarPagamento();
+            } else if (origem == itemMenuEditarDataPagamento) {
+                editarDataPagamento();
             } else if (origem == radioPeriodo || origem == radioTodos) {
                 if (origem == radioPeriodo) {
                     Calendar dat1 = Calendar.getInstance();
@@ -651,6 +674,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
             itemMenuApagarSelecionados.addActionListener(this);
             btnVisualizarSaldos.addActionListener(this);
             itemMenuEditarPagamento.addActionListener(this);
+            itemMenuEditarDataPagamento.addActionListener(this);
             radioPeriodo.addActionListener(this);
             radioTodos.addActionListener(this);
             txtDataInicial.addChangeListener(this);
@@ -691,6 +715,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         popupMenu = new javax.swing.JPopupMenu();
         itemMenuApagarSelecionados = new javax.swing.JMenuItem();
         itemMenuEditarPagamento = new javax.swing.JMenuItem();
+        itemMenuEditarDataPagamento = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirExtrato = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
@@ -749,6 +774,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
 
         itemMenuEditarPagamento.setText("Editar Pagamento Selecionado");
         popupMenu.add(itemMenuEditarPagamento);
+
+        itemMenuEditarDataPagamento.setText("Editar Data - Pagamentos Selecionados");
+        popupMenu.add(itemMenuEditarDataPagamento);
         popupMenu.add(jSeparator1);
 
         itemMenuImprimirExtrato.setText("Imprimir Extrato Conta Corrente");
@@ -782,7 +810,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         setClosable(true);
         setTitle("Conta Corrente");
 
-        tabelaContaCorrente.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
+        tabelaContaCorrente.setFont(new java.awt.Font("Tahoma", 0, 9));
         tabelaContaCorrente.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -1077,7 +1105,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -1110,7 +1138,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1127,6 +1155,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JComboBox cbFiltros;
     private javax.swing.JMenuItem itemMenuApagarSelecionados;
+    private javax.swing.JMenuItem itemMenuEditarDataPagamento;
     private javax.swing.JMenuItem itemMenuEditarPagamento;
     private javax.swing.JMenuItem itemMenuImprimirBalanceteAnalitico;
     private javax.swing.JMenuItem itemMenuImprimirBalanceteSintetico;
