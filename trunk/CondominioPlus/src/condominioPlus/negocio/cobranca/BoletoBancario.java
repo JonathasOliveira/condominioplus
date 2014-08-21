@@ -4,6 +4,8 @@
  */
 package condominioPlus.negocio.cobranca;
 
+import condominioPlus.Main;
+import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
@@ -65,6 +67,7 @@ public class BoletoBancario {
     private String mensagem2;
     private String mensagem3;
     private String mensagem4;
+    private String mensagem0;
 
     public String getAceite() {
         return aceite;
@@ -306,6 +309,14 @@ public class BoletoBancario {
         this.mensagem4 = mensagem4;
     }
 
+    public String getMensagem0() {
+        return mensagem0;
+    }
+
+    public void setMensagem0(String mensagem0) {
+        this.mensagem0 = mensagem0;
+    }
+
     public static void mostreBoletoNaTela(File arquivoBoleto) {
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
 
@@ -378,19 +389,25 @@ public class BoletoBancario {
     }
 
     public static String gerarNumeroDocumento(Cobranca cobranca, DateTime data) {
+        
+        Condominio condominio = Main.getCondominio();
 
         String resultado;
 
-        int incremento = NegocioUtil.getConfiguracao().getIncrementoNumeroDocumento();
+        int incremento = condominio.getIncrementoNumeroDocumento();
+        String incr = "" + incremento;
+        while (incr.length() < 5) {
+            incr = "0" + incr;
+        }
 
-        System.out.println("incremento: " + incremento);
+        System.out.println("incremento: " + incr);
 
         String mes = String.valueOf(data.getMonthOfYear());
         if (mes.length() == 1) {
             mes = "0" + mes;
         }
 
-        resultado = cobranca.getUnidade().getCondominio().getCodigo() + mes + incremento;
+        resultado = condominio.getCodigo() + mes + incr;
 
         // verificar o banco antes de gerar o NumeroDocumento
         if (cobranca.getCodigoBanco().equals("033")) {
@@ -404,12 +421,12 @@ public class BoletoBancario {
         }
 
         if (incremento == 99999) {
-            NegocioUtil.getConfiguracao().setIncrementoNumeroDocumento(10000);
+            condominio.setIncrementoNumeroDocumento(1);
         } else {
             incremento += 1;
-            NegocioUtil.getConfiguracao().setIncrementoNumeroDocumento(incremento);
+            condominio.setIncrementoNumeroDocumento(incremento);
         }
-        new DAO().salvar(NegocioUtil.getConfiguracao());
+        new DAO().salvar(condominio);
 
         System.out.println("resultado" + resultado);
 
@@ -720,6 +737,11 @@ public class BoletoBancario {
         boleto.setMensagem2(mensagens.get(1).getMensagem());
         boleto.setMensagem3(mensagens.get(2).getMensagem());
         boleto.setMensagem4(mensagens.get(3).getMensagem());
+
+        //se tiver desconto no condominio, mostrar essa mensagem
+        if (dados.getCobranca().getDescontoAte() != null) {
+            boleto.setMensagem0("ATÉ DIA " + DataUtil.toString(dados.getCobranca().getDescontoAte()) + ", CONCEDER 10% DE DESCONTO - " + PagamentoUtil.formatarMoeda(dados.getCobranca().getTotalComDesconto().doubleValue()));
+        }
 
         return boleto;
     }

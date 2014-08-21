@@ -129,6 +129,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private boolean calcularMultaProximoMes;
     @Column(name = "parcelas_acordo")
     private int numeroMinimoParcelasAcordo;
+    @Column(name="incremento_nosso_numero")
+    private int incrementoNumeroDocumento = 1;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<TaxaExtra> taxas;
     
@@ -531,6 +533,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setNumeroMinimoParcelasAcordo(int numeroMinimoParcelasAcordo) {
         this.numeroMinimoParcelasAcordo = numeroMinimoParcelasAcordo;
+    }
+
+    public int getIncrementoNumeroDocumento() {
+        return incrementoNumeroDocumento;
+    }
+
+    public void setIncrementoNumeroDocumento(int incrementoNumeroDocumento) {
+        this.incrementoNumeroDocumento = incrementoNumeroDocumento;
     }
 
     public List<ContaGas> getContasDeGas() {

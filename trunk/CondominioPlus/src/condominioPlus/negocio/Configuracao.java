@@ -59,9 +59,8 @@ public class Configuracao implements Serializable {
     private BigDecimal percentualJuros;
     @Column(name="percentual_multa")
     private BigDecimal percentualMulta;
-    @Column(name="incremento_nosso_numero")
-    private int incrementoNumeroDocumento = 10000;
-
+    
+    
     public boolean isExpirado() {
         return expirado;
     }
@@ -167,12 +166,4 @@ public class Configuracao implements Serializable {
         this.percentualMulta = percentualMulta;
     }
 
-    public int getIncrementoNumeroDocumento() {
-        return incrementoNumeroDocumento;
-    }
-
-    public void setIncrementoNumeroDocumento(int incrementoNumeroDocumento) {
-        this.incrementoNumeroDocumento = incrementoNumeroDocumento;
-    }
-    
 }
