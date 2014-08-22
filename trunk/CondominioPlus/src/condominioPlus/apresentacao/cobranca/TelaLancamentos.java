@@ -347,7 +347,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void carregarTabelaDadosAvulsos() {
-        modeloTabelaDadosAvulsos = new TabelaModelo_2<ItemCobranca>(tabelaDadosAvulsos, "Conta, Descrição, Valor, Dividir por Fração Ideal?".split(",")) {
+        modeloTabelaDadosAvulsos = new TabelaModelo_2<ItemCobranca>(tabelaDadosAvulsos, "Conta, Descrição, Valor, F. Ideal?, Desconto?, Até dia, Valor c/ Desc.".split(",")) {
 
             @Override
             protected List<ItemCobranca> getCarregarObjetos() {
@@ -379,20 +379,33 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         return PagamentoUtil.formatarMoeda(((BigDecimal) item.getValor()).doubleValue());
                     case 3:
                         return item.isDividirFracaoIdeal();
+                    case 4:
+                        return item.isConcederDesconto() ? "Sim" : "Não";
+                    case 5:
+                        return item.getDescontoAte() != null ? DataUtil.toString(item.getDescontoAte()) : "";
+                    case 6:
+                        return item.getValorComDesconto() != null ? PagamentoUtil.formatarMoeda(item.getValorComDesconto().doubleValue()) : "";
                     default:
                         return null;
                 }
             }
         };
 
-        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(0)).setMaxWidth(50);
-        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(1)).setMinWidth(180);
-        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setMaxWidth(70);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(0)).setMaxWidth(45);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(1)).setMinWidth(200);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setMaxWidth(55);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(3)).setMinWidth(50);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(4)).setMinWidth(50);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(5)).setMaxWidth(55);
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(6)).setMinWidth(65);
 
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(4)).setCellRenderer(new RenderizadorCelulaCentralizada());
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(5)).setCellRenderer(new RenderizadorCelulaCentralizada());
+        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
 
         modeloTabelaDadosAvulsos.setEditaveis(1, 2, 3);
-
+        tabelaDadosAvulsos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
     private List<ItemCobranca> getItensCobrancasAvulsas() {
@@ -773,6 +786,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             UNIDADES:
             for (Unidade u : lista) {
+                
+                if (u.isSindico() && !condominio.isSindicoPaga()) {
+                    continue UNIDADES;
+                }
+
                 Cobranca cobranca = new Cobranca();
                 cobranca.setUnidade(u);
                 cobranca.setCodigoBanco(u.getCondominio().getContaBancaria().getBanco().getNumeroBanco());
@@ -802,10 +820,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     }
                 } else {
                     cobranca.setNumeroDocumento(txtNumeroDocumento.getText());
-                }
-
-                if (u.isSindico() && !condominio.isSindicoPaga()) {
-                    continue UNIDADES;
                 }
 
                 if (painelCobrancaBase.getSelectedIndex() == 0) {
@@ -858,6 +872,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                             pagamento.setValor(item.getValor());
                         }
                     }
+                    pagamento.setValorOriginal(pagamento.getValor());
                     pagamento.setDescontoAte(item.getDescontoAte());
                     if (item.getValorComDesconto() != null) {
                         pagamento.setValorComDesconto(item.getValorComDesconto());
@@ -893,8 +908,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
                         pagamento.setCobranca(cobranca);
                         pagamento.setConta(c1);
-                        pagamento.setHistorico(pagamento.getConta().getNome());
-                        pagamento.setDescricao(pagamento.getConta().getNome() + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear());
+                        pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                        pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
                         pagamento.setValor(r.getValorTotalCobrar());
                         if (pagamento.getValor().doubleValue() == 0) {
                             continue AGUA;
@@ -937,23 +952,68 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private boolean calcularCobrancasAvulsas(Unidade u, Cobranca cobranca) {
+        ITEMCOBRANCA:
         for (ItemCobranca item : listaItensAvulsos) {
             if (item.getValor().doubleValue() != 0) {
                 Pagamento pagamento = new Pagamento();
-                pagamento.setFornecedor("");
-                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimentoAvulso.getValue()));
-                pagamento.setCobranca(cobranca);
-                Conta c = new DAO().localizar(Conta.class, item.getCodigoConta());
-                pagamento.setConta(c);
-                pagamento.setDescricao(item.getDescricao());
-                pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                if (u.getValorPrincipal().doubleValue() != 0) {
-                    pagamento.setValor(u.getValorPrincipal());
+                //se o conta for de agua fazer
+                if (item.getCodigoConta() == 205) {
+                    for (ContaAgua c : condominio.getContasDeAgua()) {
+//                        System.out.println("primeiro dia mês: " + DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
+//                        System.out.println("último dia mês: " + DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
+                        if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == 1 && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == -1) {
+                            for (Rateio r : c.getRateios()) {
+                                if (r.getUnidade().getCodigo() == u.getCodigo()) {
+//                                    System.out.println("estou dentro do rateio de agua");
+                                    Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+//                                    System.out.println("nome conta: " + conta.getNome());
+                                    pagamento.setFornecedor("");
+                                    pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                                    pagamento.setCobranca(cobranca);
+                                    pagamento.setConta(c1);
+                                    pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                    pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
+                                    pagamento.setValor(r.getValorTotalCobrar());
+                                    if (pagamento.getValor().doubleValue() == 0) {
+                                        continue ITEMCOBRANCA;
+                                    }
+                                    cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+//                                    System.out.println("descrição pagamento água: " + pagamento.getConta().getNome());
+//                                    System.out.println("valor pagamento água: " + PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                                }
+                            }
+                        }
+                    }
                 } else {
-                    if (item.isDividirFracaoIdeal()) {
-                        pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, item.getValor())).setScale(2, RoundingMode.UP));
+                    pagamento.setFornecedor("");
+                    pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimentoAvulso.getValue()));
+                    pagamento.setCobranca(cobranca);
+                    Conta c = new DAO().localizar(Conta.class, item.getCodigoConta());
+                    pagamento.setConta(c);
+                    pagamento.setDescricao(item.getDescricao());
+                    pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                    if (u.getValorPrincipal().doubleValue() != 0) {
+                        pagamento.setValor(u.getValorPrincipal());
                     } else {
-                        pagamento.setValor(item.getValor());
+                        if (item.isDividirFracaoIdeal()) {
+                            pagamento.setValor(new BigDecimal(calcularPorFracaoIdeal(u, item.getValor())).setScale(2, RoundingMode.UP));
+                        } else {
+                            pagamento.setValor(item.getValor());
+                        }
+                    }
+                    pagamento.setValorOriginal(pagamento.getValor());
+                    pagamento.setDescontoAte(item.getDescontoAte());
+                    if (item.getValorComDesconto() != null) {
+                        pagamento.setValorComDesconto(item.getValorComDesconto());
+                    }
+
+                    if (cobranca.getDescontoAte() == null && item.getDescontoAte() != null) {
+                        cobranca.setDescontoAte(item.getDescontoAte());
+                    }
+                    if (pagamento.getValorComDesconto().doubleValue() > 0) {
+                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValorComDesconto()));
+                    } else {
+                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
                     }
                 }
                 cobranca.getPagamentos().add(pagamento);
@@ -1898,7 +1958,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void pegarConta() {
-        DialogoConta c = new DialogoConta(null, true, true, false, "");
+        DialogoConta c = new DialogoConta(null, true, true, false, "T");
         c.setVisible(true);
 
         if (c.getConta() != null) {
@@ -1914,12 +1974,36 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             validador.exibirErros(this);
             return;
         }
+
         ItemCobranca item = new ItemCobranca();
-        item.setCodigoConta(conta.getCodigo());
-        item.setCodigoObjeto(0);
-        item.setDescricao(txtHistorico.getText());
-        item.setDividirFracaoIdeal(false);
-        item.setValor(new BigDecimal(0));
+        CobrancaBase objetoAuxiliar = null;
+        for (CobrancaBase co : condominio.getCobrancasBase()) {
+            if (co.getConta().getCodigo() == conta.getCodigo()) {
+                System.out.println("estou dentro do if cobrança base");
+                objetoAuxiliar = co;
+            }
+        }
+
+        if (objetoAuxiliar != null) {
+            item.setCodigoConta(objetoAuxiliar.getConta().getCodigo());
+            item.setCodigoObjeto(0);
+            item.setDescricao(txtHistorico.getText());
+            item.setDividirFracaoIdeal(objetoAuxiliar.isDividirFracaoIdeal());
+            item.setValor(objetoAuxiliar.getValor());
+            item.setConcederDesconto(objetoAuxiliar.isConcederDesconto());
+            item.setDescontoAte(objetoAuxiliar.getDescontoAte());
+            item.setValorComDesconto(objetoAuxiliar.getValorComDesconto());
+        } else {
+            item.setCodigoConta(conta.getCodigo());
+            item.setCodigoObjeto(0);
+            item.setDescricao(txtHistorico.getText());
+            item.setDividirFracaoIdeal(false);
+            item.setValor(new BigDecimal(0));
+            item.setConcederDesconto(false);
+            item.setDescontoAte(null);
+            item.setValorComDesconto(null);
+        }
+
         listaItensAvulsos.add(item);
     }
 

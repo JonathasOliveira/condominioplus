@@ -35,6 +35,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -357,7 +358,7 @@ public class Relatorios implements Printable {
             cobrancas = getCobrancas(u);
 
             for (Cobranca co : cobrancas) {
-                if (co.getDataPagamento() != null && DataUtil.compararData(dataInicial, DataUtil.getDateTime(co.getDataPagamento())) == -1 && DataUtil.compararData(dataFinal, DataUtil.getDateTime(co.getDataPagamento())) == 1 && co.isExibir()) {
+                if (co.getDataPagamento() != null && DataUtil.compararData(dataInicial.minusDays(1), DataUtil.getDateTime(co.getDataPagamento())) == -1 && DataUtil.compararData(dataFinal.plusDays(1), DataUtil.getDateTime(co.getDataPagamento())) == 1 && co.isExibir()) {
                     HashMap<String, Object> mapa = new HashMap();
 
                     somaGeral = somaGeral.add(co.getValorPago());
@@ -438,6 +439,7 @@ public class Relatorios implements Printable {
         BigDecimal somaJuros = new BigDecimal(0);
         BigDecimal somaMulta = new BigDecimal(0);
         BigDecimal somaTotalGeral = new BigDecimal(0);
+        BigDecimal somaTotalComDesconto = new BigDecimal(0);
 
         if (unidades == null) {
             listaUnidades = ordenarUnidades(condominio.getUnidades());
@@ -454,6 +456,7 @@ public class Relatorios implements Printable {
             BigDecimal totalJuros = new BigDecimal(0);
             BigDecimal totalMulta = new BigDecimal(0);
             BigDecimal totalGeral = new BigDecimal(0);
+            BigDecimal totalGeralComDesconto = new BigDecimal(0);
 
             List<Cobranca> cobrancas = new ArrayList<Cobranca>();
             cobrancas = getCobrancas(u);
@@ -465,18 +468,27 @@ public class Relatorios implements Printable {
                     totalJuros = totalJuros.add(co.getJuros());
                     totalMulta = totalMulta.add(co.getMulta());
                     totalGeral = totalGeral.add(co.getValorTotal());
+                    totalGeralComDesconto = totalGeralComDesconto.add(co.getTotalComDesconto());
 
                     somaValorOriginal = somaValorOriginal.add(co.getValorOriginal());
                     somaJuros = somaJuros.add(co.getJuros());
                     somaMulta = somaMulta.add(co.getMulta());
                     somaTotalGeral = somaTotalGeral.add(co.getValorTotal());
+                    somaTotalComDesconto = somaTotalComDesconto.add(co.getTotalComDesconto());
 
                     mapa.put("documento", co.getNumeroDocumento());
                     mapa.put("vencimento", DataUtil.toString(co.getDataVencimento()));
                     mapa.put("valorOriginal", PagamentoUtil.formatarMoeda(co.getValorOriginal().doubleValue()));
                     mapa.put("juros", PagamentoUtil.formatarMoeda(co.getJuros().doubleValue()));
                     mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
+                    mapa.put("descontoAte", co.getDescontoAte() != null ? DataUtil.toString(co.getDescontoAte()) : "");
+                    String valorComDesconto = "";
+                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0){
+                        valorComDesconto = PagamentoUtil.formatarMoeda(co.getTotalComDesconto().doubleValue());
+                    }
+                    mapa.put("valorComDesconto", valorComDesconto);
                     mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
+                    mapa.put("linhaDigitavel", co.getLinhaDigitavel()  );
 
                     List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
 
@@ -504,6 +516,7 @@ public class Relatorios implements Printable {
                 mapa2.put("totalJuros", PagamentoUtil.formatarMoeda(totalJuros.doubleValue()));
                 mapa2.put("totalMulta", PagamentoUtil.formatarMoeda(totalMulta.doubleValue()));
                 mapa2.put("totalGeral", PagamentoUtil.formatarMoeda(totalGeral.doubleValue()));
+                mapa2.put("totalGeralComDesconto", PagamentoUtil.formatarMoeda(totalGeralComDesconto.doubleValue()));
                 mapa2.put("lista", new JRBeanCollectionDataSource(listaCobrancas));
                 lista.add(mapa2);
             }
@@ -515,6 +528,7 @@ public class Relatorios implements Printable {
         parametros.put("somaJuros", PagamentoUtil.formatarMoeda(somaJuros.doubleValue()));
         parametros.put("somaMulta", PagamentoUtil.formatarMoeda(somaMulta.doubleValue()));
         parametros.put("somaTotalGeral", PagamentoUtil.formatarMoeda(somaTotalGeral.doubleValue()));
+        parametros.put("somaTotalComDesconto", PagamentoUtil.formatarMoeda(somaTotalComDesconto.doubleValue()));
 
         URL caminho = getClass().getResource("/condominioPlus/relatorios/");
         parametros.put("subrelatorio", caminho.toString());
@@ -875,7 +889,8 @@ public class Relatorios implements Printable {
                 mapa.put("detalhe" + i, "   " + p.getDescricao());
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
             }
-
+            
+            mapa.put("mensagem0", boleto.getMensagem0());
             mapa.put("mensagem1", boleto.getMensagem1());
             mapa.put("mensagem2", boleto.getMensagem2());
             mapa.put("mensagem3", boleto.getMensagem3());
