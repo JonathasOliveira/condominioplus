@@ -18,7 +18,7 @@
 	<detail>
 		<band height="46" splitType="Stretch">
 			<rectangle>
-				<reportElement x="0" y="0" width="554" height="46" forecolor="#FFFFFF" backcolor="#CCCCCC">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="554" height="46" forecolor="#FFFFFF" backcolor="#CCCCCC">
 					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 0)]]></printWhenExpression>
 				</reportElement>
 			</rectangle>
