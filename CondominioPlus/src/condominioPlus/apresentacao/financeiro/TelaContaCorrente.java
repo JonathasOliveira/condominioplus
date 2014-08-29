@@ -717,10 +717,11 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         itemMenuEditarPagamento = new javax.swing.JMenuItem();
         itemMenuEditarDataPagamento = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        itemMenuImprimirExtrato = new javax.swing.JMenuItem();
-        itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
         itemMenuImprimirBalanceteSintetico = new javax.swing.JMenuItem();
         itemMenuImprimirBalanceteAnalitico = new javax.swing.JMenuItem();
+        itemMenuImprimirExtrato = new javax.swing.JMenuItem();
+        itemMenuImprimirExtratoConferencia = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
         itemMenuImprimirRecibo = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoContaIndividual = new javax.swing.JMenuItem();
         itemMenuImprimirExtratoCustomizado = new javax.swing.JMenuItem();
@@ -779,17 +780,18 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         popupMenu.add(itemMenuEditarDataPagamento);
         popupMenu.add(jSeparator1);
 
-        itemMenuImprimirExtrato.setText("Imprimir Extrato Conta Corrente");
-        popupMenu.add(itemMenuImprimirExtrato);
-
-        itemMenuImprimirExtratoConferencia.setText("Imprimir Extrato Conferência Conta Corrente");
-        popupMenu.add(itemMenuImprimirExtratoConferencia);
-
         itemMenuImprimirBalanceteSintetico.setText("Imprimir Balancete Sintético");
         popupMenu.add(itemMenuImprimirBalanceteSintetico);
 
         itemMenuImprimirBalanceteAnalitico.setText("Imprimir Balancete Analítico");
         popupMenu.add(itemMenuImprimirBalanceteAnalitico);
+
+        itemMenuImprimirExtrato.setText("Imprimir Extrato Conta Corrente");
+        popupMenu.add(itemMenuImprimirExtrato);
+
+        itemMenuImprimirExtratoConferencia.setText("Imprimir Extrato Conferência Conta Corrente");
+        popupMenu.add(itemMenuImprimirExtratoConferencia);
+        popupMenu.add(jSeparator3);
 
         itemMenuImprimirRecibo.setText("Imprimir 2ª Via Recibo");
         popupMenu.add(itemMenuImprimirRecibo);
@@ -1105,7 +1107,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                                     .addComponent(txtDebitosContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
                         .addGroup(painelSaldosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel7)
                             .addComponent(jLabel8)
@@ -1138,7 +1140,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 .addContainerGap()
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(painelSaldos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -1188,6 +1190,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JPanel painelSaldos;
     private javax.swing.JPopupMenu popupMenu;
     private javax.swing.JRadioButton radioPeriodo;
