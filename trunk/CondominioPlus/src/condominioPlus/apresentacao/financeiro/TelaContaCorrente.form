@@ -25,16 +25,6 @@
         </MenuItem>
         <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator1">
         </Component>
-        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirExtrato">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Imprimir Extrato Conta Corrente"/>
-          </Properties>
-        </MenuItem>
-        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirExtratoConferencia">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Imprimir Extrato Confer&#xea;ncia Conta Corrente"/>
-          </Properties>
-        </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirBalanceteSintetico">
           <Properties>
             <Property name="text" type="java.lang.String" value="Imprimir Balancete Sint&#xe9;tico"/>
@@ -45,6 +35,18 @@
             <Property name="text" type="java.lang.String" value="Imprimir Balancete Anal&#xed;tico"/>
           </Properties>
         </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirExtrato">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Extrato Conta Corrente"/>
+          </Properties>
+        </MenuItem>
+        <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirExtratoConferencia">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Imprimir Extrato Confer&#xea;ncia Conta Corrente"/>
+          </Properties>
+        </MenuItem>
+        <Component class="javax.swing.JPopupMenu$Separator" name="jSeparator3">
+        </Component>
         <MenuItem class="javax.swing.JMenuItem" name="itemMenuImprimirRecibo">
           <Properties>
             <Property name="text" type="java.lang.String" value="Imprimir 2&#xaa; Via Recibo"/>
@@ -116,7 +118,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel4" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="241" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="243" max="32767" attributes="0"/>
               <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
               <Component id="painelSaldos" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -417,7 +419,7 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="50" max="32767" attributes="0"/>
+                          <EmptySpace pref="52" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
