@@ -16,8 +16,22 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="132" splitType="Stretch">
+	<pageHeader>
+		<band height="145" splitType="Stretch">
+			<staticText>
+				<reportElement x="6" y="132" width="36" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="50" y="132" width="82" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Proprietário(a)]]></text>
+			</staticText>
 			<image>
 				<reportElement x="0" y="12" width="362" height="89"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -26,10 +40,10 @@
 				<reportElement x="0" y="96" width="473" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="477" y="96" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="477" y="63" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="477" y="63" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+				<reportElement x="477" y="96" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<textField isBlankWhenNull="true">
 				<reportElement x="6" y="108" width="461" height="15"/>
@@ -85,24 +99,6 @@
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Relação para Postagem]]></text>
-			</staticText>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="13" splitType="Stretch">
-			<staticText>
-				<reportElement x="6" y="0" width="36" height="13"/>
-				<textElement verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Unidade]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="50" y="0" width="82" height="13"/>
-				<textElement verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Proprietário(a)]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
