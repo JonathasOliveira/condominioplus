@@ -384,8 +384,7 @@ Conta Corrente]]></text>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Total
-Sub Recursos]]></text>
+				<text><![CDATA[Total Recursos]]></text>
 			</staticText>
 			<rectangle>
 				<reportElement x="370" y="58" width="84" height="32" forecolor="#F0F0F0" backcolor="#CCCCCC"/>

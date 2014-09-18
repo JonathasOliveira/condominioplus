@@ -157,21 +157,24 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="12">
+		<band height="21">
 			<textField isBlankWhenNull="true">
-				<reportElement x="418" y="0" width="31" height="12"/>
+				<reportElement x="418" y="8" width="31" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaFracao}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="368" y="0" width="51" height="12"/>
+				<reportElement x="368" y="8" width="51" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[TOTAL = ]]></text>
 			</staticText>
+			<rectangle>
+				<reportElement positionType="Float" stretchType="RelativeToBandHeight" x="417" y="3" width="32" height="5" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+			</rectangle>
 		</band>
 	</summary>
 </jasperReport>

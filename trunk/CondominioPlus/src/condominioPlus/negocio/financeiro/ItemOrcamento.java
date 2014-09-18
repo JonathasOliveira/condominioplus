@@ -4,6 +4,7 @@
  */
 package condominioPlus.negocio.financeiro;
 
+import condominioPlus.negocio.Unidade;
 import java.math.BigDecimal;
 
 /**
@@ -12,26 +13,26 @@ import java.math.BigDecimal;
  */
 public class ItemOrcamento {
     
-    private int numeroUnidades;
-    private String fracaoIdeal;
+    private Unidade unidade;
+    private BigDecimal taxaMedia;
     private BigDecimal taxa1;
     private BigDecimal taxa2;
     private BigDecimal taxa3;
 
-    public String getFracaoIdeal() {
-        return fracaoIdeal;
+    public Unidade getUnidade() {
+        return unidade;
     }
 
-    public void setFracaoIdeal(String fracaoIdeal) {
-        this.fracaoIdeal = fracaoIdeal;
+    public void setUnidade(Unidade unidade) {
+        this.unidade = unidade;
     }
 
-    public int getNumeroUnidades() {
-        return numeroUnidades;
+    public BigDecimal getTaxaMedia() {
+        return taxaMedia;
     }
 
-    public void setNumeroUnidades(int numeroUnidades) {
-        this.numeroUnidades = numeroUnidades;
+    public void setTaxaMedia(BigDecimal taxaMedia) {
+        this.taxaMedia = taxaMedia;
     }
 
     public BigDecimal getTaxa1() {

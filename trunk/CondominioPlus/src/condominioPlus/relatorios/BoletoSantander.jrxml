@@ -2,10 +2,12 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoSantander" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="785"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="logoSantander" class="java.lang.String"/>
+	<parameter name="textoInadimplencia" class="java.lang.String"/>
+	<parameter name="totalInadimplencia" class="java.lang.String"/>
 	<field name="nomeCedente" class="java.lang.String"/>
 	<field name="nomeSacado" class="java.lang.String"/>
 	<field name="dataVencimento" class="java.lang.String"/>
@@ -190,7 +192,7 @@
 			<line>
 				<reportElement x="0" y="509" width="555" height="1"/>
 				<graphicElement>
-					<pen lineWidth="0.25"/>
+					<pen lineWidth="1.25"/>
 				</graphicElement>
 			</line>
 			<line direction="BottomUp">
@@ -200,7 +202,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="443" y="509" width="68" height="8"/>
+				<reportElement x="443" y="510" width="68" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
@@ -240,14 +242,14 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{tipoDocumento}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="119" y="509" width="32" height="8"/>
+				<reportElement x="119" y="510" width="32" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
 				<text><![CDATA[Espécie]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="382" y="509" width="38" height="8"/>
+				<reportElement x="382" y="510" width="38" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
@@ -261,7 +263,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{numeroDocumento}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="5" y="509" width="83" height="8"/>
+				<reportElement x="5" y="510" width="83" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
@@ -280,7 +282,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="163" y="509" width="83" height="8"/>
+				<reportElement x="163" y="510" width="83" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
@@ -293,7 +295,7 @@
 				</graphicElement>
 			</line>
 			<staticText>
-				<reportElement x="264" y="509" width="83" height="8"/>
+				<reportElement x="264" y="510" width="83" height="8"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="5"/>
 				</textElement>
@@ -1020,7 +1022,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{valordetalhe11}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="4" y="161" width="192" height="345"/>
+				<reportElement x="4" y="161" width="192" height="322"/>
 				<textElement>
 					<font size="5"/>
 				</textElement>
@@ -1061,11 +1063,28 @@
 				<text><![CDATA[Instruções]]></text>
 			</staticText>
 			<line direction="BottomUp">
-				<reportElement x="198" y="154" width="1" height="354"/>
+				<reportElement x="198" y="153" width="1" height="356"/>
 				<graphicElement>
 					<pen lineWidth="0.75"/>
 				</graphicElement>
 			</line>
+			<rectangle>
+				<reportElement x="0" y="487" width="197" height="21" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="160" y="499" width="34" height="8"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalInadimplencia}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="4" y="489" width="153" height="8"/>
+				<textElement verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{textoInadimplencia}]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 </jasperReport>

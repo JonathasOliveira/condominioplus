@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Orcamento" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="96"/>
+	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
 	<parameter name="condominio" class="java.lang.String"/>
 	<parameter name="dataEmissao" class="java.lang.String"/>
@@ -22,8 +22,6 @@
 	<parameter name="taxa1" class="java.lang.String"/>
 	<parameter name="taxa2" class="java.lang.String"/>
 	<parameter name="taxa3" class="java.lang.String"/>
-	<parameter name="unidadesConsideradas" class="java.lang.String"/>
-	<parameter name="unidadesDesprezadas" class="java.lang.String"/>
 	<field name="codigoConta" class="java.lang.String"/>
 	<field name="historico" class="java.lang.String"/>
 	<field name="media" class="java.lang.String"/>
@@ -31,15 +29,52 @@
 	<field name="media2" class="java.lang.String"/>
 	<field name="media3" class="java.lang.String"/>
 	<field name="listaItens" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<field name="listaUnidadesConsideradas" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="165" splitType="Stretch">
+	<pageHeader>
+		<band height="191" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
+			<rectangle>
+				<reportElement positionType="Float" x="7" y="168" width="542" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="226" y="129" width="110" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement x="113" y="129" width="110" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
+				<graphicElement>
+					<pen lineWidth="0.25"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="118" y="141" width="98" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{sindicoPaga}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="285" y="179" width="62" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Média]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="48" y="179" width="233" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[  Descrição das Despesas]]></text>
+			</staticText>
 			<rectangle>
 				<reportElement x="0" y="96" width="487" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
 				<graphicElement>
@@ -64,6 +99,40 @@
 					<pen lineWidth="0.25"/>
 				</graphicElement>
 			</rectangle>
+			<staticText>
+				<reportElement x="7" y="179" width="42" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Conta Nº]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="351" y="179" width="62" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{media1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="417" y="179" width="62" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{media2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="483" y="179" width="62" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{media3}]]></textFieldExpression>
+			</textField>
+			<line direction="BottomUp">
+				<reportElement x="548" y="179" width="1" height="12"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
 			<textField isBlankWhenNull="true">
 				<reportElement x="6" y="108" width="474" height="15"/>
 				<textElement verticalAlignment="Middle">
@@ -99,6 +168,15 @@
 				</textElement>
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="7" y="179" width="541" height="1"/>
+			</line>
+			<line>
+				<reportElement x="7" y="168" width="541" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
 			<staticText>
 				<reportElement x="6" y="98" width="76" height="15"/>
 				<textElement verticalAlignment="Middle">
@@ -113,6 +191,24 @@
 				</textElement>
 				<text><![CDATA[Folha]]></text>
 			</staticText>
+			<line direction="BottomUp">
+				<reportElement x="7" y="168" width="1" height="13"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="548" y="168" width="1" height="12"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</line>
+			<line direction="BottomUp">
+				<reportElement x="7" y="179" width="1" height="12"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
 			<staticText>
 				<reportElement x="382" y="65" width="98" height="15"/>
 				<textElement>
@@ -130,6 +226,37 @@
 			<rectangle>
 				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
+			<staticText>
+				<reportElement x="14" y="168" width="233" height="12" forecolor="#000000"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="6" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Quadro I - Demonstrativo das Médias Apuradas]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="161" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="231" y="141" width="76" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Inadimplentes >=]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="304" y="141" width="25" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{cobrancasDesprezadas}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="231" y="131" width="98" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[CobrançasDesprezadas]]></text>
+			</staticText>
 			<rectangle>
 				<reportElement x="0" y="129" width="110" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
 				<graphicElement>
@@ -150,15 +277,6 @@
 				</textElement>
 				<text><![CDATA[Nº de Unidades]]></text>
 			</staticText>
-			<rectangle>
-				<reportElement x="0" y="160" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="113" y="129" width="110" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
-				<graphicElement>
-					<pen lineWidth="0.25"/>
-				</graphicElement>
-			</rectangle>
 			<staticText>
 				<reportElement x="118" y="131" width="98" height="15"/>
 				<textElement>
@@ -166,128 +284,12 @@
 				</textElement>
 				<text><![CDATA[Síndico Paga?]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="118" y="141" width="98" height="15"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{sindicoPaga}]]></textFieldExpression>
-			</textField>
-			<rectangle>
-				<reportElement x="226" y="129" width="110" height="30" forecolor="#000000" backcolor="#CCCCCC"/>
-				<graphicElement>
-					<pen lineWidth="0.25"/>
-				</graphicElement>
-			</rectangle>
 			<staticText>
-				<reportElement x="231" y="131" width="98" height="15"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[CobrançasDesprezadas]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="304" y="141" width="25" height="15"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{cobrancasDesprezadas}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="231" y="141" width="76" height="15"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Inadimplentes >=]]></text>
-			</staticText>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="26" splitType="Stretch">
-			<rectangle>
-				<reportElement positionType="Float" x="7" y="3" width="542" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<staticText>
-				<reportElement x="285" y="14" width="62" height="12" forecolor="#000000"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Média]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="48" y="14" width="233" height="12" forecolor="#000000"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[  Descrição das Despesas]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="7" y="14" width="42" height="12" forecolor="#000000"/>
+				<reportElement x="315" y="168" width="233" height="12" forecolor="#000000"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Conta Nº]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="351" y="14" width="62" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{media1}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="417" y="14" width="62" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{media2}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="483" y="14" width="62" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{media3}]]></textFieldExpression>
-			</textField>
-			<line direction="BottomUp">
-				<reportElement x="548" y="14" width="1" height="12"/>
-				<graphicElement>
-					<pen lineWidth="1.0"/>
-				</graphicElement>
-			</line>
-			<line>
-				<reportElement x="7" y="14" width="541" height="1"/>
-			</line>
-			<line>
-				<reportElement x="7" y="3" width="541" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<line direction="BottomUp">
-				<reportElement x="7" y="3" width="1" height="13"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<line direction="BottomUp">
-				<reportElement x="548" y="3" width="1" height="12"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<line direction="BottomUp">
-				<reportElement x="7" y="14" width="1" height="12"/>
-				<graphicElement>
-					<pen lineWidth="1.0"/>
-				</graphicElement>
-			</line>
-			<staticText>
-				<reportElement x="14" y="3" width="233" height="12" forecolor="#000000"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="6" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Quadro I - Demonstrativo das Médias Apuradas]]></text>
+				<text><![CDATA[Valores em R$]]></text>
 			</staticText>
 		</band>
 	</pageHeader>
@@ -361,7 +363,13 @@
 		</band>
 	</detail>
 	<summary>
-		<band height="470">
+		<band height="79">
+			<line>
+				<reportElement x="7" y="0" width="542" height="1"/>
+				<graphicElement>
+					<pen lineWidth="1.0"/>
+				</graphicElement>
+			</line>
 			<staticText>
 				<reportElement x="6" y="4" width="128" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -369,27 +377,9 @@
 				</textElement>
 				<text><![CDATA[TOTAIS ->]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="489" y="6" width="56" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia3}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="423" y="6" width="56" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia2}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="357" y="6" width="56" height="12"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="7" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia1}]]></textFieldExpression>
-			</textField>
+			<rectangle>
+				<reportElement x="291" y="3" width="59" height="5" forecolor="#FFFFFF" backcolor="#000000"/>
+			</rectangle>
 			<textField isBlankWhenNull="true">
 				<reportElement x="291" y="6" width="56" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
@@ -398,25 +388,40 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia}]]></textFieldExpression>
 			</textField>
 			<rectangle>
-				<reportElement x="291" y="3" width="59" height="5" forecolor="#FFFFFF" backcolor="#000000"/>
-			</rectangle>
-			<rectangle>
 				<reportElement x="357" y="3" width="59" height="5" forecolor="#FFFFFF" backcolor="#000000"/>
 			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="357" y="6" width="56" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia1}]]></textFieldExpression>
+			</textField>
 			<rectangle>
 				<reportElement x="423" y="3" width="59" height="5" forecolor="#FFFFFF" backcolor="#000000"/>
 			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement x="489" y="6" width="56" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia3}]]></textFieldExpression>
+			</textField>
 			<rectangle>
 				<reportElement x="489" y="3" width="59" height="5" forecolor="#FFFFFF" backcolor="#000000"/>
 			</rectangle>
-			<line>
-				<reportElement x="7" y="0" width="542" height="1"/>
-				<graphicElement>
-					<pen lineWidth="1.0"/>
-				</graphicElement>
-			</line>
-			<subreport runToBottom="false">
-				<reportElement x="14" y="33" width="247" height="27"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="423" y="6" width="56" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{somaMedia2}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="22" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<subreport>
+				<reportElement positionType="Float" x="5" y="33" width="545" height="12"/>
 				<subreportParameter name="taxa1">
 					<subreportParameterExpression><![CDATA[$P{taxa1}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -429,59 +434,11 @@
 				<dataSourceExpression><![CDATA[$F{listaItens}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioOrcamento.jasper"]]></subreportExpression>
 			</subreport>
-			<rectangle>
-				<reportElement x="0" y="22" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="280" y="33" width="255" height="12" forecolor="#FFFFFF" backcolor="#999999">
-					<printWhenExpression><![CDATA[new Boolean(($V{COLUMN_COUNT}.intValue() % 2) == 0)]]></printWhenExpression>
-				</reportElement>
-			</rectangle>
-			<rectangle>
-				<reportElement x="281" y="45" width="253" height="415"/>
-				<graphicElement>
-					<pen lineWidth="1.0"/>
-				</graphicElement>
-			</rectangle>
-			<line>
-				<reportElement x="281" y="33" width="254" height="1"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<textField>
-				<reportElement x="286" y="33" width="187" height="12"/>
-				<textElement verticalAlignment="Middle">
-					<font size="6" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Quadro III - Demonstrativo das Frações Ideais"]]></textFieldExpression>
-			</textField>
-			<line direction="BottomUp">
-				<reportElement x="534" y="33" width="1" height="12"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<line direction="BottomUp">
-				<reportElement x="280" y="33" width="1" height="12"/>
-				<graphicElement>
-					<pen lineWidth="0.5"/>
-				</graphicElement>
-			</line>
-			<textField isStretchWithOverflow="true">
-				<reportElement x="286" y="51" width="243" height="9"/>
-				<textElement>
-					<font size="7" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidadesConsideradas}]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true">
-				<reportElement positionType="Float" x="286" y="71" width="243" height="9"/>
-				<textElement>
-					<font size="7" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidadesDesprezadas}]]></textFieldExpression>
-			</textField>
+			<subreport>
+				<reportElement positionType="Float" x="5" y="57" width="545" height="12"/>
+				<dataSourceExpression><![CDATA[$F{listaUnidadesConsideradas}]]></dataSourceExpression>
+				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioOrcamento2.jasper"]]></subreportExpression>
+			</subreport>
 		</band>
 	</summary>
 </jasperReport>

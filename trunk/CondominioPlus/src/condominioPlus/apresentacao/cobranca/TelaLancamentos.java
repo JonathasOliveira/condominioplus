@@ -35,6 +35,9 @@ import condominioPlus.negocio.financeiro.PagamentoUtil;
 import condominioPlus.negocio.financeiro.arquivoRetorno.EntradaArquivoRetorno;
 import condominioPlus.negocio.financeiro.arquivoRetorno.RegistroTransacao;
 import condominioPlus.relatorios.TipoRelatorio;
+import condominioPlus.util.ComparadorPagamentoCodigo;
+import condominioPlus.util.ComparadorPagamentoDocumento;
+import condominioPlus.util.ComparatorPagamento;
 import condominioPlus.util.ContaUtil;
 import condominioPlus.util.LimitarCaracteres;
 import condominioPlus.util.Relatorios;
@@ -365,6 +368,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         break;
                     case 3:
                         item.setDividirFracaoIdeal((Boolean) valor);
+                    case 4:
+                        item.setConcederDesconto((Boolean) valor);
                 }
             }
 
@@ -380,11 +385,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 3:
                         return item.isDividirFracaoIdeal();
                     case 4:
-                        return item.isConcederDesconto() ? "Sim" : "Não";
+                        return item.isConcederDesconto();
                     case 5:
                         return item.getDescontoAte() != null ? DataUtil.toString(item.getDescontoAte()) : "";
                     case 6:
-                        return item.getValorComDesconto() != null ? PagamentoUtil.formatarMoeda(item.getValorComDesconto().doubleValue()) : "";
+                        return item.getValorComDesconto() != null && item.getValorComDesconto().doubleValue() != 0 ? PagamentoUtil.formatarMoeda(item.getValorComDesconto().doubleValue()) : "";
                     default:
                         return null;
                 }
@@ -400,11 +405,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(6)).setMinWidth(65);
 
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(2)).setCellRenderer(new RenderizadorCelulaADireita());
-        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(4)).setCellRenderer(new RenderizadorCelulaCentralizada());
+//        tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(4)).setCellRenderer(new RenderizadorCelulaCentralizada());
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(5)).setCellRenderer(new RenderizadorCelulaCentralizada());
         tabelaDadosAvulsos.getColumn(modeloTabelaDadosAvulsos.getCampo(6)).setCellRenderer(new RenderizadorCelulaADireita());
 
-        modeloTabelaDadosAvulsos.setEditaveis(1, 2, 3);
+        modeloTabelaDadosAvulsos.setEditaveis(1, 2, 3, 4);
         tabelaDadosAvulsos.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
@@ -440,7 +445,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     case 7:
                         return DataUtil.getDateTime(cobranca.getDescontoAte());
                     case 8:
-                        return cobranca.getTotalComDesconto() == null ? "" : PagamentoUtil.formatarMoeda(cobranca.getTotalComDesconto().doubleValue());
+                        return cobranca.getTotalComDesconto() == null || cobranca.getTotalComDesconto().doubleValue() == 0 ? "" : PagamentoUtil.formatarMoeda(cobranca.getTotalComDesconto().doubleValue());
                     case 9:
                         return PagamentoUtil.formatarMoeda(cobranca.getValorTotal().doubleValue());
                     case 10:
@@ -786,7 +791,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
             UNIDADES:
             for (Unidade u : lista) {
-                
+
                 if (u.isSindico() && !condominio.isSindicoPaga()) {
                     continue UNIDADES;
                 }
@@ -954,33 +959,47 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private boolean calcularCobrancasAvulsas(Unidade u, Cobranca cobranca) {
         ITEMCOBRANCA:
         for (ItemCobranca item : listaItensAvulsos) {
-            if (item.getValor().doubleValue() != 0) {
+            if (item.getValor().doubleValue() != 0 || item.getCodigoConta() == 205) {
                 Pagamento pagamento = new Pagamento();
                 //se o conta for de agua fazer
                 if (item.getCodigoConta() == 205) {
                     for (ContaAgua c : condominio.getContasDeAgua()) {
 //                        System.out.println("primeiro dia mês: " + DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
 //                        System.out.println("último dia mês: " + DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
-                        if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == 1 && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == -1) {
-                            for (Rateio r : c.getRateios()) {
-                                if (r.getUnidade().getCodigo() == u.getCodigo()) {
+                        if (item.getValor().doubleValue() == 0) {
+                            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == 1 && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == -1) {
+                                for (Rateio r : c.getRateios()) {
+                                    if (r.getUnidade().getCodigo() == u.getCodigo()) {
 //                                    System.out.println("estou dentro do rateio de agua");
-                                    Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+                                        Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
 //                                    System.out.println("nome conta: " + conta.getNome());
-                                    pagamento.setFornecedor("");
-                                    pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
-                                    pagamento.setCobranca(cobranca);
-                                    pagamento.setConta(c1);
-                                    pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                                    pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
-                                    pagamento.setValor(r.getValorTotalCobrar());
-                                    if (pagamento.getValor().doubleValue() == 0) {
-                                        continue ITEMCOBRANCA;
-                                    }
-                                    cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+                                        pagamento.setFornecedor("");
+                                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                                        pagamento.setCobranca(cobranca);
+                                        pagamento.setConta(c1);
+                                        pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                        pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
+                                        pagamento.setValor(r.getValorTotalCobrar());
+                                        if (pagamento.getValor().doubleValue() == 0) {
+                                            continue ITEMCOBRANCA;
+                                        }
+                                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
 //                                    System.out.println("descrição pagamento água: " + pagamento.getConta().getNome());
 //                                    System.out.println("valor pagamento água: " + PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                                    }
                                 }
+                            }
+                        } else {
+                            Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+                            pagamento.setFornecedor("");
+                            pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                            pagamento.setCobranca(cobranca);
+                            pagamento.setConta(c1);
+                            pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                            pagamento.setDescricao(item.getDescricao());
+                            pagamento.setValor(item.getValor());
+                            if (item.isConcederDesconto()) {
+                                cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
                             }
                         }
                     }
@@ -1002,18 +1021,22 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         }
                     }
                     pagamento.setValorOriginal(pagamento.getValor());
-                    pagamento.setDescontoAte(item.getDescontoAte());
-                    if (item.getValorComDesconto() != null) {
+                    if (item.isConcederDesconto()) {
+                        pagamento.setDescontoAte(item.getDescontoAte());
+                    }
+                    if (item.isConcederDesconto() && item.getValorComDesconto() != null) {
                         pagamento.setValorComDesconto(item.getValorComDesconto());
                     }
 
-                    if (cobranca.getDescontoAte() == null && item.getDescontoAte() != null) {
-                        cobranca.setDescontoAte(item.getDescontoAte());
-                    }
-                    if (pagamento.getValorComDesconto().doubleValue() > 0) {
-                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValorComDesconto()));
-                    } else {
-                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+                    if (item.isConcederDesconto()) {
+                        if (cobranca.getDescontoAte() == null && item.getDescontoAte() != null) {
+                            cobranca.setDescontoAte(item.getDescontoAte());
+                        }
+                        if (pagamento.getValorComDesconto().doubleValue() > 0) {
+                            cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValorComDesconto()));
+                        } else {
+                            cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+                        }
                     }
                 }
                 cobranca.getPagamentos().add(pagamento);
@@ -1165,29 +1188,50 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void imprimirBoleto(List<Cobranca> listaCobrancas) {
-        List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
-        for (Cobranca cobranca : listaCobrancas) {
+        DialogoDadosCobranca dialogo = new DialogoDadosCobranca(null, true);
+        dialogo.setVisible(true);
 
-            if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
-                calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())), true);
+        if (dialogo.isContinuar()) {
+            List<DadosCorrespondencia> listaDados = new ArrayList<DadosCorrespondencia>();
+            for (Cobranca cobranca : listaCobrancas) {
+
+                if (DataUtil.compararData(DataUtil.getDateTime(cobranca.getDataVencimento()), DataUtil.getDateTime(txtVencimentoProrrogado.getValue())) == -1) {
+                    calcularJurosMulta(cobranca, DataUtil.getDateTime(DataUtil.getDateTime(txtVencimentoProrrogado.getValue())), true);
+                }
+
+                listaDados = DadosCorrespondencia.preencherLista(cobranca.getUnidade(), listaDados, cobranca.getUnidade().isBoletoProprietario(), cobranca.getUnidade().isBoletoInquilino(), cobranca);
+
             }
 
-            listaDados = DadosCorrespondencia.preencherLista(cobranca.getUnidade(), listaDados, cobranca.getUnidade().isBoletoProprietario(), cobranca.getUnidade().isBoletoInquilino(), cobranca);
+            List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
+            for (DadosCorrespondencia dados : listaDados) {
+                boletos.add(BoletoBancario.gerarBoleto(dados));
+            }
 
+            /*
+             * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
+             */
+
+            //preenchendo lista de pagamentos para exibir o balancete sintetico
+            List<Pagamento> listaPagamentos = new ArrayList<Pagamento>();
+            if (dialogo.isExibirBalancete()) {
+                listaPagamentos = new DAO().listar("PagamentosPorPeriodoContaCorrente", condominio.getContaCorrente(), DataUtil.getCalendar(dialogo.getDataInicial()), DataUtil.getCalendar(dialogo.getDataFinal()));
+            }
+            ComparadorPagamentoCodigo comCod = new ComparadorPagamentoCodigo();
+            Collections.sort(listaPagamentos, comCod);
+
+            ComparadorPagamentoDocumento comDoc = new ComparadorPagamentoDocumento();
+            Collections.sort(listaPagamentos, comDoc);
+
+            ComparatorPagamento comparator = new ComparatorPagamento();
+            Collections.sort(listaPagamentos, comparator);
+            //fim
+
+            new Relatorios().imprimirBoleto(boletos, condominio, dialogo.isExibirBalancete(), dialogo.getDataInicial(), dialogo.getDataFinal(), listaPagamentos);
+
+//          File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
+//          BoletoBancario.mostreBoletoNaTela(pdf);
         }
-
-        List<BoletoBancario> boletos = new ArrayList<BoletoBancario>();
-        for (DadosCorrespondencia dados : listaDados) {
-            boletos.add(BoletoBancario.gerarBoleto(dados));
-        }
-
-        /*
-         * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
-         */
-
-        new Relatorios().imprimirBoleto(boletos, condominio);
-//        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
-//        BoletoBancario.mostreBoletoNaTela(pdf);
     }
 
     private void limparSelecoesTabelas() {
@@ -1404,6 +1448,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         txtMensagem2.setText(condominio.getMensagens().get(1).getMensagem());
         txtMensagem3.setText(condominio.getMensagens().get(2).getMensagem());
         txtMensagem4.setText(condominio.getMensagens().get(3).getMensagem());
+        checkMostrarInadimplenciaBoleto.setSelected(condominio.isMostrarInadimplenciaBoleto());
     }
 
     private void salvarMensagens() {
@@ -1412,6 +1457,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         condominio.getMensagens().get(1).setMensagem(txtMensagem2.getText());
         condominio.getMensagens().get(2).setMensagem(txtMensagem3.getText());
         condominio.getMensagens().get(3).setMensagem(txtMensagem4.getText());
+        condominio.setMostrarInadimplenciaBoleto(checkMostrarInadimplenciaBoleto.isSelected());
         new DAO().salvar(condominio);
         ApresentacaoUtil.exibirInformacao("Mensagens salvas com sucesso!", this);
     }
@@ -1509,7 +1555,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         pagamento.setDataVencimento(DataUtil.getCalendar(DataUtil.getDateTime(ac.getDataPrimeiroPagamento()).plusMonths(i)));
         pagamento.setCobranca(cobranca);
         pagamento.setConta(new DAO().localizar(Conta.class, 41102));
-        pagamento.setHistorico(pagamento.getConta().getNome() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+        pagamento.setHistorico(pagamento.getConta().getNome().toUpperCase() + " " + ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getNumeroDocumento() + " " + DataUtil.escreverMes(ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getDataVencimento()) + "/" + DataUtil.getDateTime(ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getDataVencimento()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+        pagamento.setDescricao(pagamento.getConta().getNome().toUpperCase() + " " + ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getNumeroDocumento() + " " + DataUtil.escreverMes(ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getDataVencimento()) + "/" + DataUtil.getDateTime(ac.getHistorico().getCobrancasOriginais().get(ac.getHistorico().getCobrancasOriginais().size() - 1).getDataVencimento()).getYear());
         pagamento.setValor(ac.getValor());
         pagamento.setValor(new Moeda(pagamento.getValor().doubleValue() / (ac.getNumeroParcelas())).bigDecimalValue());
         cobranca.getPagamentos().add(pagamento);
@@ -1859,10 +1906,10 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     public void imprimirInadimplencia(TipoRelatorio tipo) {
         if (!modeloTabelaCondominos.getObjetosSelecionados().isEmpty()) {
-            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, tipo, modeloTabelaCondominos.getObjetosSelecionados());
+            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, false, condominio, tipo, modeloTabelaCondominos.getObjetosSelecionados());
             dialogo.setVisible(true);
         } else {
-            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, true, condominio, tipo, condominio.getUnidades());
+            DialogoDadosInadimplencia dialogo = new DialogoDadosInadimplencia(null, false, condominio, tipo, condominio.getUnidades());
             dialogo.setVisible(true);
         }
     }
@@ -2467,6 +2514,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         radioSemRegistro = new javax.swing.JRadioButton();
         jLabel10 = new javax.swing.JLabel();
         radioComRegistro = new javax.swing.JRadioButton();
+        checkMostrarInadimplenciaBoleto = new javax.swing.JCheckBox();
         jPanel7 = new javax.swing.JPanel();
         jScrollPane7 = new javax.swing.JScrollPane();
         tabelaAcordo = new javax.swing.JTable();
@@ -2696,7 +2744,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
+        tabelaCobrancasBase.setFont(new java.awt.Font("Tahoma", 0, 9));
         tabelaCobrancasBase.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -3137,6 +3185,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
         buttonGroup1.add(radioComRegistro);
         radioComRegistro.setText("Cobrança com registro");
 
+        checkMostrarInadimplenciaBoleto.setText("Exibir total da inadimplência no Boleto?");
+
         javax.swing.GroupLayout painelMensagemLayout = new javax.swing.GroupLayout(painelMensagem);
         painelMensagem.setLayout(painelMensagemLayout);
         painelMensagemLayout.setHorizontalGroup(
@@ -3147,14 +3197,6 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addComponent(jLabel7)
                     .addComponent(jLabel8)
                     .addComponent(jLabel6)
-                    .addComponent(jLabel9)
-                    .addGroup(painelMensagemLayout.createSequentialGroup()
-                        .addComponent(jLabel10)
-                        .addGap(31, 31, 31)
-                        .addComponent(radioSemRegistro)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(radioComRegistro)
-                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelMensagemLayout.createSequentialGroup()
                         .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -3162,7 +3204,20 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                             .addComponent(txtMensagem3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
                             .addComponent(txtMensagem2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
                             .addComponent(jScrollPane11, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(painelMensagemLayout.createSequentialGroup()
+                        .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(painelMensagemLayout.createSequentialGroup()
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(checkMostrarInadimplenciaBoleto))
+                            .addGroup(painelMensagemLayout.createSequentialGroup()
+                                .addComponent(jLabel10)
+                                .addGap(31, 31, 31)
+                                .addComponent(radioSemRegistro)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(radioComRegistro)))
+                        .addContainerGap(33, Short.MAX_VALUE))))
         );
         painelMensagemLayout.setVerticalGroup(
             painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -3172,10 +3227,14 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     .addComponent(jLabel10)
                     .addComponent(radioSemRegistro)
                     .addComponent(radioComRegistro))
-                .addGap(9, 9, 9)
-                .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(painelMensagemLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelMensagemLayout.createSequentialGroup()
+                        .addComponent(checkMostrarInadimplenciaBoleto)
+                        .addGap(17, 17, 17))
+                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -3206,7 +3265,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(painelMensagem, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(painelMensagem, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3379,6 +3438,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvarMensagem;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox checkMostrarInadimplenciaBoleto;
     private javax.swing.JMenuItem itemMenuBaixaManual;
     private javax.swing.JMenuItem itemMenuBaixaManualInadimplente;
     private javax.swing.JMenuItem itemMenuCalcularJurosMulta;

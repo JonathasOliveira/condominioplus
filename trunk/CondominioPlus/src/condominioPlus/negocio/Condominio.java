@@ -131,6 +131,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private int numeroMinimoParcelasAcordo;
     @Column(name="incremento_nosso_numero")
     private int incrementoNumeroDocumento = 1;
+    @Column(name="mostrar_inadimplencia_boleto")
+    private boolean mostrarInadimplenciaBoleto = false;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<TaxaExtra> taxas;
     
@@ -541,6 +543,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setIncrementoNumeroDocumento(int incrementoNumeroDocumento) {
         this.incrementoNumeroDocumento = incrementoNumeroDocumento;
+    }
+
+    public boolean isMostrarInadimplenciaBoleto() {
+        return mostrarInadimplenciaBoleto;
+    }
+
+    public void setMostrarInadimplenciaBoleto(boolean mostrarInadimplenciaBoleto) {
+        this.mostrarInadimplenciaBoleto = mostrarInadimplenciaBoleto;
     }
 
     public List<ContaGas> getContasDeGas() {

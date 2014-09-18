@@ -35,7 +35,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -378,7 +377,7 @@ public class Relatorios implements Printable {
                     mapa.put("valorPago", PagamentoUtil.formatarMoeda(co.getValorPago().doubleValue()));
                     mapa.put("descontoAte", co.getDescontoAte() != null ? DataUtil.toString(co.getDescontoAte()) : "");
                     String valorComDesconto = "";
-                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0){
+                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0) {
                         valorComDesconto = PagamentoUtil.formatarMoeda(co.getTotalComDesconto().doubleValue());
                     }
                     mapa.put("valorComDesconto", valorComDesconto);
@@ -389,7 +388,7 @@ public class Relatorios implements Printable {
                     if (tipo == TipoRelatorio.PAGAMENTOS_EFETUADOS_ANALITICO) {
                         for (Pagamento pagamento : co.getPagamentos()) {
                             HashMap<String, String> mapa2 = new HashMap();
-                            mapa2.put("descricao", pagamento.getDescricao().equals(" ") ? pagamento.getHistorico() : pagamento.getDescricao());
+                            mapa2.put("descricao", pagamento.getDescricao() == null || pagamento.getDescricao().equals(" ") ? pagamento.getHistorico().toUpperCase() : pagamento.getDescricao().toUpperCase());
                             mapa2.put("valor", PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
                             listaPagamentos.add(mapa2);
                         }
@@ -483,12 +482,12 @@ public class Relatorios implements Printable {
                     mapa.put("multa", PagamentoUtil.formatarMoeda(co.getMulta().doubleValue()));
                     mapa.put("descontoAte", co.getDescontoAte() != null ? DataUtil.toString(co.getDescontoAte()) : "");
                     String valorComDesconto = "";
-                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0){
+                    if (co.getTotalComDesconto() != null && co.getTotalComDesconto().doubleValue() != 0) {
                         valorComDesconto = PagamentoUtil.formatarMoeda(co.getTotalComDesconto().doubleValue());
                     }
                     mapa.put("valorComDesconto", valorComDesconto);
                     mapa.put("total", PagamentoUtil.formatarMoeda(co.getValorTotal().doubleValue()));
-                    mapa.put("linhaDigitavel", co.getLinhaDigitavel()  );
+                    mapa.put("linhaDigitavel", co.getLinhaDigitavel());
 
                     List<HashMap<String, String>> listaPagamentos = new ArrayList<HashMap<String, String>>();
 
@@ -757,7 +756,14 @@ public class Relatorios implements Printable {
             lista.add(mapa);
         }
 
-        parametros.put("somaFracao", somaFracao.setScale(2).toString());
+        String fracao = "";
+        if (somaFracao.doubleValue() >= 0.9 && somaFracao.doubleValue() <= 1.2) {
+            fracao = "1.00";
+        } else if (somaFracao.doubleValue() >= 90 && somaFracao.doubleValue() <= 105) {
+            fracao = "100";
+        }
+
+        parametros.put("somaFracao", fracao);
 
         if (!lista.isEmpty()) {
             imprimir("RelatorioRelacaoFracaoIdeal", parametros, lista, false, true, null);
@@ -799,10 +805,176 @@ public class Relatorios implements Printable {
         imprimir("CertificadoQuitacao", parametros, lista, false, true, null);
     }
 
-    public void imprimirBoleto(List<BoletoBancario> boletos, Condominio condominio) {
+    public void imprimirBoleto(List<BoletoBancario> boletos, Condominio condominio, boolean exibirBalancete, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos) {
         List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
 
         HashMap<String, Object> parametros = new HashMap();
+
+        // DADOS PARA PREENCHER O BALANCETE SINTETICO
+        if (exibirBalancete) {
+            parametros.put("dataInicial", DataUtil.toString(dataInicial));
+            parametros.put("dataFinal", DataUtil.toString(dataFinal));
+
+            List<PagamentoAuxiliar> pagamentosAuxiliaresDebito = new ArrayList<PagamentoAuxiliar>();
+            List<PagamentoAuxiliar> pagamentosAuxiliaresCredito = new ArrayList<PagamentoAuxiliar>();
+
+            BigDecimal saldoAnterior = new BigDecimal(0);
+            BigDecimal creditos = new BigDecimal(0);
+            BigDecimal debitos = new BigDecimal(0);
+            BigDecimal saldoAtual = new BigDecimal(0);
+
+            //campo para calcular o saldo de cada pagamento e mostrar no relatorio
+//        BigDecimal saldoAuxiliar = new BigDecimal(0);
+
+            for (Pagamento p : pagamentos) {
+                boolean continuar = true;
+                int codigoConta = p.getConta().getCodigo();
+                PagamentoAuxiliar pa = null;
+
+                if (p.getConta().isCredito()) {
+                    if (pagamentosAuxiliaresCredito.isEmpty()) {
+                        pa = new PagamentoAuxiliar();
+                        pa.setCodigoConta(codigoConta);
+                        pa.setNomeConta(p.getConta().getNome());
+                        pa.adicionarPagamento(p);
+                    } else {
+                        for (PagamentoAuxiliar p1 : pagamentosAuxiliaresCredito) {
+                            if (p1.getCodigoConta() == codigoConta) {
+                                p1.adicionarPagamento(p);
+                                continuar = false;
+                            } else {
+                                pa = new PagamentoAuxiliar();
+                                pa.setCodigoConta(codigoConta);
+                                pa.setNomeConta(p.getConta().getNome());
+                                pa.adicionarPagamento(p);
+                            }
+                        }
+                    }
+
+                    if (pa != null && continuar == true) {
+                        pagamentosAuxiliaresCredito.add(pa);
+                    }
+                } else {
+                    if (pagamentosAuxiliaresDebito.isEmpty()) {
+                        pa = new PagamentoAuxiliar();
+                        pa.setCodigoConta(codigoConta);
+                        pa.setNomeConta(p.getConta().getNome());
+                        pa.adicionarPagamento(p);
+                    } else {
+                        for (PagamentoAuxiliar p1 : pagamentosAuxiliaresDebito) {
+                            if (p1.getCodigoConta() == codigoConta) {
+                                p1.adicionarPagamento(p);
+                                continuar = false;
+                            } else {
+                                pa = new PagamentoAuxiliar();
+                                pa.setCodigoConta(codigoConta);
+                                pa.setNomeConta(p.getConta().getNome());
+                                pa.adicionarPagamento(p);
+                            }
+                        }
+                    }
+
+                    if (pa != null && continuar == true) {
+                        pagamentosAuxiliaresDebito.add(pa);
+                    }
+                }
+
+                if (p.getConta().isCredito()) {
+                    creditos = creditos.add(p.getValor());
+                } else {
+                    debitos = debitos.add(p.getValor());
+                }
+
+                saldoAtual = p.getSaldo();
+            }
+
+            saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
+//        saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
+
+            HashMap<String, Object> mapa = new HashMap();
+            List<HashMap<String, Object>> listaCredito = new ArrayList<HashMap<String, Object>>();
+            List<HashMap<String, Object>> listaDebito = new ArrayList<HashMap<String, Object>>();
+
+            //preenchendo as listas para visualização do relatório//
+            for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresCredito)) {
+                listaCredito.add(preencherListaBalancete(p, TipoRelatorio.BALANCETE_SINTETICO));
+            }
+            for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresDebito)) {
+                listaDebito.add(preencherListaBalancete(p, TipoRelatorio.BALANCETE_SINTETICO));
+            }
+
+            parametros.put("listaCredito", new JRBeanCollectionDataSource(listaCredito));
+            parametros.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
+            parametros.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
+            parametros.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
+
+            //verificar se o saldo é nulo para nao dar erro ao gerar o relatorio//
+            BigDecimal saldoPoupanca = new BigDecimal(0);
+            BigDecimal saldoAplicacao = new BigDecimal(0);
+            BigDecimal saldoEmprestismo = new BigDecimal(0);
+            BigDecimal saldoConsignacao = new BigDecimal(0);
+            if (condominio.getPoupanca() != null) {
+                saldoPoupanca = saldoPoupanca.add(condominio.getPoupanca().getSaldo());
+            }
+            if (condominio.getAplicacao() != null) {
+                saldoAplicacao = saldoAplicacao.add(condominio.getAplicacao().getSaldo());
+            }
+            if (condominio.getEmprestimo() != null) {
+                saldoEmprestismo = saldoEmprestismo.add(condominio.getEmprestimo().getSaldo());
+            }
+            if (condominio.getConsignacao() != null) {
+                saldoConsignacao = saldoConsignacao.add(condominio.getConsignacao().getSaldo());
+            }
+            //fim verificar se o saldo é nulo para nao dar erro ao gerar o relatorio//
+
+            BigDecimal totalSubRecursos = new BigDecimal(0);
+            totalSubRecursos = totalSubRecursos.add(saldoAtual).add(saldoPoupanca).add(saldoAplicacao).add(saldoEmprestismo).add(saldoConsignacao);
+
+            List<Pagamento> contasAPagar = new DAO().listar("PagamentosContaPagar", condominio.getContaPagar());
+            BigDecimal somaValorContasAPagar = new BigDecimal(0);
+            PAGAMENTOS:
+            for (Pagamento p : contasAPagar) {
+                if (p.getConta().getNomeVinculo().equals("EM")) {
+                    continue PAGAMENTOS;
+                }
+                somaValorContasAPagar = somaValorContasAPagar.add(p.getValor());
+            }
+
+            BigDecimal deficitSuperavit = new BigDecimal(0);
+            deficitSuperavit = deficitSuperavit.add(totalSubRecursos).add(somaValorContasAPagar);
+
+            parametros.put("saldoAnterior", PagamentoUtil.formatarMoeda(saldoAnterior.doubleValue()));
+            parametros.put("creditos", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
+            parametros.put("debitos", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
+            parametros.put("saldoAtual", PagamentoUtil.formatarMoeda(saldoAtual.doubleValue()));
+            parametros.put("poupanca", PagamentoUtil.formatarMoeda(saldoPoupanca.doubleValue()));
+            parametros.put("aplicacoes", PagamentoUtil.formatarMoeda(saldoAplicacao.doubleValue()));
+            parametros.put("emprestimos", PagamentoUtil.formatarMoeda(saldoEmprestismo.doubleValue()));
+            parametros.put("consignacoes", PagamentoUtil.formatarMoeda(saldoConsignacao.doubleValue()));
+            parametros.put("pagamentosNaoEfetuados", PagamentoUtil.formatarMoeda(somaValorContasAPagar.doubleValue()));
+            parametros.put("deficitSuperavit", PagamentoUtil.formatarMoeda(deficitSuperavit.doubleValue()));
+
+            parametros.put("totalSubRecursos", PagamentoUtil.formatarMoeda(totalSubRecursos.doubleValue()));
+
+            URL caminho = getClass().getResource("/condominioPlus/relatorios/");
+            parametros.put("subrelatorio", caminho.toString());
+        }
+        // FIM DADOS BALANCETE SINTETICO
+
+        //DADOS PARA INFORMACAO DA INADIMPLENCIA
+        if (condominio.isMostrarInadimplenciaBoleto()) {
+            BigDecimal totalInadimplencia = new BigDecimal(0);
+            for (Unidade u : condominio.getUnidades()) {
+                for (Cobranca c : u.getCobrancas()) {
+                    if (c.getDataPagamento() == null && DataUtil.getDiferencaEmDias(DataUtil.getDateTime(condominio.getContaCorrente().getDataFechamento()), DataUtil.getDateTime(c.getDataVencimento())) >= 1 && c.isExibir()) {
+                        totalInadimplencia = totalInadimplencia.add(c.getValorTotal());
+                    }
+                }
+            }
+            parametros.put("textoInadimplencia", "TOTAL DA INADIMPLÊNCIA ATÉ DIA " + DataUtil.toString(condominio.getContaCorrente().getDataFechamento()));
+            parametros.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
+        }
+        //FIM DADOS INFORMACAO DA INADIMPLENCIA
 
         if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
             URL logoSantander = getClass().getResource("/condominioPlus/recursos/imagens/santander_logo.jpg");
@@ -864,7 +1036,7 @@ public class Relatorios implements Printable {
                 }
                 listaAuxiliarPagamentos.add(p);
             }
-            
+
             Comparator c = null;
             c = new Comparator() {
 
@@ -889,7 +1061,7 @@ public class Relatorios implements Printable {
                 mapa.put("detalhe" + i, "   " + p.getDescricao());
                 mapa.put("valordetalhe" + i, PagamentoUtil.formatarMoeda(p.getValor().doubleValue()) + "   ");
             }
-            
+
             mapa.put("mensagem0", boleto.getMensagem0());
             mapa.put("mensagem1", boleto.getMensagem1());
             mapa.put("mensagem2", boleto.getMensagem2());
@@ -900,10 +1072,18 @@ public class Relatorios implements Printable {
         }
 
         if (!lista.isEmpty()) {
-            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
-                imprimir("BoletoSantander", parametros, lista, false, true, null);
-            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
-                imprimir("BoletoBradesco", parametros, lista, false, true, null);
+            if (exibirBalancete) {
+                if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                    imprimir("BoletoSantanderBalancete", parametros, lista, false, true, null);
+                } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                    imprimir("BoletoBradescoBalancete", parametros, lista, false, true, null);
+                }
+            } else {
+                if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                    imprimir("BoletoSantander", parametros, lista, false, true, null);
+                } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                    imprimir("BoletoBradesco", parametros, lista, false, true, null);
+                }
             }
         }
     }
