@@ -33,7 +33,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -56,20 +55,6 @@ import logicpoint.persistencia.DAO;
 import logicpoint.util.DataUtil;
 import logicpoint.util.Moeda;
 import net.sf.nachocalendar.table.JTableCustomizer;
-import org.jrimum.bopepo.BancoSuportado;
-import org.jrimum.bopepo.Boleto;
-import org.jrimum.bopepo.view.BoletoViewer;
-import org.jrimum.domkee.comum.pessoa.endereco.CEP;
-import org.jrimum.domkee.comum.pessoa.endereco.Endereco;
-import org.jrimum.domkee.financeiro.banco.febraban.Agencia;
-import org.jrimum.domkee.financeiro.banco.febraban.Carteira;
-import org.jrimum.domkee.financeiro.banco.febraban.Cedente;
-import org.jrimum.domkee.financeiro.banco.febraban.ContaBancaria;
-import org.jrimum.domkee.financeiro.banco.febraban.NumeroDaConta;
-import org.jrimum.domkee.financeiro.banco.febraban.Sacado;
-import org.jrimum.domkee.financeiro.banco.febraban.TipoDeTitulo;
-import org.jrimum.domkee.financeiro.banco.febraban.Titulo;
-import org.jrimum.domkee.financeiro.banco.febraban.Titulo.EnumAceite;
 
 /**
  *
@@ -413,7 +398,7 @@ public class TelaTaxaExtra extends javax.swing.JInternalFrame {
          * GERANDO O(S) BOLETO(S) BANCÁRIO(S).
          */
 
-        new Relatorios().imprimirBoleto(boletos, condominio);
+        new Relatorios().imprimirBoleto(boletos, condominio, false, null, null, null);
 //        File pdf = BoletoViewer.groupInOnePDF("MeuPrimeiroBoleto.pdf", boletos);
 //        BoletoBancario.mostreBoletoNaTela(pdf);
     }

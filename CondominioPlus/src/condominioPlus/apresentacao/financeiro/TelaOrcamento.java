@@ -23,6 +23,7 @@ import condominioPlus.util.Relatorios;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.ArrayList;
@@ -641,7 +642,12 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         conta.setCodigo(0);
         conta.setNome(txtDescricaoDiversos.getText());
         contaOrcamentariaAdicional.setConta(conta);
-        contaOrcamentariaAdicional.setMedia(new BigDecimal(txtValorDiversos.getText().replace(",", ".")));
+        BigDecimal valor = new BigDecimal(txtValorDiversos.getText().replace(",", "."));
+        if (valor.doubleValue() > 0) {
+            contaOrcamentariaAdicional.setMedia(valor.negate());
+        } else {
+            contaOrcamentariaAdicional.setMedia(valor);
+        }
         contaOrcamentariaAdicional.setMedia1(contaOrcamentariaAdicional.getMedia());
         contaOrcamentariaAdicional.setMedia1(contaOrcamentariaAdicional.getMedia1().add(contaOrcamentariaAdicional.getMedia1().multiply(new Moeda((Integer) spnIncremento1.getValue()).divide(100).bigDecimalValue())).setScale(2, RoundingMode.HALF_UP));
         contaOrcamentariaAdicional.setMedia2(contaOrcamentariaAdicional.getMedia());
@@ -694,48 +700,38 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
     private void carregarDadosSubRelatorio() {
         listaItemOrcamento.clear();
 
+        BigDecimal taxaMedia = new BigDecimal(txtSomaMedia.getText().replace(".", "").replace(",", "."));
         BigDecimal taxa1 = new BigDecimal(txtSomaMedia1.getText().replace(".", "").replace(",", "."));
         BigDecimal taxa2 = new BigDecimal(txtSomaMedia2.getText().replace(".", "").replace(",", "."));
         BigDecimal taxa3 = new BigDecimal(txtSomaMedia3.getText().replace(".", "").replace(",", "."));
 
         if (radioIgualParaTodos.isSelected()) {
+            taxaMedia = new Moeda(taxaMedia.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             taxa1 = new Moeda(taxa1.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             taxa2 = new Moeda(taxa2.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             taxa3 = new Moeda(taxa3.doubleValue() / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
 
+            List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
+
             for (Unidade u : listaUnidadesAConsiderar) {
-                if (listaItemOrcamento.isEmpty()) {
-                    ItemOrcamento item = new ItemOrcamento();
-                    item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
-                    item.setNumeroUnidades(item.getNumeroUnidades() + 1);
-                    item.setTaxa1(taxa1);
-                    item.setTaxa2(taxa2);
-                    item.setTaxa3(taxa3);
-                    listaItemOrcamento.add(item);
-                } else {
-                    List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
-                    for (ItemOrcamento i : listaItemOrcamento) {
-                        if (String.valueOf(u.getFracaoIdeal()).equals(i.getFracaoIdeal())) {
-                            i.setNumeroUnidades(i.getNumeroUnidades() + 1);
-                        } else {
-                            ItemOrcamento item = new ItemOrcamento();
-                            item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
-                            item.setNumeroUnidades(item.getNumeroUnidades() + 1);
-                            item.setTaxa1(taxa1);
-                            item.setTaxa2(taxa2);
-                            item.setTaxa3(taxa3);
-                            listaAuxiliar.add(item);
-                        }
-                    }
-                    for (ItemOrcamento i : listaAuxiliar) {
-                        listaItemOrcamento.add(i);
-                    }
-                }
+                ItemOrcamento item = new ItemOrcamento();
+                item.setUnidade(u);
+                item.setTaxaMedia(taxaMedia);
+                item.setTaxa1(taxa1);
+                item.setTaxa2(taxa2);
+                item.setTaxa3(taxa3);
+                listaAuxiliar.add(item);
             }
+
+            for (ItemOrcamento i : listaAuxiliar) {
+                listaItemOrcamento.add(i);
+            }
+
         } else if (radioFracaoIdeal.isSelected()) {
 
             //calcular o valor das unidades descartadas e dividir pelas unidades consideradas
             double somaFracoesIdeaisDescartadas = 0;
+            BigDecimal valorTaxaMediaFracionadaPorUnidade = new BigDecimal(0);
             BigDecimal valorTaxa1FracionadoPorUnidade = new BigDecimal(0);
             BigDecimal valorTaxa2FracionadoPorUnidade = new BigDecimal(0);
             BigDecimal valorTaxa3FracionadoPorUnidade = new BigDecimal(0);
@@ -748,10 +744,13 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                 }
             }
 
+            valorTaxaMediaFracionadaPorUnidade = new Moeda((taxaMedia.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             valorTaxa1FracionadoPorUnidade = new Moeda((taxa1.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             valorTaxa2FracionadoPorUnidade = new Moeda((taxa2.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             valorTaxa3FracionadoPorUnidade = new Moeda((taxa3.doubleValue() * somaFracoesIdeaisDescartadas) / listaUnidadesAConsiderar.size()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP);
             //fim calcular o valor das unidades descartadas e dividir pelas unidades consideradas
+
+            List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
 
             for (Unidade u : listaUnidadesAConsiderar) {
                 //verificando a soma da Fração Ideal
@@ -762,35 +761,23 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
                     fracaoIdeal += u.getFracaoIdeal().doubleValue() / 100;
                 }
                 //fim
-                if (listaItemOrcamento.isEmpty()) {
-                    ItemOrcamento item = new ItemOrcamento();
-                    item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
-                    item.setNumeroUnidades(item.getNumeroUnidades() + 1);
-                    item.setTaxa1(new Moeda((taxa1.doubleValue() * fracaoIdeal) + valorTaxa1FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                    item.setTaxa2(new Moeda((taxa2.doubleValue() * fracaoIdeal) + valorTaxa2FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                    item.setTaxa3(new Moeda((taxa3.doubleValue() * fracaoIdeal) + valorTaxa3FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                    listaItemOrcamento.add(item);
-                } else {
-                    List<ItemOrcamento> listaAuxiliar = new ArrayList<ItemOrcamento>();
-                    for (ItemOrcamento i : listaItemOrcamento) {
-                        if (String.valueOf(u.getFracaoIdeal()).equals(i.getFracaoIdeal())) {
-                            i.setNumeroUnidades(i.getNumeroUnidades() + 1);
-                        } else {
-                            ItemOrcamento item = new ItemOrcamento();
-                            item.setFracaoIdeal(String.valueOf(u.getFracaoIdeal()));
-                            item.setNumeroUnidades(item.getNumeroUnidades() + 1);
-                            item.setTaxa1(new Moeda((taxa1.doubleValue() * fracaoIdeal) + valorTaxa1FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                            item.setTaxa2(new Moeda((taxa2.doubleValue() * fracaoIdeal) + valorTaxa2FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                            item.setTaxa3(new Moeda((taxa3.doubleValue() * fracaoIdeal) + valorTaxa3FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
-                            listaAuxiliar.add(item);
-                        }
-                    }
-                    for (ItemOrcamento i : listaAuxiliar) {
-                        listaItemOrcamento.add(i);
-                    }
-                }
+
+                ItemOrcamento item = new ItemOrcamento();
+                item.setUnidade(u);
+                item.setTaxaMedia(new Moeda((taxaMedia.doubleValue() * fracaoIdeal) + valorTaxaMediaFracionadaPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                item.setTaxa1(new Moeda((taxa1.doubleValue() * fracaoIdeal) + valorTaxa1FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                item.setTaxa2(new Moeda((taxa2.doubleValue() * fracaoIdeal) + valorTaxa2FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                item.setTaxa3(new Moeda((taxa3.doubleValue() * fracaoIdeal) + valorTaxa3FracionadoPorUnidade.doubleValue()).bigDecimalValue().setScale(2, RoundingMode.HALF_UP));
+                listaAuxiliar.add(item);
+
+            }
+
+            for (ItemOrcamento i : listaAuxiliar) {
+                listaItemOrcamento.add(i);
             }
         }
+
+        System.out.println("tamanho lista orçamento: " + listaItemOrcamento.size());
     }
 
     private void imprimir() {
@@ -803,11 +790,13 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         List<HashMap<String, String>> listaItens = new ArrayList<HashMap<String, String>>();
         for (ItemOrcamento item : listaItemOrcamento) {
             HashMap<String, String> mapa2 = new HashMap();
-            mapa2.put("numeroUnidades", "" + item.getNumeroUnidades());
-            mapa2.put("fracaoIdeal", item.getFracaoIdeal());
-            mapa2.put("taxa1", PagamentoUtil.formatarMoeda(item.getTaxa1().doubleValue()));
-            mapa2.put("taxa2", PagamentoUtil.formatarMoeda(item.getTaxa2().doubleValue()));
-            mapa2.put("taxa3", PagamentoUtil.formatarMoeda(item.getTaxa3().doubleValue()));
+            mapa2.put("numeroUnidades", "" + item.getUnidade().getUnidade());
+            mapa2.put("nome", item.getUnidade().getCondomino().getNome());
+            mapa2.put("fracaoIdeal", String.valueOf(item.getUnidade().getFracaoIdeal()));
+            mapa2.put("media", PagamentoUtil.formatarMoeda(item.getTaxaMedia().negate().doubleValue()));
+            mapa2.put("taxa1", PagamentoUtil.formatarMoeda(item.getTaxa1().negate().doubleValue()));
+            mapa2.put("taxa2", PagamentoUtil.formatarMoeda(item.getTaxa2().negate().doubleValue()));
+            mapa2.put("taxa3", PagamentoUtil.formatarMoeda(item.getTaxa3().negate().doubleValue()));
             listaItens.add(mapa2);
         }
 
@@ -831,13 +820,16 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
         for (Unidade u : listaUnidadesAConsiderar) {
             unidadesConsideradas = unidadesConsideradas + u.getUnidade() + "; ";
         }
-        parametros.put("unidadesConsideradas", unidadesConsideradas);
 
-        String unidadesDesprezadas = "Unidades Desprezadas" + "\n";
+        unidadesConsideradas = unidadesConsideradas + "\n\n" + "Unidades Desprezadas" + "\n";
         for (Unidade u : listaUnidadesADescartar) {
-            unidadesDesprezadas = unidadesDesprezadas + u.getUnidade() + "; ";
+            unidadesConsideradas = unidadesConsideradas + u.getUnidade() + "; ";
         }
-        parametros.put("unidadesDesprezadas", unidadesDesprezadas);
+
+        List<HashMap<String, String>> listaUnidadesConsideradas = new ArrayList<HashMap<String, String>>();
+        HashMap<String, String> mapa3 = new HashMap<String, String>();
+        mapa3.put("unidadesConsideradas", unidadesConsideradas);
+        listaUnidadesConsideradas.add(mapa3);
 
         for (ContaOrcamentaria co : contasOrcamentarias) {
             HashMap<String, Object> mapa = new HashMap();
@@ -848,6 +840,7 @@ public class TelaOrcamento extends javax.swing.JInternalFrame {
             mapa.put("media2", PagamentoUtil.formatarMoeda(co.getMedia2().doubleValue()));
             mapa.put("media3", PagamentoUtil.formatarMoeda(co.getMedia3().doubleValue()));
             mapa.put("listaItens", new JRBeanCollectionDataSource(listaItens));
+            mapa.put("listaUnidadesConsideradas", new JRBeanCollectionDataSource(listaUnidadesConsideradas));
             listaContasOrcamentarias.add(mapa);
         }
 

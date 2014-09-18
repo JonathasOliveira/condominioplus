@@ -336,8 +336,7 @@ Conta Corrente]]></text>
 				<textElement>
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[Total
-Sub Recursos]]></text>
+				<text><![CDATA[Total Recursos]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
 				<reportElement x="195" y="40" width="72" height="12"/>
