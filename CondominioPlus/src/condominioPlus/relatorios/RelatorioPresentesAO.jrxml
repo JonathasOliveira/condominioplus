@@ -14,23 +14,68 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="132" splitType="Stretch">
+	<pageHeader>
+		<band height="150" splitType="Stretch">
+			<rectangle>
+				<reportElement x="477" y="63" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<textField>
+				<reportElement x="496" y="75" width="54" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
 			<image>
 				<reportElement x="0" y="12" width="362" height="89"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
 			</image>
+			<staticText>
+				<reportElement x="6" y="132" width="46" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Unidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="132" width="82" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Proprietário(a)]]></text>
+			</staticText>
 			<rectangle>
 				<reportElement x="0" y="96" width="473" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
-			<rectangle>
-				<reportElement x="477" y="63" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
-			</rectangle>
+			<staticText>
+				<reportElement x="344" y="132" width="82" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Assinatura]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="375" y="33" width="180" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomeRelatorio}]]></textFieldExpression>
+			</textField>
 			<rectangle>
 				<reportElement x="477" y="96" width="78" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<rectangle>
 				<reportElement x="385" y="63" width="88" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="375" y="15" width="180" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Presentes na]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<textField isBlankWhenNull="true">
 				<reportElement x="6" y="108" width="461" height="15"/>
@@ -46,6 +91,9 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{data}]]></textFieldExpression>
 			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
 			<staticText>
 				<reportElement x="482" y="98" width="70" height="15"/>
 				<textElement>
@@ -53,19 +101,19 @@
 				</textElement>
 				<text><![CDATA[Data Assembleia]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="496" y="75" width="54" height="15"/>
+			<textField isBlankWhenNull="true">
+				<reportElement x="413" y="75" width="54" height="15"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="98" width="76" height="15"/>
-				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
+				<reportElement x="390" y="65" width="70" height="15"/>
+				<textElement>
+					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Entidade]]></text>
+				<text><![CDATA[Emissão]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="482" y="65" width="70" height="15"/>
@@ -75,63 +123,11 @@
 				<text><![CDATA[Folha]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="390" y="65" width="70" height="15"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Emissão]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="413" y="75" width="54" height="15"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
-			</textField>
-			<rectangle>
-				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<staticText>
-				<reportElement x="375" y="15" width="180" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
-				</textElement>
-				<text><![CDATA[Presentes na]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="375" y="33" width="180" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="14" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{nomeRelatorio}]]></textFieldExpression>
-			</textField>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="18" splitType="Stretch">
-			<staticText>
-				<reportElement x="6" y="0" width="46" height="15"/>
+				<reportElement x="6" y="98" width="76" height="15"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
+					<font size="8" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Unidade]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="64" y="0" width="82" height="15"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Proprietário(a)]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="344" y="0" width="82" height="15"/>
-				<textElement verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Assinatura]]></text>
+				<text><![CDATA[Entidade]]></text>
 			</staticText>
 		</band>
 	</pageHeader>

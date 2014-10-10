@@ -8,7 +8,7 @@
 	<parameter name="dataEmissao" class="java.lang.String"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="periodo" class="java.lang.String"/>
-	<field name="valorTotal" class="java.lang.String"/>
+	<field name="total" class="java.lang.String"/>
 	<field name="linhaDigitavel" class="java.lang.String"/>
 	<field name="vencimento" class="java.lang.String"/>
 	<field name="descontoAte" class="java.lang.String"/>
@@ -78,7 +78,7 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{valorTotal}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{total}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="344" y="0" width="207" height="12"/>

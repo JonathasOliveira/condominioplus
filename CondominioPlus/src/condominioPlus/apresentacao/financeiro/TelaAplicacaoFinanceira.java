@@ -28,6 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -174,6 +175,7 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
 
     private boolean preencherObjeto() {
         if (conta.getNomeVinculo().equals("AF")) {
+            System.out.println("estou dentro do if de aplicações");
             pagamento = new Pagamento();
 
             pagamento.setDataPagamento(DataUtil.getCalendar(txtData.getValue()));
@@ -197,7 +199,11 @@ public class TelaAplicacaoFinanceira extends javax.swing.JInternalFrame {
             verificarListaVaziaAplicacao(pagamento);
 
             condominio.getAplicacao().adicionarPagamento(pagamento);
-            condominio.getAplicacao().setSaldo(condominio.getAplicacao().getSaldo().add(pagamento.getValor()));
+            BigDecimal saldoAplicacao = new BigDecimal(0);
+            for (Pagamento p : condominio.getAplicacao().getPagamentos()){
+                saldoAplicacao = saldoAplicacao.add(p.getValor());
+            }
+            condominio.getAplicacao().setSaldo(saldoAplicacao);
 
             PagamentoUtil.pagamentoVinculado(pagamento);
 

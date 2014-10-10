@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RelatorioCartaAnalitica" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
@@ -25,8 +25,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="132" splitType="Stretch">
+	<pageHeader>
+		<band height="228" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -112,64 +112,60 @@
 			<rectangle>
 				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="96" splitType="Stretch">
 			<staticText>
-				<reportElement x="19" y="54" width="497" height="24"/>
+				<reportElement x="19" y="186" width="497" height="24"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Caso já tenha(m) sido executado(s) o(s) pagamento(s) do(s) aludido(s) débito(s) solicitamos tornar este aviso sem efeito e encaminhar a(s) cópia(s) xerox, para que possamos averiguar junto ao banco.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="32" width="518" height="12"/>
+				<reportElement x="19" y="164" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Ao contabilizar os documentos da entidade em apreço, verificamos o(s) débito(s) abaixo relacionado(s).]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="43" width="518" height="12"/>
+				<reportElement x="19" y="175" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Para liquidar o(s) débito(s) V. Sa. deverá entrar em contato com esta administradora.]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="0" y="0" width="554" height="24" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="132" width="554" height="24" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="0" width="39" height="12"/>
+				<reportElement x="6" y="132" width="39" height="12"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="53" y="0" width="82" height="12"/>
+				<reportElement x="53" y="132" width="82" height="12"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Proprietário]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="6" y="11" width="39" height="12"/>
+				<reportElement x="6" y="143" width="39" height="12"/>
 				<textElement>
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="53" y="11" width="453" height="12"/>
+				<reportElement x="53" y="143" width="453" height="12"/>
 				<textElement>
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{nome}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="83" width="544" height="12"/>
+				<reportElement x="6" y="215" width="544" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>

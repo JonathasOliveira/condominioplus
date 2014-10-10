@@ -15,8 +15,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="132" splitType="Stretch">
+	<pageHeader>
+		<band height="132">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -88,7 +88,7 @@ Todos os Condomínios]]></text>
 				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 		</band>
-	</title>
+	</pageHeader>
 	<detail>
 		<band height="36" splitType="Stretch">
 			<rectangle>

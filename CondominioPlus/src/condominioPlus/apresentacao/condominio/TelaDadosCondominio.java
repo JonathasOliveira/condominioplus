@@ -502,6 +502,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtLimiteBanking.setText(condominio.getContaBancaria().getValor().toString());
 
 //        txtAreaAnotacoes.setText(condominio.getAnotacoes());
+        
+        //dados para relatorios
+        txtTituloCapa.setText(condominio.getTituloCapa());
 
         txtNumeroMinimoTaloes.setText(Util.IntegerToString(condominio.getNumeroMinimoTaloes()));
         preencherCamposCheque();
@@ -578,6 +581,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         condominio.getContaBancaria().setValor(new BigDecimal(txtLimiteBanking.getText().replace(",", ".")));
 
 //        condominio.setAnotacoes(txtAreaAnotacoes.getText());
+        
+        //dados para relatorios
+        condominio.setTituloCapa(txtTituloCapa.getText());
 
         condominio.setNumeroMinimoTaloes(Integer.parseInt(txtNumeroMinimoTaloes.getText()));
 
@@ -804,6 +810,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         btnRemoverAnotacao = new javax.swing.JButton();
         btnEditarAnotacao = new javax.swing.JButton();
         btnImprimirAnotacoes = new javax.swing.JButton();
+        painelRelatorios = new javax.swing.JPanel();
+        jLabel42 = new javax.swing.JLabel();
+        txtTituloCapa = new javax.swing.JTextField();
         jPanel12 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnVoltar = new javax.swing.JButton();
@@ -1438,7 +1447,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                             .addComponent(txtDigitoContaPoupanca, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(txtDigitoCedente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(12, 12, 12)))
-                .addGap(40, 40, 40))
+                .addGap(60, 60, 60))
         );
         painelBancoLayout.setVerticalGroup(
             painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1742,7 +1751,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                     .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(btnImprimirAnotacoes, javax.swing.GroupLayout.Alignment.LEADING, 0, 0, Short.MAX_VALUE)
                         .addComponent(btnRemoverAnotacao, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(18, 18, 18))
+                .addGap(38, 38, 38))
         );
         painelAnotacoesLayout.setVerticalGroup(
             painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1762,6 +1771,31 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         );
 
         painelGeral.addTab("Anotações", painelAnotacoes);
+
+        jLabel42.setText("Título da Capa");
+
+        javax.swing.GroupLayout painelRelatoriosLayout = new javax.swing.GroupLayout(painelRelatorios);
+        painelRelatorios.setLayout(painelRelatoriosLayout);
+        painelRelatoriosLayout.setHorizontalGroup(
+            painelRelatoriosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelRelatoriosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel42, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtTituloCapa, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(361, Short.MAX_VALUE))
+        );
+        painelRelatoriosLayout.setVerticalGroup(
+            painelRelatoriosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(painelRelatoriosLayout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addGroup(painelRelatoriosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel42)
+                    .addComponent(txtTituloCapa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(162, Short.MAX_VALUE))
+        );
+
+        painelGeral.addTab("Relatórios", painelRelatorios);
 
         jPanel12.setLayout(new java.awt.GridBagLayout());
 
@@ -1869,6 +1903,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
+    private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -1898,6 +1933,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JPanel painelDadosBancarios;
     private javax.swing.JTabbedPane painelGeral;
     private javax.swing.JPanel painelMaisDados;
+    private javax.swing.JPanel painelRelatorios;
     private javax.swing.JTable tabelaAnotacoes;
     private javax.swing.JTable tbTaloes;
     private javax.swing.JTable tblConselheiros;
@@ -1940,6 +1976,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private javax.swing.JTextField txtSenhaBanking;
     private javax.swing.JTextField txtSindico;
     private javax.swing.JTextField txtSite;
+    private javax.swing.JTextField txtTituloCapa;
     private javax.swing.JTextField txtUf;
     private javax.swing.JTextField txtUltimoCheque;
     private javax.swing.JTextField txtUsuarioBanking;

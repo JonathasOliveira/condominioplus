@@ -17,12 +17,18 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="126" splitType="Stretch">
-			<image>
-				<reportElement x="0" y="9" width="385" height="105"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
-			</image>
+	<pageHeader>
+		<band height="138" splitType="Stretch">
+			<staticText>
+				<reportElement x="496" y="98" width="59" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Folha]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement positionType="Float" x="0" y="126" width="555" height="12" forecolor="#999999" backcolor="#999999"/>
+			</rectangle>
 			<rectangle>
 				<reportElement x="0" y="96" width="487" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -33,25 +39,60 @@
 				<reportElement x="490" y="96" width="64" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
 			<textField isBlankWhenNull="true">
-				<reportElement x="6" y="108" width="474" height="15"/>
-				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
 				<reportElement x="496" y="75" width="54" height="15"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{dataEmissao}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="496" y="65" width="59" height="15"/>
-				<textElement>
-					<font size="8"/>
+			<image>
+				<reportElement x="0" y="9" width="385" height="105"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="377" y="6" width="173" height="57"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="13" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Emissão]]></text>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{titulo}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
+			</rectangle>
+			<staticText>
+				<reportElement positionType="Float" x="458" y="126" width="43" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Valor ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="126" width="297" height="12" forecolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ Histórico]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="114" y="126" width="37" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Conta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="98" width="76" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Entidade]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="126" width="57" height="12" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="496" y="108" width="54" height="15"/>
@@ -61,71 +102,26 @@
 				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="6" y="98" width="76" height="15"/>
-				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Entidade]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="496" y="98" width="59" height="15"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Folha]]></text>
-			</staticText>
-			<rectangle>
-				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
-			</rectangle>
-			<textField>
-				<reportElement x="377" y="6" width="173" height="57"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="13" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{titulo}]]></textFieldExpression>
-			</textField>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="12" splitType="Stretch">
-			<rectangle>
-				<reportElement positionType="Float" x="0" y="0" width="555" height="12" forecolor="#999999" backcolor="#999999"/>
-			</rectangle>
-			<staticText>
-				<reportElement positionType="Float" x="458" y="0" width="43" height="12" forecolor="#FFFFFF"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7"/>
-				</textElement>
-				<text><![CDATA[Valor ]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="156" y="0" width="297" height="12" forecolor="#FFFFFF"/>
-				<textElement verticalAlignment="Middle">
-					<font size="7" isBold="false"/>
-				</textElement>
-				<text><![CDATA[ Histórico]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="114" y="0" width="37" height="12" forecolor="#FFFFFF"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Conta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="8" y="0" width="57" height="12" forecolor="#FFFFFF"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="7" isBold="false"/>
-				</textElement>
-				<text><![CDATA[Documento]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="69" y="0" width="40" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="69" y="126" width="40" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Data]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="496" y="65" width="59" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Emissão]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="6" y="108" width="474" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{condominio}]]></textFieldExpression>
+			</textField>
 		</band>
 	</pageHeader>
 	<detail>

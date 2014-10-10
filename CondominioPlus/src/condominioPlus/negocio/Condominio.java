@@ -21,7 +21,6 @@ import condominioPlus.negocio.financeiro.Emprestimo;
 import condominioPlus.negocio.financeiro.ExtratoBancario;
 import condominioPlus.negocio.financeiro.Poupanca;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -123,8 +122,8 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     private ParametrosCalculoAgua parametros;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
     private List<MensagemBoleto> mensagens = new ArrayList<MensagemBoleto>();
-    @Column(precision = 20, scale = 2)
-    private BigDecimal desconto = new BigDecimal(0);
+//    @Column(precision = 20, scale = 2)
+//    private BigDecimal desconto = new BigDecimal(0);
     @Column(name = "calcular_multa_proximo_mes")
     private boolean calcularMultaProximoMes;
     @Column(name = "parcelas_acordo")
@@ -153,6 +152,10 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     @Temporal(value = TemporalType.DATE)
     @Column(name = "prazo_certificacao")
     private Calendar prazoCertificacao;
+    
+    //configuracao de relatorios
+    @Column(name="titulo_capa")
+    private String tituloCapa = "";
 
     public Condominio() {
     }
@@ -513,13 +516,13 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.mensagens = mensagens;
     }
 
-    public BigDecimal getDesconto() {
-        return desconto;
-    }
-
-    public void setDesconto(BigDecimal desconto) {
-        this.desconto = desconto;
-    }
+//    public BigDecimal getDesconto() {
+//        return desconto;
+//    }
+//
+//    public void setDesconto(BigDecimal desconto) {
+//        this.desconto = desconto;
+//    }
 
     public boolean isCalcularMultaProximoMes() {
         return calcularMultaProximoMes;
@@ -631,6 +634,14 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
 
     public void setResponsavelLegal(String responsavelLegal) {
         this.responsavelLegal = responsavelLegal;
-    }    
+    }
+
+    public String getTituloCapa() {
+        return tituloCapa;
+    }
+
+    public void setTituloCapa(String tituloCapa) {
+        this.tituloCapa = tituloCapa;
+    }
     
 }

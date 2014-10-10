@@ -28,8 +28,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="130" splitType="Stretch">
+	<pageHeader>
+		<band height="158" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -115,57 +115,53 @@
 			<rectangle>
 				<reportElement x="0" y="125" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="28" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="2" width="277" height="15"/>
+				<reportElement x="0" y="132" width="277" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[CRÉDITOS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="277" y="2" width="277" height="15"/>
+				<reportElement x="277" y="132" width="277" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[DÉBITOS]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="16" y="14" width="100" height="12"/>
+				<reportElement x="16" y="144" width="100" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Nome da Conta]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="195" y="14" width="71" height="12"/>
+				<reportElement x="195" y="144" width="71" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ Total da Conta]]></text>
 			</staticText>
 			<line>
-				<reportElement x="8" y="26" width="266" height="1" forecolor="#999999"/>
+				<reportElement x="8" y="156" width="266" height="1" forecolor="#999999"/>
 			</line>
 			<staticText>
-				<reportElement x="472" y="14" width="71" height="12"/>
+				<reportElement x="472" y="144" width="71" height="12"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ Total da Conta ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="293" y="14" width="100" height="12"/>
+				<reportElement x="293" y="144" width="100" height="12"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="true"/>
 				</textElement>
 				<text><![CDATA[ Nome da Conta]]></text>
 			</staticText>
 			<line>
-				<reportElement x="285" y="26" width="266" height="1" forecolor="#999999"/>
+				<reportElement x="285" y="156" width="266" height="1" forecolor="#999999"/>
 			</line>
 		</band>
 	</pageHeader>
