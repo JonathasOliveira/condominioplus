@@ -23,12 +23,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="132" splitType="Stretch">
-			<image>
-				<reportElement x="0" y="9" width="385" height="105"/>
-				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
-			</image>
+	<pageHeader>
+		<band height="228" splitType="Stretch">
 			<rectangle>
 				<reportElement x="0" y="96" width="487" height="30" forecolor="#F0F0F0" backcolor="#CCCCCC"/>
 			</rectangle>
@@ -110,107 +106,107 @@
 			<rectangle>
 				<reportElement x="0" y="126" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="96" splitType="Stretch">
 			<rectangle>
-				<reportElement positionType="Float" x="0" y="84" width="555" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
+				<reportElement positionType="Float" x="0" y="216" width="555" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="304" y="84" width="61" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="304" y="216" width="61" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Juros]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="388" y="84" width="69" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="388" y="216" width="69" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Multa]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="474" y="84" width="56" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="474" y="216" width="56" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="114" y="84" width="69" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="114" y="216" width="69" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Vencimento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="20" y="84" width="76" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="20" y="216" width="76" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Documento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="54" width="497" height="24"/>
+				<reportElement x="19" y="186" width="497" height="24"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Caso já tenha(m) sido executado(s) o(s) pagamento(s) do(s) aludido(s) débito(s) solicitamos tornar este aviso sem efeito e encaminhar a(s) cópia(s) xerox, para que possamos averiguar junto ao banco.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="32" width="518" height="12"/>
+				<reportElement x="19" y="164" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Ao contabilizar os documentos da entidade em apreço, verificamos o(s) débito(s) abaixo relacionado(s).]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="19" y="43" width="518" height="12"/>
+				<reportElement x="19" y="175" width="518" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Para liquidar o(s) débito(s) V. Sa. deverá entrar em contato com esta administradora.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="201" y="84" width="81" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="201" y="216" width="81" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Valor Original]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="0" y="0" width="554" height="24" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
+				<reportElement x="0" y="132" width="554" height="24" forecolor="#FFFFFF" backcolor="#CCCCCC"/>
 			</rectangle>
 			<staticText>
-				<reportElement x="6" y="0" width="39" height="12"/>
+				<reportElement x="6" y="132" width="39" height="12"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Unidade]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="53" y="0" width="82" height="12"/>
+				<reportElement x="53" y="132" width="82" height="12"/>
 				<textElement>
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Proprietário]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="6" y="11" width="39" height="12"/>
+				<reportElement x="6" y="143" width="39" height="12"/>
 				<textElement>
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{unidade}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="53" y="11" width="453" height="12"/>
+				<reportElement x="53" y="143" width="453" height="12"/>
 				<textElement>
 					<font size="7" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{nome}]]></textFieldExpression>
 			</textField>
+			<image>
+				<reportElement x="0" y="9" width="385" height="105"/>
+				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
+			</image>
 		</band>
 	</pageHeader>
 	<detail>

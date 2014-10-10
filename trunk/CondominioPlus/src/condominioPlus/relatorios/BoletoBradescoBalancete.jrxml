@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BoletoBradesco" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="451"/>
+	<property name="ireport.y" value="0"/>
 	<subDataset name="dataset1"/>
 	<parameter name="logoEmpresa" class="java.lang.String"/>
 	<parameter name="logoBradesco" class="java.lang.String"/>
@@ -10,8 +10,6 @@
 	<parameter name="dataInicial" class="java.lang.String"/>
 	<parameter name="dataFinal" class="java.lang.String"/>
 	<parameter name="subrelatorio" class="java.lang.String"/>
-	<parameter name="listaCredito" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
-	<parameter name="listaDebito" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="somaCredito" class="java.lang.String"/>
 	<parameter name="somaDebito" class="java.lang.String"/>
 	<parameter name="saldoAnterior" class="java.lang.String"/>
@@ -84,6 +82,8 @@
 	<field name="mensagem3" class="java.lang.String"/>
 	<field name="mensagem4" class="java.lang.String"/>
 	<field name="mensagem0" class="java.lang.String"/>
+	<field name="listaCredito" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<field name="listaDebito" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -463,7 +463,7 @@
 				<subreportParameter name="soma">
 					<subreportParameterExpression><![CDATA[$P{somaCredito}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[$P{listaCredito}]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[$F{listaCredito}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioBalanceteBoleto.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
@@ -541,7 +541,7 @@
 				<subreportParameter name="soma">
 					<subreportParameterExpression><![CDATA[$P{somaDebito}]]></subreportParameterExpression>
 				</subreportParameter>
-				<dataSourceExpression><![CDATA[$P{listaDebito}]]></dataSourceExpression>
+				<dataSourceExpression><![CDATA[$F{listaDebito}]]></dataSourceExpression>
 				<subreportExpression class="java.lang.String"><![CDATA[$P{subrelatorio} + "SubRelatorioBalanceteBoleto.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isBlankWhenNull="true">
@@ -837,9 +837,9 @@ Conta Corrente]]></text>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalInadimplencia}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="5" y="489" width="153" height="8"/>
+				<reportElement x="5" y="489" width="193" height="8"/>
 				<textElement verticalAlignment="Middle">
-					<font size="6" isBold="false"/>
+					<font size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{textoInadimplencia}]]></textFieldExpression>
 			</textField>

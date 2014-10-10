@@ -19,8 +19,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="126" splitType="Stretch">
+	<pageHeader>
+		<band height="151" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -140,13 +140,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{agencia}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="330" y="108" width="35" height="15"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8" isBold="true"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{numeroBanco}]]></textFieldExpression>
-			</textField>
 			<staticText>
 				<reportElement x="330" y="98" width="35" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -154,50 +147,53 @@
 				</textElement>
 				<text><![CDATA[Banco]]></text>
 			</staticText>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="25" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="330" y="108" width="35" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{numeroBanco}]]></textFieldExpression>
+			</textField>
 			<rectangle>
-				<reportElement positionType="Float" x="0" y="1" width="555" height="24" forecolor="#999999" backcolor="#999999"/>
+				<reportElement positionType="Float" x="0" y="127" width="555" height="24" forecolor="#999999" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="418" y="1" width="63" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="418" y="127" width="63" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Cheque Nº]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="512" y="1" width="39" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="512" y="127" width="39" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Valor]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="359" y="1" width="40" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="359" y="127" width="40" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Data]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="276" y="1" width="62" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="276" y="127" width="62" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Conta Corrente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3" y="1" width="56" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="3" y="127" width="56" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[ Emitente]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="3" y="13" width="56" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="3" y="139" width="56" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>

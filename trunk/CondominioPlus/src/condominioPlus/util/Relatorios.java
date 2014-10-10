@@ -806,9 +806,12 @@ public class Relatorios implements Printable {
     }
 
     public void imprimirBoleto(List<BoletoBancario> boletos, Condominio condominio, boolean exibirBalancete, DateTime dataInicial, DateTime dataFinal, List<Pagamento> pagamentos) {
-        List<HashMap<String, String>> lista = new ArrayList<HashMap<String, String>>();
+        List<HashMap<String, Object>> lista = new ArrayList<HashMap<String, Object>>();
 
         HashMap<String, Object> parametros = new HashMap();
+
+        List<HashMap<String, Object>> listaCredito = new ArrayList<HashMap<String, Object>>();
+        List<HashMap<String, Object>> listaDebito = new ArrayList<HashMap<String, Object>>();
 
         // DADOS PARA PREENCHER O BALANCETE SINTETICO
         if (exibirBalancete) {
@@ -891,10 +894,6 @@ public class Relatorios implements Printable {
             saldoAnterior = saldoAnterior.add(saldoAtual).subtract(creditos).subtract(debitos);
 //        saldoAuxiliar = saldoAuxiliar.add(saldoAnterior);
 
-            HashMap<String, Object> mapa = new HashMap();
-            List<HashMap<String, Object>> listaCredito = new ArrayList<HashMap<String, Object>>();
-            List<HashMap<String, Object>> listaDebito = new ArrayList<HashMap<String, Object>>();
-
             //preenchendo as listas para visualização do relatório//
             for (PagamentoAuxiliar p : ordenarPagamentosPorConta(pagamentosAuxiliaresCredito)) {
                 listaCredito.add(preencherListaBalancete(p, TipoRelatorio.BALANCETE_SINTETICO));
@@ -903,8 +902,6 @@ public class Relatorios implements Printable {
                 listaDebito.add(preencherListaBalancete(p, TipoRelatorio.BALANCETE_SINTETICO));
             }
 
-            parametros.put("listaCredito", new JRBeanCollectionDataSource(listaCredito));
-            parametros.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
             parametros.put("somaCredito", PagamentoUtil.formatarMoeda(creditos.doubleValue()));
             parametros.put("somaDebito", PagamentoUtil.formatarMoeda(debitos.doubleValue()));
 
@@ -971,7 +968,7 @@ public class Relatorios implements Printable {
                     }
                 }
             }
-            parametros.put("textoInadimplencia", "TOTAL DA INADIMPLÊNCIA ATÉ DIA " + DataUtil.toString(condominio.getContaCorrente().getDataFechamento()));
+            parametros.put("textoInadimplencia", "TOTAL DA INADIMPLÊNCIA DE TODOS OS CONDÔMINOS ATÉ DIA " + DataUtil.toString(condominio.getContaCorrente().getDataFechamento()));
             parametros.put("totalInadimplencia", PagamentoUtil.formatarMoeda(totalInadimplencia.doubleValue()));
         }
         //FIM DADOS INFORMACAO DA INADIMPLENCIA
@@ -987,7 +984,7 @@ public class Relatorios implements Printable {
         }
 
         for (BoletoBancario boleto : boletos) {
-            HashMap<String, String> mapa = new HashMap();
+            HashMap<String, Object> mapa = new HashMap();
             mapa.put("nomeCedente", boleto.getNomeCedente());
             mapa.put("cnpjCedente", boleto.getCnpjCedente());
             mapa.put("nomeSacado", boleto.getNomeSacado());
@@ -1067,6 +1064,9 @@ public class Relatorios implements Printable {
             mapa.put("mensagem2", boleto.getMensagem2());
             mapa.put("mensagem3", boleto.getMensagem3());
             mapa.put("mensagem4", boleto.getMensagem4());
+
+            mapa.put("listaCredito", new JRBeanCollectionDataSource(listaCredito));
+            mapa.put("listaDebito", new JRBeanCollectionDataSource(listaDebito));
 
             lista.add(mapa);
         }

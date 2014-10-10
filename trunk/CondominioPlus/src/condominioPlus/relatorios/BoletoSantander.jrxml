@@ -1079,9 +1079,9 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{totalInadimplencia}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="4" y="489" width="153" height="8"/>
+				<reportElement x="4" y="489" width="193" height="8"/>
 				<textElement verticalAlignment="Middle">
-					<font size="6" isBold="false"/>
+					<font size="5" isBold="false"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$P{textoInadimplencia}]]></textFieldExpression>
 			</textField>

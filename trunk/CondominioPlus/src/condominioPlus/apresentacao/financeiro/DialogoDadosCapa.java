@@ -13,7 +13,6 @@ package condominioPlus.apresentacao.financeiro;
 import condominioPlus.negocio.Condominio;
 import condominioPlus.negocio.Unidade;
 import condominioPlus.util.Relatorios;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,7 +65,7 @@ public class DialogoDadosCapa extends javax.swing.JDialog {
         HashMap<String, Object> mapa = new HashMap();
         String mesExtenso = cmbMes.getModel().getSelectedItem().toString();
 
-        mapa.put("condominio", converterLetraMinuscula(condominio.getRazaoSocial()));
+        mapa.put("condominio", converterLetraMinuscula(condominio.getTituloCapa()));
 
         mapa.put("periodo", mesExtenso + "/" + txtAno.getText());
         mapa.put("periodoExtenso", retornarMesNumerico(mesExtenso) + "/" + txtAno.getText());

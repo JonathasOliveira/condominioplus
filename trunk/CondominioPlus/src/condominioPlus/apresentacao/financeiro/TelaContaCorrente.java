@@ -470,7 +470,7 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
         if (!dialogo.getCancelar() && dialogo.getDataPagamento() != null) {
             List<Pagamento> lista = modeloTabela.getObjetosSelecionados();
             for (Pagamento p : lista) {
-                if (DataUtil.compararData(DataUtil.getDateTime(p.getDataPagamento()), DataUtil.getDateTime(contaCorrente.getDataFechamento())) == -1) {
+                if (DataUtil.compararData(DataUtil.getDateTime(p.getDataPagamento()), DataUtil.getDateTime(contaCorrente.getDataFechamento())) == -1 || DataUtil.compararData(DataUtil.getDateTime(p.getDataPagamento()), DataUtil.getDateTime(contaCorrente.getDataFechamento())) == 0) {
                     ApresentacaoUtil.exibirAdvertencia("Não é possível editar o(s) pagamento(s). Caixa Fechado!", this);
                     return;
                 }

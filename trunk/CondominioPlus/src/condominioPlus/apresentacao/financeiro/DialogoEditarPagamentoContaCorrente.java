@@ -294,7 +294,7 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
         }
         preencherObjeto();
         
-         if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1) {
+         if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1 || DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == 0) {
             ApresentacaoUtil.exibirAdvertencia("Não é possível editar o pagamento. Caixa Fechado!", this);
             return;
         }

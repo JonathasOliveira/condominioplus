@@ -16,8 +16,8 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="126" splitType="Stretch">
+	<pageHeader>
+		<band height="138" splitType="Stretch">
 			<image>
 				<reportElement x="0" y="9" width="385" height="105"/>
 				<imageExpression class="java.lang.String"><![CDATA[$P{logoEmpresa}]]></imageExpression>
@@ -101,43 +101,39 @@ por Condomínio]]></text>
 			<rectangle>
 				<reportElement x="0" y="0" width="554" height="5" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
-		</band>
-	</title>
-	<pageHeader>
-		<band height="12" splitType="Stretch">
 			<rectangle>
-				<reportElement positionType="Float" x="0" y="0" width="555" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
+				<reportElement positionType="Float" x="0" y="126" width="555" height="12" forecolor="#FFFFFF" backcolor="#999999"/>
 			</rectangle>
 			<staticText>
-				<reportElement positionType="Float" x="372" y="0" width="54" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="372" y="126" width="54" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[A Arrecadar]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="434" y="0" width="54" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="434" y="126" width="54" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Arrecadado]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="496" y="0" width="54" height="12" forecolor="#FFFFFF"/>
+				<reportElement positionType="Float" x="496" y="126" width="54" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7"/>
 				</textElement>
 				<text><![CDATA[Inadimplência]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="78" y="0" width="286" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="78" y="126" width="286" height="12" forecolor="#FFFFFF"/>
 				<textElement verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Histórico]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="6" y="0" width="64" height="12" forecolor="#FFFFFF"/>
+				<reportElement x="6" y="126" width="64" height="12" forecolor="#FFFFFF"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="7" isBold="false"/>
 				</textElement>

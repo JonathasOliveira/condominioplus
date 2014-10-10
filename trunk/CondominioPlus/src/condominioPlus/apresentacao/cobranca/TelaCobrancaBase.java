@@ -307,7 +307,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private void preencherPainelConfiguracoes() {
 //        txtJuros.setText(String.valueOf(configuracao.getPercentualJuros()));
 //        txtMulta.setText(String.valueOf(configuracao.getPercentualMulta()));
-        txtDesconto.setText(PagamentoUtil.formatarMoeda(condominio.getDesconto().doubleValue()));
+//        txtDesconto.setText(PagamentoUtil.formatarMoeda(condominio.getDesconto().doubleValue()));
         chkCalcularMultaProximoMes.setSelected(condominio.isCalcularMultaProximoMes());
         if (condominio.getNumeroMinimoParcelasAcordo() < 1) {
             spnNumeroMinimoInamplencia.setValue(1);
@@ -321,7 +321,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 //        configuracao.setPercentualJuros(new BigDecimal(txtJuros.getText().replace(",", ".")));
 //        configuracao.setPercentualMulta(new BigDecimal(txtMulta.getText().replace(",", ".")));
 //        new DAO().salvar(configuracao);
-        condominio.setDesconto(new BigDecimal(txtDesconto.getText().replace(",", ".")));
+//        condominio.setDesconto(new BigDecimal(txtDesconto.getText().replace(",", ".")));
         condominio.setCalcularMultaProximoMes(chkCalcularMultaProximoMes.isSelected());
         condominio.setNumeroMinimoParcelasAcordo((Integer) spnNumeroMinimoInamplencia.getValue());
         new DAO().salvar(condominio);
@@ -602,8 +602,6 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
         txtValorDesconto = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
-        jLabel5 = new javax.swing.JLabel();
-        txtDesconto = new javax.swing.JTextField();
         chkCalcularMultaProximoMes = new javax.swing.JCheckBox();
         spnNumeroMinimoInamplencia = new javax.swing.JSpinner();
         jLabel6 = new javax.swing.JLabel();
@@ -824,11 +822,6 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Cobranças Base", jPanel2);
 
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel5.setText("Desconto  R$");
-
-        txtDesconto.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-
         chkCalcularMultaProximoMes.setText("Calcular Juros/Multa Próximo Mês?");
 
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -847,13 +840,8 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
                         .addGap(252, 252, 252)
                         .addComponent(spnNumeroMinimoInamplencia, javax.swing.GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE))
-                            .addComponent(jLabel6))
-                        .addGap(28, 28, 28)
-                        .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel6)
+                        .addGap(102, 102, 102))
                     .addComponent(chkCalcularMultaProximoMes))
                 .addGap(201, 201, 201))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
@@ -866,11 +854,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(80, 80, 80)
                 .addComponent(chkCalcularMultaProximoMes)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtDesconto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
+                .addGap(45, 45, 45)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(spnNumeroMinimoInamplencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE))
@@ -985,7 +969,7 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 383, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(31, Short.MAX_VALUE))
         );
 
         pack();
@@ -1009,7 +993,6 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
@@ -1029,7 +1012,6 @@ public class TelaCobrancaBase extends javax.swing.JInternalFrame {
     private javax.swing.JTable tabelaCobranca;
     private javax.swing.JTextField txtConta;
     private net.sf.nachocalendar.components.DateField txtDataDesconto;
-    private javax.swing.JTextField txtDesconto;
     private javax.swing.JTextField txtHistorico;
     private javax.swing.JTextField txtValor;
     private javax.swing.JTextField txtValorDesconto;
