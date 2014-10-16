@@ -1311,8 +1311,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                     }
 
                 } else if (diferencaValorPagoValorTitulo.doubleValue() == 0 && c.getDescontoAte() != null) {
-//                    System.out.println("o pagamento foi efetuado com o valor total da fatura, porém tem desconto");
-                    verificarDesconto(r, c, r.getData(), DataUtil.getDateTime(c.getDescontoAte()));
+//                    System.out.println("o pagamento foi efetuado com o valor total da fatura, porém tem desconto");                    
+                    if (!isFinalDeSemana(DataUtil.getDateTime(c.getDescontoAte()))) {
+                        verificarDesconto(r, c, r.getData(), DataUtil.getDateTime(c.getDescontoAte()));
+                    } else {
+                        verificarDesconto(r, c, r.getData(), getProximoDiaUtil(DataUtil.getDateTime(c.getDescontoAte())));
+                    }                    
                 } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {
                     //Verifica se houve pagamento superior ao valor da fatura
                     c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(diferencaValorPagoValorTitulo.bigDecimalValue()));
@@ -1521,11 +1525,11 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 descontarMaiorValor = false;
             }
             if (valorDesconto) {
-                if (r.getValorPago().doubleValue() == c.getTotalComDesconto().doubleValue()) {
+//                if (r.getValorPago().doubleValue() == c.getTotalComDesconto().doubleValue()) {
                     if (p.getValorComDesconto().doubleValue() > 0) {
                         p.setValor(p.getValorComDesconto());
                     }
-                }
+//                }
             }
         }
         if (c.getTotalComDesconto() != null && r.getValorPago().doubleValue() > c.getTotalComDesconto().doubleValue()) {
