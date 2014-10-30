@@ -6,7 +6,6 @@ package condominioPlus.negocio.cobranca;
 
 import condominioPlus.Main;
 import condominioPlus.negocio.Condominio;
-import condominioPlus.negocio.NegocioUtil;
 import condominioPlus.negocio.financeiro.Pagamento;
 import condominioPlus.negocio.financeiro.PagamentoUtil;
 import java.io.File;
@@ -389,15 +388,21 @@ public class BoletoBancario {
     }
 
     public static String gerarNumeroDocumento(Cobranca cobranca, DateTime data) {
-        
+
         Condominio condominio = Main.getCondominio();
 
         String resultado;
 
-        int incremento = condominio.getIncrementoNumeroDocumento();
+        int incremento = Integer.parseInt(condominio.getIncrementoNumeroDocumento());
         String incr = "" + incremento;
-        while (incr.length() < 5) {
-            incr = "0" + incr;
+        if (cobranca.getCodigoBanco().equals("033")) {
+            while (incr.length() < 5) {
+                incr = "0" + incr;
+            }
+        } else if (cobranca.getCodigoBanco().equals("237")) {
+            while (incr.length() < 4) {
+                incr = "0" + incr;
+            }
         }
 
         System.out.println("incremento: " + incr);
@@ -420,11 +425,25 @@ public class BoletoBancario {
             }
         }
 
-        if (incremento == 99999) {
-            condominio.setIncrementoNumeroDocumento(1);
+        if (incremento == 99999 || incremento == 9999) {
+            if (cobranca.getCodigoBanco().equals("033")) {
+                condominio.setIncrementoNumeroDocumento("00001");
+            } else if (cobranca.getCodigoBanco().equals("237")) {
+                condominio.setIncrementoNumeroDocumento("0001");
+            }
         } else {
             incremento += 1;
-            condominio.setIncrementoNumeroDocumento(incremento);
+            String incrementoAuxiliar = "" + incremento;
+            if (cobranca.getCodigoBanco().equals("033")) {
+                while (incrementoAuxiliar.length() < 5) {
+                    incrementoAuxiliar = "0" + incrementoAuxiliar;
+                }
+            } else if (cobranca.getCodigoBanco().equals("237")) {
+                while (incrementoAuxiliar.length() < 4) {
+                    incrementoAuxiliar = "0" + incrementoAuxiliar;
+                }
+            }
+            condominio.setIncrementoNumeroDocumento(incrementoAuxiliar);
         }
         new DAO().salvar(condominio);
 

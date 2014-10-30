@@ -8,6 +8,7 @@ package condominioPlus.negocio.financeiro.arquivoRetorno;
  *
  * @author Administrador
  */
+import condominioPlus.Main;
 import condominioPlus.apresentacao.TelaPrincipal;
 import condominioPlus.negocio.cobranca.Cobranca;
 import java.awt.FileDialog;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import logicpoint.apresentacao.ApresentacaoUtil;
 import logicpoint.persistencia.DAO;
 import logicpoint.util.Moeda;
 import org.joda.time.DateTime;
@@ -44,7 +46,7 @@ public class EntradaArquivoRetorno implements Serializable {
         new EntradaArquivoRetorno().lerArquivo(diretorio.listFiles());
     }
 
-    public List<RegistroTransacao> getRegistros(){
+    public List<RegistroTransacao> getRegistros() {
         return registros;
     }
 
@@ -70,6 +72,7 @@ public class EntradaArquivoRetorno implements Serializable {
                 arquivo = new ArquivoAtualizado();
                 arquivo.setNome(arquivos[i].getName());
                 if (verificarArquivosAtualizados(arquivo)) {
+                    ApresentacaoUtil.exibirInformacao("O arquivo " + arquivo.getNome() + " já foi atualizado!", null);
                     continue ARQUIVOS;
                 }
                 new DAO().salvar(arquivo);
@@ -84,8 +87,14 @@ public class EntradaArquivoRetorno implements Serializable {
                         break;
                     }
                     if (isTransacao(linha) && arquivos[i].getName().charAt(0) == 'C') {
-                        if (obterRegistro(linha) != null) {
-                            registros.add(obterRegistro(linha));
+                        if (Main.getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                            if (obterRegistroSantander(linha) != null) {
+                                registros.add(obterRegistroSantander(linha));
+                            }
+                        } else if (Main.getCondominio().getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                            if (obterRegistroBradesco(linha) != null) {
+                                registros.add(obterRegistroBradesco(linha));
+                            }
                         }
                     }
                 }
@@ -119,7 +128,7 @@ public class EntradaArquivoRetorno implements Serializable {
         }
     }
 
-    private RegistroTransacao obterRegistro(String linha) {
+    private RegistroTransacao obterRegistroSantander(String linha) {
         RegistroTransacao registro = new RegistroTransacao();
 
         DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(299, 301)), Integer.parseInt(linha.substring(297, 299)), Integer.parseInt(linha.substring(295, 297)), 0, 0, 0, 0);
@@ -128,6 +137,25 @@ public class EntradaArquivoRetorno implements Serializable {
         registro.setValorTitulo(new Moeda(editarValor(linha, 152, 165)));
         registro.setValorPago(new Moeda(editarValor(linha, 253, 266)));
         registro.setJuros(new Moeda(editarValor(linha, 266, 279)));
+
+        Cobranca co = new DAO().localizar(Cobranca.class, "CobrancaPorNumeroDocumento", registro.getDocumento());
+
+        if (co != null) {
+            registro.setCobranca(co);
+        }
+
+        return registro;
+    }
+
+    private RegistroTransacao obterRegistroBradesco(String linha) {
+        RegistroTransacao registro = new RegistroTransacao();
+
+        DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(114, 116)), Integer.parseInt(linha.substring(112, 114)), Integer.parseInt(linha.substring(110, 112)), 0, 0, 0, 0);
+        registro.setData(data);
+        registro.setDocumento(linha.substring(70, 81));
+        registro.setValorTitulo(new Moeda(editarValor(linha, 153, 165)));
+        registro.setValorPago(new Moeda(editarValor(linha, 254, 266)));
+        registro.setJuros(new Moeda(editarValor(linha, 267, 279)));
 
         Cobranca co = new DAO().localizar(Cobranca.class, "CobrancaPorNumeroDocumento", registro.getDocumento());
 
@@ -155,4 +183,3 @@ public class EntradaArquivoRetorno implements Serializable {
         listaCobrancasEmAberto = new DAO().listar("CobrancasEmAberto");
     }
 }
-

@@ -20,7 +20,7 @@ import org.joda.time.DateTime;
  *
  * @author cifani
  */
-public class RegistroTransacao implements Serializable {
+ public class RegistroTransacao implements Serializable {
 
   private Moeda valorPago;
   private Moeda valorTitulo;
