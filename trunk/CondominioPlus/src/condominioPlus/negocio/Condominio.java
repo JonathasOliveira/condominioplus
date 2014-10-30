@@ -129,7 +129,7 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
     @Column(name = "parcelas_acordo")
     private int numeroMinimoParcelasAcordo;
     @Column(name="incremento_nosso_numero")
-    private int incrementoNumeroDocumento = 1;
+    private String incrementoNumeroDocumento = "1";
     @Column(name="mostrar_inadimplencia_boleto")
     private boolean mostrarInadimplenciaBoleto = false;
     @OneToMany(mappedBy = "condominio", cascade = CascadeType.ALL)
@@ -540,11 +540,11 @@ public class Condominio implements Removivel, Comparable<Condominio>, Serializab
         this.numeroMinimoParcelasAcordo = numeroMinimoParcelasAcordo;
     }
 
-    public int getIncrementoNumeroDocumento() {
+    public String getIncrementoNumeroDocumento() {
         return incrementoNumeroDocumento;
     }
 
-    public void setIncrementoNumeroDocumento(int incrementoNumeroDocumento) {
+    public void setIncrementoNumeroDocumento(String incrementoNumeroDocumento) {
         this.incrementoNumeroDocumento = incrementoNumeroDocumento;
     }
 

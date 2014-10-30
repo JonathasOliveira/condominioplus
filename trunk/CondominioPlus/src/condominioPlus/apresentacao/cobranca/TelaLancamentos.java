@@ -1249,7 +1249,12 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     }
 
     private void baixarVariasCobrancas() {
+        COBRANCAS:
         for (RegistroTransacao r : listaRegistros) {
+            if (r.getCobranca().getDataPagamento() != null){
+                ApresentacaoUtil.exibirInformacao("A cobrança cujo número documento é " + r.getCobranca().getNumeroDocumento() + " já foi paga anteriormente.", this);
+                continue COBRANCAS;
+            }
             baixarCobranca(r, true);
         }
         listaRegistros.clear();
@@ -1258,6 +1263,8 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void baixarCobranca(RegistroTransacao r, boolean setContaCorrente) {
         if (r.getCobranca() != null) {
+            
+            System.out.println("Dentro da baixa da cobrança.");
 
             Cobranca c = r.getCobranca();
             c.setDataPagamento(DataUtil.getCalendar(r.getData()));
@@ -1328,7 +1335,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             if (valor.doubleValue() > 0) {
                 Pagamento pagamento = new Pagamento();
                 pagamento.setFornecedor("");
-                pagamento.setConta(new DAO().localizar(Conta.class, 37226));
+                pagamento.setConta(new DAO().localizar(Conta.class, 11));
                 pagamento.setHistorico(pagamento.getConta().getNome() + " " + c.getUnidade().getUnidade() + " " + c.getUnidade().getCondomino().getNome());
                 pagamento.setValor(valor.bigDecimalValue());
                 pagamento.setCobranca(c);

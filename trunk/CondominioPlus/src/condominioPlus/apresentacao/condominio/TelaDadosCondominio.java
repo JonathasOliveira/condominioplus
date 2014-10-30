@@ -61,6 +61,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
     private ComboModelo<Banco> modelo;
     private TabelaModelo_2<Anotacao> modeloTabelaAnotacoes;
     private List<Anotacao> listaAnotacoes = new ArrayList<Anotacao>();
+    private Banco banco = null;
 
     /** Creates new form TelaDadosCondominio */
     public TelaDadosCondominio(Condominio condominio) {
@@ -488,6 +489,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             txtNumeroBanco.setText(condominio.getContaBancaria().getBanco().getNumeroBanco());
             txtAgencia.setText(condominio.getContaBancaria().getBanco().getAgencia());
             modelo.setSelectedItem(condominio.getContaBancaria().getBanco().getNomeBanco());
+            banco = condominio.getContaBancaria().getBanco();
         }
         txtContaCorrente.setText(condominio.getContaBancaria().getContaCorrente());
         txtContaPoupanca.setText(condominio.getContaBancaria().getContaPoupanca());
@@ -569,6 +571,17 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         if (cmbBanco.getSelectedIndex() != -1) {
             condominio.getContaBancaria().setBanco(modelo.getSelectedItem());
         }
+        
+        //metodo para verificar o banco e inicializar o incremento com 4 ou 5 digitos
+        if (banco == null || !banco.getNumeroBanco().equals(condominio.getContaBancaria().getBanco().getNumeroBanco())){
+            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")){
+                condominio.setIncrementoNumeroDocumento("00001");
+            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")){
+                condominio.setIncrementoNumeroDocumento("0001");
+            }
+        }
+        //fim
+        
         condominio.getContaBancaria().setContaCorrente(txtContaCorrente.getText());
         condominio.getContaBancaria().setDigitoCorrente(txtDigitoContaCorrente.getText());
         condominio.getContaBancaria().setDigitoPoupanca(txtDigitoContaPoupanca.getText());
@@ -1418,7 +1431,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                         .addGap(67, 67, 67)
                         .addComponent(jLabel12)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(cmbBanco, 0, 176, Short.MAX_VALUE))
+                        .addComponent(cmbBanco, 0, 156, Short.MAX_VALUE))
                     .addGroup(painelBancoLayout.createSequentialGroup()
                         .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(painelBancoLayout.createSequentialGroup()
@@ -1438,9 +1451,9 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
                                     .addComponent(jLabel14))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtCodigoCedente, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                    .addComponent(txtContaPoupanca, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                    .addComponent(txtContaCorrente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))))
+                                    .addComponent(txtCodigoCedente, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(txtContaPoupanca, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(txtContaCorrente, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(painelBancoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(txtDigitoContaCorrente, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1743,7 +1756,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
             painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelAnotacoesLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(painelAnotacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnAdicionarAnotacao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
