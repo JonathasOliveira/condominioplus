@@ -221,11 +221,17 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
 
     private void selecionaFormaPagamento(Pagamento p) {
         if (btnNumeroDocumento.isSelected()) {
-            p.setForma(FormaPagamento.CHEQUE);
             if (p.getCodigo() == 0) {
+                p.setForma(FormaPagamento.CHEQUE);
                 p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
             } else {
-                ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
+                if (p.getForma() == FormaPagamento.DINHEIRO) {
+                    p.setForma(FormaPagamento.CHEQUE);
+                    p.setDadosPagamento(new DadosCheque(txtNumeroDocumento.getText(), Main.getCondominio().getContaBancaria().getContaCorrente(), Main.getCondominio().getRazaoSocial()));
+                } else {
+                    p.setForma(FormaPagamento.CHEQUE);
+                    ((DadosCheque) p.getDadosPagamento()).setNumero(txtNumeroDocumento.getText());
+                }
             }
         } else {
             if (p.getForma() == FormaPagamento.DINHEIRO) {
@@ -293,8 +299,8 @@ public class DialogoEditarPagamentoContaCorrente extends javax.swing.JDialog {
             }
         }
         preencherObjeto();
-        
-         if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1 || DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == 0) {
+
+        if (DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == -1 || DataUtil.compararData(DataUtil.getDateTime(pagamento.getDataPagamento()), DataUtil.getDateTime(pagamento.getContaCorrente().getDataFechamento())) == 0) {
             ApresentacaoUtil.exibirAdvertencia("Não é possível editar o pagamento. Caixa Fechado!", this);
             return;
         }
