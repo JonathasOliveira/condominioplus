@@ -153,7 +153,7 @@ public class EntradaArquivoRetorno implements Serializable {
         DateTime data = new DateTime(2000 + Integer.parseInt(linha.substring(114, 116)), Integer.parseInt(linha.substring(112, 114)), Integer.parseInt(linha.substring(110, 112)), 0, 0, 0, 0);
         registro.setData(data);
         registro.setDocumento(linha.substring(70, 81));
-        registro.setValorTitulo(new Moeda(editarValor(linha, 153, 165)));
+//        registro.setValorTitulo(new Moeda(editarValor(linha, 153, 165)));
         registro.setValorPago(new Moeda(editarValor(linha, 254, 266)));
         registro.setJuros(new Moeda(editarValor(linha, 267, 279)));
 
@@ -161,6 +161,7 @@ public class EntradaArquivoRetorno implements Serializable {
 
         if (co != null) {
             registro.setCobranca(co);
+            registro.setValorTitulo(new Moeda(co.getValorTotal()));
         }
 
         return registro;
