@@ -46,7 +46,6 @@ import logicpoint.apresentacao.ControladorEventosGenerico;
 import logicpoint.apresentacao.TabelaModelo_2;
 import logicpoint.exception.TratadorExcecao;
 import logicpoint.persistencia.DAO;
-import logicpoint.util.ComboModelo;
 import logicpoint.util.DataUtil;
 import org.joda.time.DateTime;
 
@@ -105,6 +104,7 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         painelSaldoContaCorrente.setVisible(false);
         btnGravar.setEnabled(false);
         btnImprimir.setEnabled(false);
+        habilitarDateField();
         if (condominio != null) {
             this.setTitle("Contas a Pagar/Receber - " + condominio.getRazaoSocial());
         }
@@ -690,6 +690,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         btnHoje.setEnabled(false);
         btnSemana.setEnabled(false);
         btnMes.setEnabled(false);
+        dataInicio.setValue(DataUtil.getDate(DataUtil.getDateTime(DataUtil.getPrimeiroDiaMes())));
+        dataTermino.setValue(DataUtil.getDate(DataUtil.getDateTime(DataUtil.getUltimoDiaMes())));
         preencherTabelaDateField();
     }
 
@@ -1105,6 +1107,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         jLabel4.setText("Data Final:");
 
         dataInicio.setEnabled(false);
+
+        checkBoxMostrarDateField.setSelected(true);
 
         btnHoje.setText("Hoje");
 
