@@ -424,6 +424,9 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="checkBoxMostrarDateField">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="btnHoje">
           <Properties>
