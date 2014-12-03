@@ -754,6 +754,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             }
         }
         txtEmail.setText(unidade.getCondomino().getEmail());
+        txtNomeContato.setText(unidade.getCondomino().getNomeContato());
+        txtAosCuidadosProprietario.setText(unidade.getCondomino().getAosCuidados());
 //        txtAnotacoes.setText(unidade.getCondomino().getAnotacoes());
 
         if (unidade.getInquilino() != null) {
@@ -761,6 +763,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtNomeInquilino.setText(unidade.getInquilino().getNome());
             txtCpfInquilino.setText(unidade.getInquilino().getCpf());
             txtRgInquilino.setText(unidade.getInquilino().getRg());
+            txtEmailInquilino.setText(unidade.getInquilino().getEmail());
+            txtAosCuidadosInquilino.setText(unidade.getInquilino().getAosCuidados());
             carregarTabelaTelefoneInquilino();
             carregarTabelaEnderecoInquilino();
         }
@@ -878,6 +882,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         unidade.getCondomino().setCnpj(checkBoxCNPJ.isSelected());
 
         unidade.getCondomino().setEmail(txtEmail.getText());
+        unidade.getCondomino().setNomeContato(txtNomeContato.getText());
+        unidade.getCondomino().setAosCuidados(txtAosCuidadosProprietario.getText());
 //        unidade.getCondomino().setAnotacoes(txtAnotacoes.getText());
 
         if (checkBoxInquilino.isSelected()) {
@@ -887,6 +893,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             unidade.getInquilino().setNome(txtNomeInquilino.getText());
             unidade.getInquilino().setCpf(txtCpfInquilino.getText());
             unidade.getInquilino().setRg(txtRgInquilino.getText());
+            unidade.getInquilino().setEmail(txtEmailInquilino.getText());
+            unidade.getInquilino().setAosCuidados(txtAosCuidadosInquilino.getText());
         } else {
             if (unidade.getInquilino() != null) {
                 Inquilino inquilino = unidade.getInquilino();
@@ -896,6 +904,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 txtNomeInquilino.setText("");
                 txtCpfInquilino.setText("");
                 txtRgInquilino.setText("");
+                txtEmailInquilino.setText("");
+                txtAosCuidadosInquilino.setText("");
                 modeloTabelaEnderecoInquilino.limpar();
                 modeloTabelaTelefoneInquilino.limpar();
             }
@@ -974,6 +984,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         txtNomeInquilino.setEnabled(valor);
         txtCpfInquilino.setEnabled(valor);
         txtRgInquilino.setEnabled(valor);
+        txtEmailInquilino.setEnabled(valor);
+        txtAosCuidadosInquilino.setEnabled(valor);
         tblEnderecoInquilino.setEnabled(valor);
         btnAdicionarEnderecoInquilino.setEnabled(valor);
         btnEditarEnderecoInquilino.setEnabled(valor);
@@ -995,6 +1007,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtNomeInquilino.setBackground(color);
             txtCpfInquilino.setBackground(color);
             txtRgInquilino.setBackground(color);
+            txtEmailInquilino.setBackground(color);
+            txtAosCuidadosInquilino.setBackground(color);
 //            txtRuaInquilino.setBackground(color);
 //            txtNumeroInquilino.setBackground(color);
 //            txtComplementoInquilino.setBackground(color);
@@ -1008,6 +1022,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             txtNomeInquilino.setBackground(color);
             txtCpfInquilino.setBackground(color);
             txtRgInquilino.setBackground(color);
+            txtEmailInquilino.setBackground(color);
+            txtAosCuidadosInquilino.setBackground(color);
 //            txtRuaInquilino.setBackground(color);
 //            txtNumeroInquilino.setBackground(color);
 //            txtComplementoInquilino.setBackground(color);
@@ -1222,6 +1238,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnRemoverTelefone = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
+        jLabel14 = new javax.swing.JLabel();
+        txtNomeContato = new javax.swing.JTextField();
         painelInquilino = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         txtNomeInquilino = new javax.swing.JTextField();
@@ -1242,6 +1260,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         btnAdicionarTelefoneInquilino = new javax.swing.JButton();
         btnEditarTelefoneInquilino = new javax.swing.JButton();
         btnRemoverTelefoneInquilino = new javax.swing.JButton();
+        txtEmailInquilino = new javax.swing.JTextField();
+        jLabel15 = new javax.swing.JLabel();
         painelCorrespondencia = new javax.swing.JPanel();
         painelBoleto = new javax.swing.JPanel();
         radioBoletoProprietario = new javax.swing.JRadioButton();
@@ -1250,6 +1270,10 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         radioBalanceteProprietario = new javax.swing.JRadioButton();
         radioBalanceteInquilino = new javax.swing.JRadioButton();
         radioBalanceteProprietarioInquilino = new javax.swing.JRadioButton();
+        jLabel5 = new javax.swing.JLabel();
+        txtAosCuidadosProprietario = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        txtAosCuidadosInquilino = new javax.swing.JTextField();
         painelUnidade = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
@@ -1308,7 +1332,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         setClosable(true);
         setTitle("Cadastro de Condômino");
-        setPreferredSize(new java.awt.Dimension(643, 481));
+        setPreferredSize(new java.awt.Dimension(644, 484));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(679, 439));
 
@@ -1323,7 +1347,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         lblCpf.setText("CPF*:");
 
         try {
-            txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("")));
+            txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -1543,7 +1567,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(11, 18, 11, 268);
         jPanel12.add(btnVoltar, gridBagConstraints);
 
+        jTabbedPane1.setMinimumSize(new java.awt.Dimension(608, 222));
+
+        painelContato.setMinimumSize(new java.awt.Dimension(602, 199));
+
         painelEnderecoInquilino.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereços"));
+        painelEnderecoInquilino.setMaximumSize(new java.awt.Dimension(302, 125));
+        painelEnderecoInquilino.setMinimumSize(new java.awt.Dimension(302, 125));
+        painelEnderecoInquilino.setPreferredSize(new java.awt.Dimension(302, 125));
 
         tblEndereco.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1557,28 +1588,28 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         btnAdicionarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnAdicionarEndereco.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarEndereco.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarEndereco.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnEditarEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
-        btnEditarEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnEditarEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnEditarEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnEditarEndereco.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnEditarEndereco.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnEditarEndereco.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnRemoverEndereco.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverEndereco.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnRemoverEndereco.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnRemoverEndereco.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnRemoverEndereco.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnRemoverEndereco.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnRemoverEndereco.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnRemoverEndereco.setPreferredSize(new java.awt.Dimension(25, 25));
 
         javax.swing.GroupLayout painelEnderecoInquilinoLayout = new javax.swing.GroupLayout(painelEnderecoInquilino);
         painelEnderecoInquilino.setLayout(painelEnderecoInquilinoLayout);
         painelEnderecoInquilinoLayout.setHorizontalGroup(
             painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelEnderecoInquilinoLayout.createSequentialGroup()
-                .addContainerGap(251, Short.MAX_VALUE)
+                .addContainerGap(258, Short.MAX_VALUE)
                 .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1587,8 +1618,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(painelEnderecoInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(57, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(45, Short.MAX_VALUE)))
         );
         painelEnderecoInquilinoLayout.setVerticalGroup(
             painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1598,15 +1629,18 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addComponent(btnEditarEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverEndereco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(6, Short.MAX_VALUE))
             .addGroup(painelEnderecoInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(painelEnderecoInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
         painelTelefoneInquilino.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
+        painelTelefoneInquilino.setMaximumSize(new java.awt.Dimension(271, 116));
+        painelTelefoneInquilino.setMinimumSize(new java.awt.Dimension(271, 116));
+        painelTelefoneInquilino.setPreferredSize(new java.awt.Dimension(271, 116));
 
         tblTelefone.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1620,28 +1654,28 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         btnAdicionarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnAdicionarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTelefone.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarTelefone.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarTelefone.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnEditarTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
-        btnEditarTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefone.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnEditarTelefone.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnEditarTelefone.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnRemoverTelefone.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverTelefone.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnRemoverTelefone.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefone.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefone.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefone.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnRemoverTelefone.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnRemoverTelefone.setPreferredSize(new java.awt.Dimension(25, 25));
 
         javax.swing.GroupLayout painelTelefoneInquilinoLayout = new javax.swing.GroupLayout(painelTelefoneInquilino);
         painelTelefoneInquilino.setLayout(painelTelefoneInquilinoLayout);
         painelTelefoneInquilinoLayout.setHorizontalGroup(
             painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelTelefoneInquilinoLayout.createSequentialGroup()
-                .addContainerGap(217, Short.MAX_VALUE)
+                .addContainerGap(224, Short.MAX_VALUE)
                 .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1650,8 +1684,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(painelTelefoneInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(54, Short.MAX_VALUE)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(46, Short.MAX_VALUE)))
         );
         painelTelefoneInquilinoLayout.setVerticalGroup(
             painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1661,15 +1695,17 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addComponent(btnEditarTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnRemoverTelefone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(6, Short.MAX_VALUE))
             .addGroup(painelTelefoneInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(painelTelefoneInquilinoLayout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
                     .addContainerGap()))
         );
 
         jLabel13.setText("E-mail:");
+
+        jLabel14.setText("Contato:");
 
         javax.swing.GroupLayout painelContatoLayout = new javax.swing.GroupLayout(painelContato);
         painelContato.setLayout(painelContatoLayout);
@@ -1677,29 +1713,37 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelContatoLayout.createSequentialGroup()
                 .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(painelContatoLayout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelContatoLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(painelEnderecoInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(painelEnderecoInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(painelTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelContatoLayout.createSequentialGroup()
                         .addGap(20, 20, 20)
-                        .addComponent(jLabel13)
+                        .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel14)
+                            .addComponent(jLabel13))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 536, Short.MAX_VALUE)))
+                        .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+                            .addComponent(txtNomeContato, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         painelContatoLayout.setVerticalGroup(
             painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelContatoLayout.createSequentialGroup()
-                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(painelEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(painelTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(painelEnderecoInquilino, 0, 120, Short.MAX_VALUE)
+                    .addComponent(painelTelefoneInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22))
+                    .addComponent(jLabel14)
+                    .addComponent(txtNomeContato, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(painelContatoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel13))
+                .addGap(27, 27, 27))
         );
 
         jTabbedPane1.addTab("Proprietário", painelContato);
@@ -1729,6 +1773,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
         checkBoxInquilino.setText("Tem inquilino?");
 
         jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder("Endereços"));
+        jPanel8.setMaximumSize(new java.awt.Dimension(302, 125));
+        jPanel8.setMinimumSize(new java.awt.Dimension(302, 125));
 
         tblEnderecoInquilino.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1742,55 +1788,53 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         btnAdicionarEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnAdicionarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnAdicionarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
-        btnEditarEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
+        btnEditarEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         btnEditarEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
-        btnEditarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnEditarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnEditarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnEditarEnderecoInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnEditarEnderecoInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnEditarEnderecoInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnRemoverEnderecoInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverEnderecoInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnRemoverEnderecoInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnRemoverEnderecoInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnRemoverEnderecoInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnRemoverEnderecoInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnRemoverEnderecoInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnRemoverEnderecoInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
         javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                .addContainerGap(248, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRemoverEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
-            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel8Layout.createSequentialGroup()
-                    .addGap(3, 3, 3)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(54, Short.MAX_VALUE)))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
-                .addComponent(btnAdicionarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnEditarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnRemoverEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel8Layout.createSequentialGroup()
-                    .addGap(3, 3, 3)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
-                    .addContainerGap()))
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(btnAdicionarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEditarEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRemoverEnderecoInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel14.setBorder(javax.swing.BorderFactory.createTitledBorder("Telefones"));
+        jPanel14.setMaximumSize(new java.awt.Dimension(271, 116));
+        jPanel14.setMinimumSize(new java.awt.Dimension(271, 116));
 
         tblTelefoneInquilino.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1804,28 +1848,28 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
 
         btnAdicionarTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnAdicionarTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/adicionar.gif"))); // NOI18N
-        btnAdicionarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnAdicionarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnAdicionarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnAdicionarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnEditarTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnEditarTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/atualizar.gif"))); // NOI18N
-        btnEditarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnEditarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnEditarTelefoneInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnEditarTelefoneInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnEditarTelefoneInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
         btnRemoverTelefoneInquilino.setFont(new java.awt.Font("Tahoma", 0, 10));
         btnRemoverTelefoneInquilino.setIcon(new javax.swing.ImageIcon(getClass().getResource("/condominioPlus/recursos/imagens/remover.gif"))); // NOI18N
-        btnRemoverTelefoneInquilino.setMaximumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefoneInquilino.setMinimumSize(new java.awt.Dimension(32, 32));
-        btnRemoverTelefoneInquilino.setPreferredSize(new java.awt.Dimension(32, 32));
+        btnRemoverTelefoneInquilino.setMaximumSize(new java.awt.Dimension(25, 25));
+        btnRemoverTelefoneInquilino.setMinimumSize(new java.awt.Dimension(25, 25));
+        btnRemoverTelefoneInquilino.setPreferredSize(new java.awt.Dimension(25, 25));
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
         jPanel14.setLayout(jPanel14Layout);
         jPanel14Layout.setHorizontalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel14Layout.createSequentialGroup()
-                .addContainerGap(217, Short.MAX_VALUE)
+                .addContainerGap(224, Short.MAX_VALUE)
                 .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnEditarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAdicionarTelefoneInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1848,9 +1892,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel14Layout.createSequentialGroup()
                     .addGap(3, 3, 3)
-                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 94, Short.MAX_VALUE)
+                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)
                     .addContainerGap()))
         );
+
+        jLabel15.setText("E-mail:");
 
         javax.swing.GroupLayout painelInquilinoLayout = new javax.swing.GroupLayout(painelInquilino);
         painelInquilino.setLayout(painelInquilinoLayout);
@@ -1859,25 +1905,31 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
             .addGroup(painelInquilinoLayout.createSequentialGroup()
                 .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(painelInquilinoLayout.createSequentialGroup()
-                        .addComponent(checkBoxInquilino)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel21)
-                        .addGap(2, 2, 2)
-                        .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(12, 12, 12)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(painelInquilinoLayout.createSequentialGroup()
-                        .addGap(10, 10, 10)
+                        .addContainerGap()
                         .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(9, 9, 9)
-                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelInquilinoLayout.createSequentialGroup()
+                            .addGap(87, 87, 87)
+                            .addComponent(jLabel15)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtEmailInquilino))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, painelInquilinoLayout.createSequentialGroup()
+                            .addComponent(checkBoxInquilino)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jLabel21)
+                            .addGap(2, 2, 2)
+                            .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(jLabel6)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(12, 12, 12)
+                            .addComponent(jLabel7)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(txtRgInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         painelInquilinoLayout.setVerticalGroup(
             painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1891,10 +1943,14 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                     .addComponent(txtNomeInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6)
                     .addComponent(txtCpfInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(3, 3, 3)
+                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(txtEmailInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addGroup(painelInquilinoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 116, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -1967,25 +2023,45 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
+        jLabel5.setText("A/C (Proprietário): ");
+
+        jLabel16.setText("A/C (Inquilino) :");
+
         javax.swing.GroupLayout painelCorrespondenciaLayout = new javax.swing.GroupLayout(painelCorrespondencia);
         painelCorrespondencia.setLayout(painelCorrespondenciaLayout);
         painelCorrespondenciaLayout.setHorizontalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addComponent(painelEnvelope1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(painelBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(196, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
+                        .addComponent(painelEnvelope1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(painelBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtAosCuidadosProprietario, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel16)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtAosCuidadosInquilino, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         painelCorrespondenciaLayout.setVerticalGroup(
             painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(painelCorrespondenciaLayout.createSequentialGroup()
-                .addGap(27, 27, 27)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, painelCorrespondenciaLayout.createSequentialGroup()
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtAosCuidadosInquilino, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel16)
+                    .addComponent(txtAosCuidadosProprietario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(painelCorrespondenciaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(painelEnvelope1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(painelBoleto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Correspondência - Enviar Para:", painelCorrespondencia);
@@ -2421,6 +2497,9 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -2434,6 +2513,7 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -2478,6 +2558,8 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JTable tblEnderecoInquilino;
     private javax.swing.JTable tblTelefone;
     private javax.swing.JTable tblTelefoneInquilino;
+    private javax.swing.JTextField txtAosCuidadosInquilino;
+    private javax.swing.JTextField txtAosCuidadosProprietario;
     private javax.swing.JTextField txtBairro;
     private javax.swing.JTextField txtBloco;
     private javax.swing.JFormattedTextField txtCep;
@@ -2488,9 +2570,11 @@ public class TelaDadosCondomino extends javax.swing.JInternalFrame {
     private javax.swing.JFormattedTextField txtCpf;
     private javax.swing.JFormattedTextField txtCpfInquilino;
     private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtEmailInquilino;
     private javax.swing.JTextField txtFracaoIdeal;
     private javax.swing.JTextField txtIptu;
     private javax.swing.JTextField txtNome;
+    private javax.swing.JTextField txtNomeContato;
     private javax.swing.JTextField txtNomeInquilino;
     private javax.swing.JTextField txtNumero;
     private javax.swing.JTextField txtNumeroProcesso;

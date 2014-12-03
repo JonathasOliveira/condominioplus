@@ -57,6 +57,10 @@ public class Condomino implements Serializable {
     @Column(name = "tipo_conselheiro")
     private String tipoConselheiro;
     private boolean cnpj;
+    @Column(name = "aos_cuidados")
+    private String aosCuidados;
+    @Column(name = "nome_contato")
+    private String nomeContato;
 
     public Condomino() {
     }
@@ -155,6 +159,22 @@ public class Condomino implements Serializable {
 
     public void setRg(String rg) {
         this.rg = rg;
+    }
+
+    public String getAosCuidados() {
+        return aosCuidados;
+    }
+
+    public void setAosCuidados(String aosCuidados) {
+        this.aosCuidados = aosCuidados;
+    }
+
+    public String getNomeContato() {
+        return nomeContato;
+    }
+
+    public void setNomeContato(String nomeContato) {
+        this.nomeContato = nomeContato;
     }
 
     public List<Telefone> getTelefones() {
