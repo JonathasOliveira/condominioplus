@@ -504,7 +504,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         txtLimiteBanking.setText(condominio.getContaBancaria().getValor().toString());
 
 //        txtAreaAnotacoes.setText(condominio.getAnotacoes());
-        
+
         //dados para relatorios
         txtTituloCapa.setText(condominio.getTituloCapa());
 
@@ -571,17 +571,19 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         if (cmbBanco.getSelectedIndex() != -1) {
             condominio.getContaBancaria().setBanco(modelo.getSelectedItem());
         }
-        
+
         //metodo para verificar o banco e inicializar o incremento com 4 ou 5 digitos
-        if (banco == null || !banco.getNumeroBanco().equals(condominio.getContaBancaria().getBanco().getNumeroBanco())){
-            if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")){
-                condominio.setIncrementoNumeroDocumento("00001");
-            } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")){
-                condominio.setIncrementoNumeroDocumento("0001");
+        if (banco == null || !banco.getNumeroBanco().equals(condominio.getContaBancaria().getBanco().getNumeroBanco())) {
+            if (banco != null) {
+                if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("033")) {
+                    condominio.setIncrementoNumeroDocumento("00001");
+                } else if (condominio.getContaBancaria().getBanco().getNumeroBanco().equals("237")) {
+                    condominio.setIncrementoNumeroDocumento("0001");
+                }
             }
         }
         //fim
-        
+
         condominio.getContaBancaria().setContaCorrente(txtContaCorrente.getText());
         condominio.getContaBancaria().setDigitoCorrente(txtDigitoContaCorrente.getText());
         condominio.getContaBancaria().setDigitoPoupanca(txtDigitoContaPoupanca.getText());
@@ -594,7 +596,7 @@ public class TelaDadosCondominio extends javax.swing.JInternalFrame implements I
         condominio.getContaBancaria().setValor(new BigDecimal(txtLimiteBanking.getText().replace(",", ".")));
 
 //        condominio.setAnotacoes(txtAreaAnotacoes.getText());
-        
+
         //dados para relatorios
         condominio.setTituloCapa(txtTituloCapa.getText());
 

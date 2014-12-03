@@ -35,6 +35,8 @@ public class Inquilino implements Serializable {
     private String cpf;
     private String rg;
     private String email;
+    @Column(name = "aos_cuidados")
+    private String aosCuidados;
     //campo para listar historico de inquilinos
     @Column(name = "codigo_unidade")
     private int codigoUnidade;
@@ -85,6 +87,14 @@ public class Inquilino implements Serializable {
 
     public void setRg(String rg) {
         this.rg = rg;
+    }
+
+    public String getAosCuidados() {
+        return aosCuidados;
+    }
+
+    public void setAosCuidados(String aosCuidados) {
+        this.aosCuidados = aosCuidados;
     }
     
     public List<Endereco> getEnderecos() {
