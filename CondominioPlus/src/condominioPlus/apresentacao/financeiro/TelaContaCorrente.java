@@ -476,7 +476,9 @@ public class TelaContaCorrente extends javax.swing.JInternalFrame {
                 }
                 p.setDataPagamento(DataUtil.getCalendar(dialogo.getDataPagamento()));
             }
-            new DAO().salvar(lista);
+            for (Pagamento p: lista){
+                new DAO().salvar(p);
+            }
             calcularSaldo();
         }
     }
