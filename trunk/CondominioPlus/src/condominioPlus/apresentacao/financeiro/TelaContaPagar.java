@@ -108,6 +108,8 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         if (condominio != null) {
             this.setTitle("Contas a Pagar/Receber - " + condominio.getRazaoSocial());
         }
+        
+        checkBoxMostrarDateField.setSelected(true);
     }
 
     private void carregarTabela() {
@@ -1107,8 +1109,6 @@ public class TelaContaPagar extends javax.swing.JInternalFrame {
         jLabel4.setText("Data Final:");
 
         dataInicio.setEnabled(false);
-
-        checkBoxMostrarDateField.setSelected(true);
 
         btnHoje.setText("Hoje");
 

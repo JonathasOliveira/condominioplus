@@ -963,44 +963,58 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                 Pagamento pagamento = new Pagamento();
                 //se o conta for de agua fazer
                 if (item.getCodigoConta() == 205) {
-                    for (ContaAgua c : condominio.getContasDeAgua()) {
+                    if (!condominio.getContasDeAgua().isEmpty()) {
+                        for (ContaAgua c : condominio.getContasDeAgua()) {
 //                        System.out.println("primeiro dia mês: " + DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
 //                        System.out.println("último dia mês: " + DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1)));
-                        if (item.getValor().doubleValue() == 0) {
-                            if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == 1 && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == -1) {
-                                for (Rateio r : c.getRateios()) {
-                                    if (r.getUnidade().getCodigo() == u.getCodigo()) {
+                            if (item.getValor().doubleValue() == 0) {
+                                if (c.getDataVencimentoConta() != null && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getPrimeiroDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == 1 && DataUtil.compararData(DataUtil.getDateTime(c.getDataVencimentoConta()), DataUtil.getUltimoDiaMes(DataUtil.getDateTime(cobranca.getDataVencimento()).minusMonths(1))) == -1) {
+                                    for (Rateio r : c.getRateios()) {
+                                        if (r.getUnidade().getCodigo() == u.getCodigo()) {
 //                                    System.out.println("estou dentro do rateio de agua");
-                                        Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+                                            Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
 //                                    System.out.println("nome conta: " + conta.getNome());
-                                        pagamento.setFornecedor("");
-                                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
-                                        pagamento.setCobranca(cobranca);
-                                        pagamento.setConta(c1);
-                                        pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                                        pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
-                                        pagamento.setValor(r.getValorTotalCobrar());
-                                        if (pagamento.getValor().doubleValue() == 0) {
-                                            continue ITEMCOBRANCA;
-                                        }
-                                        cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+                                            pagamento.setFornecedor("");
+                                            pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                                            pagamento.setCobranca(cobranca);
+                                            pagamento.setConta(c1);
+                                            pagamento.setHistorico("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                            pagamento.setDescricao("ÁGUA" + " " + DataUtil.escreverMes(c.getDataVencimentoConta()).toUpperCase() + "/" + DataUtil.getDateTime(c.getDataVencimentoConta()).getYear() + " " + String.valueOf(r.getLeituraAtual().subtract(r.getLeituraAnterior()).setScale(2, RoundingMode.HALF_UP)).replace(".", ",") + " M3");
+                                            pagamento.setValor(r.getValorTotalCobrar());
+                                            if (pagamento.getValor().doubleValue() == 0) {
+                                                continue ITEMCOBRANCA;
+                                            }
+                                            cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
 //                                    System.out.println("descrição pagamento água: " + pagamento.getConta().getNome());
 //                                    System.out.println("valor pagamento água: " + PagamentoUtil.formatarMoeda(pagamento.getValor().doubleValue()));
+                                        }
                                     }
                                 }
+                            } else {
+                                Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+                                pagamento.setFornecedor("");
+                                pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                                pagamento.setCobranca(cobranca);
+                                pagamento.setConta(c1);
+                                pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                                pagamento.setDescricao(item.getDescricao());
+                                pagamento.setValor(item.getValor());
+                                if (item.isConcederDesconto()) {
+                                    cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
+                                }
                             }
-                        } else {
-                            Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
-                            pagamento.setFornecedor("");
-                            pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
-                            pagamento.setCobranca(cobranca);
-                            pagamento.setConta(c1);
-                            pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
-                            pagamento.setDescricao(item.getDescricao());
-                            pagamento.setValor(item.getValor());
-                            if (item.isConcederDesconto()) {
-                                cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
-                            }
+                        }
+                    } else {
+                        Conta c1 = new DAO().localizar(Conta.class, item.getCodigoConta());
+                        pagamento.setFornecedor("");
+                        pagamento.setDataVencimento(DataUtil.getCalendar(txtDataVencimento.getValue()));
+                        pagamento.setCobranca(cobranca);
+                        pagamento.setConta(c1);
+                        pagamento.setHistorico(item.getDescricao() + " " + cobranca.getUnidade().getUnidade() + " " + cobranca.getUnidade().getCondomino().getNome());
+                        pagamento.setDescricao(item.getDescricao());
+                        pagamento.setValor(item.getValor());
+                        if (item.isConcederDesconto()) {
+                            cobranca.setTotalComDesconto(cobranca.getTotalComDesconto().add(pagamento.getValor()));
                         }
                     }
                 } else {
@@ -1251,7 +1265,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
     private void baixarVariasCobrancas() {
         COBRANCAS:
         for (RegistroTransacao r : listaRegistros) {
-            if (r.getCobranca().getDataPagamento() != null){
+            if (r.getCobranca().getDataPagamento() != null) {
                 ApresentacaoUtil.exibirInformacao("A cobrança cujo número documento é " + r.getCobranca().getNumeroDocumento() + " já foi paga anteriormente.", this);
                 continue COBRANCAS;
             }
@@ -1263,7 +1277,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
 
     private void baixarCobranca(RegistroTransacao r, boolean setContaCorrente) {
         if (r.getCobranca() != null) {
-            
+
             System.out.println("Dentro da baixa da cobrança.");
 
             Cobranca c = r.getCobranca();
@@ -1323,7 +1337,7 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
                         verificarDesconto(r, c, r.getData(), DataUtil.getDateTime(c.getDescontoAte()));
                     } else {
                         verificarDesconto(r, c, r.getData(), getProximoDiaUtil(DataUtil.getDateTime(c.getDescontoAte())));
-                    }                    
+                    }
                 } else if (diferencaValorPagoValorTitulo.doubleValue() > 0) {
                     //Verifica se houve pagamento superior ao valor da fatura
                     c.setDiferencaPagamento(c.getDiferencaPagamento().subtract(diferencaValorPagoValorTitulo.bigDecimalValue()));
@@ -1533,9 +1547,9 @@ public class TelaLancamentos extends javax.swing.JInternalFrame {
             }
             if (valorDesconto) {
 //                if (r.getValorPago().doubleValue() == c.getTotalComDesconto().doubleValue()) {
-                    if (p.getValorComDesconto().doubleValue() > 0) {
-                        p.setValor(p.getValorComDesconto());
-                    }
+                if (p.getValorComDesconto().doubleValue() > 0) {
+                    p.setValor(p.getValorComDesconto());
+                }
 //                }
             }
         }
